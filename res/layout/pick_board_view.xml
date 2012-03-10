@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:background="?activityRootBackground">
+    
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="?android:attr/listPreferredItemHeight"
+    	android:orientation="horizontal"
+    	>
+    	<Button android:id="@+id/pick_board_button"
+	    	android:layout_width="?android:attr/listPreferredItemHeight"
+	    	android:layout_height="?android:attr/listPreferredItemHeight"
+	    	android:layout_alignParentRight="true"
+	    	android:text="@string/pick_board_button"
+	    	/>
+	    <EditText android:id="@+id/pick_board_input"
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="fill_parent"
+	    	android:layout_toLeftOf="@id/pick_board_button"
+	    	android:singleLine="true"
+	    	android:hint="@string/pick_board_input_hint"
+	    	/>
+   	</RelativeLayout>
+   	
+    <ListView android:id="@android:id/list"
+    	android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+    />
+</LinearLayout>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2ch Browser</string>
+ 
+    <!-- UI Text -->
+    <string name="loading">Loading...</string>
+	<string name="addpost_sage">Sage</string>
+	<string name="addpost_message">Message:</string>
+	<string name="addpost_message_hint">Message</string>
+	<string name="addpost_captcha_text">Enter the confirmation code:</string>
+	<string name="addpost_captcha_can_skip">Send without confirmation</string>
+	<string name="addpost_captcha_hint">Confirmation code</string>
+	<string name="addpost_send_button">Send</string>
+	<string name="addpost_refresh_button">Refresh</string>
+	<string name="pick_board_input_hint">Board code</string>
+	<string name="pick_board_button">Go</string>
+	<string name="pick_board_title">Pick board</string>
+	<string name="postitem_replies">Replies:</string>
+	<string name="postitem_sameperson">Same person:</string>
+	<string name="fileslist_nofiles">No files.</string>
+	<string name="postitem_sameperson_generic_name">Anon</string>
+	
+    <!-- Data strings -->
+    <plurals name="data_posts_quantity">
+        <item quantity="one">%d post</item>
+        <item quantity="other">%d posts</item>
+    </plurals>
+    <plurals name="data_files_quantity">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="data_new_posts_quantity">
+        <item quantity="one">%d new post</item>
+        <item quantity="other">%d new posts</item>
+    </plurals>
+    <string name="data_posts_files">%1$s and %2$s</string>
+    <string name="data_file_size_measure">KB</string>   
+    <string name="data_board_title">2ch.so/%1$s/</string> 
+    <string name="data_board_title_with_page">2ch.so/%1$s/%2$s</string> 
+    <string name="data_thread_title">2ch.so/%1$s/%2$s</string> 
+    <string name="data_thread_withsubject_title">2ch.so/%1$s/ - %2$s</string> 
+    <string name="data_add_thread_title">2ch.so/%1$s/ - Add new thread</string> 
+    <string name="data_add_post_title">2ch.so/%1$s/%2$s - Add new post</string> 
+    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string> 
+    
+    <!-- Menus -->
+    <string name="menu_pick_board">Pick board</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_open_browser">Open browser</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="menu_add_post">Reply</string>
+    <string name="menu_add_thread">New thread</string>
+    <string name="menu_send_post">Send post</string>
+    <string name="menu_attach_file">Attach file</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_gallery">Gallery</string>
+    
+    <!-- Context menus -->
+    <string name="cmenu_answer_without_reading">Reply without reading</string>
+    <string name="cmenu_open_attachment">Open attachment</string>
+    <string name="cmenu_reply_post">Reply to this post</string>
+    <string name="cmenu_reply_post_quote">Reply with quote</string>
+    <string name="cmenu_download_file">Download file</string>
+    
+    <!-- Preferences -->
+    <string name="pref_category_appearance">Appearance</string>
+    <string name="pref_category_autorefresh">AutoRefresh</string>
+    
+    <string name="pref_homepage_key">homepage</string>
+    <string name="pref_homepage">Default starting board</string>
+    <string name="pref_homepage_summary">Change start page</string>
+	<string name="pref_homepage_hint">Leave blank to use /b</string>
+	<string name="pref_load_thumbnails_key">load_thumbnails</string>
+	<string name="pref_load_thumbnails">Display thumbnails</string>
+	<string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
+	<string name="pref_display_post_date_key">display_post_date</string>
+	<string name="pref_display_post_date">Time of posts</string>
+	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
+	<string name="pref_display_same_person_key">display_same_person</string>
+	<string name="pref_display_same_person">Detector of same persons</string>
+	<string name="pref_display_same_person_summary">Enable to display the list of posts of the same author (Only /b)</string>
+	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
+	<string name="pref_display_navigation_bar">Navigation bar</string>
+	<string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
+	
+	<string name="pref_popup_link_key">popup_link</string>
+	<string name="pref_popup_link">Popup links</string>
+	<string name="pref_popup_link_summary">Open links of the current thread in the popup window</string>
+	
+	<string name="pref_text_size_key">text_size</string>
+	<string name="pref_text_size">Text size</string>
+	<string-array name="pref_text_size_choices">
+    	<item>Medium</item>
+    	<item>Large</item>
+    	<item>Larger</item>
+    	<item>Huge</item>
+   	</string-array>
+	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
+	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
+	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
+	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
+	<string-array name="pref_text_size_values" translatable="false">
+        <item>@string/pref_text_size_default_value</item>
+        <item>@string/pref_text_size_large_value</item>
+        <item>@string/pref_text_size_larger_value</item>
+        <item>@string/pref_text_size_huge_value</item>
+    </string-array>
+    
+	<string name="pref_theme_key">theme</string>
+	<string name="pref_theme">Theme</string>
+	<string-array name="pref_theme_choices">
+    	<item>Light</item>
+    	<item>Neutron</item>
+    	<item>Photon</item>
+   	</string-array>
+	<string name="pref_theme_default_value">THEME_LIGHT</string>
+	<string name="pref_theme_dark_value">THEME_DARK</string>
+	<string name="pref_theme_photon_value">THEME_PHOTON</string>
+	<string-array name="pref_theme_values" translatable="false">
+        <item>@string/pref_theme_default_value</item>
+        <item>@string/pref_theme_dark_value</item>
+        <item>@string/pref_theme_photon_value</item>
+    </string-array>
+    
+	<string name="pref_auto_refresh_key">auto_refresh</string>
+	<string name="pref_auto_refresh">AutoRefresh</string>
+	<string name="pref_auto_refresh_summary">Refresh the current thread</string>
+	
+	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
+	<string name="pref_auto_refresh_interval">Interval</string>
+	<string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
+	<string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
+	
+	<!-- Errors -->
+	<string name="error_send_post">An error has occured while sending the post.</string>
+	<string name="error_download_data">Unable to connect to the page.</string>
+	<string name="error_unknown">An unknown error occured.</string>
+	<string name="error_incorrect_argument">The function argument is incorrect.</string>
+	<string name="error_json_parse">Developers of this site cannot into json. Just refresh the page.</string>
+	<string name="error_file_exist">Such file already exists.</string>
+	<string name="error_save_file">An error has occured while saving the file.</string>
+	
+	<!-- Warnings -->
+	<string name="warning_enter_captcha">Enter the confirmation code</string>
+	<string name="warning_write_comment">Write a comment</string>
+	<string name="warning_enter_board">Specify a board name</string>
+	<string name="warning_attach_file_new_thread">Attach a file to create a new thread</string>
+	
+	<!-- Notifications -->
+	<string name="notification_send_post_success">The post was sent successfully</string>
+	<string name="notification_no_new_posts">No new posts</string>
+	<string name="notification_save_image_success">The file was saved to %1$s</string>
+	<string name="notification_post_not_found">The post isn\'t found</string>
+</resources>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach">
+  
+    <EditTextPreference
+			android:key="@string/pref_homepage_key"
+			android:title="@string/pref_homepage"
+			android:hint="@string/pref_homepage_hint"
+			android:summary="@string/pref_homepage_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
+	<CheckBoxPreference
+			android:key="@string/pref_load_thumbnails_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_load_thumbnails_summary"
+			android:title="@string/pref_load_thumbnails" />
+	
+<PreferenceCategory android:title="@string/pref_category_appearance">
+	<ListPreference
+            android:key="@string/pref_text_size_key"
+            android:title="@string/pref_text_size"
+            android:defaultValue="@string/pref_text_size_default_value"
+            android:entries="@array/pref_text_size_choices"
+            android:entryValues="@array/pref_text_size_values"
+            android:dialogTitle="@string/pref_text_size" />
+    <ListPreference
+       		android:key="@string/pref_theme_key"
+       		android:title="@string/pref_theme"
+       		android:defaultValue="@string/pref_theme_default_value"
+       		android:entries="@array/pref_theme_choices"
+       		android:entryValues="@array/pref_theme_values"
+       		android:dialogTitle="@string/pref_theme" />
+   <CheckBoxPreference
+			android:key="@string/pref_display_post_date_key"
+			android:defaultValue="false"
+			android:summary="@string/pref_display_post_date_summary"
+			android:title="@string/pref_display_post_date" />
+  <CheckBoxPreference
+			android:key="@string/pref_display_same_person_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_display_same_person_summary"
+			android:title="@string/pref_display_same_person" />
+   <CheckBoxPreference
+			android:key="@string/pref_popup_link_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_popup_link_summary"
+			android:title="@string/pref_popup_link" />
+  <CheckBoxPreference
+			android:key="@string/pref_display_navigation_bar_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_display_navigation_bar_summary"
+			android:title="@string/pref_display_navigation_bar" />
+  </PreferenceCategory>
+  
+	<PreferenceCategory android:title="@string/pref_category_autorefresh">
+		 <CheckBoxPreference 
+		     android:key="@string/pref_auto_refresh_key" 
+		     android:title="@string/pref_auto_refresh" 
+		     android:defaultValue="false" 
+		     android:summary="@string/pref_auto_refresh_summary" />
+		 
+		 <com.vortexwolf.dvach.settings.SeekBarPreference
+				android:key="@string/pref_auto_refresh_interval_key"
+				android:dependency="@string/pref_auto_refresh_key"
+			    android:title="@string/pref_auto_refresh_interval"
+			    android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"
+			    android:summary="@string/pref_auto_refresh_interval_summary"
+			    android:defaultValue="60"
+			    local:valueFormat="@string/pref_auto_refresh_interval_summary"
+			    local:minValue="30"
+			    local:maxValue="150"
+			    local:step="10" />
+	</PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Theme">
+        <attr name="activityRootBackground" format="color|reference" />
+        <attr name="threadTitleForeground" format="color|reference" />
+        <attr name="itemInfoForeground" format="color|reference" />
+        <attr name="postNumberForeground" format="color|reference" />
+        <attr name="postQuoteForeground" format="color|reference" />
+        <attr name="spoilerForeground" format="color|reference" />
+        <attr name="spoilerBackground" format="color|reference" />
+        <attr name="listSectionBackground" format="color|reference" />
+        <attr name="postItemBackground" format="color|reference" />
+        <attr name="urlLinkForeground" format="color|reference" />
+    </declare-styleable>
+    
+    <declare-styleable name="SeekBarPreference">
+		<attr name="minValue" format="integer" />
+		<attr name="maxValue" format="integer" />
+		<attr name="step" format="integer" />
+		<attr name="valueFormat" format="string|reference" />
+	</declare-styleable>
+</resources>

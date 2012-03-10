@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:orientation="horizontal" 
+    	android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:minHeight="?android:attr/listPreferredItemHeight"
+		android:padding="5dip" 
+		android:baselineAligned="false" >
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <ImageView android:id="@+id/filelist_thumb_frame" 
+            android:layout_width="@dimen/filelist_frame_size" 
+            android:layout_height="@dimen/filelist_frame_size" 
+            android:src="@drawable/thumbnail_frame" />
+        <ImageView android:id="@+id/filelist_icon" 
+            android:layout_width="@dimen/filelist_thumbnail_size" 
+            android:layout_height="@dimen/filelist_thumbnail_size" 
+            android:layout_marginLeft="4dip" 
+            android:layout_marginTop="4dip" />
+    </RelativeLayout>
+    
+    <LinearLayout android:orientation="vertical" android:layout_width="0dip" android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" android:layout_weight="1.0">
+        <TextView android:textAppearance="?android:attr/textAppearanceLarge" 
+            android:textColor="@color/darkBlueText" 
+            android:ellipsize="middle" 
+            android:gravity="center_vertical" 
+            android:id="@+id/file_picker_text" 
+            android:layout_width="fill_parent" 
+            android:layout_height="fill_parent" 
+            android:maxLines="1" 
+            android:singleLine="true" 
+            android:layout_weight="1.0" />
+        <TextView android:textAppearance="?android:attr/textAppearanceMedium" 
+             android:textColor="@color/darkGrayText"
+             android:id="@+id/filelist_status" 
+             android:layout_width="wrap_content" 
+             android:layout_height="wrap_content" 
+             android:singleLine="true" 
+             android:layout_weight="0.0" />
+    </LinearLayout>
+</LinearLayout>

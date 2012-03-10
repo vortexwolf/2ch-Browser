@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2ch Browser</string>
+ 
+    <!-- UI Text -->
+    <string name="loading">Загрузка...</string>
+	<string name="addpost_sage">Sage (не поднимать тред)</string>
+	<string name="addpost_message">Сообщение:</string>
+	<string name="addpost_message_hint">Сообщение</string>
+	<string name="addpost_captcha_text">Введите код подтверждения:</string>
+	<string name="addpost_captcha_can_skip">Без кода подтверждения</string>
+	<string name="addpost_captcha_hint">Код подтверждения</string>
+	<string name="addpost_send_button">Отправить</string>
+	<string name="addpost_refresh_button">Обновить</string>
+	<string name="pick_board_input_hint">Код форума</string>
+	<string name="pick_board_button">Go</string>
+	<string name="pick_board_title">Форумы</string>
+	<string name="postitem_replies">Ответы:</string>
+	<string name="postitem_sameperson">Тот же автор:</string>
+	<string name="fileslist_nofiles">Нет файлов.</string>
+	<string name="postitem_sameperson_generic_name">Аноним</string>
+	
+    <!-- Data strings -->
+    <plurals name="data_posts_quantity">
+        <item quantity="one">%d сообщение</item>
+        <item quantity="other">%d сообщений</item>
+    </plurals>
+    <plurals name="data_files_quantity">
+        <item quantity="one">%d файл</item>
+        <item quantity="other">%d файлов</item>
+    </plurals>
+    <plurals name="data_new_posts_quantity">
+        <item quantity="one">%d новое сообщение</item>
+        <item quantity="other">%d новых сообщений</item>
+    </plurals>
+    <string name="data_posts_files">%1$s и %2$s</string>
+    <string name="data_file_size_measure">Кб</string>   
+    <string name="data_board_title">2ch.so/%1$s/</string>
+	<string name="data_board_title_with_page">2ch.so/%1$s/%2$s</string> 
+    <string name="data_thread_title">2ch.so/%1$s/%2$s</string> 
+    <string name="data_add_thread_title">2ch.so/%1$s/ - Новый тред</string> 
+    <string name="data_add_post_title">2ch.so/%1$s/%2$s - Новое сообщение</string> 
+    <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string> 
+    
+    <!-- Menus -->
+    <string name="menu_pick_board">Форумы</string>
+    <string name="menu_refresh">Обновить</string>
+    <string name="menu_open_browser">Браузер</string>
+    <string name="menu_preferences">Настройки</string>
+    <string name="menu_add_post">Ответ</string>
+    <string name="menu_add_thread">Новый тред</string>
+    <string name="menu_send_post">Отправить</string>
+    <string name="menu_attach_file">Прикрепить файл</string>
+    <string name="menu_save">Сохранить</string>
+    <string name="menu_gallery">Галерея</string>
+        
+    <!-- Context menus -->
+    <string name="cmenu_answer_without_reading">Ответить не читая</string>
+    <string name="cmenu_open_attachment">Открыть файл</string>
+    <string name="cmenu_reply_post">Ответить</string>
+    <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
+    <string name="cmenu_download_file">Загрузить файл</string>
+    
+    <!-- Preferences -->
+    <string name="pref_category_appearance">Интерфейс</string>
+    <string name="pref_category_autorefresh">Автообновление</string>
+    
+    <string name="pref_homepage">Форум по умолчанию</string>
+    <string name="pref_homepage_summary">Измените стартовую страницу</string>
+	<string name="pref_homepage_hint">По умолчанию /b</string>
+
+	<string name="pref_load_thumbnails">Загружать изображения</string>
+	<string name="pref_load_thumbnails_summary">Отмените для экономии трафика</string>
+	
+	<string name="pref_display_post_date">Время сообщений</string>
+	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
+
+	<string name="pref_display_same_person">Детектор семенов</string>
+	<string name="pref_display_same_person_summary">Включите для отображения сообщений того же автора (только для /b)</string>
+	
+	<string name="pref_popup_link">Ссылки во всплывающих окнах</string>
+	<string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
+
+	<string name="pref_display_navigation_bar">Панель навигации</string>
+	<string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
+	
+	<string name="pref_text_size">Размер текста</string>
+	<string-array name="pref_text_size_choices">
+    	<item>Средний</item>
+    	<item>Большой</item>
+    	<item>Больше</item>
+    	<item>Самый большой</item>
+   	</string-array>
+
+	<string name="pref_theme">Тема</string>
+	<string-array name="pref_theme_choices">
+    	<item>Light</item>
+    	<item>Neutron</item>
+    	<item>Photon</item>
+   	</string-array>
+
+	<string name="pref_auto_refresh">Автообновление</string>
+	<string name="pref_auto_refresh_summary">Обновлять открытый тред автоматически</string>
+	
+	<string name="pref_auto_refresh_interval">Интервал</string>
+	<string name="pref_auto_refresh_interval_dialog_title">Интервал автообновления</string>
+	<string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
+	
+	<!-- Errors -->
+	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>
+	<string name="error_download_data">Невозможно открыть страницу.</string>
+	<string name="error_unknown">Произошла неизвестная ошибка.</string>
+	<string name="error_incorrect_argument">Неправильно передан параметр функции.</string>
+	<string name="error_json_parse">Быдлокодеры сайта 2ch.so не могут в валидный json. Просто перезагрузите страницу.</string>
+	<string name="error_file_exist">Такой файл уже существует.</string>
+	<string name="error_save_file">Во время сохранения произошла ошибка.</string>
+	
+	<!-- Warnings -->
+	<string name="warning_enter_captcha">Введите код подтверждения</string>
+	<string name="warning_write_comment">Напишите что-нибудь в сообщении</string>
+	<string name="warning_enter_board">Введите код форума</string>
+	<string name="warning_attach_file_new_thread">Прикрепите файл для создания нового треда</string>
+	
+	<!-- Notifications -->
+	<string name="notification_send_post_success">Сообщение успешно отправлено</string>
+	<string name="notification_no_new_posts">Нет новых сообщений</string>
+	<string name="notification_save_image_success">Файл сохранен в %1$s</string>
+	<string name="notification_post_not_found">Сообщение на найдено</string>
+</resources>

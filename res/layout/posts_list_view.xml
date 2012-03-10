@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="fill_parent" 
+  android:layout_height="fill_parent"
+  android:background="?activityRootBackground">
+	<FrameLayout 
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent" 		    
+		android:layout_weight="1">
+	    <ListView android:id="@android:id/list" android:padding="2dp" android:dividerHeight="4dp" android:divider="@android:color/transparent" android:fastScrollEnabled="true" android:smoothScrollbar="true" android:choiceMode="singleChoice" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+	    <include android:layout_gravity="center" android:id="@+id/loading" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/loading" />
+    	<include android:layout_gravity="center" android:id="@+id/error" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/error" />
+    </FrameLayout>
+    
+  	<include android:id="@+id/addItemsLoading"
+		layout="@layout/loading"
+    	android:layout_height="wrap_content"
+    	android:layout_weight="0" 
+    	android:layout_width="fill_parent" 
+    	android:visibility="gone"
+    	/>
+</LinearLayout>

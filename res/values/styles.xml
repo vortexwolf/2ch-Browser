@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="WidgetTextViewListSeparator">
+        <item name="android:textSize">14.0sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?listSectionBackground</item>
+        <item name="android:paddingLeft">5.0sp</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">25.0dip</item>
+    </style>
+    
+	<style name="TextFormatButton">
+    	<item name="android:background">@null</item>
+    	<item name="android:padding">7dp</item>
+       	<item name="android:layout_height">wrap_content</item>
+    	<item name="android:layout_width">wrap_content</item>
+    </style>
+
+	<!-- TextAppearance for different font size settings -->
+	<style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small">
+		<item name="android:textSize">11sp</item>
+	</style>
+	<style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium">
+		<item name="android:textSize">13sp</item>
+	</style>
+	<style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large">
+		<item name="android:textSize">15sp</item>
+	</style>
+
+	<style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small">
+		<item name="android:textSize">13sp</item>
+	</style>
+	<style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium">
+		<item name="android:textSize">15sp</item>
+	</style>
+	<style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large">
+		<item name="android:textSize">17sp</item>
+	</style>
+	
+	<style name="TextAppearance_Larger.Small" parent="@android:style/TextAppearance.Small">
+		<item name="android:textSize">15sp</item>
+	</style>
+	<style name="TextAppearance_Larger.Medium" parent="@android:style/TextAppearance.Medium">
+		<item name="android:textSize">17sp</item>
+	</style>
+	<style name="TextAppearance_Larger.Large" parent="@android:style/TextAppearance.Large">
+		<item name="android:textSize">19sp</item>
+	</style>
+	
+	<style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small">
+		<item name="android:textSize">18sp</item>
+	</style>
+	<style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium">
+		<item name="android:textSize">20sp</item>
+	</style>
+	<style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large">
+		<item name="android:textSize">22sp</item>
+	</style>
+</resources>

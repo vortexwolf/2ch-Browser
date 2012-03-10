@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     			xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach"
+    			android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:minHeight="?android:attr/listPreferredItemHeight"
+    			android:orientation="vertical"
+    			android:padding="4dip"
+    			android:background="?postItemBackground"
+				  >
+				  
+<!-- Top row -->
+<LinearLayout android:id="@+id/post_top_row"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:layout_marginBottom="1dip">
+		
+	<TextView android:id="@+id/post_index"
+   		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textStyle="bold"
+		android:textColor="#4F7942"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_marginRight="4dip"
+       /> 
+       
+	<TextView android:id="@+id/post_id"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:layout_marginRight="4dip"
+	    android:textColor="?postNumberForeground"
+		/>
+	
+	<TextView android:id="@+id/post_same_person_id"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:layout_marginRight="4dip"
+	    android:textColor="#4F7942"
+		/>
+	
+	<TextView
+	    android:id="@+id/post_item_date_id"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="right"
+	    android:visibility="gone"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    />
+</LinearLayout>
+
+<!-- Content  -->
+<ScrollView android:layout_width="fill_parent"
+    android:layout_height="0dip"
+    android:layout_weight="1.0"
+    android:fillViewport="true" >
+	<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+
+    <LinearLayout android:id="@+id/thumbnail_view"
+    			  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:orientation="vertical"
+				  android:layout_alignParentLeft="true"
+				  android:layout_marginRight="5dip">
+				  
+	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
+		    <com.vortexwolf.dvach.common.view.ExtendedImageView
+		    	android:id="@+id/thumbnail"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:adjustViewBounds="true"
+		        android:layout_gravity="center"
+		        android:scaleType="centerInside"
+	    	/>
+	    	
+	    	<ProgressBar
+	    	    android:id="@+id/indeterminate_progress"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+	    	    android:layout_gravity="center"
+	    	    android:indeterminate="true"
+	    	    android:visibility="gone" 
+	    	/>        
+    	</FrameLayout>
+   	
+   		<TextView android:id="@+id/attachment_info"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:textColor="?itemInfoForeground"
+	        android:textAppearance="?android:attr/textAppearanceSmall"
+	    />
+    </LinearLayout>
+    
+     <TextView 
+        android:id="@+id/comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_alignWithParentIfMissing="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        local:postQuoteForeground="?postQuoteForeground"
+        local:spoilerForeground="?spoilerForeground"
+        local:spoilerBackground="?spoilerBackground"
+        local:urlLinkForeground="?urlLinkForeground"
+        />
+</RelativeLayout>
+</ScrollView>
+
+<!-- Bottom row -->
+<TextView 
+		android:id="@+id/post_replies"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_marginTop="5dip"
+		android:textStyle="italic"
+		android:textColor="?android:textColorPrimary" /> 
+<TextView 
+		android:id="@+id/post_same_persons"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_marginTop="5dip"
+		android:textStyle="italic"
+		android:textColor="?android:textColorPrimary" /> 
+</LinearLayout>

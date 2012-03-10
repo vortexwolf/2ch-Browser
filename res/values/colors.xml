@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="blue">#ff0000ff</color>
+    
+    <color name="darkBlueText">#ff456793</color>
+    <color name="darkGrayText">#ff808080</color>
+    
+    <color name="white_background">@android:color/white</color>
+    <color name="photon_background">#EEEEEE</color>
+    <color name="neutron_background">#212121</color>
+</resources>
