@@ -12,7 +12,7 @@ import android.view.View.OnClickListener;
 public class ThumbnailOnClickListenerFactory implements IThumbnailOnClickListenerFactory {
 	
 	private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
-	private static long sHeapPad = 2 * 1024;
+	private static long sHeapPad = 128; // 128 Kb
 	
 	@Override
 	public OnClickListener getOnClickListener(final String url, final Context context, final int imageSize) {
@@ -28,7 +28,7 @@ public class ThumbnailOnClickListenerFactory implements IThumbnailOnClickListene
 	public void raiseClick(final String url, final Context context, final int imageSize){
 		long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
 		if(allocatedSize > sMaxVmHeap){
-			long freeSize = imageSize - (allocatedSize - sMaxVmHeap);
+			long freeSize = Math.max(0, imageSize - (allocatedSize - sMaxVmHeap));
 			AppearanceUtils.showToastMessage(context, "Image is " + imageSize+"Kb. Available Memory is " + freeSize + "Kb");
 			return;
 		}

@@ -59,9 +59,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		else if(key.equals(mResources.getString(R.string.pref_display_navigation_bar_key))){
 			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_NAVIGATION_BAR, String.valueOf(isDisplayNavigationBar()));
 		}
-		else if(key.equals(mResources.getString(R.string.pref_display_same_person_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_SAME_PERSON, String.valueOf(isDisplaySamePerson()));
-		}
 	}
 	
 
@@ -76,10 +73,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	
 	public boolean isDisplayPostItemDate() {
 		return mSettings.getBoolean(mResources.getString(R.string.pref_display_post_date_key), false);
-	}
-	
-	public boolean isDisplaySamePerson() {
-		return mSettings.getBoolean(mResources.getString(R.string.pref_display_same_person_key), true);
 	}
 	
 	public boolean isLinksInPopup(){

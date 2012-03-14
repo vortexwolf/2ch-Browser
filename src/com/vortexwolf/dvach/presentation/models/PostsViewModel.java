@@ -12,9 +12,6 @@ import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 public class PostsViewModel {
 
 	private final HashMap<String, PostItemViewModel> mViewModels = new HashMap<String, PostItemViewModel>();
-	private final HashMap<String, ArrayList<PostItemViewModel>> mSamePersons = new HashMap<String, ArrayList<PostItemViewModel>>();
-	private final HashMap<String, Integer> mSamePersonIndices = new HashMap<String, Integer>();
-	private int mLastSamePersonIndex = 0;
 	private String mLastPostNumber = null;
 
 	
@@ -26,35 +23,8 @@ public class PostsViewModel {
 				refModel.addReferenceFrom(viewModel.getNumber());
 			}
 		}
-		
-		// детектируем семенов
-		String postId = viewModel.getPostId();
-		if(!StringUtils.isEmpty(postId) && !Constants.NAME_HEAVEN.equals(postId)){
-			ArrayList<PostItemViewModel> samePersonPosts = this.mSamePersons.get(postId);
-			if(samePersonPosts == null){
-				samePersonPosts = new ArrayList<PostItemViewModel>();
-				this.mSamePersons.put(postId, samePersonPosts);
-			}
-			
-			for(PostItemViewModel samePersonModel : samePersonPosts){
-				samePersonModel.addSamePersonReference(viewModel.getNumber());
-				viewModel.addSamePersonReference(samePersonModel.getNumber());
-			}
-			
-			// Если текущий пост второй - то считаем пользователя семеном
-			if(samePersonPosts.size() == 1){
-				mLastSamePersonIndex++;
-				mSamePersonIndices.put(postId, mLastSamePersonIndex);
-			}
 				
-			samePersonPosts.add(viewModel);
-		}
-		
 		this.mViewModels.put(viewModel.getNumber(), viewModel);
-	}
-	
-	public Integer getSamePersonIndex(String postId){
-		return mSamePersonIndices.get(postId);
 	}
 	
 	public PostItemViewModel getModel(String postNumber){

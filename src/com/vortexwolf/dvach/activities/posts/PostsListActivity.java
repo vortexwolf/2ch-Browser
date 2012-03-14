@@ -62,7 +62,6 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 	
 	private int mCurrentTheme;
 	private boolean mCurrentDisplayDate;
-	private boolean mCurrentDisplaySamePersons;
 	private boolean mCurrentLoadThumbnails;
 	
 	private View mLoadingView = null;
@@ -90,7 +89,6 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
         this.mCurrentTheme = this.mSettings.getTheme();
         this.mCurrentDisplayDate = this.mSettings.isDisplayPostItemDate();
         this.mCurrentLoadThumbnails = this.mSettings.isLoadThumbnails();
-        this.mCurrentDisplaySamePersons = this.mSettings.isDisplaySamePerson();
         this.mTracker = this.mApplication.getTracker();
         
         this.resetUI();
@@ -156,7 +154,7 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 			this.mCurrentDownloadTask.cancel(true);
 		}
 
-		MyLog.d(TAG, "Detstroyed");
+		MyLog.d(TAG, "Destroyed");
 		
 	   super.onDestroy();
 	}
@@ -177,12 +175,6 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 		boolean newDisplayDate = this.mApplication.getSettings().isDisplayPostItemDate();
 		if(this.mCurrentDisplayDate != newDisplayDate){
 			this.mCurrentDisplayDate = newDisplayDate;
-			updateAdapter = true;
-		}
-		
-		boolean newDisplaySamePerson = this.mApplication.getSettings().isDisplaySamePerson();
-		if(this.mCurrentDisplaySamePersons != newDisplaySamePerson){
-			this.mCurrentDisplaySamePersons = newDisplaySamePerson;
 			updateAdapter = true;
 		}
 		

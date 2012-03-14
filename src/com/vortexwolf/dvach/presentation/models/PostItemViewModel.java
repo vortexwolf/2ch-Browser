@@ -41,10 +41,7 @@ public class PostItemViewModel {
 	private final ArrayList<String> refersTo = new ArrayList<String>();
 	private final ArrayList<String> referencesFrom = new ArrayList<String>();
 	
-	private final ArrayList<String> samePersonReferences = new ArrayList<String>();
-	
 	private boolean isFloatImageComment = false;
-	private boolean mDisplaySamePersonLinks = false;
 
 	
 	public PostItemViewModel(int position, PostInfo model, Theme theme, IURLSpanClickListener listener) {
@@ -88,10 +85,6 @@ public class PostItemViewModel {
 	
 	public void addReferenceFrom(String postNumber){
 		referencesFrom.add(postNumber);
-	}
-	
-	public void addSamePersonReference(String postNumber){
-		samePersonReferences.add(postNumber);
 	}
 
 	public int getPosition(){
@@ -143,20 +136,9 @@ public class PostItemViewModel {
 		return !this.referencesFrom.isEmpty();
 	}
 	
-	public boolean hasSamePersons(){
-		return !this.samePersonReferences.isEmpty();
-	}
-	
 	public SpannableStringBuilder getReferencesFromAsSpannableString(Resources res, String boardName, String threadNumber){
 		String firstWord = res.getString(R.string.postitem_replies);
 		SpannableStringBuilder builder = createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
-				
-		return builder;
-	}
-	
-	public SpannableStringBuilder getSamePersonsAsSpannableString(Resources res, String boardName, String threadNumber){
-		String firstWord = res.getString(R.string.postitem_sameperson);
-		SpannableStringBuilder builder = createReferencesString(firstWord, this.samePersonReferences, boardName, threadNumber);
 				
 		return builder;
 	}
@@ -197,13 +179,5 @@ public class PostItemViewModel {
 	/** Можно поставить обтекание текста если версия 2.2 и к посту прикреплено изображение */
 	public boolean canMakeCommentFloat() {
 		return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment && this.hasAttachment();
-	}
-
-	public void setDisplaySamePersonLinks(boolean displaySamePersonLinks) {
-		this.mDisplaySamePersonLinks = displaySamePersonLinks;
-	}
-
-	public boolean isDisplaySamePersonLinks() {
-		return mDisplaySamePersonLinks;
 	}
 }

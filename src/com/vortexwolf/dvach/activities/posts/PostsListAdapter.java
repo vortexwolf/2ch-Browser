@@ -169,38 +169,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         //Сообщения того же автора
 		vb.samePersonsView.setVisibility(View.GONE);
 		vb.samePersonIdView.setVisibility(View.GONE);
-		
-        if(this.mSettings.isDisplaySamePerson()){
-        	String postId = item.getPostId();
-
-	        // Разделение на семенов и Heaven
-        	if(item.hasSamePersons()){
-	        	final TextView linksView = vb.samePersonsView;
-				linksView.setVisibility(item.isDisplaySamePersonLinks() ? View.VISIBLE : View.GONE);
 		        
-				vb.samePersonIdView.setVisibility(View.VISIBLE);
-		        vb.samePersonIdView.setText(mActivity.getString(R.string.postitem_sameperson_generic_name) + mPostsViewModel.getSamePersonIndex(postId).intValue());
-		        vb.samePersonIdView.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View arg0) {
-						item.setDisplaySamePersonLinks(!item.isDisplaySamePersonLinks());
-						if(item.isDisplaySamePersonLinks()){
-							SpannableStringBuilder samePersons = item.getSamePersonsAsSpannableString(mActivity.getResources(), mBoardName, mThreadNumber);
-							linksView.setText(samePersons);
-							linksView.setMovementMethod(LinkMovementMethod.getInstance());
-						}
-						
-						linksView.setVisibility(item.isDisplaySamePersonLinks() ? View.VISIBLE : View.GONE);
-					}
-				});
-        	}
-        	else if (Constants.NAME_HEAVEN.equals(postId)){
-        		vb.samePersonIdView.setVisibility(View.VISIBLE);
-        		vb.samePersonIdView.setText(Constants.NAME_HEAVEN);
-        		vb.samePersonIdView.setOnClickListener(null);
-        	}
-        }
-        
         // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой listener вроде решает проблему
         view.setOnLongClickListener(this.mOnLongClickListener);
     }

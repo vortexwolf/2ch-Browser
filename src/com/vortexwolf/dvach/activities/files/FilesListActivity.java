@@ -14,6 +14,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.presentation.models.ImageFileModel;
 
@@ -104,6 +105,16 @@ public class FilesListActivity extends ListActivity {
 		super.onResume();
 	}
 	
+	
+	
+	@Override
+	protected void onDestroy() {
+        AppearanceUtils.unbindDrawables(this.getListView());
+        System.gc();
+        
+		super.onDestroy();
+	}
+
 	/**
 	 * Updates the list view to the current directory
 	 */

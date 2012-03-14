@@ -144,6 +144,11 @@ public class BitmapManager implements IBitmapManager {
 
 	@Override
 	public void clearCache() {
+		
+		for(Bitmap b : mCache.values()){
+			b.recycle();
+		}
+		
 		mCache.clear();
 	}
 }

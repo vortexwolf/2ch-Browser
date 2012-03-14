@@ -36,11 +36,6 @@
 			android:defaultValue="false"
 			android:summary="@string/pref_display_post_date_summary"
 			android:title="@string/pref_display_post_date" />
-  <CheckBoxPreference
-			android:key="@string/pref_display_same_person_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_display_same_person_summary"
-			android:title="@string/pref_display_same_person" />
    <CheckBoxPreference
 			android:key="@string/pref_popup_link_key"
 			android:defaultValue="true"

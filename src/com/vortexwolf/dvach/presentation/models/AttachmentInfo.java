@@ -66,10 +66,14 @@ public class AttachmentInfo {
 	}
 	
 	public String getDescription(String sizeMeasure) {
-		String result = null;
+		String result = "";
 		
-		if(this.mModel.getSize() != 0){
-			result = this.mModel.getSize() + sizeMeasure;
+		if(this.mModel.getSize() != 0){		
+			result += this.mModel.getSize() + sizeMeasure;
+			
+			if("gif".equalsIgnoreCase(this.mSourceExtension)){
+				result += " gif";
+			}
 		}
 		else if (!StringUtils.isEmpty(this.mModel.getVideo())){
 			result = "YouTube";

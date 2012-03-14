@@ -370,6 +370,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	
 	@Override
 	public void showCaptcha(CaptchaEntity captcha, Bitmap captchaImage) {
+		if(this.mCaptchaBitmap != null){
+			this.mCaptchaBitmap.recycle();
+		}
+		
 		this.mCaptcha = captcha;
 		this.mCaptchaBitmap = captchaImage;
 		this.mCaptchaImageView.setImageBitmap(captchaImage);
