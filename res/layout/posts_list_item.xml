@@ -33,14 +33,6 @@
 	    android:textColor="?postNumberForeground"
 		/>
 	
-	<TextView android:id="@+id/post_same_person_id"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:layout_marginRight="4dip"
-	    android:textColor="#4F7942"
-		/>
-	
 	<TextView
 	    android:id="@+id/post_item_date_id"
 	    android:layout_width="fill_parent"
@@ -112,14 +104,6 @@
 <!-- Bottom row -->
 <TextView 
 		android:id="@+id/post_replies"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:layout_marginTop="5dip"
-		android:textStyle="italic"
-		android:textColor="?android:textColorPrimary" /> 
-<TextView 
-		android:id="@+id/post_same_persons"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:textAppearance="?android:attr/textAppearanceMedium"

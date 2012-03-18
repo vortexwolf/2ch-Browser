@@ -14,6 +14,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -22,6 +24,7 @@ import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HttpContext;
 
 import com.vortexwolf.dvach.common.Constants;
@@ -39,41 +42,54 @@ public class GzipHttpClientFactory {
 		return createGzipHttpClient();
 	}
 	
-	private static DefaultHttpClient createGzipHttpClient() {
+	public static DefaultHttpClient createGzipHttpClient() {
 		BasicHttpParams params = new BasicHttpParams();
+		
+		// Scheme registry
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 		SSLSocketFactory ssf = SSLSocketFactory.getSocketFactory();
 		ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 		schemeRegistry.register(new Scheme("https", ssf, 443));
-
 		ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+
+        // Turn off stale checking. Our connections break all the time anyway,
+        // and it's not worth it to pay the penalty of checking every time.
+        HttpConnectionParams.setStaleCheckingEnabled(params, false);
+        
+        // Default connection and socket timeout of 30 seconds. Tweak to taste.
+        HttpConnectionParams.setConnectionTimeout(params, 10*1000);
+        HttpConnectionParams.setSoTimeout(params, 20*1000);
+        HttpConnectionParams.setSocketBufferSize(params, 8192);
+        
+        //ConnManagerParams.setTimeout(params, 5 * 1000);
+        ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(50));
+        ConnManagerParams.setMaxTotalConnections(params, 200);
+
+        // http client
 		DefaultHttpClient httpclient = new DefaultHttpClient(cm, params);
 		
         httpclient.addRequestInterceptor(new HttpRequestInterceptor() {
             @Override
-			public void process(
-                    final HttpRequest request,
-                    final HttpContext context
-            ) throws HttpException, IOException {
+			public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
                 request.setHeader("User-Agent", Constants.USER_AGENT_STRING);
-                if (!request.containsHeader("Accept-Encoding"))
+                if (!request.containsHeader("Accept-Encoding")){
                     request.addHeader("Accept-Encoding", "gzip");
+                }
             }
         });
+        
         httpclient.addResponseInterceptor(new HttpResponseInterceptor() {
             @Override
-			public void process(
-                    final HttpResponse response, 
-                    final HttpContext context) throws HttpException, IOException {
+			public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
                 HttpEntity entity = response.getEntity();
                 Header ceheader = entity.getContentEncoding();
                 if (ceheader != null) {
+                	//header.getValue().contains("gzip")
                     HeaderElement[] codecs = ceheader.getElements();
                     for (int i = 0; i < codecs.length; i++) {
                         if (codecs[i].getName().equalsIgnoreCase("gzip")) {
-                            response.setEntity(
-                                    new GzipDecompressingEntity(response.getEntity())); 
+                            response.setEntity(new GzipDecompressingEntity(response.getEntity())); 
                             return;
                         }
                     }
@@ -87,13 +103,14 @@ public class GzipHttpClientFactory {
         public GzipDecompressingEntity(final HttpEntity entity) {
             super(entity);
         }
+        
         @Override
-        public InputStream getContent()
-            throws IOException, IllegalStateException {
+        public InputStream getContent() throws IOException, IllegalStateException {
             // the wrapped entity's getContent() decides about repeatability
             InputStream wrappedin = wrappedEntity.getContent();
             return new GZIPInputStream(wrappedin);
         }
+        
         @Override
         public long getContentLength() {
             // length of ungzipped content is not known

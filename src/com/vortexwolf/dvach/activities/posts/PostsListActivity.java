@@ -29,8 +29,10 @@ import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
+import com.vortexwolf.dvach.settings.SettingsEntity;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,27 +44,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AbsListView.OnScrollListener;
 
-public class PostsListActivity extends ListActivity implements IPostsListView{
+public class PostsListActivity extends ListActivity implements ListView.OnScrollListener {
     private static final String TAG = "PostsListActivity";
     
     private MainApplication mApplication;
     private ApplicationSettings mSettings;
-    private IBitmapManager mBitmapManager;
 	private IJsonApiReader mJsonReader;
-	private IDownloadFileService mDownloadFileService;
 	private Tracker mTracker;
 
 	private final IThumbnailOnClickListenerFactory mThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
     private TimerService mAutoRefreshTimer = null;
+    private final PostsReaderListener mPostsReaderListener = new PostsReaderListener();
 	
-	private int mCurrentTheme;
-	private boolean mCurrentDisplayDate;
-	private boolean mCurrentLoadThumbnails;
+	private SettingsEntity mCurrentSettings;
 	
 	private View mLoadingView = null;
 	private View mErrorView = null;
@@ -84,11 +86,7 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
         this.mApplication = (MainApplication) this.getApplication();
         this.mSettings = this.mApplication.getSettings();
         this.mJsonReader = this.mApplication.getJsonApiReader();
-        this.mDownloadFileService = this.mApplication.getDownloadFileService();
-        this.mBitmapManager = new BitmapManager(new HttpBitmapReader(this.mApplication.getHttpClient()));
-        this.mCurrentTheme = this.mSettings.getTheme();
-        this.mCurrentDisplayDate = this.mSettings.isDisplayPostItemDate();
-        this.mCurrentLoadThumbnails = this.mSettings.isLoadThumbnails();
+        this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
         
         this.resetUI();
@@ -113,7 +111,7 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
         
         if(mAdapter == null)
         {    	
-        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, mBitmapManager, mThumbnailOnClickListenerFactory, mApplication.getSettings());
+        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mThumbnailOnClickListenerFactory, mApplication.getSettings());
         	setListAdapter(mAdapter);
         	
     		this.refreshPosts();
@@ -145,9 +143,6 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
     
     @Override
 	protected void onDestroy() {
-
-		this.mBitmapManager.clearCache();
-		
 		this.mAutoRefreshTimer.stop();
 		
 		if(this.mCurrentDownloadTask != null){
@@ -163,32 +158,20 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 	protected void onResume() {
 		super.onResume();
 		
-		int newTheme = this.mApplication.getSettings().getTheme();
-		if(this.mCurrentTheme != newTheme){
-			this.mCurrentTheme = newTheme;
+		// Проверяем изменение настроек
+		SettingsEntity newSettings = this.mSettings.getCurrentSettings();
+		if(this.mCurrentSettings.theme != newSettings.theme){
 			this.resetUI();
 			return;
 		}
-		
-		boolean updateAdapter = false;
-		
-		boolean newDisplayDate = this.mApplication.getSettings().isDisplayPostItemDate();
-		if(this.mCurrentDisplayDate != newDisplayDate){
-			this.mCurrentDisplayDate = newDisplayDate;
-			updateAdapter = true;
-		}
-		
-		boolean newLoadThumbnails = this.mApplication.getSettings().isLoadThumbnails();
-		if(this.mCurrentLoadThumbnails != newLoadThumbnails){
-			this.mCurrentLoadThumbnails = newLoadThumbnails;
-			updateAdapter = true;
-		}
-		
-		if(updateAdapter == true){
+
+		if(this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails){
 			this.mAdapter.notifyDataSetChanged();
 		}
-		
+
 		this.mAutoRefreshTimer.update(this.mSettings.isAutoRefresh(), this.mSettings.getAutoRefreshInterval());
+		
+		this.mCurrentSettings = newSettings;
 	}
 	
 	private void resetUI()
@@ -196,7 +179,7 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 		// Возвращаем прежнее положение scroll view после перезагрузки темы
 		AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
 		
-		this.setTheme(this.mCurrentTheme);
+		this.setTheme(this.mSettings.getTheme());
 		this.setContentView(R.layout.posts_list_view);
 		this.registerForContextMenu(this.getListView());
 
@@ -205,74 +188,9 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 		this.mPartialLoadingView = this.findViewById(R.id.addItemsLoading);
         
 		this.getListView().setSelectionFromTop(position.position, position.top);
+        this.getListView().setOnScrollListener(this);
     }
     
-    @Override
-    public void showLoadingScreen() {
-    	switchToView(ViewType.LOADING);
-    }
-    
-    @Override
-    public void hideLoadingScreen() {
-    	switchToView(ViewType.LIST);
-    	mCurrentDownloadTask = null;
-    }
-
-	@Override
-	public void setWindowProgress(int value) {
-		this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, value);
-	}
-
-	@Override
-	public void setData(PostsList posts) {
-		if(posts != null){
-			mAdapter.setAdapterData(posts.getThread());
-		}
-		else {
-			MyLog.e(TAG, "posts = null");
-		}
-
-	}
-	
-	@Override
-	public void showError(String error) {
-		switchToView(ViewType.ERROR);
-		
-		TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
-		if(errorTextView != null){
-			errorTextView.setText(error != null ? error : this.mApplication.getErrors().getUnknownError());
-		}
-	}
-	
-
-	@Override
-	public void updateData(String from, PostsList list) {
-		PostInfo[] posts = list.getThread();
-
-		int addedCount = this.mAdapter.updateAdapterData(from, posts);
-		if(addedCount != 0){
-			AppearanceUtils.showToastMessage(this, this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
-		}
-		else {
-			AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_no_new_posts));
-		}
-	}
-
-	@Override
-	public void showUpdateError(String error) {
-		AppearanceUtils.showToastMessage(this.getApplicationContext(), error);
-	}
-
-	@Override
-	public void showUpdateLoading() {
-		mPartialLoadingView.setVisibility(View.VISIBLE);
-	}
-
-	@Override
-	public void hideUpdateLoading() {
-		mPartialLoadingView.setVisibility(View.GONE);
-		mCurrentDownloadTask = null;
-	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -337,7 +255,7 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 				return true;        	
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE:{
-	        	this.mDownloadFileService.downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
+	        	this.mApplication.getDownloadFileService().downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
 	        	
 	    	    this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU);
 	    	    
@@ -403,13 +321,106 @@ public class PostsListActivity extends ListActivity implements IPostsListView{
 		//Если адаптер пустой, то значит была ошибка при загрузке, в таком случае запускаю загрузку заново
 		if(!mAdapter.isEmpty()){
 			//Здесь запускаю с индикатором того, что происходит обновление, а не загрузка заново
-			mCurrentDownloadTask = new DownloadPostsTask(this, mBoardName, mThreadNumber, mJsonReader, true);
+			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, mJsonReader, true);
 			mCurrentDownloadTask.execute(mAdapter.getLastPostNumber());
 		}
 		else
 		{
-			mCurrentDownloadTask = new DownloadPostsTask(this, mBoardName, mThreadNumber, mJsonReader, false);
+			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, mJsonReader, false);
     		mCurrentDownloadTask.execute();
+		}
+	}
+
+	@Override
+	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {		
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState) {
+	        case OnScrollListener.SCROLL_STATE_IDLE:
+	            this.mAdapter.setBusy(false, view);
+	            break;
+	        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+	        	this.mAdapter.setBusy(true, view);
+	            break;
+	        case OnScrollListener.SCROLL_STATE_FLING:
+	        	this.mAdapter.setBusy(true, view);
+	            break;
+		}
+	}
+	
+	private class PostsReaderListener implements IPostsListView {
+
+		@Override
+		public Context getApplicationContext() {
+			return PostsListActivity.this.getApplicationContext();
+		}
+
+		@Override
+		public void setWindowProgress(int value) {
+			PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, value);
+		}
+
+		@Override
+		public void setData(PostsList posts) {
+			if(posts != null){
+				mAdapter.setAdapterData(posts.getThread());
+			}
+			else {
+				MyLog.e(TAG, "posts = null");
+			}
+
+		}
+
+		@Override
+		public void showError(String error) {
+			PostsListActivity.this.switchToView(ViewType.ERROR);
+			
+			TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
+			if(errorTextView != null){
+				errorTextView.setText(error != null ? error : mApplication.getErrors().getUnknownError());
+			}
+		}
+
+	    @Override
+	    public void showLoadingScreen() {
+	    	PostsListActivity.this.switchToView(ViewType.LOADING);
+	    }
+	    
+	    @Override
+	    public void hideLoadingScreen() {
+	    	PostsListActivity.this.switchToView(ViewType.LIST);
+	    	mCurrentDownloadTask = null;
+	    }
+
+		@Override
+		public void updateData(String from, PostsList list) {
+			PostInfo[] posts = list.getThread();
+
+			int addedCount = mAdapter.updateAdapterData(from, posts);
+			if(addedCount != 0){
+				AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
+			}
+			else {
+				AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getString(R.string.notification_no_new_posts));
+			}
+		}
+
+		@Override
+		public void showUpdateError(String error) {
+			AppearanceUtils.showToastMessage(PostsListActivity.this, error);
+		}
+
+		@Override
+		public void showUpdateLoading() {
+			mPartialLoadingView.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		public void hideUpdateLoading() {
+			mPartialLoadingView.setVisibility(View.GONE);
+			mCurrentDownloadTask = null;
 		}
 	}
 }

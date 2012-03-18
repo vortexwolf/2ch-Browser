@@ -137,4 +137,13 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		
 		return R.style.Theme_Light_Medium;
 	}
+	
+	public SettingsEntity getCurrentSettings(){
+		SettingsEntity result = new SettingsEntity();
+		result.theme = this.getTheme();
+		result.isDisplayDate = this.isDisplayPostItemDate();
+		result.isLoadThumbnails = this.isLoadThumbnails();
+		
+		return result;
+	}
 }

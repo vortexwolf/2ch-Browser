@@ -5,11 +5,13 @@ import java.text.MessageFormat;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
+import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 
 import android.app.Activity;
@@ -19,6 +21,7 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -33,6 +36,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 	private final Theme mTheme;
 	
 	private final String mBoardName;
+	
+	private boolean mIsBusy = false;
 
 	public ThreadsListAdapter(Activity activity, String boardName, IBitmapManager bitmapManager, IThumbnailOnClickListenerFactory thumbnailOnClickListenerFactory) {
         super(activity.getApplicationContext(), 0);
@@ -94,9 +99,11 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         vb.repliesNumberView.setText(repliesText);
         
         //Обрабатываем прикрепленный файл
-        ThreadPostUtils.handleAttachment(item.getAttachment(this.mBoardName), 
-        		vb.thumbnailView, vb.indeterminateProgressBar, vb.attachmentInfoView, vb.fullThumbnailView, 
+        AttachmentInfo attachment = item.getAttachment(this.mBoardName);
+        ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, 
+        		vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
         		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+        ThreadPostUtils.handleAttachmentDescription(attachment, this.mActivity.getResources(), vb.attachmentInfoView);
     }
     
 	/** Обновляет адаптер полностью*/
@@ -104,6 +111,27 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 		this.clear();
 		for(ThreadInfo ti : threads){
 			this.add(new ThreadItemViewModel(ti, this.mTheme));
+		}
+	}
+	
+	public void setBusy(boolean isBusy, AbsListView view){
+		boolean prevBusy = this.mIsBusy;
+		this.mIsBusy = isBusy;
+		
+		if(prevBusy == true && isBusy == false){
+			MyLog.v("ThreadsListAdapter", "Non busy");
+	        int count = view.getChildCount();
+	        for (int i=0; i<count; i++) {
+	            View v = (View)view.getChildAt(i);
+	            int position = view.getPositionForView(v);
+	            
+	            ViewBag vb = (ViewBag)v.getTag();
+	            
+	            AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
+	            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
+	            		vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
+	            		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+	        }
 		}
 	}
 	

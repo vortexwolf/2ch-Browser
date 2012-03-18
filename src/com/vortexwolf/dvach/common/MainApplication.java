@@ -15,8 +15,10 @@ import com.vortexwolf.dvach.api.JsonApiReaderException;
 import com.vortexwolf.dvach.api.entities.BoardSettings;
 import com.vortexwolf.dvach.common.http.DownloadFileService;
 import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
+import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.DraftPostsStorage;
 import com.vortexwolf.dvach.common.library.Tracker;
+import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
@@ -25,6 +27,8 @@ import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.app.Application;
+import android.httpimage.FileSystemPersistence;
+import android.httpimage.HttpImageManager;
 
 public class MainApplication extends Application {
 	
@@ -39,7 +43,8 @@ public class MainApplication extends Application {
 	private IDownloadFileService mDownloadFileService;
 	private Tracker mTracker;
 	private ExecutorService mExecutorService;
-
+    private IBitmapManager mBitmapManager;
+    
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -51,6 +56,10 @@ public class MainApplication extends Application {
 		this.mDraftPostsStorage = new DraftPostsStorage();
 		this.mDownloadFileService = new DownloadFileService(this.mErrors);
 		this.mExecutorService = Executors.newFixedThreadPool(3);
+		
+		String cacheDir = this.getCacheDir().getAbsolutePath();
+		HttpImageManager httpImageManager = new HttpImageManager(new FileSystemPersistence(cacheDir));
+		this.mBitmapManager = new BitmapManager(httpImageManager);
 		
 		this.mTracker = Tracker.getInstance();
 		this.mTracker.getInnerTracker().startNewSession(Constants.ANALYTICS_KEY, 120, this);
@@ -103,6 +112,10 @@ public class MainApplication extends Application {
 
 	public ExecutorService getExecutorService() {
 		return mExecutorService;
+	}
+	
+	public IBitmapManager getBitmapManager(){
+		return mBitmapManager;
 	}
 	
 	/** Создает маппер, который будет игнорировать неизвестные свойства */

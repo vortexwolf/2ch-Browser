@@ -25,13 +25,17 @@ import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
+import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
+import com.vortexwolf.dvach.settings.SettingsEntity;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -43,28 +47,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ThreadsListActivity extends ListActivity implements IListView<ThreadsList> {
+public class ThreadsListActivity extends ListActivity implements ListView.OnScrollListener {
     private static final String TAG = "ThreadsListActivity";
 
     private MainApplication mApplication;
-    private IBitmapManager mBitmapManager;
 	private IJsonApiReader mJsonReader;
-	private IDownloadFileService mDownloadFileService;
 	private Tracker mTracker;
+	private ApplicationSettings mSettings;
 	
 	private final IThumbnailOnClickListenerFactory mThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
+	private final ThreadsReaderListener mThreadsReaderListener = new ThreadsReaderListener();
 	
-	private int mCurrentTheme;
-	private boolean mCurrentDisplayNavigationBar;
-	private boolean mCurrentLoadThumbnails;
+	private SettingsEntity mCurrentSettings;
 	
 	private View mLoadingView = null;
 	private View mErrorView = null;
@@ -84,11 +88,8 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 
         this.mApplication = (MainApplication) this.getApplication();
         this.mJsonReader = this.mApplication.getJsonApiReader();
-        this.mBitmapManager = new BitmapManager(new HttpBitmapReader(this.mApplication.getHttpClient()));
-        this.mDownloadFileService = this.mApplication.getDownloadFileService();
-        this.mCurrentTheme = this.mApplication.getSettings().getTheme();
-        this.mCurrentDisplayNavigationBar = this.mApplication.getSettings().isDisplayNavigationBar();
-        this.mCurrentLoadThumbnails = this.mApplication.getSettings().isLoadThumbnails();
+        this.mSettings = this.mApplication.getSettings();
+        this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
         
     	Uri data = this.getIntent().getData();
@@ -105,7 +106,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 
         if(mAdapter == null)
         {       	
-        	mAdapter = new ThreadsListAdapter(this, mBoardName, mBitmapManager, mThumbnailOnClickListenerFactory);
+        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), mThumbnailOnClickListenerFactory);
 	        setListAdapter(mAdapter);
 	        
 	        this.refreshThreads();
@@ -123,8 +124,6 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
     
 	@Override
 	protected void onDestroy() {
-		this.mBitmapManager.clearCache();
-		
 		if(this.mCurrentDownloadTask != null){
 			this.mCurrentDownloadTask.cancel(true);
 		}
@@ -138,25 +137,22 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 	protected void onResume() {
 		super.onResume();
 		
-		int newTheme = this.mApplication.getSettings().getTheme();
-		if(this.mCurrentTheme != newTheme){
-			this.mCurrentTheme = newTheme;
+		SettingsEntity newSettings = this.mSettings.getCurrentSettings();
+		
+		if(this.mCurrentSettings.theme != newSettings.theme){
 			this.resetUI();
 			return;
 		}
 		
-		boolean newDisplayNavigationBar = this.mApplication.getSettings().isDisplayNavigationBar();
-		if(this.mCurrentDisplayNavigationBar != newDisplayNavigationBar){
-			this.mCurrentDisplayNavigationBar = newDisplayNavigationBar;
-			
-			this.mNavigationBar.setVisibility(this.mCurrentDisplayNavigationBar ? View.VISIBLE : View.GONE);
+		if(this.mCurrentSettings.isDisplayNavigationBar != newSettings.isDisplayNavigationBar){
+			this.mNavigationBar.setVisibility(newSettings.isDisplayNavigationBar ? View.VISIBLE : View.GONE);
 		}
 		
-		boolean newLoadThumbnails = this.mApplication.getSettings().isLoadThumbnails();
-		if(this.mCurrentLoadThumbnails != newLoadThumbnails){
-			this.mCurrentLoadThumbnails = newLoadThumbnails;
+		if(this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails){
 			this.mAdapter.notifyDataSetChanged();
 		}
+		
+		this.mCurrentSettings = this.mSettings.getCurrentSettings();
 	}
 	
 	private void resetUI()
@@ -164,7 +160,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 		// Возвращаем прежнее положение scroll view после перезагрузки темы
 		AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
 
-		this.setTheme(this.mCurrentTheme);
+		this.setTheme(this.mSettings.getTheme());
         this.setContentView(R.layout.threads_list_view);
 
         this.mLoadingView = this.findViewById(R.id.loadingView);
@@ -172,6 +168,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
         
         this.registerForContextMenu(this.getListView());
         this.getListView().setSelectionFromTop(position.position, position.top);
+        this.getListView().setOnScrollListener(this);
         
         // Отображаем или список, или индикатор ошибки, или загрузку в новой теме
         if(this.mCurrentView != null){
@@ -180,7 +177,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
         
         //Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
-        this.mNavigationBar.setVisibility(this.mCurrentDisplayNavigationBar ? View.VISIBLE : View.GONE);
+        this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar() ? View.VISIBLE : View.GONE);
         
         TextView pageNumberView = (TextView)this.findViewById(R.id.threads_page_number);
         pageNumberView.setText(String.valueOf(this.mPageNumber));
@@ -210,26 +207,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
        
     }
 
-	@Override
-	public void setData(ThreadsList threads) {
-		if(threads != null){
-			this.mAdapter.setAdapterData(threads.getThreads());
-		}
-		else {
-			MyLog.e(TAG, "threads = null");
-		}
-	}
-	
-	@Override
-    public void showLoadingScreen() {
-		this.switchToView(ViewType.LOADING);
-    }
-	
-	@Override
-    public void hideLoadingScreen() {
-    	this.switchToView(ViewType.LIST);
-    	this.mCurrentDownloadTask = null;
-    }
+
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -301,28 +279,13 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 		
 		this.navigateToThread(info.getNumber(), info.getSpannedSubject() != null ? info.getSpannedSubject().toString() : null);
 	}
-
-	@Override
-	public void setWindowProgress(int value) {
-		this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, value);
-	}
-
+/*
 	//При повороте экрана из списка заголовки исчезают, поэтому попробую такой костыль
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
       super.onConfigurationChanged(newConfig);
       this.setListAdapter(this.mAdapter);
-    }
-
-	@Override
-	public void showError(String error) {
-		this.switchToView(ViewType.ERROR);
-		
-		TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
-		if(errorTextView != null){
-			errorTextView.setText(error != null ? error : this.mApplication.getErrors().getUnknownError());
-		}
-	}
+    }*/
 
 	private void switchToView(ViewType vt){
 		this.mCurrentView = vt;
@@ -384,7 +347,7 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 	        	return false;
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
-	        	this.mDownloadFileService.downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
+	        	this.mApplication.getDownloadFileService().downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
 	        	
 	    	    this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU);
 	    	    
@@ -431,8 +394,73 @@ public class ThreadsListActivity extends ListActivity implements IListView<Threa
 		}
 		
 		if(this.mBoardName != null){
-			this.mCurrentDownloadTask = new DownloadThreadsTask(this, this, this.mBoardName, this.mPageNumber, this.mJsonReader);
+			this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mPageNumber, this.mJsonReader);
 			this.mCurrentDownloadTask.execute();
 		}
 	}
+
+	@Override
+	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {		
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState) {
+	        case OnScrollListener.SCROLL_STATE_IDLE:
+	            this.mAdapter.setBusy(false, view);
+	            break;
+	        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+	        	this.mAdapter.setBusy(true, view);
+	            break;
+	        case OnScrollListener.SCROLL_STATE_FLING:
+	        	this.mAdapter.setBusy(true, view);
+	            break;
+		}
+	}
+	
+	private class ThreadsReaderListener implements IListView<ThreadsList> {
+
+		@Override
+		public Context getApplicationContext() {
+			return ThreadsListActivity.this.getApplicationContext();
+		}
+
+		@Override
+		public void setWindowProgress(int value) {
+			ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, value);
+		}
+
+		@Override
+		public void setData(ThreadsList threads) {
+			if(threads != null){
+				mAdapter.setAdapterData(threads.getThreads());
+			}
+			else {
+				MyLog.e(TAG, "threads = null");
+			}
+		}
+
+		@Override
+		public void showError(String error) {
+			ThreadsListActivity.this.switchToView(ViewType.ERROR);
+			
+			TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
+			if(errorTextView != null){
+				errorTextView.setText(error != null ? error : mApplication.getErrors().getUnknownError());
+			}
+		}
+		
+		@Override
+	    public void showLoadingScreen() {
+			ThreadsListActivity.this.switchToView(ViewType.LOADING);
+	    }
+		
+		@Override
+	    public void hideLoadingScreen() {
+			ThreadsListActivity.this.switchToView(ViewType.LIST);
+	    	mCurrentDownloadTask = null;
+	    }
+	
+	}
+
 }

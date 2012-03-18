@@ -45,7 +45,20 @@ public class AppearanceUtils {
             }
         }
     }
-
+    
+    public static void showImageProgressBar(final View indeterminateProgressBar, final ImageView imageView){
+    	if (indeterminateProgressBar != null) {
+    		imageView.setVisibility(View.GONE);
+			indeterminateProgressBar.setVisibility(View.VISIBLE);
+    	}
+    }
+    
+    public static void hideImageProgressBar(final View indeterminateProgressBar, final ImageView imageView){
+		if (indeterminateProgressBar != null) {
+			indeterminateProgressBar.setVisibility(View.GONE);
+			imageView.setVisibility(View.VISIBLE);
+		}
+    }
 		
 	public static class ListViewPosition {
 		

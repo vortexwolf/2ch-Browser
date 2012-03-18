@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -27,12 +28,14 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.FloatImageModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.models.PostsViewModel;
@@ -52,6 +55,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final Theme mTheme;
 	private final ApplicationSettings mSettings;
 	private final OnLongClickListener mOnLongClickListener;
+	
+	private boolean mIsBusy = false;
 		
 	public PostsListAdapter(ListActivity activity, String boardName, String threadNumber, IBitmapManager bitmapManager, IThumbnailOnClickListenerFactory thumbnailOnClickListenerFactory, ApplicationSettings settings) {
         super(activity.getApplicationContext(), 0);
@@ -103,8 +108,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     		vb.commentView = (TextView) view.findViewById(R.id.comment);
     		vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
     		vb.postRepliesView = (TextView)view.findViewById(R.id.post_replies);
-    		vb.samePersonsView = (TextView)view.findViewById(R.id.post_same_persons);
-    		vb.samePersonIdView = (TextView)view.findViewById(R.id.post_same_person_id);
     		vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
     		vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
     		vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
@@ -141,9 +144,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         }
 
         //Обрабатываем прикрепленный файл
-        ThreadPostUtils.handleAttachment(item.getAttachment(this.mBoardName), 
-        		vb.imageView, vb.indeterminateProgressBar, vb.attachmentInfoView, vb.fullThumbnailView, 
+        AttachmentInfo attachment = item.getAttachment(this.mBoardName);
+        ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, 
+        		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
         		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+        ThreadPostUtils.handleAttachmentDescription(attachment, this.mActivity.getResources(), vb.attachmentInfoView);
         
         //Комментарий (обновляем после файла)
         if(item.canMakeCommentFloat()){
@@ -165,11 +170,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         else{
         	vb.postRepliesView.setVisibility(View.GONE);
         }
-        
-        //Сообщения того же автора
-		vb.samePersonsView.setVisibility(View.GONE);
-		vb.samePersonIdView.setVisibility(View.GONE);
-		        
+	        
         // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой listener вроде решает проблему
         view.setOnLongClickListener(this.mOnLongClickListener);
     }
@@ -263,14 +264,32 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 		return newPostsCount;
 	}
 	
+	public void setBusy(boolean isBusy, AbsListView view){
+		boolean prevBusy = this.mIsBusy;
+		this.mIsBusy = isBusy;
+		
+		if(prevBusy == true && isBusy == false){
+	        int count = view.getChildCount();
+	        for (int i=0; i<count; i++) {
+	            View v = (View)view.getChildAt(i);
+	            int position = view.getPositionForView(v);
+	            
+	            ViewBag vb = (ViewBag)v.getTag();
+	            
+	            AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
+	            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
+	            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
+	            		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+	        }
+		}
+	}
+	
 	static class ViewBag{
     	TextView postIdView;
     	TextView postIndexView;
     	TextView commentView;
         TextView attachmentInfoView;
         TextView postRepliesView;
-        TextView samePersonsView;
-        TextView samePersonIdView;
         View fullThumbnailView;
         ImageView imageView;
         ProgressBar indeterminateProgressBar;

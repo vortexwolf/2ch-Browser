@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.common.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -50,13 +51,12 @@ public class ThreadPostUtils {
 	 * @param attachment Модель прикрепленного к треду или посту файла
 	 * @param imageView Место для картинки
 	 * @param indeterminateProgressBar Индикатор загрузки
-	 * @param attachmentInfoView Место для текстовой инфы
 	 * @param bitmapManager Для загрузки картинок с интернета
 	 * @param thumbnailOnClickListenerFactory Для обработки нажатия по картинке
 	 * @param activity
-	 */
-	public static void handleAttachment(AttachmentInfo attachment, ImageView imageView, 
-			ProgressBar indeterminateProgressBar, TextView attachmentInfoView, View fullThumbnailView, IBitmapManager bitmapManager, 
+	 */	
+	public static void handleAttachmentImage(boolean isBusy, AttachmentInfo attachment, ImageView imageView, 
+			ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, 
 			IThumbnailOnClickListenerFactory clickListenerFactory, Activity activity){
 
 		indeterminateProgressBar.setVisibility(View.GONE);
@@ -65,7 +65,6 @@ public class ThreadPostUtils {
 		//Ищем прикрепленный файл, в случае наличия добавляем его как ссылку
 		if(attachment == null || attachment.isEmpty()) {
 			imageView.setVisibility(View.GONE);
-			attachmentInfoView.setVisibility(View.GONE);
 			fullThumbnailView.setVisibility(View.GONE);
 		}
 		else {
@@ -89,7 +88,9 @@ public class ThreadPostUtils {
         	else{
 	    		//Также добавляем уменьшенное изображение, нажатие на которое открывает файл в полном размере
 	    		if (thumbnailUrl != null){
-	        		bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, indeterminateProgressBar, activity, R.drawable.error_image);
+	    			if(!isBusy || bitmapManager.isCached(thumbnailUrl)){
+	    				bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, indeterminateProgressBar, R.drawable.error_image);
+	    			}
 	    		}
 	    		else {
 	    			// Иногда можно прикреплять файлы с типом mp3, swf и пр., у которых thumbnail=null. Нужно нарисовать другую картинку в таких случаях
@@ -100,17 +101,25 @@ public class ThreadPostUtils {
 	    				imageView.setImageResource(R.drawable.error_image);
 	    			}
 	    		}
-        	}
-        	
-            //Информация о картинке или видео
-            String attachmentInfo = attachment.getDescription(activity.getString(R.string.data_file_size_measure));
-            if(attachmentInfo != null){
-            	attachmentInfoView.setText(attachmentInfo);
-            	attachmentInfoView.setVisibility(View.VISIBLE);
-            }
-            else {
-            	attachmentInfoView.setVisibility(View.GONE);
-            }
+        	} 
 		}
-	}	
+	}
+	
+	public static void handleAttachmentDescription(AttachmentInfo attachment, Resources res, TextView attachmentInfoView){
+		String attachmentInfo;
+		if(attachment == null || attachment.isEmpty()){
+			attachmentInfo = null;
+		}
+		else{
+			attachmentInfo = attachment.getDescription(res.getString(R.string.data_file_size_measure));
+		}
+		
+        if(attachmentInfo != null){
+        	attachmentInfoView.setText(attachmentInfo);
+        	attachmentInfoView.setVisibility(View.VISIBLE);
+        }
+        else {
+        	attachmentInfoView.setVisibility(View.GONE);
+        }
+	}
 }
