@@ -8,12 +8,17 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class AttachmentInfo {
 	
 	private final IAttachmentEntity mModel;
 	private final String mBoardCode;
-	private final String mSourceUrl;
+	private final boolean mIsEmpty;
+	private final boolean mIsVideo;
+	private final String mImageUrl;
+	private final String mVideoUrl;
+	private final String mVideoMobileUrl;
 	private final String mThumbnailUrl;
 	private final String mSourceExtension;
 	private static final HashMap<String, Integer> sDefaultThumbnails;
@@ -30,13 +35,36 @@ public class AttachmentInfo {
 		this.mBoardCode = boardCode;
 		
 		SourceWithThumbnailModel urls = getUrls();
-		this.mSourceUrl = urls != null ? urls.sourceUrl : null;
-		this.mThumbnailUrl = urls != null ? urls.thumbnailUrl : null;
-		this.mSourceExtension = this.mSourceUrl != null ? UriUtils.getFileExtension(Uri.parse(this.mSourceUrl)) : null;
+		if(urls != null){
+			this.mIsEmpty = false;
+			this.mIsVideo = urls.isVideo;
+			this.mImageUrl = urls.imageUrl;
+			this.mThumbnailUrl = urls.thumbnailUrl;
+			this.mSourceExtension = this.mImageUrl != null ? UriUtils.getFileExtension(Uri.parse(this.mImageUrl)) : null;
+			this.mVideoUrl = urls.videoUrl;
+			this.mVideoMobileUrl = urls.videoMobileUrl;
+		}
+		else {
+			this.mIsEmpty = true;
+			this.mIsVideo = false;
+			this.mImageUrl = null;
+			this.mThumbnailUrl = null;
+			this.mSourceExtension = null;
+			this.mVideoUrl = null;
+			this.mVideoMobileUrl = null;
+		}
 	}
 
-	public String getSourceUrl() {
-		return mSourceUrl;
+	public String getSourceUrl(ApplicationSettings settings) {
+		if(this.mIsEmpty){
+			return null;
+		}
+		else if(this.mIsVideo){
+			return settings.isYoutubeMobileLinks() ? this.mVideoMobileUrl : this.mVideoUrl;
+		}
+		else {
+			return this.mImageUrl;
+		}
 	}
 	
 	public String getSourceExtension() {
@@ -58,7 +86,7 @@ public class AttachmentInfo {
 	}
 	
 	public boolean isEmpty(){
-		return mSourceUrl == null;
+		return mIsEmpty;
 	}
 	
 	public int getSize(){
@@ -75,7 +103,7 @@ public class AttachmentInfo {
 				result += " gif";
 			}
 		}
-		else if (!StringUtils.isEmpty(this.mModel.getVideo())){
+		else if (this.mIsVideo){
 			result = "YouTube";
 		}
 		
@@ -89,13 +117,13 @@ public class AttachmentInfo {
 		String imageUrl = this.mModel.getImage();
 		String imageThumbnail = this.mModel.getThumbnail();
 		if(!StringUtils.isEmpty(imageUrl)){
-			model.sourceUrl = UriUtils.create2chURL(this.mBoardCode, imageUrl).toString();
+			model.imageUrl = UriUtils.create2chURL(this.mBoardCode, imageUrl).toString();
 		}
 		if(!StringUtils.isEmpty(imageThumbnail)){
 			model.thumbnailUrl = UriUtils.create2chURL(this.mBoardCode, imageThumbnail).toString();
 		}
 		// Если выше вызвался любой из двух if, значт прикреплен какой-то файл, а не видео
-		if(model.sourceUrl != null || model.thumbnailUrl != null){
+		if(model.imageUrl != null || model.thumbnailUrl != null){
 			return model;
 		}
 		
@@ -103,7 +131,9 @@ public class AttachmentInfo {
 		String videoHtml = this.mModel.getVideo();	
 		String videoCode = UriUtils.parseYouTubeCode(videoHtml);
 		if(!StringUtils.isEmpty(videoCode)){
-			model.sourceUrl = "http://www.youtube.com/v/"+videoCode;
+			model.isVideo = true;
+			model.videoMobileUrl = "http://m.youtube.com/#/watch?v="+videoCode;
+			model.videoUrl = "http://www.youtube.com/v/"+videoCode;
 			model.thumbnailUrl = "http://img.youtube.com/vi/"+videoCode+"/default.jpg";
 			return model;
 		}
@@ -113,7 +143,10 @@ public class AttachmentInfo {
 	
 	private class SourceWithThumbnailModel
 	{
-		public String sourceUrl;
+		public boolean isVideo = false;
+		public String imageUrl;
+		public String videoUrl;
+		public String videoMobileUrl;
 		public String thumbnailUrl;
 	}
 }

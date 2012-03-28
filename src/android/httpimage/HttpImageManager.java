@@ -71,10 +71,10 @@ public class HttpImageManager{
     
     private static final String TAG = "HttpImageManager";
     
-    public static final int DEFAULT_CACHE_SIZE = 64;
+    public static final int DEFAULT_CACHE_SIZE = 128;
       
     private final BitmapCache mCache;
-    private final BitmapCache mPersistence;
+    private BitmapCache mPersistence;
     private final NetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
     
     private final Handler mHandler = new Handler();
@@ -178,6 +178,9 @@ public class HttpImageManager{
         this(new BasicBitmapCache(DEFAULT_CACHE_SIZE), persistence);
     }
     
+    public void setPersistenceCache(BitmapCache persistence){
+    	mPersistence = persistence;
+    }
     
     public Bitmap loadImage(Uri uri) {
         return loadImage(new LoadRequest(uri));
@@ -245,16 +248,15 @@ public class HttpImageManager{
                     data = mCache.loadData(key);
                     if(data == null) {
                         //then check the persistent storage
-                        data = mPersistence.loadData(key);
+                        data = mPersistence != null ? mPersistence.loadData(key) : null;
                         if(data != null) {
-                            MyLog.d(TAG, "found in persistent: " + request.getUri().toString());
+                            // MyLog.d(TAG, "found in persistent: " + request.getUri().toString());
                             // load it into memory
                             mCache.storeData(key, data);
                         }
                         else {
                             // we go to network
-                            InputStream in = mNetworkResourceLoader.load(request.getUri());
-                            data = BitmapFactory.decodeStream(in);
+                            data = mNetworkResourceLoader.loadBitmap(request.getUri());
                             if(data == null) 
                                 throw new RuntimeException("data from remote can't be decoded to bitmap");
                             
@@ -262,7 +264,9 @@ public class HttpImageManager{
                             mCache.storeData(key, data);
                             
                             // persist it
-                            mPersistence.storeData(key, data);
+                            if(mPersistence != null){
+                            	mPersistence.storeData(key, data);
+                            }
                         }
                     }
                     

@@ -15,11 +15,13 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	private final SharedPreferences mSettings;
 	private final Resources mResources;
 	private final Tracker mTracker;
+	private final ICacheSettingsChangedListener mCacheSettingsChangedListener;
 	
-	public ApplicationSettings(Context context, Resources resources, Tracker tracker) {
+	public ApplicationSettings(Context context, Resources resources, Tracker tracker, ICacheSettingsChangedListener cacheChangedListener) {
 		this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
 		this.mResources = resources;
 		this.mTracker = tracker;
+		this.mCacheSettingsChangedListener = cacheChangedListener;
 	}
 	
 	public void startTrackChanges(){
@@ -59,6 +61,21 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		else if(key.equals(mResources.getString(R.string.pref_display_navigation_bar_key))){
 			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_NAVIGATION_BAR, String.valueOf(isDisplayNavigationBar()));
 		}
+		else if(key.equals(mResources.getString(R.string.pref_youtube_mobile_links_key))){
+			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_YOUTUBE_MOBILE, String.valueOf(isYoutubeMobileLinks()));
+		}
+		else if(key.equals(mResources.getString(R.string.pref_file_cache_key))){
+			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE, String.valueOf(isFileCacheEnabled()));
+			if(this.mCacheSettingsChangedListener != null){
+				mCacheSettingsChangedListener.cacheFileSystemChanged(isFileCacheEnabled());
+			}
+		}
+		else if(key.equals(mResources.getString(R.string.pref_file_cache_sdcard_key))){
+			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE_SD, String.valueOf(isFileCacheSdCard()));
+			if(this.mCacheSettingsChangedListener != null){
+				mCacheSettingsChangedListener.cacheSDCardChanged(isFileCacheSdCard());
+			}
+		}
 	}
 	
 
@@ -83,12 +100,24 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return mSettings.getBoolean(mResources.getString(R.string.pref_display_navigation_bar_key), true);
 	}
 	
+	public boolean isFileCacheEnabled(){
+		return mSettings.getBoolean(mResources.getString(R.string.pref_file_cache_key), true);
+	}
+	
+	public boolean isFileCacheSdCard(){
+		return mSettings.getBoolean(mResources.getString(R.string.pref_file_cache_sdcard_key), true);
+	}
+	
 	public boolean isAutoRefresh(){
 		return mSettings.getBoolean(mResources.getString(R.string.pref_auto_refresh_key), false);
 	}
 	
 	public int getAutoRefreshInterval(){
 		return mSettings.getInt(mResources.getString(R.string.pref_auto_refresh_interval_key), 60);
+	}
+	
+	public boolean isYoutubeMobileLinks(){
+		return mSettings.getBoolean(mResources.getString(R.string.pref_youtube_mobile_links_key), false);
 	}
 	
 	public int getTheme(){

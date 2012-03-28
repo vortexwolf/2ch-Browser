@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.common;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +19,7 @@ import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.DraftPostsStorage;
 import com.vortexwolf.dvach.common.library.Tracker;
+import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
@@ -25,10 +27,13 @@ import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
+import com.vortexwolf.dvach.settings.ICacheSettingsChangedListener;
 
 import android.app.Application;
+import android.content.res.Configuration;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
+import android.os.Environment;
 
 public class MainApplication extends Application {
 	
@@ -43,7 +48,9 @@ public class MainApplication extends Application {
 	private IDownloadFileService mDownloadFileService;
 	private Tracker mTracker;
 	private ExecutorService mExecutorService;
+	private HttpImageManager mHttpImageManager;
     private IBitmapManager mBitmapManager;
+    private File mCurrentCacheDirectory;
     
 	@Override
 	public void onCreate() {
@@ -56,17 +63,16 @@ public class MainApplication extends Application {
 		this.mDraftPostsStorage = new DraftPostsStorage();
 		this.mDownloadFileService = new DownloadFileService(this.mErrors);
 		this.mExecutorService = Executors.newFixedThreadPool(3);
-		
-		String cacheDir = this.getCacheDir().getAbsolutePath();
-		HttpImageManager httpImageManager = new HttpImageManager(new FileSystemPersistence(cacheDir));
-		this.mBitmapManager = new BitmapManager(httpImageManager);
-		
+
 		this.mTracker = Tracker.getInstance();
 		this.mTracker.getInnerTracker().startNewSession(Constants.ANALYTICS_KEY, 120, this);
 		
-		this.mSettings = new ApplicationSettings(this.getApplicationContext(), this.getResources(), mTracker);
+		this.mSettings = new ApplicationSettings(this.getApplicationContext(), this.getResources(), mTracker, new CacheSettingsChangedListener());
+		this.mHttpImageManager = new HttpImageManager(null);
+		this.updateImageManagerFromSettings();
+		this.mBitmapManager = new BitmapManager(this.mHttpImageManager);	
 	}
-	
+
 	@Override
 	public void onTerminate() {
 		this.mTracker.getInnerTracker().stopSession();
@@ -118,6 +124,50 @@ public class MainApplication extends Application {
 		return mBitmapManager;
 	}
 	
+	@Override
+	  public File getCacheDir()
+	  {
+		  // NOTE: this method is used in Android 2.2 and higher
+		  if (mCurrentCacheDirectory != null)
+		  {
+			  return mCurrentCacheDirectory;
+		  }
+		  else
+		  {
+			  return this.getInternalCacheDir();
+		  }
+	  }
+	
+	  public File getInternalCacheDir()
+	  {
+		  return super.getCacheDir();
+	  }
+	  
+	  public File getExternalCacheDir()
+	  {
+		  return IoUtils.tryGetExternalCachePath(this);
+	  }
+	
+	private void updateImageManagerFromSettings(){
+		mCurrentCacheDirectory = this.getSettingsCacheDirectory(mSettings);
+		mHttpImageManager.setPersistenceCache(mCurrentCacheDirectory != null ? new FileSystemPersistence(mCurrentCacheDirectory) : null);
+	}
+	
+	private File getSettingsCacheDirectory(ApplicationSettings settings){
+		if(settings.isFileCacheEnabled()){
+			if(settings.isFileCacheSdCard()){
+				File externalPath = getExternalCacheDir();
+				if(externalPath != null){
+					return externalPath;
+				}
+			}
+			
+			return getInternalCacheDir();
+		}
+		
+		return null;
+	}
+	
 	/** Создает маппер, который будет игнорировать неизвестные свойства */
 	private ObjectMapper createObjectMapper()
 	{
@@ -127,4 +177,17 @@ public class MainApplication extends Application {
 	}
 
 
+	private class CacheSettingsChangedListener implements ICacheSettingsChangedListener {
+
+		@Override
+		public void cacheFileSystemChanged(boolean newValue) {
+			updateImageManagerFromSettings();
+		}
+
+		@Override
+		public void cacheSDCardChanged(boolean newValue) {
+			updateImageManagerFromSettings();
+		}
+	}
+	
 }

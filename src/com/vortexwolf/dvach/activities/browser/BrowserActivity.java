@@ -1,4 +1,6 @@
 package com.vortexwolf.dvach.activities.browser;
+import java.io.File;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.http.DownloadFileTask;
@@ -7,6 +9,7 @@ import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -158,7 +161,6 @@ public class BrowserActivity extends Activity {
 	    		}
 	    		break;
 	        case R.id.save_menu_id: {
-
 	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString());
 	        	
 	        	Tracker.getInstance().setBoardVar(UriUtils.getBoardName(this.mUri));
@@ -174,4 +176,11 @@ public class BrowserActivity extends Activity {
     public void onSaveInstanceState(Bundle outState) {
     	this.mWebview.saveState(outState);
     }
+
+	@Override
+	public File getCacheDir() {
+		return this.getApplicationContext().getCacheDir();
+	}
+    
+    
 }

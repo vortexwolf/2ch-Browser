@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.common.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.activities.threads.ThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.common.Constants;
@@ -17,8 +19,11 @@ import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadPostUtils {
+	
+	private static final IThumbnailOnClickListenerFactory sThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	
 	public static boolean isSage(PostInfo item){
 		String email = item.getEmail();
@@ -32,19 +37,11 @@ public class ThreadPostUtils {
 	public static boolean hasAttachment(IAttachmentEntity item){
 		return !StringUtils.isEmpty(item.getImage()) || !StringUtils.isEmpty(item.getVideo());
 	}
-
-	/** Возвращает обработчик события при нажатии на картинку-thumbnail */
-	public static OnClickListener getAttachmentClickListener(AttachmentInfo attach,
-			IThumbnailOnClickListenerFactory clickListenerFactory, Context context){
-		
-		if(!attach.isEmpty()){
-			String attachmentUrl = attach.getSourceUrl();
-        	if (attachmentUrl != null) {
-        		return clickListenerFactory.getOnClickListener(attachmentUrl, context, attach.getSize());
-        	}
-		}
-		
-		return null;
+	
+	public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings){
+    	if(attachment != null){
+    		sThumbnailOnClickListenerFactory.raiseClick(attachment, context, settings);
+    	}
 	}
 	
 	/** Разбирается с прикрепленным файлом для треда или поста; перенес сюда, чтобы не повторять код
@@ -56,8 +53,7 @@ public class ThreadPostUtils {
 	 * @param activity
 	 */	
 	public static void handleAttachmentImage(boolean isBusy, AttachmentInfo attachment, ImageView imageView, 
-			ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, 
-			IThumbnailOnClickListenerFactory clickListenerFactory, Activity activity){
+			ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, Activity activity) {
 
 		indeterminateProgressBar.setVisibility(View.GONE);
 		imageView.setImageResource(android.R.color.transparent); // clear the image content
@@ -71,30 +67,33 @@ public class ThreadPostUtils {
 			fullThumbnailView.setVisibility(View.VISIBLE);
 			imageView.setVisibility(View.VISIBLE);
 			
+			ApplicationSettings settings = ((MainApplication)activity.getApplication()).getSettings();
+			
 			//Обработчик события нажатия на картинку
-			OnClickListener thumbnailOnClickListener = getAttachmentClickListener(attachment, clickListenerFactory, activity.getApplicationContext());
+			OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getOnClickListener(attachment, activity.getApplicationContext(), settings);
 			if (thumbnailOnClickListener != null) {
             	imageView.setOnClickListener(thumbnailOnClickListener);
             	indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);
     		}
 
-        	MainApplication app = (MainApplication)activity.getApplication();
         	String thumbnailUrl = attachment.getThumbnailUrl();
         	
         	//Ничего не загружаем, если так установлено в настройках
-        	if(app.getSettings().isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)){
+        	if(settings.isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)){
         		imageView.setImageResource(R.drawable.empty_image);
         	}
         	else{
 	    		//Также добавляем уменьшенное изображение, нажатие на которое открывает файл в полном размере
 	    		if (thumbnailUrl != null){
+	    			imageView.setTag(Uri.parse(thumbnailUrl));
+	    			
 	    			if(!isBusy || bitmapManager.isCached(thumbnailUrl)){
 	    				bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, indeterminateProgressBar, R.drawable.error_image);
 	    			}
 	    		}
 	    		else {
 	    			// Иногда можно прикреплять файлы с типом mp3, swf и пр., у которых thumbnail=null. Нужно нарисовать другую картинку в таких случаях
-	    			if(!StringUtils.isEmpty(attachment.getSourceUrl())){
+	    			if(attachment.isFile()){
 	    				imageView.setImageResource(attachment.getDefaultThumbnail());
 	    			}
 	    			else{

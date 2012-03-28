@@ -49,7 +49,7 @@ public class BitmapManager implements IBitmapManager {
             	if(imageView.getTag() == r.getUri()){
             		imageView.setImageBitmap(data);
             		AppearanceUtils.hideImageProgressBar(indeterminateProgressBar, imageView);
-            	}			
+            	}
 			}
 			
 			@Override

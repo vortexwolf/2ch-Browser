@@ -64,6 +64,7 @@
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
     <string name="pref_category_autorefresh">Автообновление</string>
+    <string name="pref_category_cache">Кэширование</string>
     
     <string name="pref_homepage">Форум по умолчанию</string>
     <string name="pref_homepage_summary">Измените стартовую страницу</string>
@@ -83,6 +84,9 @@
 
 	<string name="pref_display_navigation_bar">Панель навигации</string>
 	<string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
+	
+	<string name="pref_youtube_mobile_links">Прикрепленное youtube-видео</string>
+	<string name="pref_youtube_mobile_links_summary">Открывать мобильный youtube вместо обычного</string>
 	
 	<string name="pref_text_size">Размер текста</string>
 	<string-array name="pref_text_size_choices">
@@ -105,6 +109,14 @@
 	<string name="pref_auto_refresh_interval">Интервал</string>
 	<string name="pref_auto_refresh_interval_dialog_title">Интервал автообновления</string>
 	<string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
+
+	<string name="pref_file_cache">Файловая система</string>
+	<string name="pref_file_cache_summary">Кэшировать изображения в файловой системе</string>
+	
+	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
+	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
+	
+	<string name="pref_file_cache_clear">Очистить сейчас</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>

@@ -58,13 +58,13 @@ public class GzipHttpClientFactory {
         HttpConnectionParams.setStaleCheckingEnabled(params, false);
         
         // Default connection and socket timeout of 30 seconds. Tweak to taste.
-        HttpConnectionParams.setConnectionTimeout(params, 10*1000);
-        HttpConnectionParams.setSoTimeout(params, 20*1000);
-        HttpConnectionParams.setSocketBufferSize(params, 8192);
+        //HttpConnectionParams.setConnectionTimeout(params, 10*1000);
+        //HttpConnectionParams.setSoTimeout(params, 20*1000);
+        //HttpConnectionParams.setSocketBufferSize(params, 8192);
         
-        //ConnManagerParams.setTimeout(params, 5 * 1000);
-        ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(50));
-        ConnManagerParams.setMaxTotalConnections(params, 200);
+        ConnManagerParams.setTimeout(params, 15 * 1000);
+        //ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(50));
+        //ConnManagerParams.setMaxTotalConnections(params, 200);
 
         // http client
 		DefaultHttpClient httpclient = new DefaultHttpClient(cm, params);

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.IoUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,18 +23,20 @@ public class FileSystemPersistence implements BitmapCache{
 
     private static final String TAG = "ThumbnailFSPersistent";
     
-    private String mBaseDir;
-    
-    
-    public FileSystemPersistence ( String baseDir ) {
+    private File mBaseDir;
+ 
+    public FileSystemPersistence (File baseDir) {
         mBaseDir = baseDir;
+        if (!mBaseDir.exists()) {
+        	mBaseDir.mkdirs();
+        }
     }
     
     
     @Override
     public void clear() {
         try {
-            this.removeDir(new File(mBaseDir));
+            this.removeDir(mBaseDir);
         } 
         catch (IOException e) {
             throw new RuntimeException ( e );
@@ -43,7 +46,7 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public boolean exists(String key) {
-        File file = new File( new File(mBaseDir), key) ;
+        File file = new File(mBaseDir, key) ;
         return file.exists();
     }
 
@@ -63,14 +66,16 @@ public class FileSystemPersistence implements BitmapCache{
         //load the bitmap as-is (no scaling, no crop)
         Bitmap bitmap = null;
         
-        File file = new File( new File(mBaseDir), key) ;
+        File file = new File(mBaseDir, key) ;
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
             bitmap = BitmapFactory.decodeStream(fis);
             if(bitmap == null) {
+            	file.delete();
                  // something wrong with the persistent data, can't be decoded to bitmap.
-                throw new RuntimeException("data from db can't be decoded to bitmap");
+            	return null;
+                //throw new RuntimeException("data from db can't be decoded to bitmap");
             }
             return bitmap;
         }
@@ -90,13 +95,12 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public void storeData(String key, Bitmap data) {
+    	//this.checkCacheSize();
+    	
         OutputStream outputStream = null;
         try {
-            File file = new File( new File(mBaseDir), key) ;
+            File file = new File(mBaseDir, key) ;
             
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
             outputStream = new FileOutputStream(file);
             if(!data.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
                 throw new RuntimeException("failed to compress bitmap");
@@ -114,6 +118,25 @@ public class FileSystemPersistence implements BitmapCache{
         }
     }
     
+    private void checkCacheSize(){
+    	long cacheSize =IoUtils.dirSize(mBaseDir);
+    	long maxCache = 5 * 1024 * 1024;
+    	
+    	if(cacheSize > maxCache){
+    		long diff = cacheSize - maxCache;
+    		
+    	    File[] files = mBaseDir.listFiles();
+    	    long releasedSize = 0;
+    	    for (File f:files) {
+    	    	releasedSize += f.length();
+    	    	f.delete();
+    	    	// удаляем излишки и половину доступного кэша
+    	    	if(releasedSize >= diff + cacheSize / 2){
+    	    		break;
+    	    	}
+    	    }
+    	}
+    }
     
     
     /**

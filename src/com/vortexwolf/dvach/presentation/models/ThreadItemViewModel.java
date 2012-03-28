@@ -11,6 +11,7 @@ import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadItemViewModel {
 

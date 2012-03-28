@@ -26,6 +26,7 @@ import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
+import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -35,11 +36,13 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -58,7 +61,6 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
 
-	private final IThumbnailOnClickListenerFactory mThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
     private TimerService mAutoRefreshTimer = null;
@@ -111,7 +113,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         
         if(mAdapter == null)
         {    	
-        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mThumbnailOnClickListenerFactory, mApplication.getSettings());
+        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings());
         	setListAdapter(mAdapter);
         	
     		this.refreshPosts();
@@ -188,7 +190,9 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		this.mPartialLoadingView = this.findViewById(R.id.addItemsLoading);
         
 		this.getListView().setSelectionFromTop(position.position, position.top);
-        this.getListView().setOnScrollListener(this);
+        if(Integer.valueOf(Build.VERSION.SDK) > 7){
+        	this.getListView().setOnScrollListener(this);
+        }
     }
     
 	
@@ -255,7 +259,8 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 				return true;        	
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE:{
-	        	this.mApplication.getDownloadFileService().downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
+	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
+	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	
 	    	    this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU);
 	    	    
@@ -330,9 +335,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     		mCurrentDownloadTask.execute();
 		}
 	}
+	
+	
 
 	@Override
-	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {		
+	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {	
 	}
 
 	@Override

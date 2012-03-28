@@ -31,6 +31,8 @@ import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.FlushedInputStream;
 import com.vortexwolf.dvach.common.library.MyLog;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -53,35 +55,32 @@ public class NetworkResourceLoader {
     	mHttpClient = httpClient;
     }
 
-    public InputStream load (Uri uri) throws IOException{
-        MyLog.d(TAG, "Requesting: " + uri);
-        
-		HttpGet request = null;
+    public Bitmap loadBitmap (Uri uri) {
+    	HttpGet request = null;
 		HttpEntity entity = null;
-		try
-		{
+		Bitmap bmp = null;
+		try {
+			MyLog.d(TAG, "Image load started: " + uri);
 			request = new HttpGet(uri.toString());
-	        HttpResponse response = mHttpClient.execute(request);
-	        entity = response.getEntity();
-	        
-	        InputStream stream = new FlushedInputStream(entity.getContent());
-	        return stream;
-        
-		}
-        catch (IOException e){
-        	if (entity != null){
+			HttpResponse response = this.mHttpClient.execute(request);
+			entity = response.getEntity();
+			FlushedInputStream fis = new FlushedInputStream(entity.getContent());
+			bmp = BitmapFactory.decodeStream(fis);
+	        MyLog.d(TAG, "Image downloaded: " + uri);
+		} catch (Exception e) {
+			MyLog.e(TAG, e);
+		} finally {
+			if (entity != null){
 				try {
 					entity.consumeContent();
-				} catch (IOException ioe) {
-					MyLog.e(TAG, ioe);
+				} catch (IOException e) {
+					MyLog.e(TAG, e);
 				}
 			}
 			if(request != null){
 				request.abort();
 			}
-			
-			throw e;
-        }
-
+		}
+		return bmp;
     }
 }

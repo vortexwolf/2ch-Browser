@@ -39,11 +39,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -63,7 +65,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	private Tracker mTracker;
 	private ApplicationSettings mSettings;
 	
-	private final IThumbnailOnClickListenerFactory mThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
 	private final ThreadsReaderListener mThreadsReaderListener = new ThreadsReaderListener();
@@ -106,7 +107,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 
         if(mAdapter == null)
         {       	
-        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), mThumbnailOnClickListenerFactory);
+        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager());
 	        setListAdapter(mAdapter);
 	        
 	        this.refreshThreads();
@@ -168,7 +169,10 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         
         this.registerForContextMenu(this.getListView());
         this.getListView().setSelectionFromTop(position.position, position.top);
-        this.getListView().setOnScrollListener(this);
+        
+        if(Integer.valueOf(Build.VERSION.SDK) > 7){
+        	this.getListView().setOnScrollListener(this);
+        }
         
         // Отображаем или список, или индикатор ошибки, или загрузку в новой теме
         if(this.mCurrentView != null){
@@ -339,15 +343,16 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 				return true;
 	        }
 	        case Constants.CONTEXT_MENU_OPEN_ATTACHMENT: {
-	        	AttachmentInfo attach = info.getAttachment(this.mBoardName);
-	        	if(attach != null && !attach.isEmpty()){
-	        		this.mThumbnailOnClickListenerFactory.raiseClick(attach.getSourceUrl(), this, attach.getSize());
+	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
+	        	if(attachment != null && !attachment.isEmpty()){
+	        		ThreadPostUtils.openAttachment(attachment, this.getApplicationContext(), this.mSettings);
 	        		return true;
 	        	}
 	        	return false;
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
-	        	this.mApplication.getDownloadFileService().downloadFile(this, info.getAttachment(this.mBoardName).getSourceUrl());
+	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
+	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	
 	    	    this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU);
 	    	    
@@ -462,5 +467,4 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	    }
 	
 	}
-
 }

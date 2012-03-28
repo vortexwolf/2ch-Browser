@@ -25,7 +25,9 @@ public class Tracker {
 	public static final String ACTION_PREFERENCE_POPUP_LINK = "Change Popup Links";
 	public static final String ACTION_PREFERENCE_AUTO_REFRESH = "Change Auto Refresh";
 	public static final String ACTION_PREFERENCE_NAVIGATION_BAR = "Change Display Navigation Bar";
-	public static final String ACTION_PREFERENCE_SAME_PERSON = "Change Display Same Person";
+	public static final String ACTION_PREFERENCE_YOUTUBE_MOBILE = "Change Youtube mobile links";
+	public static final String ACTION_PREFERENCE_FILE_CACHE = "Change File cache";
+	public static final String ACTION_PREFERENCE_FILE_CACHE_SD = "Change File cache on sd card";
 	
 	public static final String LABEL_DOWNLOAD_FILE_FROM_BROWSER = "From browser";
 	public static final String LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU = "From context menu";

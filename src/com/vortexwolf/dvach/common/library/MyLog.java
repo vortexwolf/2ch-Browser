@@ -32,7 +32,7 @@ public class MyLog {
 				Log.e(tag, e.getCause().getMessage().toString() + " " + e.getMessage().toString());
 			}
 			else {
-				Log.e(tag, e.getClass().getName() + " " + e.getMessage().toString());
+				Log.e(tag, e.getClass().getName() + " " + e.getMessage() != null ? e.getMessage().toString() : "");
 			}
 		}
 	}

@@ -48,7 +48,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final ListActivity mActivity;
 	private final LayoutInflater mInflater;
 	private final IBitmapManager mBitmapManager;
-	private final IThumbnailOnClickListenerFactory mThumbnailOnClickListenerFactory;
 	private final String mBoardName;
 	private final String mThreadNumber;
 	private final PostsViewModel mPostsViewModel;
@@ -58,13 +57,12 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	
 	private boolean mIsBusy = false;
 		
-	public PostsListAdapter(ListActivity activity, String boardName, String threadNumber, IBitmapManager bitmapManager, IThumbnailOnClickListenerFactory thumbnailOnClickListenerFactory, ApplicationSettings settings) {
+	public PostsListAdapter(ListActivity activity, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
         super(activity.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mBitmapManager = bitmapManager;
-        this.mThumbnailOnClickListenerFactory = thumbnailOnClickListenerFactory;
         this.mActivity = activity;
         this.mInflater = LayoutInflater.from(activity);
         this.mTheme = this.mActivity.getTheme();
@@ -147,7 +145,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
         ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, 
         		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-        		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+        		this.mBitmapManager, this.mActivity);
         ThreadPostUtils.handleAttachmentDescription(attachment, this.mActivity.getResources(), vb.attachmentInfoView);
         
         //Комментарий (обновляем после файла)
@@ -269,6 +267,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 		this.mIsBusy = isBusy;
 		
 		if(prevBusy == true && isBusy == false){
+			//this.notifyDataSetChanged();
 	        int count = view.getChildCount();
 	        for (int i=0; i<count; i++) {
 	            View v = (View)view.getChildAt(i);
@@ -279,7 +278,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	            AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
 	            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
 	            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-	            		this.mBitmapManager, this.mThumbnailOnClickListenerFactory, this.mActivity);
+	            		this.mBitmapManager, this.mActivity);
 	        }
 		}
 	}

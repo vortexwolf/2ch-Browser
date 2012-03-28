@@ -19,7 +19,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 		mSettings = application.getSettings();
 
 		addPreferencesFromResource(R.xml.preferences);
-		
+
         Tracker.getInstance().trackActivityView("ApplicationPreferencesActivity");
 	}
 

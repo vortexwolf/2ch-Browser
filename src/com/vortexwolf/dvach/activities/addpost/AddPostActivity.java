@@ -370,6 +370,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	
 	@Override
 	public void showCaptcha(CaptchaEntity captcha, Bitmap captchaImage) {
+		this.mCaptchaImageView.setImageResource(android.R.color.transparent);
 		if(this.mCaptchaBitmap != null){
 			this.mCaptchaBitmap.recycle();
 		}

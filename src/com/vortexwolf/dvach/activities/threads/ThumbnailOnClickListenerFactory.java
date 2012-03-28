@@ -3,6 +3,8 @@ package com.vortexwolf.dvach.activities.threads;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
+import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.content.Context;
 import android.os.Debug;
@@ -15,17 +17,20 @@ public class ThumbnailOnClickListenerFactory implements IThumbnailOnClickListene
 	private static long sHeapPad = 128; // 128 Kb
 	
 	@Override
-	public OnClickListener getOnClickListener(final String url, final Context context, final int imageSize) {
+	public OnClickListener getOnClickListener(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings) {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				raiseClick(url, context, imageSize);
+				raiseClick(attachment, context, settings);
 			}
 		};
 	}
 	
 	@Override
-	public void raiseClick(final String url, final Context context, final int imageSize){
+	public void raiseClick(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings){
+		int imageSize = attachment.getSize();
+		String url = attachment.getSourceUrl(settings);
+		
 		long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
 		if(allocatedSize > sMaxVmHeap){
 			long freeSize = Math.max(0, imageSize - (allocatedSize - sMaxVmHeap));

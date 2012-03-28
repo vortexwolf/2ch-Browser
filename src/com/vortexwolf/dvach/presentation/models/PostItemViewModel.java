@@ -22,6 +22,7 @@ import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostItemViewModel {
 

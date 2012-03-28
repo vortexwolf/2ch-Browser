@@ -233,19 +233,11 @@ public class FilesListActivity extends ListActivity {
 
 				String statusText = (object.file.length() / 1024) + "Kb";
 				
-				Bitmap bm = (Bitmap)imageView.getTag();
-				if(bm != null){
-					bm.recycle();
-					imageView.setTag(null);
-				}
-				
 				ImageFileModel bitmapModel = new ImageFileModel(object.file);
 				if (bitmapModel.getBitmap() != null) {
 					imageView.setImageBitmap(bitmapModel.getBitmap());
 					frame.setVisibility(View.VISIBLE);
 					statusText += ", " + bitmapModel.imageWidth + "x" + bitmapModel.imageHeight;
-					
-					imageView.setTag(bitmapModel.getBitmap());
 				}
 				else{
 					MyLog.v(TAG, "Bitmap is null");

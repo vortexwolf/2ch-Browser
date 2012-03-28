@@ -1,7 +1,11 @@
 package android.httpimage;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.vortexwolf.dvach.common.library.MyLog;
 
@@ -17,6 +21,7 @@ import android.util.Log;
 public class BasicBitmapCache implements BitmapCache{
     
     private static class CacheEntry {
+    	public String url;
         public Bitmap data;
         public int nUsed;
         public long timestamp;
@@ -25,9 +30,9 @@ public class BasicBitmapCache implements BitmapCache{
     
     private static final String TAG = "BasicBitmapCache";
 
-    private int mMaxSize;
+    private final int mMaxSize;
     private HashMap<String, CacheEntry> mMap = new HashMap<String, CacheEntry> ();
-    
+    private SortedSet<CacheEntry> mSet = new TreeSet<CacheEntry>(new CacheEntryComparator());
 
     /**
      * max number of resource this cache contains
@@ -47,12 +52,13 @@ public class BasicBitmapCache implements BitmapCache{
     @Override
     public synchronized void invalidate(String key){
         CacheEntry e = mMap.get(key);
-        Bitmap data = e.data;
-        data.recycle();
-        mMap.remove(key);
-        MyLog.d(TAG, key + " is invalidated from the cache");
+        invalidate(e);
     }
-
+    
+    public synchronized void invalidate(CacheEntry e){
+        mMap.remove(e.url);
+        mSet.remove(e);
+    }
     
     @Override
     public synchronized void clear(){
@@ -99,6 +105,7 @@ public class BasicBitmapCache implements BitmapCache{
             return;
         }
         CacheEntry res = new CacheEntry();
+        res.url = key;
         res.nUsed = 1;
         res.timestamp = System.currentTimeMillis();
         res.data = data;
@@ -106,11 +113,39 @@ public class BasicBitmapCache implements BitmapCache{
         //if the number exceeds, move an item out 
         //to prevent the storage from increasing indefinitely.
         if(mMap.size() >= mMaxSize) {
-            String outkey = this.findItemToInvalidate();
-            this.invalidate(outkey);
+        	MyLog.d(TAG, "started to invalidate");
+        	
+        	ArrayList<CacheEntry> toInvalidate = new ArrayList<CacheEntry>();
+        	int i = 0;
+        	for(CacheEntry e : mSet){
+        		toInvalidate.add(e);
+        		if(i > mMaxSize / 2) break;
+        		i++;
+        	}
+        	
+        	for(CacheEntry e : toInvalidate){
+        		this.invalidate(e);
+        	}
+        	
+        	MyLog.d(TAG, "invalidated");
         }
         
         mMap.put(key, res);
+        mSet.add(res);
+    }
+    
+    private class CacheEntryComparator implements Comparator<CacheEntry>{
+		@Override
+		public int compare(CacheEntry left, CacheEntry right) {
+			if(left.timestamp < right.timestamp){
+				return -1;
+			}
+			else if (left.timestamp > right.timestamp){
+				return 1;
+			}
+			
+			return 0;
+		}
     }
 
 }
