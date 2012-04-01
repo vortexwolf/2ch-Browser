@@ -19,6 +19,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AbsListView;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -56,6 +57,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final OnLongClickListener mOnLongClickListener;
 	
 	private boolean mIsBusy = false;
+	private boolean mIsLoadingMore = false;
 		
 	public PostsListAdapter(ListActivity activity, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
         super(activity.getApplicationContext(), 0);
@@ -79,19 +81,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         
-    	View view;
-        // Here view may be passed in for re-use, or we make a new one.
-        if (convertView == null) {
-            view = mInflater.inflate(R.layout.posts_list_item, null);
-        }
-        else {
-            view = convertView;
-        }
-        
-        PostItemViewModel item = this.getItem(position);
-        
-        // Set the values of the Views for the ThreadsListItem
-        fillItemView(view, item);
+    	if(isStatusView(position)){
+    		return mInflater.inflate(R.layout.loading, null);
+    	}
+    	
+    	View view = convertView == null ? mInflater.inflate(R.layout.posts_list_item, null) : convertView;
+
+        this.fillItemView(view, this.getItem(position));
         
         return view;
     }
@@ -275,12 +271,59 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	            
 	            ViewBag vb = (ViewBag)v.getTag();
 	            
-	            AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
-	            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
-	            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-	            		this.mBitmapManager, this.mActivity);
+	            PostItemViewModel item = this.getItem(position);
+	            if(item != null){
+		            AttachmentInfo attachment = item.getAttachment(this.mBoardName);
+		            if(!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
+			            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
+			            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
+			            		this.mBitmapManager, this.mActivity);
+		            }
+	            }
 	        }
 		}
+	}
+	
+	public void setLoadingMore(boolean isLoadingMore){
+		mIsLoadingMore = isLoadingMore;
+		this.notifyDataSetChanged();
+	}
+	
+	private final boolean hasStatusView() {
+		return mIsLoadingMore && super.getCount() > 0;
+	}
+	
+	private final boolean isStatusView(int position) {
+		return hasStatusView() && position == getCount() - 1;
+	}
+
+	@Override
+	public int getCount() {
+		int i = super.getCount();
+		if (hasStatusView()){
+			i++;
+		}
+		return i;
+	}
+	
+	@Override
+	public PostItemViewModel getItem(int position) {
+		return isStatusView(position) ? null : super.getItem(position);
+	}
+	
+	@Override
+	public long getItemId(int position) {
+		return isStatusView(position) ? Long.MIN_VALUE : super.getItemId(position);
+	}
+	
+	@Override
+	public int getItemViewType(int position) {
+		return isStatusView(position) ? Adapter.IGNORE_ITEM_VIEW_TYPE : super.getItemViewType(position);
+	}
+	
+	@Override
+	public boolean isEnabled(int position) {
+		return !isStatusView(position);
 	}
 	
 	static class ViewBag{

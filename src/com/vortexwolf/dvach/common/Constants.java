@@ -56,4 +56,5 @@ public class Constants {
     public static final int CONTEXT_MENU_REPLY_POST = 1003;
     public static final int CONTEXT_MENU_REPLY_POST_QUOTE = 1004;    
     public static final int CONTEXT_MENU_DOWNLOAD_FILE = 1005;
+    public static final int CONTEXT_MENU_COPY_TEXT = 1006;
 }

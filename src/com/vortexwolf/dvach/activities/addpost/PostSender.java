@@ -110,6 +110,9 @@ public class PostSender implements IPostSender {
             if(entity.getAttachment() != null){
             	multipartEntity.addPart(fields.getFile(), new FileBody(entity.getAttachment()));
             }
+            if(entity.getSubject() != null){
+            	multipartEntity.addPart(fields.getSubject(), new StringBody(entity.getSubject(), utf));
+            }
 
 	        httpPost.setEntity(multipartEntity);
 	        response = this.mHttpClient.execute(httpPost);  

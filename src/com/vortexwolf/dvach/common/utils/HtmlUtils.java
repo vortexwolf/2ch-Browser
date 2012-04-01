@@ -124,4 +124,14 @@ public class HtmlUtils {
 		}
 		return null;
 	}
+	
+	public static String getStringFontColor(String htmlText){
+		Integer color = getIntFontColor(htmlText);
+		
+		if(color != null){
+			return "#"+Integer.toHexString(color);
+		}
+		
+		return null;
+	}
 }

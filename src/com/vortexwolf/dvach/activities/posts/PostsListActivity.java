@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,7 +71,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	
 	private View mLoadingView = null;
 	private View mErrorView = null;
-	private View mPartialLoadingView = null;
+	//private View mPartialLoadingView = null;
 	private enum ViewType { LIST, LOADING, ERROR};
 	
 	private String mBoardName;
@@ -187,7 +188,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
 		this.mLoadingView = this.findViewById(R.id.loading);
 		this.mErrorView = this.findViewById(R.id.error);
-		this.mPartialLoadingView = this.findViewById(R.id.addItemsLoading);
+		//this.mPartialLoadingView = this.findViewById(R.id.addItemsLoading);
         
 		this.getListView().setSelectionFromTop(position.position, position.top);
         if(Integer.valueOf(Build.VERSION.SDK) > 7){
@@ -238,8 +239,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     	if(!StringUtils.isEmpty(item.getSpannedComment().toString())){
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST_QUOTE, 1, this.getString(R.string.cmenu_reply_post_quote));
     	}
+    	if(!StringUtils.isEmpty(item.getSpannedComment().toString())){
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
+    	}
     	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()){
-    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 2, this.getString(R.string.cmenu_download_file));
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(R.string.cmenu_download_file));
     	}
 	}
 	
@@ -247,8 +251,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     public boolean onContextItemSelected(MenuItem item) {
     	AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
     	PostItemViewModel info = mAdapter.getItem(menuInfo.position);
-        int itemId = item.getItemId();
-        
+
         switch(item.getItemId()){
 	        case Constants.CONTEXT_MENU_REPLY_POST:{
 	        	navigateToAddPostView(info.getNumber(), null);
@@ -257,6 +260,13 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	        case Constants.CONTEXT_MENU_REPLY_POST_QUOTE:{
 	        	navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
 				return true;        	
+	        }
+	        case Constants.CONTEXT_MENU_COPY_TEXT:{
+	        	ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+	        	clipboard.setText(info.getSpannedComment().toString());
+	        	
+	        	AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
+	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE:{
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
@@ -421,12 +431,12 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
 		@Override
 		public void showUpdateLoading() {
-			mPartialLoadingView.setVisibility(View.VISIBLE);
+			mAdapter.setLoadingMore(true);
 		}
 
 		@Override
 		public void hideUpdateLoading() {
-			mPartialLoadingView.setVisibility(View.GONE);
+			mAdapter.setLoadingMore(false);
 			mCurrentDownloadTask = null;
 		}
 	}

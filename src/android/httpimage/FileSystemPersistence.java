@@ -2,6 +2,7 @@ package android.httpimage;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -95,8 +96,6 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public void storeData(String key, Bitmap data) {
-    	//this.checkCacheSize();
-    	
         OutputStream outputStream = null;
         try {
             File file = new File(mBaseDir, key) ;
@@ -105,6 +104,11 @@ public class FileSystemPersistence implements BitmapCache{
             if(!data.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
                 throw new RuntimeException("failed to compress bitmap");
             }
+        }
+        catch (FileNotFoundException e){
+        	// No space left
+        	this.freeFileCache();
+        	MyLog.e(TAG, e);
         }
         catch (IOException e) {
             MyLog.e(TAG, e);
@@ -118,24 +122,19 @@ public class FileSystemPersistence implements BitmapCache{
         }
     }
     
-    private void checkCacheSize(){
-    	long cacheSize =IoUtils.dirSize(mBaseDir);
-    	long maxCache = 5 * 1024 * 1024;
-    	
-    	if(cacheSize > maxCache){
-    		long diff = cacheSize - maxCache;
-    		
-    	    File[] files = mBaseDir.listFiles();
-    	    long releasedSize = 0;
-    	    for (File f:files) {
-    	    	releasedSize += f.length();
-    	    	f.delete();
-    	    	// удаляем излишки и половину доступного кэша
-    	    	if(releasedSize >= diff + cacheSize / 2){
-    	    		break;
-    	    	}
-    	    }
-    	}
+    private void freeFileCache(){
+	    File[] files = mBaseDir.listFiles();
+	    int memoryToRelease = 5 * 1024 * 1024;
+	    int releasedMemory = 0;
+	    
+	    for (File file : files) {
+	    	releasedMemory += file.length();
+	    	file.delete();
+	    	
+	    	if(releasedMemory >= memoryToRelease){
+	    		break;
+	    	}
+	    }
     }
     
     

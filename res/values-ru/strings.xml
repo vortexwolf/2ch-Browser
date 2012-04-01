@@ -7,6 +7,7 @@
 	<string name="addpost_sage">Sage (не поднимать тред)</string>
 	<string name="addpost_message">Сообщение:</string>
 	<string name="addpost_message_hint">Сообщение</string>
+	<string name="addpost_subject_hint">Тема</string>
 	<string name="addpost_captcha_text">Введите код подтверждения:</string>
 	<string name="addpost_captcha_can_skip">Без кода подтверждения</string>
 	<string name="addpost_captcha_hint">Код подтверждения</string>
@@ -60,7 +61,8 @@
     <string name="cmenu_reply_post">Ответить</string>
     <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
     <string name="cmenu_download_file">Загрузить файл</string>
-    
+    <string name="cmenu_copy_post">Копировать текст</string>
+        
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
     <string name="pref_category_autorefresh">Автообновление</string>
@@ -138,4 +140,5 @@
 	<string name="notification_no_new_posts">Нет новых сообщений</string>
 	<string name="notification_save_image_success">Файл сохранен в %1$s</string>
 	<string name="notification_post_not_found">Сообщение на найдено</string>
+	<string name="notification_post_copied">Сообщение скопировано</string>
 </resources>

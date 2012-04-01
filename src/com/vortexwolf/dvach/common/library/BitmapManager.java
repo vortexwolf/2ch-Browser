@@ -12,17 +12,15 @@ import android.view.View;
 import android.widget.ImageView;
 
 public class BitmapManager implements IBitmapManager {
-	private final ArrayList<String> mErrorBitmaps;
 	private final HttpImageManager mImageManager;
     
 	public BitmapManager(HttpImageManager imageManager) {
-		this.mErrorBitmaps = new ArrayList<String>();
 		this.mImageManager = imageManager;
 	}
 
 	@Override
 	public boolean isCached(String uriString) {
-		return mImageManager.isCached(uriString) || this.mErrorBitmaps.contains(uriString);
+		return mImageManager.isCached(uriString);
 	}
 
 	@Override
@@ -30,11 +28,6 @@ public class BitmapManager implements IBitmapManager {
 
 		Uri uri = Uri.parse(uriString);
 		imageView.setTag(uri);
-		
-		if(this.mErrorBitmaps.contains(uriString)){
-			imageView.setImageResource(errorImageId);
-			return;
-		}
 
 		LoadRequest r = new LoadRequest(uri, null, new HttpImageManager.OnLoadResponseListener() {
 			@Override
@@ -54,7 +47,6 @@ public class BitmapManager implements IBitmapManager {
 			
 			@Override
 			public void onLoadError(final LoadRequest r, Throwable e) {
-				mErrorBitmaps.add(r.getUri().toString());
             	if(imageView.getTag() == r.getUri()){
             		imageView.setImageResource(errorImageId);
             		AppearanceUtils.hideImageProgressBar(indeterminateProgressBar, imageView);

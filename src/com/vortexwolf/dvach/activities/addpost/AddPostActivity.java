@@ -92,6 +92,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private View mAttachmentView;
 	private ProgressDialog mProgressDialog;
 	private Button mSendButton;
+	private EditText mSubjectView;
 	
 	// Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить (после успешной отправки)
 	private boolean mFinishedSuccessfully = false;
@@ -168,6 +169,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		
 		if(Constants.ADD_THREAD_PARENT.equals(this.mThreadNumber)){
 			this.setTitle(String.format(getString(R.string.data_add_thread_title), mBoardName));
+			this.mSubjectView.setVisibility(View.VISIBLE);
 		}
 		else{
 			this.setTitle(String.format(getString(R.string.data_add_post_title), mBoardName, mThreadNumber));
@@ -207,6 +209,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
 		this.mAttachmentView = findViewById(R.id.addpost_attachment_view);
 		this.mSendButton = (Button)this.findViewById(R.id.addpost_send_button);
+		this.mSubjectView = (EditText)this.findViewById(R.id.addpost_subject);
 		final Button removeAttachmentButton = (Button)this.findViewById(R.id.addpost_attachment_remove);
 		final Button refreshCaptchaButton = (Button)this.findViewById(R.id.addpost_refresh_button);
 		final LinearLayout textFormatView = (LinearLayout)this.findViewById(R.id.addpost_textformat_view);
@@ -289,18 +292,21 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 			return;
 		}
 		
+		String subject = StringUtils.nullIfEmpty(this.mSubjectView.getText().toString());
+		
 		//Отправляем
-		sendPost(captchaAnswer, comment, isSage, attachment);
+		sendPost(captchaAnswer, comment, isSage, attachment, subject);
 	}
 
-	private void sendPost(String captchaAnswer, String comment, boolean isSage, File attachment){
+	private void sendPost(String captchaAnswer, String comment, boolean isSage, File attachment, String subject){
 
 		if(this.mCurrentPostSendTask != null){
 			this.mCurrentPostSendTask.cancel(true);
 		}
 		
 		String captchaKey = mCaptcha != null ? mCaptcha.getKey() : null;
-		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment);
+		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject);
+		
 		this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardSettingsStorage, mBoardName, mThreadNumber, pe);
 		this.mCurrentPostSendTask.execute();
 	}

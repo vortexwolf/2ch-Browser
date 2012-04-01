@@ -281,7 +281,10 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 		
 		ThreadItemViewModel info = mAdapter.getItem(position);
 		
-		this.navigateToThread(info.getNumber(), info.getSpannedSubject() != null ? info.getSpannedSubject().toString() : null);
+		String threadSubject = info.getSpannedSubject() != null 
+							? info.getSpannedSubject().toString() 
+							: StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
+		this.navigateToThread(info.getNumber(), threadSubject);
 	}
 /*
 	//При повороте экрана из списка заголовки исчезают, поэтому попробую такой костыль

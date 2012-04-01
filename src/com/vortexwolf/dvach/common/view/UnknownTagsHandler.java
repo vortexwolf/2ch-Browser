@@ -62,7 +62,7 @@ public class UnknownTagsHandler implements TagHandler {
 			}
 			else {
 				HtmlToSpannedConverter.end(output, Code.class, new TypefaceSpan("monospace"));
-				HtmlToSpannedConverter.end(output, Code.class, new RelativeSizeSpan(0.7f));
+				HtmlToSpannedConverter.end(output, Code.class, new RelativeSizeSpan(0.75f));
 			}
 		}
 	}

@@ -13,13 +13,22 @@
 	        android:layout_height="wrap_content" 
 	        android:text="@string/addpost_sage"
 	        android:textAppearance="?android:attr/textAppearanceMedium"/>
-	        
-	        <LinearLayout android:id="@+id/addpost_attachment_view" 
-			        	android:visibility="gone"
-	            		android:orientation="horizontal"
-	            		android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						>
+	    <EditText android:id="@+id/addpost_subject"
+			android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" 
+	        android:maxLength="255"
+	        android:singleLine="true"
+	        android:hint="@string/addpost_subject_hint" 
+	   		android:inputType="textShortMessage|textCapSentences"
+	   		android:visibility="gone"
+	        />
+
+  	    <LinearLayout android:id="@+id/addpost_attachment_view" 
+        	android:visibility="gone"
+          	android:orientation="horizontal"
+          	android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			>
 			    <ImageView 
 			        android:layout_width="32dip" 
 			        android:layout_height="32dip"

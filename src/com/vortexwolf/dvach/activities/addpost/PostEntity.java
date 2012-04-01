@@ -3,51 +3,59 @@ package com.vortexwolf.dvach.activities.addpost;
 import java.io.File;
 
 public class PostEntity {
-	private String captchaKey;
-	private String captchaAnswer;
-	private String comment;
-	private boolean isSage;
-	private File attachment;
+	private String mCaptchaKey;
+	private String mCaptchaAnswer;
+	private String mComment;
+	private boolean mIsSage;
+	private File mAttachment;
+	private String mSubject;
 	
 	public PostEntity(String captchaKey, String captchaAnswer, String comment){
-		this(captchaKey, captchaAnswer, comment, false, null);
+		this(captchaKey, captchaAnswer, comment, false, null, null);
 	}
-	public PostEntity(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment){
-		this.captchaKey = captchaKey;
-		this.captchaAnswer = captchaAnswer;
-		this.comment = comment;
-		this.isSage = isSage;
-		this.setAttachment(attachment);
+	public PostEntity(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject){
+		this.mCaptchaKey = captchaKey;
+		this.mCaptchaAnswer = captchaAnswer;
+		this.mComment = comment;
+		this.mIsSage = isSage;
+		this.mAttachment = attachment;
+		this.mSubject = subject;
 	}
 	
 	public void setCaptchaKey(String captchaKey) {
-		this.captchaKey = captchaKey;
+		this.mCaptchaKey = captchaKey;
 	}
 	public String getCaptchaKey() {
-		return captchaKey;
+		return mCaptchaKey;
 	}
 	public void setCaptchaAnswer(String captchaAnswer) {
-		this.captchaAnswer = captchaAnswer;
+		this.mCaptchaAnswer = captchaAnswer;
 	}
 	public String getCaptchaAnswer() {
-		return captchaAnswer;
+		return mCaptchaAnswer;
 	}
 	public void setComment(String comment) {
-		this.comment = comment;
+		this.mComment = comment;
 	}
 	public String getComment() {
-		return comment;
+		return mComment;
 	}
 	public void setSage(boolean isSage) {
-		this.isSage = isSage;
+		this.mIsSage = isSage;
 	}
 	public boolean isSage() {
-		return isSage;
+		return mIsSage;
 	}
 	public void setAttachment(File attachment) {
-		this.attachment = attachment;
+		this.mAttachment = attachment;
 	}
 	public File getAttachment() {
-		return attachment;
+		return mAttachment;
+	}
+	public void setSubject(String subject) {
+		this.mSubject = subject;
+	}
+	public String getSubject() {
+		return mSubject;
 	}
 }

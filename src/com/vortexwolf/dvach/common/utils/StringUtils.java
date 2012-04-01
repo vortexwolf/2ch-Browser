@@ -14,10 +14,10 @@ public class StringUtils {
 	}
 	
 	public static String emptyIfNull(String s) {
-		if(s == null){
-			return "";
-		}
-		
-		return s;
+		return s == null ? "" : s;
+	}
+	
+	public static String nullIfEmpty(String s) {
+		return isEmpty(s) ? null : s;
 	}
 }

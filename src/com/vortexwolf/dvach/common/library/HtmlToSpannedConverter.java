@@ -34,6 +34,7 @@ import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
+import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.XmlUtils;
 
 public class HtmlToSpannedConverter implements ContentHandler {
@@ -278,9 +279,11 @@ public class HtmlToSpannedConverter implements ContentHandler {
                                   Attributes attributes) {
         String color = attributes.getValue("", "color");
         String face = attributes.getValue("", "face");
-
+        String style = attributes.getValue("", "style");
+        String parsedColor = HtmlUtils.getStringFontColor(style);
+        
         int len = text.length();
-        text.setSpan(new Font(color, face), len, len, Spannable.SPAN_MARK_MARK);
+        text.setSpan(new Font(parsedColor != null ? parsedColor : color, face), len, len, Spannable.SPAN_MARK_MARK);
     }
 
     private static void endFont(SpannableStringBuilder text) {

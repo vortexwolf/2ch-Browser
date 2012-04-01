@@ -7,6 +7,7 @@
 	<string name="addpost_sage">Sage</string>
 	<string name="addpost_message">Message:</string>
 	<string name="addpost_message_hint">Message</string>
+	<string name="addpost_subject_hint">Subject</string>
 	<string name="addpost_captcha_text">Enter the confirmation code:</string>
 	<string name="addpost_captcha_can_skip">Send without confirmation</string>
 	<string name="addpost_captcha_hint">Confirmation code</string>
@@ -61,6 +62,7 @@
     <string name="cmenu_reply_post">Reply to this post</string>
     <string name="cmenu_reply_post_quote">Reply with quote</string>
     <string name="cmenu_download_file">Download file</string>
+    <string name="cmenu_copy_post">Copy the post</string>
     
     <!-- Preferences -->
     <string name="pref_category_appearance">Appearance</string>
@@ -166,4 +168,5 @@
 	<string name="notification_no_new_posts">No new posts</string>
 	<string name="notification_save_image_success">The file was saved to %1$s</string>
 	<string name="notification_post_not_found">The post isn\'t found</string>
+	<string name="notification_post_copied">Copied to clipboard</string>
 </resources>

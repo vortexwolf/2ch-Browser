@@ -70,9 +70,7 @@ import android.widget.ImageView;
 public class HttpImageManager{
     
     private static final String TAG = "HttpImageManager";
-    
-    public static final int DEFAULT_CACHE_SIZE = 128;
-      
+
     private final BitmapCache mCache;
     private BitmapCache mPersistence;
     private final NetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
@@ -175,7 +173,7 @@ public class HttpImageManager{
     
     
     public HttpImageManager ( BitmapCache persistence ) {
-        this(new BasicBitmapCache(DEFAULT_CACHE_SIZE), persistence);
+        this(new BasicBitmapCache(), persistence);
     }
     
     public void setPersistenceCache(BitmapCache persistence){
@@ -211,15 +209,15 @@ public class HttpImageManager{
          
         String key = r.getHashedUri();
         
-        if(mCache.exists(key)) {
-            return mCache.loadData(key);
-        }
-        else { 
+        Bitmap cachedBitmap = mCache.loadData(key);
+        if(cachedBitmap == null) { 
             // not ready yet, try to retrieve it asynchronously.
         	if(r.mListener != null) r.mListener.beforeLoad(r);
             mExecutor.submit(newRequestCall(r));
             return null;
         }
+        
+        return cachedBitmap;
     }
     
     

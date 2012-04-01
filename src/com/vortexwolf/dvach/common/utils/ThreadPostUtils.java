@@ -77,31 +77,39 @@ public class ThreadPostUtils {
     		}
 
         	String thumbnailUrl = attachment.getThumbnailUrl();
-        	
-        	//Ничего не загружаем, если так установлено в настройках
-        	if(settings.isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)){
-        		imageView.setImageResource(R.drawable.empty_image);
-        	}
-        	else{
-	    		//Также добавляем уменьшенное изображение, нажатие на которое открывает файл в полном размере
-	    		if (thumbnailUrl != null){
+        	//Также добавляем уменьшенное изображение, нажатие на которое открывает файл в полном размере
+    		if (thumbnailUrl != null){
+		    	//Ничего не загружаем, если так установлено в настройках
+		    	if(settings.isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)){
+		    		imageView.setImageResource(R.drawable.empty_image);
+		    	}
+		    	else{
 	    			imageView.setTag(Uri.parse(thumbnailUrl));
 	    			
 	    			if(!isBusy || bitmapManager.isCached(thumbnailUrl)){
 	    				bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, indeterminateProgressBar, R.drawable.error_image);
 	    			}
-	    		}
-	    		else {
-	    			// Иногда можно прикреплять файлы с типом mp3, swf и пр., у которых thumbnail=null. Нужно нарисовать другую картинку в таких случаях
-	    			if(attachment.isFile()){
-	    				imageView.setImageResource(attachment.getDefaultThumbnail());
-	    			}
-	    			else{
-	    				imageView.setImageResource(R.drawable.error_image);
-	    			}
-	    		}
-        	} 
+		    	} 
+    		}
+    		else {
+    			// Иногда можно прикреплять файлы с типом mp3, swf и пр., у которых thumbnail=null. Нужно нарисовать другую картинку в таких случаях
+    			if(attachment.isFile()){
+    				imageView.setImageResource(attachment.getDefaultThumbnail());
+    			}
+    			else{
+    				imageView.setImageResource(R.drawable.error_image);
+    			}
+    		}
 		}
+	}
+	
+	public static boolean isImageHandledWhenWasBusy(AttachmentInfo attachment, ApplicationSettings settings, IBitmapManager bitmapManager){
+    	if(attachment == null || attachment.isEmpty()){
+    		return true;
+    	}
+		
+		String thumbnailUrl = attachment.getThumbnailUrl();
+		return thumbnailUrl == null || !settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl);
 	}
 	
 	public static void handleAttachmentDescription(AttachmentInfo attachment, Resources res, TextView attachmentInfoView){

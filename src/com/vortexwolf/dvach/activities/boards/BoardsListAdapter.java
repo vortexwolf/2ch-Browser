@@ -8,15 +8,26 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity>  {
+public class BoardsListAdapter extends BaseAdapter {
 	private static final int ITEM_VIEW_TYPE_BOARD = 0;
 	private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
 	
-	private LayoutInflater mInflater;
+	private final LayoutInflater mInflater;
+	private IBoardListEntity[] mItems;
 	
 	public BoardsListAdapter(Context context, IBoardListEntity[] items) {
-		super(context, 0, items);
-        mInflater = LayoutInflater.from(context);
+        this.mInflater = LayoutInflater.from(context);
+        this.mItems = items;
+	}
+
+	@Override
+	public int getCount() {
+		return this.mItems.length;
+	}
+
+	@Override
+	public IBoardListEntity getItem(int position) {
+		return this.mItems[position];
 	}
 
 	@Override
@@ -42,7 +53,6 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity>  {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         
-    	//final IBoardListEntity item = mItems[position];
     	final IBoardListEntity item = this.getItem(position);
     	
         if (convertView == null) {
