@@ -1,7 +1,7 @@
 package com.vortexwolf.dvach.activities.browser;
 
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 
 import android.content.Context;
 import android.content.Intent;

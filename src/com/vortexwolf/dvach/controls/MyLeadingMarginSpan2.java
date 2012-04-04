@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.view;
+package com.vortexwolf.dvach.controls;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

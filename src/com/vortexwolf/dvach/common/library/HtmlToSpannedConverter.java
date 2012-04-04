@@ -90,7 +90,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
             if (end == start) {
                 mSpannableStringBuilder.removeSpan(obj[i]);
             } else {
-                mSpannableStringBuilder.setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
+                mSpannableStringBuilder.setSpan(obj[i], start, end, Spanned.SPAN_PARAGRAPH);
             }
         }
 
@@ -235,7 +235,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     public static void start(SpannableStringBuilder text, Object mark) {
         int len = text.length();
-        text.setSpan(mark, len, len, Spannable.SPAN_MARK_MARK);
+        text.setSpan(mark, len, len, Spanned.SPAN_MARK_MARK);
     }
 
     public static <T> void end(SpannableStringBuilder text, Class<T> kind,
@@ -247,7 +247,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         text.removeSpan(obj);
 
         if (where != len) {
-            text.setSpan(repl, where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(repl, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
         return;
@@ -272,7 +272,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         text.append("\uFFFC");
 
         text.setSpan(new ImageSpan(d, src), len, text.length(),
-                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private static void startFont(SpannableStringBuilder text,
@@ -283,7 +283,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         String parsedColor = HtmlUtils.getStringFontColor(style);
         
         int len = text.length();
-        text.setSpan(new Font(parsedColor != null ? parsedColor : color, face), len, len, Spannable.SPAN_MARK_MARK);
+        text.setSpan(new Font(parsedColor != null ? parsedColor : color, face), len, len, Spanned.SPAN_MARK_MARK);
     }
 
     private static void endFont(SpannableStringBuilder text) {
@@ -305,21 +305,21 @@ public class HtmlToSpannedConverter implements ContentHandler {
                         ColorStateList colors = res.getColorStateList(colorRes);
                         text.setSpan(new TextAppearanceSpan(null, 0, 0, colors, null),
                                 where, len,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 } else {
                     int c = getHtmlColor(f.mColor);
                     if (c != -1) {
                         text.setSpan(new ForegroundColorSpan(c | 0xFF000000),
                                 where, len,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }
             }
 
             if (f.mFace != null) {
                 text.setSpan(new TypefaceSpan(f.mFace), where, len,
-                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
     }
@@ -328,7 +328,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         String href = attributes.getValue("", "href");
 
         int len = text.length();
-        text.setSpan(new Href(href), len, len, Spannable.SPAN_MARK_MARK);
+        text.setSpan(new Href(href), len, len, Spanned.SPAN_MARK_MARK);
     }
 
     private static void endA(SpannableStringBuilder text) {
@@ -343,7 +343,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
             if (h.mHref != null) {
                 text.setSpan(new URLSpan(h.mHref), where, len,
-                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
     }
@@ -365,37 +365,45 @@ public class HtmlToSpannedConverter implements ContentHandler {
             Header h = (Header) obj;
 
             text.setSpan(new RelativeSizeSpan(HEADER_SIZES[h.mLevel]),
-                         where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                         where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             text.setSpan(new StyleSpan(Typeface.BOLD),
-                         where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                         where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
-    public void setDocumentLocator(Locator locator) {
+    @Override
+	public void setDocumentLocator(Locator locator) {
     }
 
-    public void startDocument() throws SAXException {
+    @Override
+	public void startDocument() throws SAXException {
     }
 
-    public void endDocument() throws SAXException {
+    @Override
+	public void endDocument() throws SAXException {
     }
 
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+    @Override
+	public void startPrefixMapping(String prefix, String uri) throws SAXException {
     }
 
-    public void endPrefixMapping(String prefix) throws SAXException {
+    @Override
+	public void endPrefixMapping(String prefix) throws SAXException {
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes)
+    @Override
+	public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         handleStartTag(localName, attributes);
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    @Override
+	public void endElement(String uri, String localName, String qName) throws SAXException {
         handleEndTag(localName);
     }
 
-    public void characters(char ch[], int start, int length) throws SAXException {
+    @Override
+	public void characters(char ch[], int start, int length) throws SAXException {
         StringBuilder sb = new StringBuilder();
 
         /*
@@ -434,13 +442,16 @@ public class HtmlToSpannedConverter implements ContentHandler {
         mSpannableStringBuilder.append(sb);
     }
 
-    public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+    @Override
+	public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
     }
 
-    public void processingInstruction(String target, String data) throws SAXException {
+    @Override
+	public void processingInstruction(String target, String data) throws SAXException {
     }
 
-    public void skippedEntity(String name) throws SAXException {
+    @Override
+	public void skippedEntity(String name) throws SAXException {
     }
 
     private static class Bold { }

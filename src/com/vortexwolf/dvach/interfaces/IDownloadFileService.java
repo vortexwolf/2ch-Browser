@@ -4,8 +4,6 @@ import java.io.File;
 
 import android.content.Context;
 
-import com.vortexwolf.dvach.common.http.DownloadFileException;
-
 public interface IDownloadFileService {
 
 	File getSaveFilePath(String uri);

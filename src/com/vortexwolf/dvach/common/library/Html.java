@@ -6,14 +6,6 @@ import org.xml.sax.Attributes;
 
 import android.graphics.drawable.Drawable;
 import android.text.*;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.AlignmentSpan;
-import android.text.style.CharacterStyle;
-import android.text.style.StrikethroughSpan;
-import android.util.Log;
-
-
-import java.nio.CharBuffer;
 
 /**
  * This class processes HTML strings into displayable styled text.

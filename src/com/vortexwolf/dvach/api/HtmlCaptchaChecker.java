@@ -1,11 +1,8 @@
 package com.vortexwolf.dvach.api;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.text.Html;
 
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.http.HttpStringReader;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;

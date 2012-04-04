@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.view;
+package com.vortexwolf.dvach.controls;
 
 public class MyLeadingMarginSpan2Wrapper {
 	   private MyLeadingMarginSpan2 mInstance;

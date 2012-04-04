@@ -6,7 +6,7 @@ Light theme
 ==================
 -->		
     <style name="Theme_Light_Medium" parent="@android:style/Theme.Light">
-        <item name="activityRootBackground">@android:color/white</item>
+        <item name="activityRootBackground">@color/white_background</item>
         <item name="threadTitleForeground">@color/blue</item>
         <item name="itemInfoForeground">#666666</item>
         <item name="postNumberForeground">@android:color/black</item>

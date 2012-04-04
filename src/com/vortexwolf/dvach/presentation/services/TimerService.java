@@ -1,9 +1,9 @@
-package com.vortexwolf.dvach.common.library;
+package com.vortexwolf.dvach.presentation.services;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.vortexwolf.dvach.activities.posts.PostsListActivity;
+import com.vortexwolf.dvach.common.library.MyLog;
 
 import android.app.Activity;
 

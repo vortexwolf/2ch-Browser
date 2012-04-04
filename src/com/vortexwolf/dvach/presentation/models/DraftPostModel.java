@@ -2,7 +2,6 @@ package com.vortexwolf.dvach.presentation.models;
 
 import android.graphics.Bitmap;
 
-import com.vortexwolf.dvach.activities.files.SerializableFileModel;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 
 public class DraftPostModel {

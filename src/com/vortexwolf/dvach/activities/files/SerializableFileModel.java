@@ -47,11 +47,13 @@ public class SerializableFileModel extends ImageFileModel implements Parcelable
 	
     public static final Parcelable.Creator<SerializableFileModel> CREATOR =
     	new Parcelable.Creator<SerializableFileModel>() {
-            public SerializableFileModel createFromParcel(Parcel in) {
+            @Override
+			public SerializableFileModel createFromParcel(Parcel in) {
                 return new SerializableFileModel(in);
             }
  
-            public SerializableFileModel[] newArray(int size) {
+            @Override
+			public SerializableFileModel[] newArray(int size) {
                 return new SerializableFileModel[size];
             }
         };

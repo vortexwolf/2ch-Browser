@@ -1,14 +1,12 @@
 package com.vortexwolf.dvach.activities.boards;
 
 
-import java.util.HashMap;
-
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -166,9 +164,7 @@ public class PickBoardActivity extends ListActivity {
     	if(boardCode.charAt(0) == '/'){
     		boardCode = boardCode.substring(1);
     	}
-    	
-    	this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_SELECT_BOARD, boardCode);
-    	
+
        	Intent intent = new Intent();
        	intent.putExtra(Constants.EXTRA_SELECTED_BOARD, boardCode);
        	setResult(RESULT_OK, intent);

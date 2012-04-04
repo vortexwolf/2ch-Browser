@@ -17,7 +17,7 @@
 	
 	<RelativeLayout android:id="@+id/threads_navigation_bar"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="@dimen/navigation_button_size"
 		>
 		   	<ImageButton android:id="@+id/threads_prev_page"
 		   		android:layout_width="@dimen/navigation_button_size"

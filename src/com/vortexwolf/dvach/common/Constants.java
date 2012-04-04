@@ -49,6 +49,7 @@ public class Constants {
     public static final String EXTRA_SELECTED_BOARD = "ExtraSelectedBoard";
     public static final String EXTRA_SELECTED_FILE = ".ExtraSelectedFile";
     public static final String EXTRA_REDIRECTED_THREAD_NUMBER = "ExtraRedirectedThreadNumber";
+    public static final String EXTRA_CURRENT_URL = "ExtraCurrentUrl";
     
     // Идентификаторы для контекстного меню 
     public static final int CONTEXT_MENU_ANSWER = 1001;

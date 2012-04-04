@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="navigation_button_size">40dp</dimen>
-    <dimen name="thumbnail_size">64dp</dimen>
-    <dimen name="filelist_frame_size">50dp</dimen>
-    <dimen name="filelist_thumbnail_size">42dp</dimen>
+    <dimen name="navigation_button_size">40dip</dimen>
+    <dimen name="thumbnail_size">64dip</dimen>
+    <dimen name="filelist_frame_size">50dip</dimen>
+    <dimen name="filelist_thumbnail_size">42dip</dimen>
 </resources>

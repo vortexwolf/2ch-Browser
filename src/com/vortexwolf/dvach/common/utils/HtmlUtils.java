@@ -9,13 +9,12 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
-import com.vortexwolf.dvach.common.http.HttpBitmapReader;
-import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.Html;
-import com.vortexwolf.dvach.common.view.ClickableURLSpan;
-import com.vortexwolf.dvach.common.view.UnknownTagsHandler;
-import com.vortexwolf.dvach.interfaces.IHttpBitmapReader;
+import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
+import com.vortexwolf.dvach.controls.ClickableURLSpan;
+import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.presentation.services.BitmapManager;
 
 import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
@@ -23,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -38,13 +38,13 @@ public class HtmlUtils {
 	//Картинки со смайликами во время всяких праздников
 	private static final Html.ImageGetter imageGetter = new Html.ImageGetter(){
 		
-		private final IHttpBitmapReader mHttpBitmapReader = new HttpBitmapReader(httpClient);
+		private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
 		
 		@Override
 		public Drawable getDrawable(String ref) {
 			Uri uri = UriUtils.adjust2chRelativeUri(Uri.parse(ref));
 			
-			Bitmap bmp = mHttpBitmapReader.fromUri(uri.toString());
+			Bitmap bmp = mNetworkResourceLoader.loadBitmap(uri);
 			Drawable d = new BitmapDrawable(bmp);
 			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 			return d;
@@ -129,7 +129,7 @@ public class HtmlUtils {
 		Integer color = getIntFontColor(htmlText);
 		
 		if(color != null){
-			return "#"+Integer.toHexString(color);
+			return String.format("#%06X", (0xFFFFFF & color));
 		}
 		
 		return null;

@@ -1,17 +1,7 @@
 package android.httpimage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import com.vortexwolf.dvach.common.library.LruCache;
-import com.vortexwolf.dvach.common.library.MyLog;
-
 import android.graphics.Bitmap;
-import android.util.Log;
 
 public class BasicBitmapCache implements BitmapCache{
 

@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.library;
+package com.vortexwolf.dvach.presentation.services;
 
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;

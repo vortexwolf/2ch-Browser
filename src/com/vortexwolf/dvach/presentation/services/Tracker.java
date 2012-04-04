@@ -1,6 +1,9 @@
-package com.vortexwolf.dvach.common.library;
+package com.vortexwolf.dvach.presentation.services;
+
+import android.content.Context;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.vortexwolf.dvach.common.Constants;
 
 public class Tracker {
 
@@ -45,6 +48,14 @@ public class Tracker {
 		}
 		
 		return sInstance;
+	}
+	
+	public void startSession(Context context){
+		this.mTracker.startNewSession(Constants.ANALYTICS_KEY, 120, context);
+	}
+	
+	public void stopSession(){
+		this.mTracker.stopSession();
 	}
 
 	public GoogleAnalyticsTracker getInnerTracker(){

@@ -5,7 +5,6 @@ import android.view.Window;
 
 import com.vortexwolf.dvach.api.JsonApiReaderException;
 import com.vortexwolf.dvach.api.entities.PostsList;
-import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostsListView;

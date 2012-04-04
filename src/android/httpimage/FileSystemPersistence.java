@@ -8,11 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.IoUtils;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 
 /**
@@ -109,9 +106,6 @@ public class FileSystemPersistence implements BitmapCache{
         	// No space left
         	this.freeFileCache();
         	MyLog.e(TAG, e);
-        }
-        catch (IOException e) {
-            MyLog.e(TAG, e);
         }
         finally {
             if(outputStream != null) {

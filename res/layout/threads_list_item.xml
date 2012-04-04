@@ -12,7 +12,7 @@
 				  android:layout_alignParentRight="true">
 				  
 	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
-		    <com.vortexwolf.dvach.common.view.ExtendedImageView
+		    <com.vortexwolf.dvach.controls.ExtendedImageView
 		    	android:id="@+id/thumbnail"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"

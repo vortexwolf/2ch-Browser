@@ -1,6 +1,4 @@
-package com.vortexwolf.dvach.common.library;
-
-import java.util.ArrayList;
+package com.vortexwolf.dvach.presentation.services;
 
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;

@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.activities.posts;
 
-import com.vortexwolf.dvach.common.view.MyLeadingMarginSpan2Wrapper;
+import com.vortexwolf.dvach.controls.MyLeadingMarginSpan2Wrapper;
 import com.vortexwolf.dvach.presentation.models.FloatImageModel;
 
 import android.text.SpannableStringBuilder;

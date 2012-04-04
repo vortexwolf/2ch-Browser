@@ -3,13 +3,11 @@ import java.io.File;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.http.DownloadFileTask;
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;

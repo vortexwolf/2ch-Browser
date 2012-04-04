@@ -1,6 +1,5 @@
 package com.vortexwolf.dvach.common.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -15,7 +14,6 @@ import com.vortexwolf.dvach.activities.threads.ThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
@@ -53,7 +51,7 @@ public class ThreadPostUtils {
 	 * @param activity
 	 */	
 	public static void handleAttachmentImage(boolean isBusy, AttachmentInfo attachment, ImageView imageView, 
-			ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, Activity activity) {
+			ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, ApplicationSettings settings, Context context) {
 
 		indeterminateProgressBar.setVisibility(View.GONE);
 		imageView.setImageResource(android.R.color.transparent); // clear the image content
@@ -66,11 +64,9 @@ public class ThreadPostUtils {
 		else {
 			fullThumbnailView.setVisibility(View.VISIBLE);
 			imageView.setVisibility(View.VISIBLE);
-			
-			ApplicationSettings settings = ((MainApplication)activity.getApplication()).getSettings();
-			
+						
 			//Обработчик события нажатия на картинку
-			OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getOnClickListener(attachment, activity.getApplicationContext(), settings);
+			OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getOnClickListener(attachment, context, settings);
 			if (thumbnailOnClickListener != null) {
             	imageView.setOnClickListener(thumbnailOnClickListener);
             	indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);

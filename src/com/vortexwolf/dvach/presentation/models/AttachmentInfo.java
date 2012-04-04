@@ -80,7 +80,7 @@ public class AttachmentInfo {
 	}
 	
 	public int getDefaultThumbnail(){
-		Integer resId = this.sDefaultThumbnails.get(this.mSourceExtension);
+		Integer resId = AttachmentInfo.sDefaultThumbnails.get(this.mSourceExtension);
 
 		return resId != null ? resId : R.drawable.page_white_4x;
 	}

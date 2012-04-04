@@ -54,6 +54,7 @@
     <string name="menu_attach_file">Прикрепить файл</string>
     <string name="menu_save">Сохранить</string>
     <string name="menu_gallery">Галерея</string>
+	<string name="menu_tabs">Вкладки</string>
         
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>

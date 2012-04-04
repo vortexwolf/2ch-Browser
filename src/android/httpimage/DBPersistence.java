@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
-import android.util.Log;
 
 
 /**
@@ -30,13 +29,15 @@ public class DBPersistence implements BitmapCache{
     }
     
     
-    public boolean exists(String key) {
+    @Override
+	public boolean exists(String key) {
         //TODO
         return false;
     }
 
 
-    public Bitmap loadData(String key) {
+    @Override
+	public Bitmap loadData(String key) {
         Bitmap bitmap = null;
         
         Uri image = Uri.withAppendedPath(DBImageTable.CONTENT_URI, key);
@@ -75,7 +76,8 @@ public class DBPersistence implements BitmapCache{
     }
 
     
-    public void storeData(String key, Bitmap data) {
+    @Override
+	public void storeData(String key, Bitmap data) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         if( data.compress(CompressFormat.PNG, 100, out)) {
             byte[] ba = out.toByteArray();

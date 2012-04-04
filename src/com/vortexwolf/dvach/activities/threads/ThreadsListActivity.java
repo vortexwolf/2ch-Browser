@@ -8,15 +8,13 @@ import com.vortexwolf.dvach.activities.boards.PickBoardActivity;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.activities.posts.DownloadPostsTask;
 import com.vortexwolf.dvach.activities.posts.PostsListActivity;
+import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.api.entities.ThreadsList;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.http.DownloadFileTask;
-import com.vortexwolf.dvach.common.http.HttpBitmapReader;
-import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
@@ -25,10 +23,14 @@ import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
+import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
+import com.vortexwolf.dvach.presentation.services.BitmapManager;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
@@ -77,6 +79,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	private ViewType mCurrentView = null;
 	private View mNavigationBar;
 	
+	private Uri mUri;
 	private String mBoardName;
 	private int mPageNumber = 0;
 	
@@ -92,6 +95,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         this.mSettings = this.mApplication.getSettings();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
+        IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
     	Uri data = this.getIntent().getData();
     	if(data != null){
@@ -107,7 +111,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 
         if(mAdapter == null)
         {       	
-        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager());
+        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
 	        setListAdapter(mAdapter);
 	        
 	        this.refreshThreads();
@@ -117,6 +121,10 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 				        ? String.format(getString(R.string.data_board_title_with_page), mBoardName, mPageNumber) 
 				        : String.format(getString(R.string.data_board_title), mBoardName);
 		this.setTitle(pageTitle);
+		
+		OpenTabModel tabModel = new OpenTabModel(mBoardName, mBoardName, mPageNumber);
+		this.mUri = tabModel.getUri();
+		tabsManager.add(tabModel);
 		
         this.mTracker.setBoardVar(mBoardName);
         this.mTracker.setPageNumberVar(mPageNumber);
@@ -211,8 +219,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
        
     }
 
-
-    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -225,6 +231,11 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
+    	case R.id.tabs_menu_id:
+    		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
+    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mUri.toString());
+    		startActivity(openTabsIntent);
+    		break;
     	case R.id.pick_board_menu_id:
     		//Start new activity
     		Intent pickBoardIntent = new Intent(getApplicationContext(), PickBoardActivity.class);
@@ -286,13 +297,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 							: StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
 		this.navigateToThread(info.getNumber(), threadSubject);
 	}
-/*
-	//При повороте экрана из списка заголовки исчезают, поэтому попробую такой костыль
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-      super.onConfigurationChanged(newConfig);
-      this.setListAdapter(this.mAdapter);
-    }*/
 
 	private void switchToView(ViewType vt){
 		this.mCurrentView = vt;

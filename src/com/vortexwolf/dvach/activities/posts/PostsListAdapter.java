@@ -1,17 +1,12 @@
 package com.vortexwolf.dvach.activities.posts;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
-import android.view.ContextThemeWrapper;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -22,19 +17,17 @@ import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.FloatImageModel;
@@ -43,10 +36,8 @@ import com.vortexwolf.dvach.presentation.models.PostsViewModel;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener {
+	private static final String TAG = "PostsListAdapter";
 
-	// private static final String TAG = "PostsListAdapter";
-	
-	private final ListActivity mActivity;
 	private final LayoutInflater mInflater;
 	private final IBitmapManager mBitmapManager;
 	private final String mBoardName;
@@ -55,21 +46,25 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final Theme mTheme;
 	private final ApplicationSettings mSettings;
 	private final OnLongClickListener mOnLongClickListener;
+	private final ListView mListView;
+	private final Context mActivityContext;
 	
 	private boolean mIsBusy = false;
 	private boolean mIsLoadingMore = false;
 		
-	public PostsListAdapter(ListActivity activity, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
-        super(activity.getApplicationContext(), 0);
+	public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView) {
+        super(context.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mBitmapManager = bitmapManager;
-        this.mActivity = activity;
-        this.mInflater = LayoutInflater.from(activity);
-        this.mTheme = this.mActivity.getTheme();
+        this.mInflater = LayoutInflater.from(context);
+        this.mTheme = theme;
         this.mPostsViewModel = new PostsViewModel();
         this.mSettings = settings;
+        this.mListView = listView;
+        this.mActivityContext = context;
+        
         this.mOnLongClickListener = new OnLongClickListener(){
 			@Override
 			public boolean onLongClick(View arg0) {
@@ -134,20 +129,20 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         if(this.mSettings.isDisplayPostItemDate()){
             TextView dateView = (TextView)view.findViewById(R.id.post_item_date_id);
             dateView.setVisibility(View.VISIBLE);
-        	dateView.setText(item.getPostDate(this.mActivity.getApplicationContext()));
+        	dateView.setText(item.getPostDate(this.getContext()));
         }
 
         //Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
         ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, 
         		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-        		this.mBitmapManager, this.mActivity);
-        ThreadPostUtils.handleAttachmentDescription(attachment, this.mActivity.getResources(), vb.attachmentInfoView);
+        		this.mBitmapManager, this.mSettings, this.getContext());
+        ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
         
         //Комментарий (обновляем после файла)
         if(item.canMakeCommentFloat()){
-        	WindowManager wm = ((WindowManager)this.mActivity.getSystemService(Context.WINDOW_SERVICE));
-        	FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), wm.getDefaultDisplay(), this.mActivity.getResources());
+        	WindowManager wm = ((WindowManager)this.getContext().getSystemService(Context.WINDOW_SERVICE));
+        	FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), wm.getDefaultDisplay(), this.getContext().getResources());
         	item.makeCommentFloat(floatModel);
         }
         
@@ -156,7 +151,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         
         //Ответы на сообщение
         if(item.hasReferencesFrom()){
-	        SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.mActivity.getResources(), this.mBoardName, this.mThreadNumber);
+	        SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.getContext().getResources(), this.mBoardName, this.mThreadNumber);
 	        vb.postRepliesView.setText(replies);
 	        vb.postRepliesView.setMovementMethod(LinkMovementMethod.getInstance());
 	        vb.postRepliesView.setVisibility(View.VISIBLE);
@@ -181,7 +176,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 //			// Переходим на тот пост, куда указывает ссылка
 			int position = postNumber != null ? findPostByNumber(postNumber) : 0;
 			if(position == -1){
-				AppearanceUtils.showToastMessage(this.mActivity, this.mActivity.getString(R.string.notification_post_not_found));
+				AppearanceUtils.showToastMessage(this.getContext(), this.getContext().getString(R.string.notification_post_not_found));
 				return;
 			}
 			
@@ -193,14 +188,14 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 				view.setBackgroundColor(backColor);
 				
 				//Отображаем созданное view в диалоге
-				Dialog currentDialog = new Dialog(this.mActivity);
+				Dialog currentDialog = new Dialog(this.mActivityContext);
 				currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				currentDialog.setCanceledOnTouchOutside(true);
 				currentDialog.setContentView(view);
 				currentDialog.show();
 			}
 			else{
-				mActivity.getListView().setSelection(position);
+				this.mListView.setSelection(position);
 			}
 		}
 		else {
@@ -266,7 +261,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 			//this.notifyDataSetChanged();
 	        int count = view.getChildCount();
 	        for (int i=0; i<count; i++) {
-	            View v = (View)view.getChildAt(i);
+	            View v = view.getChildAt(i);
 	            int position = view.getPositionForView(v);
 	            
 	            ViewBag vb = (ViewBag)v.getTag();
@@ -277,7 +272,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 		            if(!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
 			            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
 			            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-			            		this.mBitmapManager, this.mActivity);
+			            		this.mBitmapManager, this.mSettings, this.getContext());
 		            }
 	            }
 	        }

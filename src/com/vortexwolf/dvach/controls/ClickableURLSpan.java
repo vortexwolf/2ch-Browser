@@ -1,9 +1,7 @@
-package com.vortexwolf.dvach.common.view;
+package com.vortexwolf.dvach.controls;
 
-import com.vortexwolf.dvach.common.utils.XmlUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 
-import android.graphics.Color;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;

@@ -7,27 +7,29 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.addpost.AddPostActivity;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.activities.files.SerializableFileModel;
+import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
 import com.vortexwolf.dvach.activities.threads.ThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.PostsList;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.http.DownloadFileTask;
-import com.vortexwolf.dvach.common.http.HttpBitmapReader;
-import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.library.TimerService;
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
+import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
+import com.vortexwolf.dvach.presentation.services.BitmapManager;
+import com.vortexwolf.dvach.presentation.services.TimerService;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
@@ -71,9 +73,9 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	
 	private View mLoadingView = null;
 	private View mErrorView = null;
-	//private View mPartialLoadingView = null;
 	private enum ViewType { LIST, LOADING, ERROR};
 	
+	private Uri mUri;
 	private String mBoardName;
 	private String mThreadNumber;
 	
@@ -91,6 +93,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
+        IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
         this.resetUI();
 
@@ -104,7 +107,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         	}
         	else{
         		//При переходе изнутри этого приложения
-		        Bundle extras = getIntent().getExtras();
+		        Bundle extras = this.getIntent().getExtras();
 		    	if (extras != null) {
 		    		this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
 		    		this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
@@ -114,18 +117,22 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         
         if(mAdapter == null)
         {    	
-        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings());
+        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
         	setListAdapter(mAdapter);
         	
     		this.refreshPosts();
         }
         
-        String titleString = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT) 
-        					? String.format(getString(R.string.data_thread_withsubject_title), mBoardName, this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT))
+        String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT) ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT) : null;
+        String pageTitle = pageSubject != null
+        					? String.format(getString(R.string.data_thread_withsubject_title), mBoardName, pageSubject)
         					: String.format(getString(R.string.data_thread_title), mBoardName, mThreadNumber);
         
-		this.setTitle(titleString);
+		this.setTitle(pageTitle);
 		
+		OpenTabModel tabModel = new OpenTabModel(pageSubject != null ? pageSubject : pageTitle, mBoardName, mThreadNumber);
+		this.mUri = tabModel.getUri();
+		tabsManager.add(tabModel);
 
 		final Runnable refreshTask = new Runnable() {
 			@Override
@@ -152,6 +159,8 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 			this.mCurrentDownloadTask.cancel(true);
 		}
 
+		this.getListView().setAdapter(null);
+		
 		MyLog.d(TAG, "Destroyed");
 		
 	   super.onDestroy();
@@ -209,6 +218,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
+    	case R.id.tabs_menu_id:
+    		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
+    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mUri.toString());
+    		startActivity(openTabsIntent);
+    		break;
     	case R.id.refresh_menu_id:
     		this.refreshPosts();
     		break;

@@ -14,7 +14,7 @@ import android.view.View.OnClickListener;
 public class ThumbnailOnClickListenerFactory implements IThumbnailOnClickListenerFactory {
 	
 	private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
-	private static long sHeapPad = 128; // 128 Kb
+	private static long sHeapPad = 1024; // 128 Kb
 	
 	@Override
 	public OnClickListener getOnClickListener(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings) {

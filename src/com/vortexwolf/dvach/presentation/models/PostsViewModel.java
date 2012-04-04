@@ -1,12 +1,9 @@
 package com.vortexwolf.dvach.presentation.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import android.content.res.Resources.Theme;
 
 import com.vortexwolf.dvach.api.entities.PostInfo;
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 
 public class PostsViewModel {

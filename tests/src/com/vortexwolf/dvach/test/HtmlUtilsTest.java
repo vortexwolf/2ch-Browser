@@ -29,4 +29,10 @@ public class HtmlUtilsTest extends InstrumentationTestCase {
 		postId = HtmlUtils.parseIdFromName(name);
 		assertEquals(postId, null);
 	}
+	
+	public void testGetStringFontColor(){
+		String style = "color: rgb(255, 0, 0);";
+		String color = HtmlUtils.getStringFontColor(style);
+		assertEquals(color, "#FF0000");
+	}
 }

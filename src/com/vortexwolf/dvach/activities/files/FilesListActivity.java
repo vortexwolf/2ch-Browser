@@ -1,11 +1,8 @@
 package com.vortexwolf.dvach.activities.files;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -21,9 +18,6 @@ import com.vortexwolf.dvach.presentation.models.ImageFileModel;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.KeyEvent;
@@ -95,7 +89,7 @@ public class FilesListActivity extends ListActivity {
 		}
 		if(getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
 			ArrayList<String> collection = getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
-			acceptedFileExtensions = (String[]) collection.toArray(new String[collection.size()]);
+			acceptedFileExtensions = collection.toArray(new String[collection.size()]);
 		}
 	}
 	

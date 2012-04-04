@@ -55,6 +55,7 @@
     <string name="menu_attach_file">Attach file</string>
     <string name="menu_save">Save</string>
     <string name="menu_gallery">Gallery</string>
+    <string name="menu_tabs">Tabs</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>

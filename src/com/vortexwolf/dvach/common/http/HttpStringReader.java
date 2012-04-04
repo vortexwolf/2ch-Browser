@@ -11,7 +11,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 
 public class HttpStringReader implements IHttpStringReader {

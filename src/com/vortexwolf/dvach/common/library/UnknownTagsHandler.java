@@ -1,21 +1,16 @@
-package com.vortexwolf.dvach.common.view;
+package com.vortexwolf.dvach.common.library;
 
 import java.util.HashMap;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.XMLReader;
-
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.Html.TagHandler;
-import com.vortexwolf.dvach.common.library.HtmlToSpannedConverter;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -23,9 +18,7 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
-import android.text.style.TextAppearanceSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
 public class UnknownTagsHandler implements TagHandler {
@@ -72,7 +65,7 @@ public class UnknownTagsHandler implements TagHandler {
         Span span = Span.fromAttributes(attributes);
 
         int len = text.length();
-        text.setSpan(span, len, len, Spannable.SPAN_MARK_MARK);
+        text.setSpan(span, len, len, Spanned.SPAN_MARK_MARK);
     }
 
     private void endSpan(SpannableStringBuilder text) {

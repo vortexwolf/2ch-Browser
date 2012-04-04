@@ -5,13 +5,11 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
-import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadItemViewModel {
 

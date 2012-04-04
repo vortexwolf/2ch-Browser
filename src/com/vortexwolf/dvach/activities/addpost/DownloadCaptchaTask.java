@@ -4,15 +4,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.api.JsonApiReaderException;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
-import com.vortexwolf.dvach.common.library.BitmapManager;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
-import com.vortexwolf.dvach.interfaces.IHttpBitmapReader;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
+import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
+import com.vortexwolf.dvach.presentation.services.BitmapManager;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancellable {
@@ -22,7 +23,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	private final IJsonApiReader mJsonReader;
 	private final String mBoard;
 	private final String mThreadNumberd;
-	private final IHttpBitmapReader mHttpBitmapReader;
+	private final INetworkResourceLoader mNetworkResourceLoader;
 	private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
 	
 	private boolean mCanSkip = false;
@@ -30,12 +31,12 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	private Bitmap mCaptchaImage;
 	private String mUserError;
 	
-	public DownloadCaptchaTask(ICaptchaView view, String board, String threadNumber, IJsonApiReader jsonReader, IHttpBitmapReader httpBitmapReader, IHtmlCaptchaChecker htmlCaptchaChecker) {
+	public DownloadCaptchaTask(ICaptchaView view, String board, String threadNumber, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker) {
 		this.mView = view;
 		this.mJsonReader = jsonReader;
 		this.mBoard = board;
 		this.mThreadNumberd = threadNumber;
-		this.mHttpBitmapReader = httpBitmapReader;
+		this.mNetworkResourceLoader = networkResourceLoader;
 		this.mHtmlCaptchaChecker = htmlCaptchaChecker;
 	}
 	
@@ -67,7 +68,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 			this.mCaptcha = this.mJsonReader.readCaptcha(this.mBoard, this);
 			if(this.isCancelled()) return false;
 
-			this.mCaptchaImage = this.mHttpBitmapReader.fromUri(this.mCaptcha.getUrl());
+			this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
 			
 			return true;
 		}

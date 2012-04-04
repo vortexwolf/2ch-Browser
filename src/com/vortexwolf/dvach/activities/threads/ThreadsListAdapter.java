@@ -1,23 +1,16 @@
 package com.vortexwolf.dvach.activities.threads;
 
-import java.text.MessageFormat;
-
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources.Theme;
-import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,24 +22,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
-	
-	private final Activity mActivity;
 	private final LayoutInflater mInflater;
 	private final IBitmapManager mBitmapManager;
 	private final Theme mTheme;
+	private final ApplicationSettings mSettings;
 	
 	private final String mBoardName;
 	
 	private boolean mIsBusy = false;
 
-	public ThreadsListAdapter(Activity activity, String boardName, IBitmapManager bitmapManager) {
-        super(activity.getApplicationContext(), 0);
+	public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme) {
+        super(context.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
         this.mBitmapManager = bitmapManager;
-        this.mActivity = activity;
-        this.mTheme = activity.getTheme();
-        this.mInflater = LayoutInflater.from(activity);
+        this.mTheme = theme;
+        this.mInflater = LayoutInflater.from(context);
+        this.mSettings = settings;
     }
 
     @Override
@@ -91,9 +83,9 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         vb.commentView.setText(item.getSpannedComment());
 
         //Количество ответов
-        String postsQuantity = mActivity.getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
-        String imagesQuantity = mActivity.getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
-        String repliesFormat = mActivity.getString(R.string.data_posts_files);
+        String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
+        String imagesQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
+        String repliesFormat = this.getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
         
@@ -101,8 +93,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
         ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, 
         		vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-        		this.mBitmapManager, this.mActivity);
-        ThreadPostUtils.handleAttachmentDescription(attachment, this.mActivity.getResources(), vb.attachmentInfoView);
+        		this.mBitmapManager, this.mSettings, this.getContext());
+        ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
     }
     
 	/** Обновляет адаптер полностью*/
@@ -122,15 +114,17 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 			//MyLog.v("ThreadsListAdapter", "Non busy");
 	        int count = view.getChildCount();
 	        for (int i=0; i<count; i++) {
-	            View v = (View)view.getChildAt(i);
+	            View v = view.getChildAt(i);
 	            int position = view.getPositionForView(v);
 	            
 	            ViewBag vb = (ViewBag)v.getTag();
 	            
 	            AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
-	            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
-	            		vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-	            		this.mBitmapManager, this.mActivity);
+	            if(!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
+		            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
+		            		vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
+		            		this.mBitmapManager, this.mSettings, this.getContext());
+	            }
 	        }
 		}
 	}

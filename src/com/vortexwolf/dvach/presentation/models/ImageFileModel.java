@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.vortexwolf.dvach.activities.files.SerializableFileModel;
 import com.vortexwolf.dvach.common.library.MyLog;
 
 import android.graphics.Bitmap;

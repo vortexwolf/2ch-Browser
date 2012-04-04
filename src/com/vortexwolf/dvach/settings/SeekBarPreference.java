@@ -106,18 +106,21 @@ public class SeekBarPreference extends DialogPreference implements OnSeekBarChan
 		return String.format(summary, value);
     }
     
-    public void onProgressChanged(SeekBar seek, int value, boolean fromTouch) {
+    @Override
+	public void onProgressChanged(SeekBar seek, int value, boolean fromTouch) {
 		// Update current value
 		mCurrentValue = value * mStep + mMinValue;
 		// Update label with current value
 		this.updateCurrentValueText();
     }
 
-    public void onStartTrackingTouch(SeekBar seek) {
+    @Override
+	public void onStartTrackingTouch(SeekBar seek) {
 	// Not used
     }
 
-    public void onStopTrackingTouch(SeekBar seek) {
+    @Override
+	public void onStopTrackingTouch(SeekBar seek) {
 	// Not used
     }
     

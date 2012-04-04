@@ -15,12 +15,12 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
+import com.vortexwolf.dvach.presentation.services.DownloadFileService;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.view.Window;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancellable, IProgressChangeListener {
 	public static final String TAG = "DownloadFileTask";

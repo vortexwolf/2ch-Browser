@@ -1,7 +1,6 @@
 package android.httpimage;
 
 
-import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -10,15 +9,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 
 
@@ -73,7 +70,7 @@ public class HttpImageManager{
 
     private final BitmapCache mCache;
     private BitmapCache mPersistence;
-    private final NetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
+    private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
     
     private final Handler mHandler = new Handler();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
@@ -224,7 +221,8 @@ public class HttpImageManager{
     ////PRIVATE
     private Callable<LoadRequest> newRequestCall(final LoadRequest request) {
         return new Callable<LoadRequest>() {
-            public LoadRequest call() {
+            @Override
+			public LoadRequest call() {
                 
                 synchronized (mActiveRequests) {
                     // If there's been already request pending for the same URL, we just wait until it is handled.
@@ -255,8 +253,9 @@ public class HttpImageManager{
                         else {
                             // we go to network
                             data = mNetworkResourceLoader.loadBitmap(request.getUri());
-                            if(data == null) 
+                            if(data == null) {
                                 throw new RuntimeException("data from remote can't be decoded to bitmap");
+                            }
                             
                             // load it into memory
                             mCache.storeData(key, data);

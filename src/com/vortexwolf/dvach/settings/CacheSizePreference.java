@@ -2,14 +2,12 @@ package com.vortexwolf.dvach.settings;
 
 import java.io.File;
 
-import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.IoUtils;
+import com.vortexwolf.dvach.presentation.services.ICacheManager;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.Environment;
 import android.preference.Preference;
 import android.util.AttributeSet;
 
@@ -22,13 +20,14 @@ public class CacheSizePreference extends Preference {
 		super(context, attrs);
 		
 		MainApplication app = (MainApplication)((Activity)context).getApplication();
-		mExternalCacheDir = app.getExternalCacheDir();
-		mInternalCacheDir = app.getInternalCacheDir();
+		ICacheManager cacheManager = app.getCacheManager();
+		mExternalCacheDir = cacheManager.getExternalCacheDir();
+		mInternalCacheDir = cacheManager.getInternalCacheDir();
 	}
 
 	@Override
 	public CharSequence getSummary() {
-		long externalSize = mExternalCacheDir != null ? IoUtils.dirSize(mExternalCacheDir) : 0;
+		long externalSize = IoUtils.dirSize(mExternalCacheDir);
 		long internalSize = IoUtils.dirSize(mInternalCacheDir);
 		
 		double allSizeMb = (externalSize + internalSize)/ 1024d / 1024d;

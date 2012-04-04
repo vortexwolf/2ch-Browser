@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.http;
+package com.vortexwolf.dvach.presentation.services;
 
 import java.io.File;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Errors;
+import com.vortexwolf.dvach.common.http.DownloadFileTask;
+import com.vortexwolf.dvach.common.http.DownloadManagerWrapper;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 

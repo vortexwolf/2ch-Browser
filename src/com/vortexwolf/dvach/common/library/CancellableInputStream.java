@@ -4,9 +4,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.HttpResponse;
-import org.codehaus.jackson.map.ser.FilteredBeanPropertyWriter;
-
 import com.vortexwolf.dvach.interfaces.ICancellable;
 
 public class CancellableInputStream extends FilterInputStream {

@@ -16,10 +16,8 @@ import com.vortexwolf.dvach.activities.threads.DownloadThreadsTask;
 import com.vortexwolf.dvach.api.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 import com.vortexwolf.dvach.common.*;
-import com.vortexwolf.dvach.common.http.HttpBitmapReader;
 import com.vortexwolf.dvach.common.http.HttpStringReader;
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.library.Tracker;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
@@ -27,7 +25,6 @@ import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
-import com.vortexwolf.dvach.interfaces.IHttpBitmapReader;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostSendView;
@@ -35,6 +32,7 @@ import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.presentation.models.CaptchaViewType;
 import com.vortexwolf.dvach.presentation.models.DraftPostModel;
 import com.vortexwolf.dvach.presentation.models.ImageFileModel;
+import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 
 import android.app.Activity;
@@ -42,11 +40,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
+import android.provider.MediaStore.MediaColumns;
 import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -69,7 +69,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private IPostSender mPostSender;
 	private IBoardSettingsStorage mBoardSettingsStorage;
 	private IHtmlCaptchaChecker mHtmlCaptchaChecker;
-	private IHttpBitmapReader mHttpBitmapReader;
+	private NetworkResourceLoader mNetworkResourceLoader;
 	private IDraftPostsStorage mDraftPostsStorage;
 	private Tracker mTracker;
 	
@@ -105,9 +105,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mJsonReader = this.mApplication.getJsonApiReader();
 		this.mPostSender = this.mApplication.getPostSender();
 		this.mBoardSettingsStorage = this.mApplication.getBoardSettingsStorage();
-		DefaultHttpClient httpClient = this.mApplication.getHttpClient();
+		DefaultHttpClient httpClient = MainApplication.getHttpClient();
 		this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient));
-		this.mHttpBitmapReader = new HttpBitmapReader(httpClient);
+		this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
 		this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
 		this.mTracker = this.mApplication.getTracker();
 
@@ -469,7 +469,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 					
 					Uri selectedImage = data.getData();
 					
-					String[] filePathColumn = { Images.Media.DATA };
+					String[] filePathColumn = { MediaColumns.DATA };
 		            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
 		            cursor.moveToFirst();
 
@@ -508,7 +508,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     		mCurrentDownloadCaptchaTask.cancel(true);
     	}
     	
-    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, mBoardName, mThreadNumber, mJsonReader, mHttpBitmapReader, mHtmlCaptchaChecker);
+    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, mBoardName, mThreadNumber, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker);
     	mCurrentDownloadCaptchaTask.execute();
 	}
 	

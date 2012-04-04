@@ -11,10 +11,7 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.format.DateFormat;
-import android.text.format.DateUtils;
-
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.posts.FlowTextHelper;
 import com.vortexwolf.dvach.api.entities.PostInfo;
@@ -22,7 +19,6 @@ import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostItemViewModel {
 
@@ -68,7 +64,7 @@ public class PostItemViewModel {
 	
 	private SpannableStringBuilder createSpannedComment(){
 		String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
-		SpannableStringBuilder builder = (SpannableStringBuilder)HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
+		SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
         HtmlUtils.replaceUrls(builder, this.mUrlListener, mTheme);
         
         this.mModel.setComment(null); // удаляем лишние данные из памяти

@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import android.text.Html;
 
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 
 public class PostResponseParser {

@@ -4,7 +4,6 @@ import com.vortexwolf.dvach.api.JsonApiReaderException;
 import com.vortexwolf.dvach.api.entities.BoardSettings;
 import com.vortexwolf.dvach.api.entities.PostFields;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
-import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostSendView;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 
