@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.http;
+package com.vortexwolf.dvach.presentation.services;
 
 import java.io.BufferedReader;
 import java.io.IOException;

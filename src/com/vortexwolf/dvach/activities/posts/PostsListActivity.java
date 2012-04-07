@@ -11,9 +11,9 @@ import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
 import com.vortexwolf.dvach.activities.threads.ThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.PostsList;
+import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.http.DownloadFileTask;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -23,11 +23,13 @@ import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
+import com.vortexwolf.dvach.interfaces.ISerializationService;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.services.BitmapManager;
+import com.vortexwolf.dvach.presentation.services.DownloadFileTask;
 import com.vortexwolf.dvach.presentation.services.TimerService;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -63,7 +65,8 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     private ApplicationSettings mSettings;
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
-
+	private ISerializationService mSerializationService;
+	
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
     private TimerService mAutoRefreshTimer = null;
@@ -93,6 +96,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
+        this.mSerializationService = this.mApplication.getSerializationService();
         IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
         this.resetUI();
@@ -118,9 +122,20 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         if(mAdapter == null)
         {    	
         	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
-        	setListAdapter(mAdapter);
+        	this.setListAdapter(mAdapter);
         	
-    		this.refreshPosts();
+        	// Пробуем десериализовать в любом случае
+        	PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
+        	if(posts != null){
+        		this.mAdapter.setAdapterData(posts);
+        		// Обновляем посты, если не был установлен ограничивающий extra
+        		if(!this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
+        			this.refreshPosts();
+        		}
+        	}
+        	else {
+        		this.refreshPosts();
+        	}
         }
         
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT) ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT) : null;
@@ -268,14 +283,17 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
         switch(item.getItemId()){
 	        case Constants.CONTEXT_MENU_REPLY_POST:{
+	        	mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_CONTEXT_REPLY_POST);
 	        	navigateToAddPostView(info.getNumber(), null);
 				return true;
 	        }
 	        case Constants.CONTEXT_MENU_REPLY_POST_QUOTE:{
+	        	mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_CONTEXT_REPLY_POST_QUOTE);
 	        	navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
 				return true;        	
 	        }
 	        case Constants.CONTEXT_MENU_COPY_TEXT:{
+	        	mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_CONTEXT_COPY_POST);
 	        	ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
 	        	clipboard.setText(info.getSpannedComment().toString());
 	        	
@@ -394,9 +412,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		}
 
 		@Override
-		public void setData(PostsList posts) {
-			if(posts != null){
-				mAdapter.setAdapterData(posts.getThread());
+		public void setData(PostsList postsList) {
+			if(postsList != null){
+				PostInfo[] posts = postsList.getThread();
+				mSerializationService.serializePosts(mThreadNumber, posts);
+				mAdapter.setAdapterData(posts);
 			}
 			else {
 				MyLog.e(TAG, "posts = null");
@@ -431,6 +451,8 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
 			int addedCount = mAdapter.updateAdapterData(from, posts);
 			if(addedCount != 0){
+				// Нужно удостовериться, что элементы из posts не менялись после добавления в адаптер, чтобы сериализация прошла правильно
+				mSerializationService.serializePosts(mThreadNumber, posts);
 				AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
 			}
 			else {

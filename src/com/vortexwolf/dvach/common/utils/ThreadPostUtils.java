@@ -23,12 +23,11 @@ public class ThreadPostUtils {
 	
 	private static final IThumbnailOnClickListenerFactory sThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
 	
-	public static boolean isSage(PostInfo item){
-		String email = item.getEmail();
-		return email != null 
-				&& (email.equalsIgnoreCase("mailto:"+Constants.SAGE_EMAIL)
-					|| email.equalsIgnoreCase(Constants.SAGE_EMAIL));
-				
+	/** Удаляет ссылки на другие сообщения из поста, если они расположены вначале строки */
+	public static String removeLinksFromComment(String comment){
+		String result = comment.replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1");
+
+		return result;
 	}
 	
 	/** Проверяет, прикреплен ли к посту какой-либо файл */

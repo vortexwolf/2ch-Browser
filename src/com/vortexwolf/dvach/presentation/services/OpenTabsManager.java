@@ -46,11 +46,13 @@ public class OpenTabsManager implements IOpenTabsManager {
 		if(tabType == OpenTabType.BOARD){
 			Intent i = new Intent(activity.getApplicationContext(), ThreadsListActivity.class);
 			i.setData(tab.getUri());
+			i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
 			activity.startActivity(i);
 		}
 		else if(tabType == OpenTabType.THREAD){
 			Intent i = new Intent(activity.getApplicationContext(), PostsListActivity.class);
 			i.setData(tab.getUri());
+			i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
 			activity.startActivity(i);
 		}
 	}

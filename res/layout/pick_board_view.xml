@@ -22,6 +22,7 @@
 	    	android:layout_height="fill_parent"
 	    	android:layout_toLeftOf="@id/pick_board_button"
 	    	android:singleLine="true"
+	    	android:inputType="text|textEmailAddress"
 	    	android:hint="@string/pick_board_input_hint"
 	    	/>
    	</RelativeLayout>

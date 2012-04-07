@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 
 public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {

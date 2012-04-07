@@ -1,8 +1,12 @@
 package com.vortexwolf.dvach.api.entities;
 
+import java.io.Serializable;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class ThreadInfo {
+public class ThreadInfo implements Serializable {
+	private static final long serialVersionUID = -2097742770262868291L;
+	
 	@JsonProperty("reply_count")
 	private int replyCount;
 	@JsonProperty("image_count")

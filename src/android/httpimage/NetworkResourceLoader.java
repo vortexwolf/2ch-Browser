@@ -5,8 +5,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.FlushedInputStream;
+import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 

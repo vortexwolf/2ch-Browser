@@ -1,6 +1,11 @@
 package com.vortexwolf.dvach.api.entities;
 
-public class PostInfo implements IAttachmentEntity {
+import java.io.Serializable;
+
+public class PostInfo implements IAttachmentEntity, Serializable {
+
+	private static final long serialVersionUID = 8212562227302607027L;
+	
 	protected String num;
 	private String thumbnail;
 	protected String comment;
@@ -8,7 +13,6 @@ public class PostInfo implements IAttachmentEntity {
 	private String video;
 	private String image;
 	private int size;
-	private String email;
 	private String name;
 	private int width;
 	private int height;
@@ -72,14 +76,6 @@ public class PostInfo implements IAttachmentEntity {
 
 	public void setSize(int size) {
 		this.size = size;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public void setName(String name) {

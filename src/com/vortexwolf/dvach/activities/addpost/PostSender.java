@@ -16,11 +16,11 @@ import org.apache.http.protocol.HTTP;
 import com.vortexwolf.dvach.api.entities.PostFields;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Errors;
-import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
-import com.vortexwolf.dvach.common.http.HttpStringReader;
+import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IPostSender;
+import com.vortexwolf.dvach.presentation.services.HttpStringReader;
 
 public class PostSender implements IPostSender {
 	private static final String TAG = "PostSender";

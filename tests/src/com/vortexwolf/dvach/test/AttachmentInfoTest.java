@@ -16,7 +16,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase  {
 
 	public AttachmentInfoTest(){
 		Instrumentation instr = this.getInstrumentation();
-		mSettings = new ApplicationSettings(instr.getContext(), instr.getContext().getResources(), null, null);
+		mSettings = new ApplicationSettings(instr.getContext(), instr.getContext().getResources(), null);
 	}
 	
 	public void testEmptyAttachment(){

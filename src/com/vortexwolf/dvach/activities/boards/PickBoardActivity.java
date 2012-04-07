@@ -164,6 +164,7 @@ public class PickBoardActivity extends ListActivity {
     	if(boardCode.charAt(0) == '/'){
     		boardCode = boardCode.substring(1);
     	}
+    	boardCode = boardCode.toLowerCase();
 
        	Intent intent = new Intent();
        	intent.putExtra(Constants.EXTRA_SELECTED_BOARD, boardCode);

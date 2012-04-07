@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.http;
+package com.vortexwolf.dvach.common.library;
 
 import java.io.IOException;
 import java.io.InputStream;

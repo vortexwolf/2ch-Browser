@@ -13,7 +13,6 @@ import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.api.entities.ThreadsList;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.http.DownloadFileTask;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -25,11 +24,13 @@ import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
+import com.vortexwolf.dvach.interfaces.ISerializationService;
 import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 import com.vortexwolf.dvach.presentation.services.BitmapManager;
+import com.vortexwolf.dvach.presentation.services.DownloadFileTask;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -66,6 +67,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
 	private ApplicationSettings mSettings;
+	private ISerializationService mSerializationService;
 	
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
@@ -95,6 +97,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         this.mSettings = this.mApplication.getSettings();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
+        this.mSerializationService = this.mApplication.getSerializationService();
         IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
     	Uri data = this.getIntent().getData();
@@ -112,9 +115,19 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         if(mAdapter == null)
         {       	
         	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
-	        setListAdapter(mAdapter);
+	        this.setListAdapter(mAdapter);
 	        
-	        this.refreshThreads();
+	        ThreadInfo[] threads = null;
+	        if(this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
+	        	threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
+	        }
+	        
+	        if(threads == null){
+	        	this.refreshThreads();
+	        }
+	        else {
+	        	this.mAdapter.setAdapterData(threads);
+	        }
         }
         
         String pageTitle = mPageNumber != 0 
@@ -443,9 +456,11 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 		}
 
 		@Override
-		public void setData(ThreadsList threads) {
-			if(threads != null){
-				mAdapter.setAdapterData(threads.getThreads());
+		public void setData(ThreadsList threadsList) {
+			if(threadsList != null){
+				ThreadInfo[] threads = threadsList.getThreads();
+				mSerializationService.serializeThreads(mBoardName, mPageNumber, threads);
+				mAdapter.setAdapterData(threads);
 			}
 			else {
 				MyLog.e(TAG, "threads = null");

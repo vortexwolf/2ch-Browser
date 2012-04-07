@@ -88,8 +88,8 @@
 	<string name="pref_display_navigation_bar">Панель навигации</string>
 	<string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
 	
-	<string name="pref_youtube_mobile_links">Прикрепленное youtube-видео</string>
-	<string name="pref_youtube_mobile_links_summary">Открывать мобильный youtube вместо обычного</string>
+	<string name="pref_youtube_mobile_links">YouTube-видео</string>
+	<string name="pref_youtube_mobile_links_summary">Открывать мобильный YouTube вместо обычного</string>
 	
 	<string name="pref_text_size">Размер текста</string>
 	<string-array name="pref_text_size_choices">

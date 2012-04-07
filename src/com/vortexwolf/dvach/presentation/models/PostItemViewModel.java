@@ -33,7 +33,6 @@ public class PostItemViewModel {
 	private SpannableStringBuilder mSpannedComment = null;
 	private AttachmentInfo mAttachment;
 	private String mPostDate = null;
-	private final String mPostId;
 	
 	private final ArrayList<String> refersTo = new ArrayList<String>();
 	private final ArrayList<String> referencesFrom = new ArrayList<String>();
@@ -47,8 +46,6 @@ public class PostItemViewModel {
 		this.mUrlListener = listener;
 		this.mPosition = position;
 		
-		this.mPostId = HtmlUtils.parseIdFromName(this.mModel.getName());
-		this.mModel.setName(null); // чистим из памяти
 		this.parseReferences();
 	}
 
@@ -90,10 +87,6 @@ public class PostItemViewModel {
 	
 	public String getNumber(){
 		return mModel.getNum();
-	}
-	
-	public String getPostId(){
-		return mPostId;
 	}
 	
 	public boolean hasAttachment(){

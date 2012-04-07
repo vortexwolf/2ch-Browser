@@ -1,10 +1,14 @@
 package com.vortexwolf.dvach.settings;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.presentation.services.ICacheManager;
+import com.vortexwolf.dvach.interfaces.ICacheManager;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,9 +16,9 @@ import android.preference.Preference;
 import android.util.AttributeSet;
 
 public class CacheSizePreference extends Preference {
-	
-	private File mExternalCacheDir;
-	private File mInternalCacheDir;
+    private final ExecutorService mExecutor = Executors.newFixedThreadPool(1);
+	private final File mExternalCacheDir;
+	private final File mInternalCacheDir;
 	
 	public CacheSizePreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -23,16 +27,34 @@ public class CacheSizePreference extends Preference {
 		ICacheManager cacheManager = app.getCacheManager();
 		mExternalCacheDir = cacheManager.getExternalCacheDir();
 		mInternalCacheDir = cacheManager.getInternalCacheDir();
+		
+		this.setSummary(context.getString(R.string.loading));
+		
+		mExecutor.execute(new Runnable(){
+			@Override
+			public void run() {
+				try{
+					double cacheSize = IoUtils.getSizeInMegabytes(mExternalCacheDir, mInternalCacheDir);
+	
+					String summary = cacheSize + " MB";
+					if(!mExecutor.isTerminated()){
+						CacheSizePreference.this.setSummary(summary);
+					}
+				}
+				catch(Exception e){
+					MyLog.e("CacheSizePreference", e);
+				}
+			}
+		});		
+	}
+	
+	@Override
+	protected void onPrepareForRemoval() {
+		mExecutor.shutdownNow();
+		super.onPrepareForRemoval();
 	}
 
-	@Override
-	public CharSequence getSummary() {
-		long externalSize = IoUtils.dirSize(mExternalCacheDir);
-		long internalSize = IoUtils.dirSize(mInternalCacheDir);
-		
-		double allSizeMb = (externalSize + internalSize)/ 1024d / 1024d;
-		return (allSizeMb > 0 ? Math.round(allSizeMb * 100) / 100d : 0) + " MB";
-	}
+
 
 	@Override
 	protected void onClick() {

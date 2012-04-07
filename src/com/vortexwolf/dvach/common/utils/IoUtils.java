@@ -13,15 +13,13 @@ public class IoUtils {
 		if(dir == null) return 0;
 		
 	    long result = 0;
-	    File[] fileList = dir.listFiles();
-
-	    for(int i = 0; i < fileList.length; i++) {
+	    for (File file : dir.listFiles()) {
 	        // Recursive call if it's a directory
-	        if(fileList[i].isDirectory()) {
-	            result += dirSize(fileList [i]);
+	        if(file.isDirectory()) {
+	            result += dirSize(file);
 	        } else {
 	            // Sum the file size in bytes
-	            result += fileList[i].length();
+	            result += file.length();
 	        }
 	    }
 	    return result; // return the file size
@@ -29,19 +27,54 @@ public class IoUtils {
 	
 	public static void deleteDirectory(File path) {
 		if (path != null && path.exists()) {
-			File[] files = path.listFiles();
-			if (files == null) {
-				return;
-			}
-			for (int i = 0; i < files.length; i++) {
-				if (files[i].isDirectory()) {
-					deleteDirectory(files[i]);
+			for (File file : path.listFiles()) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
 				} else {
-					files[i].delete();
+					file.delete();
 				}
 			}
 
 			path.delete();
 		}
+	}
+	
+	public static long freeSpace(File path, long bytesToRelease) {
+		long released = 0;
+		
+		if (path != null && path.exists()) {
+			for (File file : path.listFiles()) {
+				if (file.isDirectory()) {
+					released += freeSpace(file, bytesToRelease);
+				} else {
+					released += file.length();
+					file.delete();
+				}
+				
+				if(released > bytesToRelease){
+					break;
+				}
+			}
+		}
+		
+		return released;
+	}
+	
+	public static double getSizeInMegabytes(File folder1, File folder2){
+		long size1 = IoUtils.dirSize(folder1);
+		long size2 = IoUtils.dirSize(folder2);
+		
+		double allSizeMb = convertBytesToMb(size1 + size2);
+		double result = Math.round(allSizeMb * 100) / 100d;
+		
+		return result;
+	}
+	
+	public static double convertBytesToMb(long bytes){
+		return bytes / 1024d / 1024d;
+	}
+	
+	public static long convertMbToBytes(double mb){
+		return (long)(mb * 1024 * 1024);
 	}
 }

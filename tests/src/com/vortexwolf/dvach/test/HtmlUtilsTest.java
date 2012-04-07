@@ -1,38 +1,51 @@
 package com.vortexwolf.dvach.test;
 
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
+import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
 public class HtmlUtilsTest extends InstrumentationTestCase {
-	public void testParseId(){
-		
-		String name = "Аноним ID:&nbsp;<span class=postertrip>57aGrU6n</span>";
-		String postId = HtmlUtils.parseIdFromName(name);
-		assertEquals(postId, "57aGrU6n");
-		
-		name = "Аноним ID:&nbsp;<span id=\"qzL+/X8r\" onmouseover='this.innerHTML=\"<span class=postertrip>qzL+/X8r</span>\";'>Heaven</span>";
-		postId = HtmlUtils.parseIdFromName(name);
-		assertEquals(postId, "qzL+/X8r");
-		
-		name = "Аноним ID:&nbsp;Heaven";
-		postId = HtmlUtils.parseIdFromName(name);
-		assertEquals(postId, "Heaven");
 
-		name = "Аноним ID:&nbsp;<span class=\"postertripid\">s+xw3L0X</span>";
-		postId = HtmlUtils.parseIdFromName(name);
-		assertEquals(postId, "s+xw3L0X");
-		
-		name = "Аноним";
-		postId = HtmlUtils.parseIdFromName(name);
-		assertEquals(postId, null);
-	}
-	
 	public void testGetStringFontColor(){
 		String style = "color: rgb(255, 0, 0);";
 		String color = HtmlUtils.getStringFontColor(style);
 		assertEquals(color, "#FF0000");
+		
+		style = null;
+		color = HtmlUtils.getStringFontColor(style);
+		assertEquals(color, null);
+	}
+	
+	public void testRemoveLinksFromComment(){
+		String comment = ">>12345";
+		String result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "");
+		
+		comment = ">>12345z";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "z");
+		
+		comment = ">>12345>>23456";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "");
+		
+		comment = ">>12345>123";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, ">123");
+		
+		comment = ">>12345 z";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "z");
+		
+		comment = ">>12345\nz\n>>2345";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "z\n");
+		
+		comment = "a >>123 z";
+		result = ThreadPostUtils.removeLinksFromComment(comment);
+		assertEquals(result, "a >>123 z");
 	}
 }

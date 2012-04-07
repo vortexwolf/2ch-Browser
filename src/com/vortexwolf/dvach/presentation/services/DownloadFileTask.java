@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.http;
+package com.vortexwolf.dvach.presentation.services;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -15,7 +15,6 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.presentation.services.DownloadFileService;
 
 import android.app.ProgressDialog;
 import android.content.Context;

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.IoUtils;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -33,12 +35,7 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public void clear() {
-        try {
-            this.removeDir(mBaseDir);
-        } 
-        catch (IOException e) {
-            throw new RuntimeException ( e );
-        }
+        IoUtils.deleteDirectory(mBaseDir);
     }
 
     
@@ -104,7 +101,7 @@ public class FileSystemPersistence implements BitmapCache{
         }
         catch (FileNotFoundException e){
         	// No space left
-        	this.freeFileCache();
+        	IoUtils.freeSpace(mBaseDir, 5 * 1024 * 1024);
         	MyLog.e(TAG, e);
         }
         finally {
@@ -115,66 +112,4 @@ public class FileSystemPersistence implements BitmapCache{
             }
         }
     }
-    
-    private void freeFileCache(){
-	    File[] files = mBaseDir.listFiles();
-	    int memoryToRelease = 5 * 1024 * 1024;
-	    int releasedMemory = 0;
-	    
-	    for (File file : files) {
-	    	releasedMemory += file.length();
-	    	file.delete();
-	    	
-	    	if(releasedMemory >= memoryToRelease){
-	    		break;
-	    	}
-	    }
-    }
-    
-    
-    /**
-     * Delete a directory
-     *
-     * @param d the directory to delete
-     */
-    private void removeDir(File d) throws IOException{
-        // to see if this directory is actually a symbolic link to a directory,
-        // we want to get its canonical path - that is, we follow the link to
-        // the file it's actually linked to
-        File candir = d.getCanonicalFile();
-  
-        // a symbolic link has a different canonical path than its actual path,
-        // unless it's a link to itself
-        if (!candir.equals(d.getAbsoluteFile())) {
-            // this file is a symbolic link, and there's no reason for us to
-            // follow it, because then we might be deleting something outside of
-            // the directory we were told to delete
-            return;
-        }
-  
-        // now we go through all of the files and subdirectories in the
-        // directory and delete them one by one
-        File[] files = candir.listFiles();
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-  
-                // in case this directory is actually a symbolic link, or it's
-                // empty, we want to try to delete the link before we try
-                // anything
-                boolean deleted = file.delete();
-                if (!deleted) {
-                    // deleting the file failed, so maybe it's a non-empty
-                    // directory
-                    if (file.isDirectory()) removeDir(file);
-  
-                    // otherwise, there's nothing else we can do
-                }
-            }
-        }
-  
-        // now that we tried to clear the directory out, we can try to delete it
-        // again
-        d.delete();  
-    }    
 }

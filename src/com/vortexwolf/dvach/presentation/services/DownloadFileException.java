@@ -1,4 +1,4 @@
-package com.vortexwolf.dvach.common.http;
+package com.vortexwolf.dvach.presentation.services;
 
 public class DownloadFileException extends Exception {
 

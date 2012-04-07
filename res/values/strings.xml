@@ -89,7 +89,7 @@
 	
 	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
 	<string name="pref_youtube_mobile_links">Video attachments</string>
-	<string name="pref_youtube_mobile_links_summary">Open youtube mobile link instead of PC link</string>
+	<string name="pref_youtube_mobile_links_summary">Open YouTube mobile link instead of PC link</string>
 	
 	<string name="pref_popup_link_key">popup_link</string>
 	<string name="pref_popup_link">Popup links</string>

@@ -8,7 +8,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
+import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
 import com.vortexwolf.dvach.controls.ClickableURLSpan;
@@ -31,8 +31,6 @@ import android.text.style.URLSpan;
 
 public class HtmlUtils {
 	private static final Pattern styleColorPattern = Pattern.compile(".*?color: rgb\\((\\d+), (\\d+), (\\d+)\\);.*");
-	private static final String sAnonIdStartPattern = "Аноним ID:&nbsp;";
-	private static final Pattern sPostExistingIdPattern = Pattern.compile("<span class=.+?>(.+?)</span>");
 	
 	private static final DefaultHttpClient httpClient = MainApplication.getHttpClient();
 	//Картинки со смайликами во время всяких праздников
@@ -50,27 +48,6 @@ public class HtmlUtils {
 			return d;
 		}
 	};
-	
-	public static String parseIdFromName(String name){
-		if(name != null && name.startsWith(sAnonIdStartPattern)){
-			String postIdHtml = name.substring(sAnonIdStartPattern.length());
-			
-			if(Constants.NAME_HEAVEN.equals(postIdHtml)){
-				return Constants.NAME_HEAVEN;
-			}
-			else {
-				Matcher m2 = sPostExistingIdPattern.matcher(postIdHtml);
-				if(m2.find() && m2.groupCount() > 0){
-					return m2.group(1);
-				}
-				else {
-					return Html.fromHtml(postIdHtml).toString();
-				}
-			}
-		}
-		
-		return null;
-	}
 	
 	public static SpannableStringBuilder createSpannedFromHtml(String htmlText, Theme theme){
 		SpannableStringBuilder builder = (SpannableStringBuilder)Html.fromHtml(StringUtils.emptyIfNull(htmlText), imageGetter, new UnknownTagsHandler(theme));
@@ -111,9 +88,9 @@ public class HtmlUtils {
 	}
 	
 	public static Integer getIntFontColor(String htmlText){
-		String result = htmlText;
-
-		Matcher m = styleColorPattern.matcher(result);
+		if(htmlText == null) return null;
+		
+		Matcher m = styleColorPattern.matcher(htmlText);
 		while (m.find() && m.groupCount() == 3) {
 			Integer n1 = Integer.valueOf(m.group(1));
 			Integer n2 = Integer.valueOf(m.group(2));

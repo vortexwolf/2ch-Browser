@@ -4,12 +4,14 @@ import java.nio.charset.Charset;
 
 public class Constants {
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	// Нужно не забыть отключить логгирование при выпуске приложения
 	public static final boolean LOGGING = DEBUG;
 	
 	public static final String ANALYTICS_KEY = DEBUG ? "UA-28782346-1" : "UA-28782631-1";
+	
+	public static final int MAX_FILE_CACHE_SIZE = 20;
 	
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
@@ -50,6 +52,7 @@ public class Constants {
     public static final String EXTRA_SELECTED_FILE = ".ExtraSelectedFile";
     public static final String EXTRA_REDIRECTED_THREAD_NUMBER = "ExtraRedirectedThreadNumber";
     public static final String EXTRA_CURRENT_URL = "ExtraCurrentUrl";
+    public static final String EXTRA_PREFER_DESERIALIZED = "ExtraPreferDeserialized";
     
     // Идентификаторы для контекстного меню 
     public static final int CONTEXT_MENU_ANSWER = 1001;

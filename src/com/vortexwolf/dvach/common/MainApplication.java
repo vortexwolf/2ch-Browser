@@ -12,25 +12,28 @@ import com.vortexwolf.dvach.activities.addpost.PostSender;
 import com.vortexwolf.dvach.api.BoardSettingsStorage;
 import com.vortexwolf.dvach.api.JsonApiReader;
 import com.vortexwolf.dvach.api.ObjectMapperFactory;
-import com.vortexwolf.dvach.common.http.GzipHttpClientFactory;
+import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryChangedListener;
+import com.vortexwolf.dvach.interfaces.ICacheManager;
+import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostSender;
+import com.vortexwolf.dvach.interfaces.ISerializationService;
 import com.vortexwolf.dvach.presentation.services.BitmapManager;
 import com.vortexwolf.dvach.presentation.services.CacheManager;
 import com.vortexwolf.dvach.presentation.services.DownloadFileService;
 import com.vortexwolf.dvach.presentation.services.DraftPostsStorage;
-import com.vortexwolf.dvach.presentation.services.ICacheManager;
 import com.vortexwolf.dvach.presentation.services.OpenTabsManager;
+import com.vortexwolf.dvach.presentation.services.SerializationService;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
-import com.vortexwolf.dvach.settings.ICacheSettingsChangedListener;
+import com.vortexwolf.dvach.settings.CacheSizePreference;
 
 import android.app.Application;
 import android.httpimage.FileSystemPersistence;
@@ -52,6 +55,7 @@ public class MainApplication extends Application {
     private IBitmapManager mBitmapManager;
     private IOpenTabsManager mOpenTabsMaganer;
     private CacheManager mCacheManager;
+    private ISerializationService mSerializationService;
     
 	@Override
 	public void onCreate() {
@@ -71,11 +75,15 @@ public class MainApplication extends Application {
 		this.mSettings = new ApplicationSettings(this, this.getResources(), mTracker);
 		this.mSettings.setCacheSettingsChangedListener(new CacheSettingsChangedListener());
 		
-		this.mCacheManager = new CacheManager(super.getCacheDir(), this.getPackageName(), this.mSettings);
-
+		this.mCacheManager = new CacheManager(super.getCacheDir(), this.getPackageName(), this.mSettings, mTracker);
+		this.mCacheManager.clearExcessCache();
+		this.mSerializationService = new SerializationService(this.mCacheManager);
+		
 		this.mHttpImageManager = new HttpImageManager(null);
 		this.updateImageManager();
-		this.mBitmapManager = new BitmapManager(this.mHttpImageManager);	
+		this.mBitmapManager = new BitmapManager(this.mHttpImageManager);
+		
+
 	}
 
 	@Override
@@ -133,6 +141,10 @@ public class MainApplication extends Application {
 		return mCacheManager;
 	}
 	
+	public ISerializationService getSerializationService(){
+		return mSerializationService;
+	}
+	
 	@Override
 	public File getCacheDir() {
 		// NOTE: this method is used in Android 2.2 and higher
@@ -141,7 +153,7 @@ public class MainApplication extends Application {
 	
 	private void updateImageManager(){
 		mHttpImageManager.setPersistenceCache(
-				mCacheManager.isCacheEnabled() ? new FileSystemPersistence(this.mCacheManager.getCurrentCacheDirectory()) : null);
+				mCacheManager.isCacheEnabled() ? new FileSystemPersistence(this.mCacheManager.getThumbnailsCacheDirectory()) : null);
 	}
 	
 	private class CacheSettingsChangedListener implements ICacheSettingsChangedListener{

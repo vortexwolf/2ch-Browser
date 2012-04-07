@@ -16,10 +16,10 @@ import com.vortexwolf.dvach.activities.threads.DownloadThreadsTask;
 import com.vortexwolf.dvach.api.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 import com.vortexwolf.dvach.common.*;
-import com.vortexwolf.dvach.common.http.HttpStringReader;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
@@ -32,6 +32,7 @@ import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.presentation.models.CaptchaViewType;
 import com.vortexwolf.dvach.presentation.models.DraftPostModel;
 import com.vortexwolf.dvach.presentation.models.ImageFileModel;
+import com.vortexwolf.dvach.presentation.services.HttpStringReader;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 
@@ -152,7 +153,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 			}
 			
 			if(postComment != null){
-				postComment = postComment.replace("\n", "\n>");
+				postComment = ThreadPostUtils.removeLinksFromComment(postComment);
+				
+				postComment = postComment.replaceAll("(\n+)", "$1>");
 				commentBuilder.append(">"+postComment+"\n");
 			}
 		}
@@ -321,19 +324,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		}
 
 		this.mFinishedSuccessfully = true;
-
-		// Отправляем статистику об отправленном сообщении
-		if(Constants.ADD_THREAD_PARENT.equals(this.mThreadNumber)){
-			this.mTracker.trackEvent(Tracker.CATEGORY_SEND, Tracker.ACTION_NEW_THREAD, this.mCommentView.getText().length());
-		}
-		else{
-			String label = this.mSageCheckBox.isChecked() ? Constants.SAGE_EMAIL : "";
-			this.mTracker.trackEvent(Tracker.CATEGORY_SEND, Tracker.ACTION_NEW_POST, label, this.mCommentView.getText().length());
-		}
-		
-		if(this.mAttachedFile != null){
-			this.mTracker.trackEvent(Tracker.CATEGORY_SEND, Tracker.ACTION_ATTACH_FILE, this.mAttachedFile.file.getParentFile().getAbsolutePath(), (int)this.mAttachedFile.file.length());
-		}
 		
 		// Завершаем с успешным результатом
 		Intent intent = new Intent();
@@ -436,9 +426,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
-    		case R.id.menu_send_post_id:
-    			this.onSend();
-    			break;
     		case R.id.menu_attach_file_id:
     			Intent intent = new Intent(this, FilesListActivity.class);
     			intent.putExtra(FilesListActivity.EXTRA_CURRENT_FILE, this.mAttachedFile != null ? this.mAttachedFile.file.getAbsolutePath() : null);

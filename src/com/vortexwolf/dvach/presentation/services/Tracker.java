@@ -7,18 +7,19 @@ import com.vortexwolf.dvach.common.Constants;
 
 public class Tracker {
 
-	public static final String CATEGORY_SEND = "Send";
 	public static final String CATEGORY_UI = "UI";
 	public static final String CATEGORY_PREFERENCES = "Preferences";
+	public static final String CATEGORY_STATE = "Application State";
+
+	public static final String ACTION_CACHE_FOLDER = "Cache Size";
+	public static final String ACTION_CACHE_SIZE = "Cache Size";
 	
-	public static final String ACTION_NEW_THREAD = "Create New Thread";
-	public static final String ACTION_NEW_POST = "Add New Post";
-	public static final String ACTION_ATTACH_FILE = "Attach File";
-	
-	public static final String ACTION_SELECT_BOARD = "Select Board";
 	public static final String ACTION_DOWNLOAD_FILE = "Download File";
 	public static final String ACTION_EXTERNAL_BROWSER_OPTION = "Open External Browser";
 	public static final String ACTION_SELECT_IMAGE_FROM_GALLERY = "Select Image From Gallery";
+	public static final String ACTION_CONTEXT_REPLY_POST = "Reply Post Context Menu";
+	public static final String ACTION_CONTEXT_REPLY_POST_QUOTE = "Reply Post With Quote Context Menu";
+	public static final String ACTION_CONTEXT_COPY_POST = "Copy Post Context Menu";
 	
 	public static final String ACTION_PREFERENCE_THEME = "Change Theme";
 	public static final String ACTION_PREFERENCE_TEXT_SIZE = "Change Text Size";
