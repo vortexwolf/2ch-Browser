@@ -3,7 +3,6 @@ package com.vortexwolf.dvach.activities.tabs;
 import java.util.ArrayList;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 

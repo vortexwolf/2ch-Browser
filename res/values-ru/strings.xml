@@ -63,6 +63,7 @@
     <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
     <string name="cmenu_download_file">Загрузить файл</string>
     <string name="cmenu_copy_post">Копировать текст</string>
+    <string name="cmenu_copy_url">Копировать ссылку</string>
         
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
@@ -129,6 +130,7 @@
 	<string name="error_json_parse">Быдлокодеры сайта 2ch.so не могут в валидный json. Просто перезагрузите страницу.</string>
 	<string name="error_file_exist">Такой файл уже существует.</string>
 	<string name="error_save_file">Во время сохранения произошла ошибка.</string>
+	<string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Введите код подтверждения</string>

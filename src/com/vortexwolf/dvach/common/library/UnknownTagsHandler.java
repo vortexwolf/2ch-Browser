@@ -11,7 +11,6 @@ import com.vortexwolf.dvach.common.utils.StringUtils;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;

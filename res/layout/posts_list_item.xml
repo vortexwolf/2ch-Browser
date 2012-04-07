@@ -44,11 +44,10 @@
 </LinearLayout>
 
 <!-- Content  -->
-<ScrollView android:layout_width="fill_parent"
-    android:layout_height="0dip"
-    android:layout_weight="1.0"
-    android:fillViewport="true" >
-	<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+<ScrollView android:id="@+id/post_item_scroll" android:visibility="gone" 
+    android:layout_width="fill_parent" android:layout_height="0dip" android:layout_weight="1.0" android:fillViewport="true" />
+
+<RelativeLayout android:id="@+id/post_item_content_layout" android:layout_width="fill_parent" android:layout_height="wrap_content">
 
     <LinearLayout android:id="@+id/thumbnail_view"
     			  android:layout_width="wrap_content"
@@ -99,7 +98,6 @@
         local:urlLinkForeground="?urlLinkForeground"
         />
 </RelativeLayout>
-</ScrollView>
 
 <!-- Bottom row -->
 <TextView 

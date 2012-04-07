@@ -2,15 +2,12 @@ package com.vortexwolf.dvach.presentation.services;
 
 import java.io.File;
 
-import android.httpimage.FileSystemPersistence;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.interfaces.ICacheDirectoryChangedListener;
 import com.vortexwolf.dvach.interfaces.ICacheManager;
-import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class CacheManager implements ICacheManager {

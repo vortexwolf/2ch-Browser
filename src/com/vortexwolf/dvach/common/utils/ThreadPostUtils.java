@@ -10,18 +10,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.activities.threads.ThumbnailOnClickListenerFactory;
 import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
-import com.vortexwolf.dvach.api.entities.PostInfo;
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IThumbnailOnClickListenerFactory;
+import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadPostUtils {
 	
-	private static final IThumbnailOnClickListenerFactory sThumbnailOnClickListenerFactory = new ThumbnailOnClickListenerFactory();
+	private static final IClickListenersFactory sThumbnailOnClickListenerFactory = new ClickListenersFactory();
 	
 	/** Удаляет ссылки на другие сообщения из поста, если они расположены вначале строки */
 	public static String removeLinksFromComment(String comment){
@@ -37,7 +35,7 @@ public class ThreadPostUtils {
 	
 	public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings){
     	if(attachment != null){
-    		sThumbnailOnClickListenerFactory.raiseClick(attachment, context, settings);
+    		sThumbnailOnClickListenerFactory.raiseThumbnailClick(attachment, context, settings);
     	}
 	}
 	
@@ -65,7 +63,7 @@ public class ThreadPostUtils {
 			imageView.setVisibility(View.VISIBLE);
 						
 			//Обработчик события нажатия на картинку
-			OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getOnClickListener(attachment, context, settings);
+			OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getThumbnailOnClickListener(attachment, context, settings);
 			if (thumbnailOnClickListener != null) {
             	imageView.setOnClickListener(thumbnailOnClickListener);
             	indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);

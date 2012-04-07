@@ -11,6 +11,8 @@
         <attr name="listSectionBackground" format="color|reference" />
         <attr name="postItemBackground" format="color|reference" />
         <attr name="urlLinkForeground" format="color|reference" />
+        <attr name="tabCloseButtonBackground" format="color|reference" />
+        <attr name="tabSeparatorBackground" format="color|reference" />
     </declare-styleable>
     
     <declare-styleable name="SeekBarPreference">

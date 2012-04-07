@@ -13,6 +13,8 @@ Light theme
 		<item name="listSectionBackground">#ebeff9</item>
 		<item name="postItemBackground">@drawable/border_light</item>
 		<item name="urlLinkForeground">#5555FF</item>
+		<item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
+		<item name="tabSeparatorBackground">#D9D9D9</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">#789922</item>
         <item name="spoilerForeground">@android:color/black</item>
@@ -53,7 +55,9 @@ Dark theme
 	    <item name="postNumberForeground">#C9BE89</item>
 	    <item name="listSectionBackground">#191919</item>
 	    <item name="postItemBackground">@drawable/border_dark</item>
-	    <item name="urlLinkForeground">#C9BE89</item>
+	    <item name="urlLinkForeground">#C9BE89</item>	    
+		<item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
+		<item name="tabSeparatorBackground">#333333</item>
 	    <!-- Comment colors -->
 	    <item name="postQuoteForeground">#789922</item>
 	    <item name="spoilerForeground">#48B0FD</item>
@@ -95,6 +99,8 @@ Photon theme
 		<item name="listSectionBackground">#ebeff9</item>
 		<item name="postItemBackground">@drawable/border_photon</item>
 		<item name="urlLinkForeground">#FF6600</item>
+		<item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
+		<item name="tabSeparatorBackground">#D9D9D9</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">#789922</item>
         <item name="spoilerForeground">#333333</item>

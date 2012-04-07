@@ -14,6 +14,7 @@ import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.presentation.models.ImageFileModel;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -61,7 +62,9 @@ public class FilesListActivity extends ListActivity {
 
 		MainApplication application = (MainApplication)this.getApplication();
 		application.getTracker().trackActivityView(TAG);
+		ApplicationSettings settings = application.getSettings();
 		
+		this.setTheme(settings.getTheme());
 		this.setContentView(R.layout.files_list_view);
 
 		mDirectory = new File(SDCARD_DIRECTORY);

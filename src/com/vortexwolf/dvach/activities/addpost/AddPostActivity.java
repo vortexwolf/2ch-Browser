@@ -1,18 +1,11 @@
 package com.vortexwolf.dvach.activities.addpost;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.activities.boards.PickBoardActivity;
-import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.activities.files.FilesListActivity;
 import com.vortexwolf.dvach.activities.files.SerializableFileModel;
-import com.vortexwolf.dvach.activities.threads.DownloadThreadsTask;
 import com.vortexwolf.dvach.api.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 import com.vortexwolf.dvach.common.*;
@@ -25,7 +18,6 @@ import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
-import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostSendView;
 import com.vortexwolf.dvach.interfaces.IPostSender;
@@ -34,8 +26,6 @@ import com.vortexwolf.dvach.presentation.models.DraftPostModel;
 import com.vortexwolf.dvach.presentation.models.ImageFileModel;
 import com.vortexwolf.dvach.presentation.services.HttpStringReader;
 import com.vortexwolf.dvach.presentation.services.Tracker;
-import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -44,12 +34,8 @@ import android.graphics.Bitmap;
 import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images;
 import android.provider.MediaStore.MediaColumns;
 import android.text.Editable;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -456,15 +442,23 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 					
 					Uri selectedImage = data.getData();
 					
-					String[] filePathColumn = { MediaColumns.DATA };
-		            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+					final String[] columns = { MediaColumns.DATA};
+		            Cursor cursor = getContentResolver().query(selectedImage, columns, null, null, null);
 		            cursor.moveToFirst();
 
-		            String filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-		            ImageFileModel image = new ImageFileModel(filePath);
+		            int columnIndex = cursor.getColumnIndex(columns[0]);
+		            String filePath = cursor.getString(columnIndex);
+		            
 		            cursor.close();
-
-		            this.setAttachment(image);
+		            
+		            // Почему-то было 2 error reports с NullReferenceException из-за метода File.fixSlashes, добавлю проверку
+		            if(filePath != null){
+			            ImageFileModel image = new ImageFileModel(filePath);
+			            this.setAttachment(image);
+		            }
+		            else {
+		            	AppearanceUtils.showToastMessage(this, this.getString(R.string.error_image_cannot_be_attached));
+		            }
 		            
 					break;
 			}

@@ -8,20 +8,20 @@
 	android:orientation="horizontal">
 	
     <LinearLayout android:orientation="vertical" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="1.0">
-        <TextView android:textAppearance="?android:textAppearanceMedium" android:ellipsize="end" android:id="@+id/tabs_item_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1" android:singleLine="true" />
-        <TextView android:textAppearance="?android:textAppearanceSmall" android:ellipsize="end" android:id="@+id/tabs_item_url" android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1" android:singleLine="true" />
+        <TextView android:textAppearance="?android:textAppearanceLarge" android:ellipsize="end" android:id="@+id/tabs_item_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1" android:singleLine="true" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="?android:textColorSecondary" android:ellipsize="end" android:id="@+id/tabs_item_url" android:layout_width="fill_parent" android:layout_height="wrap_content" android:maxLines="1" android:singleLine="true" />
     </LinearLayout>
 
 	 <View android:id="@+id/divider" 
-	     	android:background="#ff313431" 
-	     	android:layout_width="1.0dip" 
+	     	android:background="?tabSeparatorBackground" 
+	     	android:layout_width="1dip" 
      		android:layout_height="fill_parent" 
      		android:layout_marginLeft="8.0dip" 
      		android:layout_marginTop="5.0dip" 
      		android:layout_marginBottom="5.0dip" />
 
 	<com.vortexwolf.dvach.controls.NonParentFocusableImageView android:id="@+id/tabs_item_delete"
-		     android:background="@drawable/tab_close_background"
+		     android:background="?tabCloseButtonBackground"
 		     android:paddingLeft="18.0dip" 
 		     android:paddingRight="18.0dip" 
 		     android:layout_width="wrap_content" 

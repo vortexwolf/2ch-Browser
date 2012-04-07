@@ -1,7 +1,5 @@
 package com.vortexwolf.dvach.activities.addpost;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import com.vortexwolf.dvach.api.JsonApiReaderException;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 import com.vortexwolf.dvach.common.library.MyLog;
@@ -10,8 +8,6 @@ import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
-import com.vortexwolf.dvach.presentation.services.BitmapManager;
-
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;

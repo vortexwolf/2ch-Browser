@@ -6,14 +6,14 @@ import com.vortexwolf.dvach.settings.ApplicationSettings;
 import android.content.Context;
 import android.view.View.OnClickListener;
 
-public interface IThumbnailOnClickListenerFactory {
+public interface IClickListenersFactory {
 	
 	/** Обработчик нажатия на картинку с ссылкой, открывает ее в браузере, например
 	 */
-	OnClickListener getOnClickListener(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings);
+	OnClickListener getThumbnailOnClickListener(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings);
 	
 	/**
 	 * Явный вызов функции
 	 */
-	void raiseClick(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings);
+	void raiseThumbnailClick(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings);
 }

@@ -2,15 +2,10 @@ package com.vortexwolf.dvach.common.utils;
 
 import java.io.File;
 
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
-import android.app.Application;
-import android.os.Environment;
-
 public class IoUtils {
 
 	public static long dirSize(File dir) {
-		if(dir == null) return 0;
+		if(dir == null || !dir.exists()) return 0;
 		
 	    long result = 0;
 	    for (File file : dir.listFiles()) {

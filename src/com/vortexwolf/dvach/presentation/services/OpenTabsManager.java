@@ -3,10 +3,7 @@ package com.vortexwolf.dvach.presentation.services;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-
 import com.vortexwolf.dvach.activities.posts.PostsListActivity;
 import com.vortexwolf.dvach.activities.threads.ThreadsListActivity;
 import com.vortexwolf.dvach.common.Constants;

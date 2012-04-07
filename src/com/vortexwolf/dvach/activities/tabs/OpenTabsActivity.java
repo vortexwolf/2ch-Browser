@@ -1,19 +1,22 @@
 package com.vortexwolf.dvach.activities.tabs;
 
-import java.util.List;
-
+import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
-
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
 import android.app.ListActivity;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.ClipboardManager;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class OpenTabsActivity extends ListActivity {
@@ -32,13 +35,17 @@ public class OpenTabsActivity extends ListActivity {
         this.mTabsManager = this.mApplication.getOpenTabsManager();
 		this.mAdapter = new OpenTabsAdapter(this, mTabsManager.getOpenTabs(), mTabsManager);
 		
-		//this.setTheme(this.mApplication.getSettings().getTheme());
+		this.setTheme(this.mApplication.getSettings().getTheme());
+		TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
+		this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
 		this.getListView().setAdapter(this.mAdapter);
 		
 		Bundle extras = this.getIntent().getExtras();
 		if(extras != null){
 			this.mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
 		}
+		
+		this.registerForContextMenu(this.getListView());
 	}
 
 	@Override
@@ -52,5 +59,28 @@ public class OpenTabsActivity extends ListActivity {
 		}
 	}
 
+	@Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+    	super.onCreateContextMenu(menu, v, menuInfo);
+
+    	menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
+	}
 	
+	@Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    	OpenTabModel model = mAdapter.getItem(menuInfo.position);
+
+        switch(item.getItemId()){
+	        case Constants.CONTEXT_MENU_COPY_URL:{
+	        	ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+	        	clipboard.setText(model.getUri().toString());
+	        	
+	        	AppearanceUtils.showToastMessage(this, model.getUri().toString());
+				return true;
+	        }
+        }
+        
+        return false;
+    }
 }

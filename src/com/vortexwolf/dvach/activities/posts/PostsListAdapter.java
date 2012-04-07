@@ -10,7 +10,6 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AbsListView;
@@ -19,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
@@ -33,6 +34,7 @@ import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.FloatImageModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.models.PostsViewModel;
+import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener {
@@ -45,7 +47,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final PostsViewModel mPostsViewModel;
 	private final Theme mTheme;
 	private final ApplicationSettings mSettings;
-	private final OnLongClickListener mOnLongClickListener;
 	private final ListView mListView;
 	private final Context mActivityContext;
 	
@@ -64,13 +65,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mSettings = settings;
         this.mListView = listView;
         this.mActivityContext = context;
-        
-        this.mOnLongClickListener = new OnLongClickListener(){
-			@Override
-			public boolean onLongClick(View arg0) {
-				return false;
-			}     	
-        };
 	}
 	
     @Override
@@ -100,7 +94,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     		vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
     		vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
     		vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
-	        
 	        view.setTag(vb);
     	}
         
@@ -159,11 +152,29 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         else{
         	vb.postRepliesView.setVisibility(View.GONE);
         }
-	        
+
         // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой listener вроде решает проблему
-        view.setOnLongClickListener(this.mOnLongClickListener);
+        view.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
     }
 
+    private View getPopupView(int position){
+		View view = this.getView(position, null, null);
+		
+		//убираем фон в виде рамки с закругленными краями и ставим обычный
+		int backColor = this.mTheme.obtainStyledAttributes(R.styleable.Theme).getColor(R.styleable.Theme_activityRootBackground, android.R.color.transparent);
+		view.setBackgroundColor(backColor);
+		
+		//Перемещаем текст в ScrollView
+		ScrollView scrollView = (ScrollView)view.findViewById(R.id.post_item_scroll);
+		RelativeLayout contentLayout = (RelativeLayout)view.findViewById(R.id.post_item_content_layout);
+		
+		((ViewGroup)contentLayout.getParent()).removeView(contentLayout);
+		scrollView.addView(contentLayout);
+		scrollView.setVisibility(View.VISIBLE);
+		
+		return view;
+    }
+    
 	@Override
 	public void onClick(View v, String url) {
 
@@ -181,11 +192,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 			}
 			
 			if(this.mSettings.isLinksInPopup()){
-				View view = this.getView(position, null, null);
-				
-				//убираем фон в виде рамки с закругленными краями и ставим обычный
-				int backColor = this.mTheme.obtainStyledAttributes(R.styleable.Theme).getColor(R.styleable.Theme_activityRootBackground, android.R.color.transparent);
-				view.setBackgroundColor(backColor);
+				View view = this.getPopupView(position);
 				
 				//Отображаем созданное view в диалоге
 				Dialog currentDialog = new Dialog(this.mActivityContext);

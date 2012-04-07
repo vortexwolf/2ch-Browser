@@ -1,22 +1,14 @@
 package com.vortexwolf.dvach.common;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.vortexwolf.dvach.activities.addpost.PostSender;
 import com.vortexwolf.dvach.api.BoardSettingsStorage;
 import com.vortexwolf.dvach.api.JsonApiReader;
 import com.vortexwolf.dvach.api.ObjectMapperFactory;
 import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
-import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
-import com.vortexwolf.dvach.interfaces.ICacheDirectoryChangedListener;
 import com.vortexwolf.dvach.interfaces.ICacheManager;
 import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
@@ -33,8 +25,6 @@ import com.vortexwolf.dvach.presentation.services.OpenTabsManager;
 import com.vortexwolf.dvach.presentation.services.SerializationService;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
-import com.vortexwolf.dvach.settings.CacheSizePreference;
-
 import android.app.Application;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;

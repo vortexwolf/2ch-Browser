@@ -32,6 +32,7 @@ public class PickBoardActivity extends ListActivity {
     	new BoardEntity("int", "international"),
     	
     	new SectionEntity("Тематика"),
+    	new BoardEntity("app", "мобильные приложения"),
     	new BoardEntity("au", "автомобили и транспорт"),
     	new BoardEntity("bi", "велосипеды"),
     	new BoardEntity("biz", "бизнес"),
@@ -74,6 +75,8 @@ public class PickBoardActivity extends ListActivity {
     	new BoardEntity("de", "дизайн"),
 		new BoardEntity("diy", "хобби"),
 		new BoardEntity("f", "flash & gif"),
+		new BoardEntity("mus", "музыканты"),
+		new BoardEntity("o", "мазня"),
 		new BoardEntity("pa", "живопись"),
 		new BoardEntity("p", "фото"),
 		new BoardEntity("wp", "обои и высокое разрешение"),
@@ -81,6 +84,7 @@ public class PickBoardActivity extends ListActivity {
         
     	new SectionEntity("Игры"),
     	new BoardEntity("bg", "настольные игры"),
+    	new BoardEntity("cg", "консоли"),
 		new BoardEntity("gb", "азартные игры"),
 		new BoardEntity("mc", "minecraft"),
 		new BoardEntity("mmo", "MMO"),
@@ -93,6 +97,8 @@ public class PickBoardActivity extends ListActivity {
 		new BoardEntity("aa", "аниме арт"),
 		new BoardEntity("fd", "фэндом"),
 		new BoardEntity("ma", "манга"),
+		new BoardEntity("rm", "rozen maiden"),
+		new BoardEntity("to", "touhou"),
 		new BoardEntity("vn", "визуальные новеллы")
     };
 

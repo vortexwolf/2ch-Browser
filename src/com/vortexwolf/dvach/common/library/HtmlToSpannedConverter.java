@@ -17,7 +17,6 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -193,6 +192,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
             handleP(mSpannableStringBuilder);
             endHeader(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase("img")) {
+            return;
         } else if (mTagHandler != null) {
             mTagHandler.handleTag(false, tag, mSpannableStringBuilder, mUnknownTagsAttributes.pop());
         }
