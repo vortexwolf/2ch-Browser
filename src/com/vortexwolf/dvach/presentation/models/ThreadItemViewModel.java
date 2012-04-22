@@ -21,6 +21,7 @@ public class ThreadItemViewModel {
 	private SpannableStringBuilder mSpannedComment = null;
 	private Spanned mSpannedSubject = null;
 	private AttachmentInfo mAttachment = null;
+	private boolean mEllipsized = false;
 	
 	public ThreadItemViewModel(ThreadInfo model, Theme theme) {
 		this.mTheme = theme;
@@ -35,8 +36,6 @@ public class ThreadItemViewModel {
 			String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
 			Spanned spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
 			this.mSpannedComment = (SpannableStringBuilder)spanned;
-			
-	        this.mOpPost.setComment(null); // удаляем лишние данные из памяти
 		}
 		
 		return mSpannedComment;
@@ -78,5 +77,13 @@ public class ThreadItemViewModel {
 	
 	public int getImageCount(){
 		return mImageCount;
+	}
+
+	public void setEllipsized(boolean ellipsized) {
+		this.mEllipsized = ellipsized;
+	}
+
+	public boolean isEllipsized() {
+		return mEllipsized;
 	}
 }

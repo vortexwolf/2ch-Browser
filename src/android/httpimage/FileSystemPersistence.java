@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
 
@@ -91,6 +92,10 @@ public class FileSystemPersistence implements BitmapCache{
     @Override
     public void storeData(String key, Bitmap data) {
         OutputStream outputStream = null;
+        if(mBaseDir.list() != null && mBaseDir.list().length > Constants.MAX_FILE_CACHE_THUMBNAILS){
+        	IoUtils.freeSpace(mBaseDir, IoUtils.convertMbToBytes(5));
+        }
+        
         try {
             File file = new File(mBaseDir, key) ;
             
@@ -101,7 +106,7 @@ public class FileSystemPersistence implements BitmapCache{
         }
         catch (FileNotFoundException e){
         	// No space left
-        	IoUtils.freeSpace(mBaseDir, 5 * 1024 * 1024);
+        	IoUtils.freeSpace(mBaseDir, IoUtils.convertMbToBytes(5));
         	MyLog.e(TAG, e);
         }
         finally {

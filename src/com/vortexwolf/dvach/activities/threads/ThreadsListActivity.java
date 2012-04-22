@@ -6,6 +6,7 @@ import com.vortexwolf.dvach.activities.boards.PickBoardActivity;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.activities.posts.PostsListActivity;
 import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
+import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.api.entities.ThreadsList;
 import com.vortexwolf.dvach.common.Constants;
@@ -21,7 +22,10 @@ import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.ISerializationService;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
+import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
+import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
+import com.vortexwolf.dvach.presentation.services.PostItemViewBuilder;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -56,6 +60,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	private Tracker mTracker;
 	private ApplicationSettings mSettings;
 	private ISerializationService mSerializationService;
+	private PostItemViewBuilder mPostItemViewBuilder;
 	
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
@@ -69,7 +74,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	private ViewType mCurrentView = null;
 	private View mNavigationBar;
 	
-	private Uri mUri;
+	private OpenTabModel mTabModel;
 	private String mBoardName;
 	private int mPageNumber = 0;
 	
@@ -81,13 +86,8 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         this.mApplication = (MainApplication) this.getApplication();
-        this.mJsonReader = this.mApplication.getJsonApiReader();
-        this.mSettings = this.mApplication.getSettings();
-        this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mTracker = this.mApplication.getTracker();
-        this.mSerializationService = this.mApplication.getSerializationService();
-        IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
-        
+
+        // Парсим код доски и номер страницы
     	Uri data = this.getIntent().getData();
     	if(data != null){
     		mBoardName = UriUtils.getBoardName(data);
@@ -98,34 +98,26 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     		mBoardName = this.mApplication.getSettings().getHomepage();
     	}
     	
-        this.resetUI();
-
-        if(mAdapter == null)
-        {       	
-        	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
-	        this.setListAdapter(mAdapter);
-	        
-	        ThreadInfo[] threads = null;
-	        if(this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
-	        	threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
-	        }
-	        
-	        if(threads == null){
-	        	this.refreshThreads();
-	        }
-	        else {
-	        	this.mAdapter.setAdapterData(threads);
-	        }
-        }
-        
+        this.mJsonReader = this.mApplication.getJsonApiReader();
+        this.mSettings = this.mApplication.getSettings();
+        this.mCurrentSettings = this.mSettings.getCurrentSettings();
+        this.mTracker = this.mApplication.getTracker();
+        this.mSerializationService = this.mApplication.getSerializationService();
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings);
+    	    	
+        // Заголовок страницы
         String pageTitle = mPageNumber != 0 
 				        ? String.format(getString(R.string.data_board_title_with_page), mBoardName, mPageNumber) 
 				        : String.format(getString(R.string.data_board_title), mBoardName);
 		this.setTitle(pageTitle);
 		
+		// Сохраняем во вкладках
 		OpenTabModel tabModel = new OpenTabModel(mBoardName, mBoardName, mPageNumber);
-		this.mUri = tabModel.getUri();
-		tabsManager.add(tabModel);
+		this.mTabModel = this.mApplication.getOpenTabsManager().add(tabModel);
+		
+        this.resetUI();
+
+        this.setAdapter();
 		
         this.mTracker.setBoardVar(mBoardName);
         this.mTracker.setPageNumberVar(mPageNumber);
@@ -134,13 +126,16 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     
 	@Override
 	protected void onDestroy() {
-		if(this.mCurrentDownloadTask != null){
-			this.mCurrentDownloadTask.cancel(true);
-		}
-		
 		MyLog.d(TAG, "Detstroyed");
 		
 		super.onDestroy();
+	}
+	
+	@Override
+	protected void onPause() {
+		this.mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(this.getListView()));
+		
+		super.onPause();
 	}
 	
 	@Override
@@ -217,8 +212,31 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 				ThreadsListActivity.this.navigateToBoardPageNumber(mBoardName, mPageNumber + 1);
 			}
 		});
-       
     }
+	
+	private void setAdapter(){
+		if (mAdapter != null) return;    	
+		
+    	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
+        this.setListAdapter(mAdapter);
+        
+        ThreadInfo[] threads = null;
+        if(this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
+        	threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
+        }
+        
+        if(threads == null){
+        	this.refreshThreads();
+        }
+        else {
+        	this.mAdapter.setAdapterData(threads);
+    		// Устанавливаем позицию, если открываем как уже открытую вкладку
+    		AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
+    		if(savedPosition != null){
+    			this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
+    		}
+        }
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -234,7 +252,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     	switch (item.getItemId()) {
     	case R.id.tabs_menu_id:
     		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
-    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mUri.toString());
+    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
     		startActivity(openTabsIntent);
     		break;
     	case R.id.pick_board_menu_id:
@@ -329,11 +347,13 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     	ThreadItemViewModel item = mAdapter.getItem(info.position);
     	
     	menu.add(Menu.NONE, Constants.CONTEXT_MENU_ANSWER, 0, this.getString(R.string.cmenu_answer_without_reading));
-    	if(item.hasAttachment()){
-    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_OPEN_ATTACHMENT, 1, this.getString(R.string.cmenu_open_attachment));
-    	}
+    	
     	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()){
-    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 2, this.getString(R.string.cmenu_download_file));
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(R.string.cmenu_download_file));
+    	}
+    	
+    	if(item.isEllipsized()){
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
     	}
 	}
 	
@@ -350,20 +370,17 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 				startActivity(addPostIntent);
 				return true;
 	        }
-	        case Constants.CONTEXT_MENU_OPEN_ATTACHMENT: {
-	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-	        	if(attachment != null && !attachment.isEmpty()){
-	        		ThreadPostUtils.openAttachment(attachment, this.getApplicationContext(), this.mSettings);
-	        		return true;
-	        	}
-	        	return false;
-	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
 	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	
 	    	    this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU);
 	    	    
+	        	return true;
+	        }
+	        case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
+	        	PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.sDvachUrlSpanClickListener);
+	        	this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
 	        	return true;
 	        }
         }
@@ -385,8 +402,9 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     
     private void navigateToThread(String threadNumber, String threadSubject){
 		Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-		i.putExtra(Constants.EXTRA_BOARD_NAME, mBoardName);
-		i.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);
+		i.setData(Uri.parse(UriUtils.create2chThreadURL(mBoardName, threadNumber)));
+/*		i.putExtra(Constants.EXTRA_BOARD_NAME, mBoardName);
+		i.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);*/
 		if(threadSubject != null){
 			i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
 		}

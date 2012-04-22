@@ -15,13 +15,14 @@ import android.text.format.DateFormat;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.posts.FlowTextHelper;
 import com.vortexwolf.dvach.api.entities.PostInfo;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 
 public class PostItemViewModel {
-
 
 	private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>&gt;&gt;(\\d+)</a>");
 	
@@ -51,6 +52,12 @@ public class PostItemViewModel {
 
 	private void parseReferences(){
 		String comment = this.mModel.getComment();
+
+		if(comment == null){
+			MyLog.v("PostItemViewModel", "comment == null");
+			return;
+		}
+		
     	Matcher m = sReplyLinkFullPattern.matcher(comment);
 		while (m.find()) {
 			if(m.groupCount() > 0 && !refersTo.contains(m.group(1))){
@@ -63,8 +70,6 @@ public class PostItemViewModel {
 		String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
 		SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
         HtmlUtils.replaceUrls(builder, this.mUrlListener, mTheme);
-        
-        this.mModel.setComment(null); // удаляем лишние данные из памяти
 
         return builder;
 	}

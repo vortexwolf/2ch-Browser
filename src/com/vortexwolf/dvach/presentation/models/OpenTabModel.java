@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.presentation.models;
 
 import android.net.Uri;
 
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 
 public class OpenTabModel {
@@ -9,6 +10,8 @@ public class OpenTabModel {
 	private final OpenTabType mTabType;
 	private final String mTitle;
 	private final Uri mUri;
+	
+	private AppearanceUtils.ListViewPosition mPosition;
 	
 	public OpenTabModel(String title, String boardName, int pageNumber){
 		this.mTitle = title;
@@ -32,5 +35,13 @@ public class OpenTabModel {
 
 	public OpenTabType getTabType() {
 		return mTabType;
+	}
+
+	public void setPosition(AppearanceUtils.ListViewPosition position) {
+		this.mPosition = position;
+	}
+
+	public AppearanceUtils.ListViewPosition getPosition() {
+		return mPosition;
 	}
 }

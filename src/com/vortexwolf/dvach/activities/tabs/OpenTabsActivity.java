@@ -33,17 +33,22 @@ public class OpenTabsActivity extends ListActivity {
 		
         this.mApplication = (MainApplication) this.getApplication();
         this.mTabsManager = this.mApplication.getOpenTabsManager();
-		this.mAdapter = new OpenTabsAdapter(this, mTabsManager.getOpenTabs(), mTabsManager);
-		
-		this.setTheme(this.mApplication.getSettings().getTheme());
-		TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
-		this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
-		this.getListView().setAdapter(this.mAdapter);
 		
 		Bundle extras = this.getIntent().getExtras();
 		if(extras != null){
 			this.mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
 		}
+		
+		this.resetUI();
+		
+		this.mAdapter = new OpenTabsAdapter(this, mTabsManager.getOpenTabs(), mTabsManager);
+		this.getListView().setAdapter(this.mAdapter);
+	}
+	
+	private void resetUI(){
+		this.setTheme(this.mApplication.getSettings().getTheme());
+		TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
+		this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
 		
 		this.registerForContextMenu(this.getListView());
 	}

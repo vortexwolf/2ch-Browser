@@ -2,11 +2,14 @@ package com.vortexwolf.dvach.presentation.services;
 
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
+import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Debug;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +24,14 @@ public class ClickListenersFactory implements IClickListenersFactory {
 		@Override
 		public boolean onLongClick(View v) {
 			return false;
+		}
+	};
+	
+	public static final IURLSpanClickListener sDvachUrlSpanClickListener = new IURLSpanClickListener() {
+		@Override
+		public void onClick(View v, String url) {
+			Uri absoluteUri = UriUtils.adjust2chRelativeUri(Uri.parse(url));
+			BrowserLauncher.launchExternalBrowser(v.getContext(), absoluteUri.toString());
 		}
 	};
 	

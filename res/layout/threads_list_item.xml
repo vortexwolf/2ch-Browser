@@ -51,7 +51,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
     />
 
-     <TextView android:id="@+id/comment"
+     <com.vortexwolf.dvach.controls.EllipsizingTextView android:id="@+id/comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     	android:layout_below="@id/title"

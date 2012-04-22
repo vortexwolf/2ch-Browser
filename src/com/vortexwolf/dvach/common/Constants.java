@@ -12,6 +12,7 @@ public class Constants {
 	public static final String ANALYTICS_KEY = DEBUG ? "UA-28782346-1" : "UA-28782631-1";
 	
 	public static final int MAX_FILE_CACHE_SIZE = 20;
+	public static final int MAX_FILE_CACHE_THUMBNAILS = 400;
 	
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
@@ -25,6 +26,8 @@ public class Constants {
     
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;
+    
+    public static final int OP_POST_POSITION = 0;
     
     // Вторая буква обязательно на кириллице, вот такой вот прикол
     public static final String ADD_POST_FORM_TASK = "pоst";
@@ -61,4 +64,5 @@ public class Constants {
     public static final int CONTEXT_MENU_DOWNLOAD_FILE = 1005;
     public static final int CONTEXT_MENU_COPY_TEXT = 1006;
     public static final int CONTEXT_MENU_COPY_URL = 1007;
+    public static final int CONTEXT_MENU_VIEW_FULL_POST = 1008;
 }

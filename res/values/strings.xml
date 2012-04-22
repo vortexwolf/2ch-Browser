@@ -5,10 +5,8 @@
     <!-- UI Text -->
     <string name="loading">Loading...</string>
 	<string name="addpost_sage">Sage</string>
-	<string name="addpost_message">Message:</string>
 	<string name="addpost_message_hint">Message</string>
 	<string name="addpost_subject_hint">Subject</string>
-	<string name="addpost_captcha_text">Enter the confirmation code:</string>
 	<string name="addpost_captcha_can_skip">Send without confirmation</string>
 	<string name="addpost_captcha_hint">Confirmation code</string>
 	<string name="addpost_send_button">Send</string>
@@ -17,9 +15,7 @@
 	<string name="pick_board_button">Go</string>
 	<string name="pick_board_title">Pick board</string>
 	<string name="postitem_replies">Replies:</string>
-	<string name="postitem_sameperson">Same person:</string>
 	<string name="fileslist_nofiles">No files.</string>
-	<string name="postitem_sameperson_generic_name">Anon</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -51,7 +47,6 @@
     <string name="menu_preferences">Preferences</string>
     <string name="menu_add_post">Reply</string>
     <string name="menu_add_thread">New thread</string>
-    <string name="menu_send_post">Send post</string>
     <string name="menu_attach_file">Attach file</string>
     <string name="menu_save">Save</string>
     <string name="menu_gallery">Gallery</string>
@@ -65,6 +60,7 @@
     <string name="cmenu_download_file">Download file</string>
     <string name="cmenu_copy_post">Copy the post</string>
     <string name="cmenu_copy_url">Copy the link</string>
+    <string name="cmenu_view_op_post">View OP post</string>
     
     <!-- Preferences -->
     <string name="pref_category_appearance">Appearance</string>
@@ -81,9 +77,6 @@
 	<string name="pref_display_post_date_key">display_post_date</string>
 	<string name="pref_display_post_date">Time of posts</string>
 	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
-	<string name="pref_display_same_person_key">display_same_person</string>
-	<string name="pref_display_same_person">Detector of same persons</string>
-	<string name="pref_display_same_person_summary">Enable to display the list of posts of the same author (Only /b)</string>
 	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
 	<string name="pref_display_navigation_bar">Navigation bar</string>
 	<string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>

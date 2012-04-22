@@ -5,10 +5,8 @@
     <!-- UI Text -->
     <string name="loading">Загрузка...</string>
 	<string name="addpost_sage">Sage (не поднимать тред)</string>
-	<string name="addpost_message">Сообщение:</string>
 	<string name="addpost_message_hint">Сообщение</string>
 	<string name="addpost_subject_hint">Тема</string>
-	<string name="addpost_captcha_text">Введите код подтверждения:</string>
 	<string name="addpost_captcha_can_skip">Без кода подтверждения</string>
 	<string name="addpost_captcha_hint">Код подтверждения</string>
 	<string name="addpost_send_button">Отправить</string>
@@ -17,7 +15,6 @@
 	<string name="pick_board_button">Go</string>
 	<string name="pick_board_title">Форумы</string>
 	<string name="postitem_replies">Ответы:</string>
-	<string name="postitem_sameperson">Тот же автор:</string>
 	<string name="fileslist_nofiles">Нет файлов.</string>
 	<string name="postitem_sameperson_generic_name">Аноним</string>
 	
@@ -64,7 +61,8 @@
     <string name="cmenu_download_file">Загрузить файл</string>
     <string name="cmenu_copy_post">Копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
-        
+    <string name="cmenu_view_op_post">Открыть ОП-пост</string>
+            
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
     <string name="pref_category_autorefresh">Автообновление</string>
@@ -79,9 +77,6 @@
 	
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
-
-	<string name="pref_display_same_person">Детектор семенов</string>
-	<string name="pref_display_same_person_summary">Включите для отображения сообщений того же автора (только для /b)</string>
 	
 	<string name="pref_popup_link">Ссылки во всплывающих окнах</string>
 	<string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>

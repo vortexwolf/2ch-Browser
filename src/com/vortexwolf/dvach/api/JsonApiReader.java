@@ -42,7 +42,7 @@ public class JsonApiReader implements IJsonApiReader{
 	}
 	
 	private static String formatApiUri(String boardName, String code){
-		return "http://85.17.28.149/"+boardName+"/wakaba.pl?task=api&code="+code;
+		return "http://2ch.so/"+boardName+"/wakaba.pl?task=api&code="+code; //85.17.28.149
 	}
 	
 	private static String formatThreadsUri(String boardName, int page){

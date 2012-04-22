@@ -17,15 +17,12 @@ public class FloatImageModel {
 	
 	public FloatImageModel(View thumbnailView, TextPaint textPaint, Display display, Resources res) {
 		thumbnailView.measure(display.getWidth(), display.getHeight());
-		mHeight = thumbnailView.getMeasuredHeight();
-		mWidth = thumbnailView.getMeasuredWidth();
+		int defaultSize = (int)res.getDimension(R.dimen.thumbnail_size);
 		
-		mTextLineHeight = textPaint.getTextSize();
-		mRightMargin = ((MarginLayoutParams)thumbnailView.getLayoutParams()).rightMargin;
-		
-		if(mHeight == 0 || mWidth == 0){
-			mHeight = mWidth = (int)res.getDimension(R.dimen.thumbnail_size);
-		}
+		mHeight = Math.max(thumbnailView.getMeasuredHeight(), defaultSize);
+		mWidth = Math.max(thumbnailView.getMeasuredWidth(), defaultSize);
+		mTextLineHeight = Math.max(textPaint.getTextSize(), 1);
+		mRightMargin = Math.max(((MarginLayoutParams)thumbnailView.getLayoutParams()).rightMargin, 0);
 	}
 
 	public int getHeight() {

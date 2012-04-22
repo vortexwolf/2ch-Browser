@@ -15,15 +15,17 @@ public class OpenTabsManager implements IOpenTabsManager {
 	private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
 	
 	@Override
-	public void add(OpenTabModel tab){
+	public OpenTabModel add(OpenTabModel newTab){
 		//Не добавляем, если уже добавлено
 		for(OpenTabModel openTab : mTabs){
-			if(openTab.getUri().equals(tab.getUri())){
-				return;
+			if(openTab.getUri().equals(newTab.getUri())){
+				return openTab;
 			}
 		}
 		
-		mTabs.add(0, tab);
+		mTabs.add(0, newTab);
+		
+		return newTab;
 	}
 	
 	@Override

@@ -28,11 +28,14 @@ public class MyLog {
 	
 	public static void e(String tag, Throwable e) {
 		if (Constants.LOGGING) {
+			String message = e.getMessage() != null ? e.getMessage().toString() : "";
+			
 			if(e.getCause() != null){
-				Log.e(tag, e.getCause().getMessage().toString() + " " + e.getMessage().toString());
+				Log.e(tag, e.getCause().getMessage().toString() + " " + message);
 			}
 			else {
-				Log.e(tag, e.getClass().getName() + " " + e.getMessage() != null ? e.getMessage().toString() : "");
+				Class<? extends Throwable> c = e.getClass();
+				Log.e(tag, c != null ? c.getName() : "Exception" + " " + message);
 			}
 		}
 	}

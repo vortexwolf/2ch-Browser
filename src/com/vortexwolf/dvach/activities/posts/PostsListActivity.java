@@ -53,7 +53,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
 	private ISerializationService mSerializationService;
-	
+
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
     private TimerService mAutoRefreshTimer = null;
@@ -65,13 +65,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	private View mErrorView = null;
 	private enum ViewType { LIST, LOADING, ERROR};
 	
-	private Uri mUri;
+	private OpenTabModel mTabModel;
 	private String mBoardName;
 	private String mThreadNumber;
 	
-	
-	/** Called when the activity is first created. */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		
@@ -79,6 +77,14 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         
         this.mApplication = (MainApplication) this.getApplication();
+
+        // Парсим код доски и номер страницы
+    	Uri data = this.getIntent().getData();
+    	if(data != null){
+    		this.mBoardName = UriUtils.getBoardName(data);
+    		this.mThreadNumber = UriUtils.getPageName(data);
+    	}
+        
         this.mSettings = this.mApplication.getSettings();
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
@@ -86,45 +92,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         this.mSerializationService = this.mApplication.getSerializationService();
         IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
-        this.resetUI();
-
-    	//Хоть одним из двух способов я должен получить название борды и номер треда
-        if(mBoardName == null || mThreadNumber == null){
-           	//При переходе извне приложения (нажатие на html-ссылку)
-        	Uri data = this.getIntent().getData();
-        	if(data != null){
-        		this.mBoardName = UriUtils.getBoardName(data);
-        		this.mThreadNumber = UriUtils.getPageName(data);
-        	}
-        	else{
-        		//При переходе изнутри этого приложения
-		        Bundle extras = this.getIntent().getExtras();
-		    	if (extras != null) {
-		    		this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
-		    		this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
-		    	}
-        	}
-        }
-        
-        if(mAdapter == null)
-        {    	
-        	mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
-        	this.setListAdapter(mAdapter);
-        	
-        	// Пробуем десериализовать в любом случае
-        	PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
-        	if(posts != null){
-        		this.mAdapter.setAdapterData(posts);
-        		// Обновляем посты, если не был установлен ограничивающий extra
-        		if(!this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
-        			this.refreshPosts();
-        		}
-        	}
-        	else {
-        		this.refreshPosts();
-        	}
-        }
-        
+        // Заголовок страницы
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT) ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT) : null;
         String pageTitle = pageSubject != null
         					? String.format(getString(R.string.data_thread_withsubject_title), mBoardName, pageSubject)
@@ -132,10 +100,14 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         
 		this.setTitle(pageTitle);
 		
+		// Сохраняем во вкладках
 		OpenTabModel tabModel = new OpenTabModel(pageSubject != null ? pageSubject : pageTitle, mBoardName, mThreadNumber);
-		this.mUri = tabModel.getUri();
-		tabsManager.add(tabModel);
+		this.mTabModel = tabsManager.add(tabModel);
+		
+        this.resetUI();
 
+        this.setAdapter();
+        
 		final Runnable refreshTask = new Runnable() {
 			@Override
 			public void run() {
@@ -153,19 +125,20 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         this.mTracker.trackActivityView(TAG);
     }
     
-    @Override
+	@Override
 	protected void onDestroy() {
 		this.mAutoRefreshTimer.stop();
-		
-		if(this.mCurrentDownloadTask != null){
-			this.mCurrentDownloadTask.cancel(true);
-		}
 
-		this.getListView().setAdapter(null);
-		
 		MyLog.d(TAG, "Destroyed");
+
+		super.onDestroy();
+	}
+    
+	@Override
+	protected void onPause() {
+		this.mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(this.getListView()));
 		
-	   super.onDestroy();
+		super.onPause();
 	}
 
 	@Override
@@ -207,6 +180,31 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
         }
     }
     
+	private void setAdapter() {
+		if (mAdapter != null) return;
+
+		mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
+		this.setListAdapter(mAdapter);
+
+		// Пробуем десериализовать в любом случае
+		PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
+		if (posts != null) {
+			this.mAdapter.setAdapterData(posts);
+
+			// Устанавливаем позицию, если открываем как уже открытую вкладку
+			AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
+			if (savedPosition != null) {
+				this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
+			}
+
+			// Обновляем посты, если не был установлен ограничивающий extra
+			if (!this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)) {
+				this.refreshPosts();
+			}
+		} else {
+			this.refreshPosts();
+		}
+	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -222,7 +220,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     	switch (item.getItemId()) {
     	case R.id.tabs_menu_id:
     		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
-    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mUri.toString());
+    		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
     		startActivity(openTabsIntent);
     		break;
     	case R.id.refresh_menu_id:
@@ -400,6 +398,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
 		@Override
 		public void setData(PostsList postsList) {
+			MyLog.d(TAG, "setData was called");
 			if(postsList != null){
 				PostInfo[] posts = postsList.getThread();
 				mSerializationService.serializePosts(mThreadNumber, posts);
@@ -428,6 +427,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	    
 	    @Override
 	    public void hideLoadingScreen() {
+	    	MyLog.d(TAG, "hide loading was called");
 	    	PostsListActivity.this.switchToView(ViewType.LIST);
 	    	mCurrentDownloadTask = null;
 	    }

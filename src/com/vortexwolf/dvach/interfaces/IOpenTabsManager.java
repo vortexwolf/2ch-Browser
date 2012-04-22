@@ -12,6 +12,6 @@ public interface IOpenTabsManager {
 
 	public abstract void navigate(OpenTabModel tab, Activity activity);
 
-	public abstract void add(OpenTabModel tab);
+	public abstract OpenTabModel add(OpenTabModel tab);
 
 }

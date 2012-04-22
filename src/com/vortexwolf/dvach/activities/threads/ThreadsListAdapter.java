@@ -4,6 +4,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
+import com.vortexwolf.dvach.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
@@ -53,13 +54,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         return view;
     }
     
-    private void fillItemView(View view, ThreadItemViewModel item) {
+    private void fillItemView(final View view, final ThreadItemViewModel item) {
     	//Get inner controls
     	ViewBag vb = (ViewBag)view.getTag();
     	if(vb == null){
     		vb = new ViewBag();
     		vb.titleView = (TextView) view.findViewById(R.id.title);
-    		vb.commentView = (TextView) view.findViewById(R.id.comment);
+    		vb.commentView = (EllipsizingTextView) view.findViewById(R.id.comment);
     		vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
     		vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
     		vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
@@ -81,6 +82,14 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         
         //Комментарий
         vb.commentView.setText(item.getSpannedComment());
+        vb.commentView.setTag(item);
+        vb.commentView.setEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
+			@Override
+			public void ellipsizeStateChanged(EllipsizingTextView view, boolean ellipsized) {
+				ThreadItemViewModel boundItem = (ThreadItemViewModel)view.getTag();
+				boundItem.setEllipsized(ellipsized);
+			}
+		});
 
         //Количество ответов
         String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
@@ -131,7 +140,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 	
 	static class ViewBag{
     	TextView titleView;
-    	TextView commentView;
+    	EllipsizingTextView commentView;
         TextView repliesNumberView;
         TextView attachmentInfoView;
         ImageView thumbnailView;
