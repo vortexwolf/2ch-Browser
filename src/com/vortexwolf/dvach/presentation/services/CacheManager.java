@@ -61,9 +61,6 @@ public class CacheManager implements ICacheManager {
 			@Override
 			public void run() {
 				double cacheSize = IoUtils.getSizeInMegabytes(getExternalCacheDir(), getInternalCacheDir());
-
-				mTracker.trackEvent(Tracker.CATEGORY_STATE, Tracker.ACTION_CACHE_FOLDER, getCurrentCacheDirectory().getAbsolutePath());
-				mTracker.trackEvent(Tracker.CATEGORY_STATE, Tracker.ACTION_CACHE_SIZE, (int)(cacheSize * 1000));
 				
 				if(cacheSize > Constants.MAX_FILE_CACHE_SIZE){
 					try{

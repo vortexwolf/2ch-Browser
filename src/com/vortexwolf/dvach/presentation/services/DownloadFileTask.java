@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.presentation.services;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,35 +20,36 @@ import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancellable, IProgressChangeListener {
 	public static final String TAG = "DownloadFileTask";
 	private final IDownloadFileService mDownloadFileService;
-	private final String mImageUri;
 	private final Context mContext;
 	private final Errors mErrors;
+	private final Uri mFrom;
+	private final File mFileWriteTo;
 	
 	private String mUserError = null;
-	private File mFileWriteTo;
 	private String mSavedFilePath;
 	
 	private ProgressDialog mProgressDialog;
 	private long mContentLength;
 
-	public DownloadFileTask(Context context, String imageUri, File to, Errors errors) {
+	public DownloadFileTask(Context context, Uri from, File to, Errors errors) {
 		super();
 		this.mContext = context;
 		this.mErrors = errors;
 		this.mDownloadFileService = new DownloadFileService(this.mErrors);
-		this.mImageUri = imageUri;
+		this.mFrom = from;
 		this.mFileWriteTo = to;
 	}
 
 	@Override
 	protected Boolean doInBackground(String... arg0) {
 		try{
-			this.mSavedFilePath = this.downloadFile(this.mImageUri, this.mFileWriteTo);
+			this.mSavedFilePath = this.downloadFile(this.mFrom, this.mFileWriteTo);
 			return true;
 		}
 		catch (DownloadFileException e){
@@ -56,32 +58,41 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 		}
 	}
 	
-	private String downloadFile(String uri, File fileToWrite) throws DownloadFileException {
-		
-	    File file = fileToWrite;
-	    if(file.exists()){
+	private String downloadFile(Uri uri, File to) throws DownloadFileException {
+	    if(to.exists()){
 	    	throw new DownloadFileException(this.mErrors.getFileExistError());
 	    }
-	    //file.createNewFile();
-	    
-		try{
-    	 // download the file
-			MyLog.v(TAG, "start to download " + fileToWrite.getName());
-    	    URL url = new URL(uri);
-            URLConnection connection = url.openConnection();
-            connection.connect();
-            this.setContentLength(connection.getContentLength());
-            InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(file);
 
+		try{
+			// download the file
+			MyLog.v(TAG, "start to download " + to.getName());
+			
+		    File fromFile = new File(uri.getPath());
+		    BufferedInputStream input;
+		    	
+		    if(fromFile.exists()){
+		    	this.setContentLength(fromFile.length());
+		    	input = new BufferedInputStream(new FileInputStream(fromFile));
+		    }
+		    else {
+	    	    URL url = new URL(uri.toString());
+	            URLConnection connection = url.openConnection();
+	            connection.connect();
+	            
+	            this.setContentLength(connection.getContentLength());
+	            input = new BufferedInputStream(url.openStream());
+		    }
+		    
             byte data[] = new byte[1024];
             long total = 0;
             int count;
+            OutputStream output = new FileOutputStream(to);
+            
             while ((count = input.read(data)) != -1) {
             	if(this.isCancelled()){
             		input.close();
             		output.close();
-            		file.delete();
+            		to.delete();
             		MyLog.v(TAG, "download file cancelled");
             		return null;
             	}
@@ -90,11 +101,12 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
                 this.progressChanged(total - count, total);
                 output.write(data, 0, count);
             }
+            
             MyLog.v(TAG, "file downloaded");
             output.close();
             input.close();
             
-            return file.getAbsolutePath();
+            return to.getAbsolutePath();
     	} catch (Exception e) {
     	    MyLog.e(TAG, e);
     	    throw new DownloadFileException(this.mErrors.getSaveFileError());
@@ -104,7 +116,6 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	@Override
 	public void onPreExecute() {
 		//Не показывать диалог совсем, если файл существует
-		this.mFileWriteTo = this.mDownloadFileService.getSaveFilePath(this.mImageUri);
 		if(this.mFileWriteTo.exists()){
 			this.cancel(false);
 			this.mUserError = this.mErrors.getFileExistError();

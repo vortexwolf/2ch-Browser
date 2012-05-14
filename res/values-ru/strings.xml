@@ -137,6 +137,6 @@
 	<string name="notification_send_post_success">Сообщение успешно отправлено</string>
 	<string name="notification_no_new_posts">Нет новых сообщений</string>
 	<string name="notification_save_image_success">Файл сохранен в %1$s</string>
-	<string name="notification_post_not_found">Сообщение на найдено</string>
+	<string name="notification_post_not_found">Сообщение не найдено</string>
 	<string name="notification_post_copied">Сообщение скопировано</string>
 </resources>

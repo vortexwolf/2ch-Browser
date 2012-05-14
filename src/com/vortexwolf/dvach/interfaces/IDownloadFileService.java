@@ -9,5 +9,7 @@ public interface IDownloadFileService {
 	File getSaveFilePath(String uri);
 	
 	void downloadFile(Context context, String uri);
+
+	public abstract void downloadFile(Context context, String uri, File cachedFile);
 	
 }

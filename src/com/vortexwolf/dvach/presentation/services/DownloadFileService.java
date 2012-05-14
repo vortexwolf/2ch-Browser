@@ -44,16 +44,26 @@ public class DownloadFileService implements IDownloadFileService {
 	
 	@Override
 	public void downloadFile(Context context, String uri){
-		File file = this.getSaveFilePath(uri);
-	    if(file.exists()){
+		downloadFile(context, uri, null);
+	}
+	
+	@Override
+	public void downloadFile(Context context, String uri, File cachedFile){
+		File to = this.getSaveFilePath(uri);
+	    if(to.exists()){
 	    	AppearanceUtils.showToastMessage(context, this.mErrors.getFileExistError());
 	    	return;
 	    }
-	        
+	    
+	    // Если файл был закеширован, то копируем оттуда
+	    // Download Manager всегда будет загружать файл заново, т.к. там более удобный интерфейс
+	    boolean isCached = cachedFile != null && cachedFile.exists();
+	    Uri from = isCached && !sNewClassAvailable ? Uri.fromFile(cachedFile) : Uri.parse(uri);
+	    
 		if (sNewClassAvailable) {
-	        DownloadManagerWrapper.downloadFile(context, Uri.parse(uri), file);
+	        DownloadManagerWrapper.downloadFile(context, from, to);
 		} else {
-			new DownloadFileTask(context, uri, file, mErrors).execute();
+			new DownloadFileTask(context, from, to, mErrors).execute();
 		}
 	}
 }

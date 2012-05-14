@@ -268,7 +268,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		}
 
 		String comment = this.mCommentView.getText().toString();
-		if(StringUtils.isEmpty(comment)){
+		if(StringUtils.isEmpty(comment) && this.mAttachedFile == null){
 			AppearanceUtils.showToastMessage(this, getString(R.string.warning_write_comment));
 			return;
 		}
@@ -432,6 +432,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		if(resultCode == RESULT_OK) {
 			switch(requestCode) {
 				case Constants.REQUEST_CODE_FILE_LIST_ACTIVITY:
+					this.mTracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_SELECT_IMAGE_FROM_FILES);
 					SerializableFileModel fileModel = data.getParcelableExtra(getPackageName() + Constants.EXTRA_SELECTED_FILE);
 					
 					this.setAttachment(fileModel);

@@ -1,8 +1,10 @@
 package com.vortexwolf.dvach.presentation.services;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 
 import android.app.DownloadManager;
@@ -38,6 +40,7 @@ public class DownloadManagerWrapper {
 	        context.startActivity(i);
 		}
 		catch (ActivityNotFoundException anfe) {
+			// Файл загрузился, но не удалось открыть список загрузок. Просто показываю сообщение об успешной загрузке.
 			AppearanceUtils.showToastMessage(context, context.getString(R.string.notification_save_image_success, to.getAbsolutePath()));
 		}
 	}

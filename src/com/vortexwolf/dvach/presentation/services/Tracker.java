@@ -10,12 +10,10 @@ public class Tracker {
 	public static final String CATEGORY_UI = "UI";
 	public static final String CATEGORY_PREFERENCES = "Preferences";
 	public static final String CATEGORY_STATE = "Application State";
-
-	public static final String ACTION_CACHE_FOLDER = "Cache Size";
-	public static final String ACTION_CACHE_SIZE = "Cache Size";
 	
 	public static final String ACTION_DOWNLOAD_FILE = "Download File";
 	public static final String ACTION_EXTERNAL_BROWSER_OPTION = "Open External Browser";
+	public static final String ACTION_SELECT_IMAGE_FROM_FILES = "Select Image From Files";
 	public static final String ACTION_SELECT_IMAGE_FROM_GALLERY = "Select Image From Gallery";
 	public static final String ACTION_CONTEXT_REPLY_POST = "Reply Post Context Menu";
 	public static final String ACTION_CONTEXT_REPLY_POST_QUOTE = "Reply Post With Quote Context Menu";

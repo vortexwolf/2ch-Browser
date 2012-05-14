@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.activities.browser;
 import java.io.File;
+import java.util.HashMap;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.webkit.CacheManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -36,8 +38,6 @@ public class BrowserActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		CookieSyncManager.createInstance(getApplicationContext());
 		
 		this.requestWindowFeature(Window.FEATURE_PROGRESS);
 		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -66,15 +66,16 @@ public class BrowserActivity extends Activity {
 		    
 		    @Override
 		    public void onPageFinished(WebView view, String url) {
-		    	CookieSyncManager.getInstance().sync();
-
 		    	String host = Uri.parse(url).getHost();
-		    	if (host != null && mTitle != null)
+		    	if (host != null && mTitle != null){
 		    		setTitle(host + " : " + mTitle);
-		    	else if (mTitle != null)
+		    	}
+		    	else if (mTitle != null){
 		    		setTitle(mTitle);
-		    	else 
+		    	}
+		    	else {
 		    		setTitle(url);
+		    	}
 		    }
 		});
 		
@@ -101,19 +102,7 @@ public class BrowserActivity extends Activity {
 			this.mWebview.loadUrl(this.mUri.toString());
 		}
 	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		CookieSyncManager.getInstance().startSync();
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		CookieSyncManager.getInstance().stopSync();
-	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -126,6 +115,7 @@ public class BrowserActivity extends Activity {
 	private void resetUI() {
 		this.setTheme(this.mApplication.getSettings().getTheme());
 		this.setContentView(R.layout.browser);
+		
 		this.mWebview = (WebViewFixed) findViewById(R.id.webview);
     	// HACK: set background color directly for android 2.0
 		this.mWebview.setBackgroundResource(R.color.white);
@@ -159,7 +149,11 @@ public class BrowserActivity extends Activity {
 	    		}
 	    		break;
 	        case R.id.save_menu_id: {
-	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString());
+	            // Пробую сгенерировать ссылку на сохраненный файл так же, как это делает WebView
+	            String hashCode = String.format("%08x", this.mUri.hashCode());
+	            File file = new File(new File(getCacheDir(), "webviewCache"), hashCode);
+	            
+	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString(), file.exists() ? file : null);
 	        	
 	        	Tracker.getInstance().setBoardVar(UriUtils.getBoardName(this.mUri));
 	    	    Tracker.getInstance().trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_BROWSER);
