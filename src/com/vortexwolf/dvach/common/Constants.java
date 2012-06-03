@@ -2,6 +2,8 @@ package com.vortexwolf.dvach.common;
 
 import java.nio.charset.Charset;
 
+import com.vortexwolf.dvach.common.utils.IoUtils;
+
 public class Constants {
 	
 	public static final boolean DEBUG = true;
@@ -11,8 +13,8 @@ public class Constants {
 	
 	public static final String ANALYTICS_KEY = DEBUG ? "UA-28782346-1" : "UA-28782631-1";
 	
-	public static final int MAX_FILE_CACHE_SIZE = 20;
-	public static final int MAX_FILE_CACHE_THUMBNAILS = 400;
+	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(20);
+	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(10);
 	
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";

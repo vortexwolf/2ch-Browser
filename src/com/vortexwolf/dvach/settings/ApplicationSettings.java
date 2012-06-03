@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
-import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 
 public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -16,7 +15,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	private final SharedPreferences mSettings;
 	private final Resources mResources;
 	private final Tracker mTracker;
-	private ICacheSettingsChangedListener mCacheSettingsChangedListener;
 	
 	public ApplicationSettings(Context context, Resources resources, Tracker tracker) {
 		this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -30,10 +28,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	
 	public void stopTrackChanges(){
 		this.mSettings.unregisterOnSharedPreferenceChangeListener(this);	
-	}
-	
-	public void setCacheSettingsChangedListener(ICacheSettingsChangedListener listener){
-		this.mCacheSettingsChangedListener = listener;
 	}
 		
 	@Override
@@ -70,15 +64,9 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		}
 		else if(key.equals(mResources.getString(R.string.pref_file_cache_key))){
 			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE, String.valueOf(isFileCacheEnabled()));
-			if(this.mCacheSettingsChangedListener != null){
-				mCacheSettingsChangedListener.onCacheSettingsChanged();
-			}
 		}
 		else if(key.equals(mResources.getString(R.string.pref_file_cache_sdcard_key))){
 			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE_SD, String.valueOf(isFileCacheSdCard()));
-			if(this.mCacheSettingsChangedListener != null){
-				mCacheSettingsChangedListener.onCacheSettingsChanged();
-			}
 		}
 	}
 	

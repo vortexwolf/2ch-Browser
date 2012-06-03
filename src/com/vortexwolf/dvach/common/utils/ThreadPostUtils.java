@@ -2,28 +2,18 @@ package com.vortexwolf.dvach.common.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.net.Uri;
-import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.activities.posts.FlowTextHelper;
 import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
-import com.vortexwolf.dvach.presentation.models.FloatImageModel;
-import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 

@@ -13,10 +13,12 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
+import android.content.res.Resources;
+
+import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.api.entities.PostFields;
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.Errors;
-import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IPostSender;
@@ -25,14 +27,14 @@ import com.vortexwolf.dvach.presentation.services.HttpStringReader;
 public class PostSender implements IPostSender {
 	private static final String TAG = "PostSender";
 	private final DefaultHttpClient mHttpClient;
-	private final Errors mErrors;
+	private final Resources mResources;
 	private final HttpStringReader mHttpStringReader;
 	private final PostResponseParser mResponseParser;
 	
-	public PostSender(DefaultHttpClient client, Errors errors){
+	public PostSender(DefaultHttpClient client, Resources resources){
 		//this.mHttpClient = client;
-		this.mHttpClient = new GzipHttpClientFactory().createHttpClient(); // похоже, что передаваемые клиент не работает, лучше создать новый
-		this.mErrors = errors;
+		this.mHttpClient = new ExtendedHttpClient(); // похоже, что передаваемые клиент не работает, лучше создать новый
+		this.mResources = resources;
 		this.mResponseParser = new PostResponseParser();
 		this.mHttpStringReader = new HttpStringReader(this.mHttpClient);
 	}
@@ -41,7 +43,7 @@ public class PostSender implements IPostSender {
 	public String sendPost(String boardName, String threadNumber, PostFields fields, PostEntity entity) throws SendPostException {
 		
 		if(boardName == null || threadNumber == null || fields == null || entity == null){
-			throw new SendPostException(this.mErrors.getIncorrectArgumentError());
+			throw new SendPostException(mResources.getString(R.string.error_incorrect_argument));
 		}
 
 		String uri = "http://2ch.so/"+boardName+"/wakaba.pl";
@@ -114,7 +116,7 @@ public class PostSender implements IPostSender {
 	    }	        
         catch (Exception e) {
         	MyLog.e(TAG, e);
-        	throw new SendPostException(this.mErrors.getSendPostError());
+        	throw new SendPostException(mResources.getString(R.string.error_send_post));
         }
         
         return response;

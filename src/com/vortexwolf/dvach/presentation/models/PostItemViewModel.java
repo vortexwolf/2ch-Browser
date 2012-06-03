@@ -15,7 +15,6 @@ import android.text.format.DateFormat;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.posts.FlowTextHelper;
 import com.vortexwolf.dvach.api.entities.PostInfo;
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;

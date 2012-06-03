@@ -4,13 +4,11 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Errors;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
@@ -20,6 +18,7 @@ import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -27,7 +26,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	public static final String TAG = "DownloadFileTask";
 	private final IDownloadFileService mDownloadFileService;
 	private final Context mContext;
-	private final Errors mErrors;
+	private final Resources mResources;
 	private final Uri mFrom;
 	private final File mFileWriteTo;
 	
@@ -37,11 +36,11 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	private ProgressDialog mProgressDialog;
 	private long mContentLength;
 
-	public DownloadFileTask(Context context, Uri from, File to, Errors errors) {
+	public DownloadFileTask(Context context, Uri from, File to) {
 		super();
 		this.mContext = context;
-		this.mErrors = errors;
-		this.mDownloadFileService = new DownloadFileService(this.mErrors);
+		this.mResources = context.getResources();
+		this.mDownloadFileService = new DownloadFileService(mResources);
 		this.mFrom = from;
 		this.mFileWriteTo = to;
 	}
@@ -60,7 +59,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	
 	private String downloadFile(Uri uri, File to) throws DownloadFileException {
 	    if(to.exists()){
-	    	throw new DownloadFileException(this.mErrors.getFileExistError());
+	    	throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
 	    }
 
 		try{
@@ -109,7 +108,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
             return to.getAbsolutePath();
     	} catch (Exception e) {
     	    MyLog.e(TAG, e);
-    	    throw new DownloadFileException(this.mErrors.getSaveFileError());
+    	    throw new DownloadFileException(mResources.getString(R.string.error_save_file));
     	}
 	}
 	
@@ -118,7 +117,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 		//Не показывать диалог совсем, если файл существует
 		if(this.mFileWriteTo.exists()){
 			this.cancel(false);
-			this.mUserError = this.mErrors.getFileExistError();
+			this.mUserError = mResources.getString(R.string.error_file_exist);
 			this.showError();
 			return;
 		}

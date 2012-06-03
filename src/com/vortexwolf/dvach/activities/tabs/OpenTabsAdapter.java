@@ -39,7 +39,7 @@ public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
 	private void fillItemView(View view, final OpenTabModel item) {
 		TextView titleView = (TextView)view.findViewById(R.id.tabs_item_title);
 		TextView urlView = (TextView)view.findViewById(R.id.tabs_item_url);
-    	ImageView deleteButton = (ImageView)view.findViewById(R.id.tabs_item_delete);
+		ImageView deleteButton = (ImageView)view.findViewById(R.id.tabs_item_delete);
     	
     	titleView.setText(item.getTitle());
 		urlView.setText(item.getUri().toString());

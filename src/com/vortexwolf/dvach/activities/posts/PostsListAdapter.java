@@ -11,12 +11,12 @@ import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
+import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.models.PostsViewModel;
@@ -24,7 +24,7 @@ import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
 import com.vortexwolf.dvach.presentation.services.PostItemViewBuilder;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
-public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener {
+public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener, IBusyAdapter {
 	private static final String TAG = "PostsListAdapter";
 
 	private final LayoutInflater mInflater;
@@ -71,7 +71,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	public void onClick(View v, String url) {
 
 		Uri uri = Uri.parse(url);
-		String pageName = UriUtils.getPageName(uri);
+		String pageName = UriUtils.getThreadNumber(uri);
 		
 		// Если ссылка указывает на этот тред - перескакиваем на нужный пост, иначе открываем в браузере
 		if(mThreadNumber.equals(pageName)){

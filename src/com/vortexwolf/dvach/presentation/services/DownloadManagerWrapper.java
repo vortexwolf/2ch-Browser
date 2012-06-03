@@ -1,10 +1,7 @@
 package com.vortexwolf.dvach.presentation.services;
 
 import java.io.File;
-import java.lang.reflect.Field;
-
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 
 import android.app.DownloadManager;

@@ -2,7 +2,7 @@ package com.vortexwolf.dvach.interfaces;
 
 import java.io.File;
 
-public interface ICacheManager {
+public interface ICacheDirectoryManager {
 
 	public File getInternalCacheDir();
 
@@ -13,5 +13,9 @@ public interface ICacheManager {
 	public abstract File getPagesCacheDirectory();
 
 	public abstract File getThumbnailsCacheDirectory();
+
+	public abstract boolean isCacheEnabled();
+
+	public abstract void trimCacheIfNeeded();
 
 }

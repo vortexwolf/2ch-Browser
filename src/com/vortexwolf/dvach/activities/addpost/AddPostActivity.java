@@ -306,7 +306,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		// return back to the list of posts
 		String redirectedThreadNumber = null;
 		if(redirectedPage != null){
-			redirectedThreadNumber = UriUtils.getPageName(Uri.parse(redirectedPage));
+			redirectedThreadNumber = UriUtils.getThreadNumber(Uri.parse(redirectedPage));
 		}
 
 		this.mFinishedSuccessfully = true;

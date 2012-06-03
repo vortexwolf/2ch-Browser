@@ -1,6 +1,7 @@
 package com.vortexwolf.dvach.settings;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 
@@ -32,7 +33,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 		mSharedPreferenceChangeListener.onSharedPreferenceChanged(mSharedPreferences, mResources.getString(R.string.pref_theme_key));
 		mSharedPreferenceChangeListener.onSharedPreferenceChanged(mSharedPreferences, mResources.getString(R.string.pref_text_size_key));
 		
-        Tracker.getInstance().trackActivityView("ApplicationPreferencesActivity");
+        Factory.getContainer().resolve(Tracker.class).trackActivityView("ApplicationPreferencesActivity");
 	}
 
 	@Override

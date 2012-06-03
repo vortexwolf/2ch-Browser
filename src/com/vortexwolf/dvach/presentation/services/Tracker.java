@@ -35,20 +35,11 @@ public class Tracker {
 	public static final String LABEL_DOWNLOAD_FILE_FROM_CONTEXT_MENU = "From context menu";
 	
 	private final GoogleAnalyticsTracker mTracker;
-	private static Tracker sInstance;
-	
-	private Tracker(GoogleAnalyticsTracker tracker) {
-		mTracker = tracker;
+
+	public Tracker() {
+		mTracker = GoogleAnalyticsTracker.getInstance();
 	}
-	
-	public static Tracker getInstance(){
-		if(sInstance == null){
-			sInstance = new Tracker(GoogleAnalyticsTracker.getInstance());
-		}
 		
-		return sInstance;
-	}
-	
 	public void startSession(Context context){
 		this.mTracker.startNewSession(Constants.ANALYTICS_KEY, 120, context);
 	}

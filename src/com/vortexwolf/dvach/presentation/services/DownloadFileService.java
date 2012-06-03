@@ -2,17 +2,18 @@ package com.vortexwolf.dvach.presentation.services;
 
 import java.io.File;
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 
-import com.vortexwolf.dvach.common.Errors;
+import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 
 public class DownloadFileService implements IDownloadFileService {
 	
 	public static final String TAG = "DownloadFileService";
-	private final Errors mErrors;
+	private final Resources mResources;
 	
 	public static boolean sNewClassAvailable;
 
@@ -26,20 +27,8 @@ public class DownloadFileService implements IDownloadFileService {
        }
    }
 	
-	public DownloadFileService(Errors errors){
-		this.mErrors = errors;
-	}
-	
-	@Override
-	public File getSaveFilePath(String uri){
-		Uri img = Uri.parse(uri);
-	    String fileName = img.getLastPathSegment();
-	    
-	    File dir = new File(Environment.getExternalStorageDirectory() + "/download/2ch Browser/");
-	    dir.mkdirs();
-	    File file = new File(dir, fileName);
-	    
-	    return file;
+	public DownloadFileService(Resources resources){
+		this.mResources = resources;
 	}
 	
 	@Override
@@ -51,19 +40,33 @@ public class DownloadFileService implements IDownloadFileService {
 	public void downloadFile(Context context, String uri, File cachedFile){
 		File to = this.getSaveFilePath(uri);
 	    if(to.exists()){
-	    	AppearanceUtils.showToastMessage(context, this.mErrors.getFileExistError());
+	    	AppearanceUtils.showToastMessage(context, this.mResources.getString(R.string.error_file_exist));
 	    	return;
 	    }
 	    
-	    // Если файл был закеширован, то копируем оттуда
-	    // Download Manager всегда будет загружать файл заново, т.к. там более удобный интерфейс
-	    boolean isCached = cachedFile != null && cachedFile.exists();
-	    Uri from = isCached && !sNewClassAvailable ? Uri.fromFile(cachedFile) : Uri.parse(uri);
-	    
+	    // В версиях до 2.3 копируем файл из кэша, если возможно
+	    // В версиях начиная с 2.3 Download Manager всегда будет загружать файл заново, т.к. там более удобный интерфейс
+	    Uri from = Uri.parse(uri);
 		if (sNewClassAvailable) {
 	        DownloadManagerWrapper.downloadFile(context, from, to);
 		} else {
-			new DownloadFileTask(context, from, to, mErrors).execute();
+		    boolean isCached = cachedFile != null && cachedFile.exists();
+		    if(isCached){
+		    	from = Uri.fromFile(cachedFile);
+		    }
+		    
+			new DownloadFileTask(context, from, to).execute();
 		}
+	}
+	
+	private File getSaveFilePath(String uri){
+		Uri img = Uri.parse(uri);
+	    String fileName = img.getLastPathSegment();
+	    
+	    File dir = new File(Environment.getExternalStorageDirectory() + "/download/2ch Browser/");
+	    dir.mkdirs();
+	    File file = new File(dir, fileName);
+	    
+	    return file;
 	}
 }

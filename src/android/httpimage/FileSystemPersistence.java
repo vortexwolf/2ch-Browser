@@ -7,9 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,15 +24,22 @@ public class FileSystemPersistence implements BitmapCache{
 
     private static final String TAG = "ThumbnailFSPersistent";
     
-    private File mBaseDir;
+    private final ICacheDirectoryManager mCacheManager;
+    private final File mBaseDir;
  
-    public FileSystemPersistence (File baseDir) {
-        mBaseDir = baseDir;
+    public FileSystemPersistence (ICacheDirectoryManager cacheManager) {
+    	mCacheManager = cacheManager;
+    	
+        mBaseDir = cacheManager.getThumbnailsCacheDirectory();
         if (!mBaseDir.exists()) {
         	mBaseDir.mkdirs();
         }
     }
     
+    @Override
+	public boolean isEnabled(){
+    	return mCacheManager.isCacheEnabled();
+    }
     
     @Override
     public void clear() {
@@ -55,7 +62,7 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public Bitmap loadData(String key) {
-        if( !exists(key)) {
+        if(!mCacheManager.isCacheEnabled() || !exists(key)) {
             return null;
         }
         
@@ -91,10 +98,11 @@ public class FileSystemPersistence implements BitmapCache{
     
     @Override
     public void storeData(String key, Bitmap data) {
+    	if(!mCacheManager.isCacheEnabled()){
+    		return;
+    	}
+    	
         OutputStream outputStream = null;
-        if(mBaseDir.list() != null && mBaseDir.list().length > Constants.MAX_FILE_CACHE_THUMBNAILS){
-        	IoUtils.freeSpace(mBaseDir, IoUtils.convertMbToBytes(5));
-        }
         
         try {
             File file = new File(mBaseDir, key) ;
@@ -106,7 +114,7 @@ public class FileSystemPersistence implements BitmapCache{
         }
         catch (FileNotFoundException e){
         	// No space left
-        	IoUtils.freeSpace(mBaseDir, IoUtils.convertMbToBytes(5));
+        	mCacheManager.trimCacheIfNeeded();
         	MyLog.e(TAG, e);
         }
         finally {

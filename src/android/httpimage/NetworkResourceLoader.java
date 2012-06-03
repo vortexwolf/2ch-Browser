@@ -5,8 +5,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.FlushedInputStream;
-import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 
@@ -26,7 +27,7 @@ public class NetworkResourceLoader implements INetworkResourceLoader {
     private final HttpClient mHttpClient;
 
     public NetworkResourceLoader(){
-    	this(GzipHttpClientFactory.createGzipHttpClient());
+    	this(new ExtendedHttpClient());
     }
     
     public NetworkResourceLoader(HttpClient httpClient){

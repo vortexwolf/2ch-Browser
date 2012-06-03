@@ -69,7 +69,7 @@ public class HttpImageManager{
     private static final String TAG = "HttpImageManager";
 
     private final BitmapCache mCache;
-    private BitmapCache mPersistence;
+    private final BitmapCache mPersistence;
     private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
     
     private final Handler mHandler = new Handler();
@@ -169,12 +169,8 @@ public class HttpImageManager{
     }
     
     
-    public HttpImageManager ( BitmapCache persistence ) {
+    public HttpImageManager (BitmapCache persistence) {
         this(new BasicBitmapCache(), persistence);
-    }
-    
-    public void setPersistenceCache(BitmapCache persistence){
-    	mPersistence = persistence;
     }
     
     public Bitmap loadImage(Uri uri) {
@@ -244,7 +240,7 @@ public class HttpImageManager{
                     data = mCache.loadData(key);
                     if(data == null) {
                         //then check the persistent storage
-                        data = mPersistence != null ? mPersistence.loadData(key) : null;
+                        data = mPersistence.isEnabled() ? mPersistence.loadData(key) : null;
                         if(data != null) {
                             // MyLog.d(TAG, "found in persistent: " + request.getUri().toString());
                             // load it into memory
@@ -261,7 +257,7 @@ public class HttpImageManager{
                             mCache.storeData(key, data);
                             
                             // persist it
-                            if(mPersistence != null){
+                            if(mPersistence.isEnabled()){
                             	mPersistence.storeData(key, data);
                             }
                         }

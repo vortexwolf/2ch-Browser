@@ -6,22 +6,25 @@ import com.vortexwolf.dvach.activities.addpost.PostSender;
 import com.vortexwolf.dvach.api.BoardSettingsStorage;
 import com.vortexwolf.dvach.api.JsonApiReader;
 import com.vortexwolf.dvach.api.ObjectMapperFactory;
-import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
+import com.vortexwolf.dvach.db.HistoryDataSource;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
-import com.vortexwolf.dvach.interfaces.ICacheManager;
-import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
+import com.vortexwolf.dvach.interfaces.INavigationService;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostSender;
-import com.vortexwolf.dvach.interfaces.ISerializationService;
+import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
 import com.vortexwolf.dvach.presentation.services.BitmapManager;
-import com.vortexwolf.dvach.presentation.services.CacheManager;
+import com.vortexwolf.dvach.presentation.services.CacheDirectoryManager;
 import com.vortexwolf.dvach.presentation.services.DownloadFileService;
 import com.vortexwolf.dvach.presentation.services.DraftPostsStorage;
+import com.vortexwolf.dvach.presentation.services.NavigationService;
 import com.vortexwolf.dvach.presentation.services.OpenTabsManager;
+import com.vortexwolf.dvach.presentation.services.PagesSerializationService;
 import com.vortexwolf.dvach.presentation.services.SerializationService;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -30,126 +33,104 @@ import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
 public class MainApplication extends Application {
-	
-	private static final DefaultHttpClient sHttpClient = new GzipHttpClientFactory().createHttpClient();
-	
-	private ApplicationSettings mSettings;
-	private Errors mErrors;
-	private IJsonApiReader mJsonApiReader;
-	private IPostSender mPostSender;
-	private IBoardSettingsStorage mBoardSettingsStorage;
-	private IDraftPostsStorage mDraftPostsStorage;
-	private IDownloadFileService mDownloadFileService;
-	private Tracker mTracker;
-	private HttpImageManager mHttpImageManager;
-    private IBitmapManager mBitmapManager;
-    private IOpenTabsManager mOpenTabsMaganer;
-    private CacheManager mCacheManager;
-    private ISerializationService mSerializationService;
-    
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		
-		this.mErrors = new Errors(this.getResources());
-		this.mJsonApiReader = new JsonApiReader(sHttpClient, this.mErrors, ObjectMapperFactory.createObjectMapper());
-		this.mPostSender = new PostSender(sHttpClient, this.mErrors);
-		this.mBoardSettingsStorage = new BoardSettingsStorage(this.mJsonApiReader);
-		this.mDraftPostsStorage = new DraftPostsStorage();
-		this.mDownloadFileService = new DownloadFileService(this.mErrors);
-		this.mOpenTabsMaganer = new OpenTabsManager();
-
-		this.mTracker = Tracker.getInstance();
-		this.mTracker.startSession(this);
+		DefaultHttpClient httpClient = new ExtendedHttpClient();
+		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), ObjectMapperFactory.createObjectMapper());
+		HistoryDataSource historyDataSource = new HistoryDataSource(this);
+		Tracker tracker = new Tracker();
+		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
+		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
+		HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager));
+		NavigationService navigationService = new NavigationService();
 		
-		this.mSettings = new ApplicationSettings(this, this.getResources(), mTracker);
-		this.mSettings.setCacheSettingsChangedListener(new CacheSettingsChangedListener());
+		Container container = Factory.getContainer();
+		container.register(DefaultHttpClient.class, httpClient);
+		container.register(IJsonApiReader.class, jsonApiReader);
+		container.register(IPostSender.class, new PostSender(httpClient, this.getResources()));
+		container.register(IBoardSettingsStorage.class, new BoardSettingsStorage(jsonApiReader));
+		container.register(IDraftPostsStorage.class, new DraftPostsStorage());
+		container.register(IDownloadFileService.class, new DownloadFileService(this.getResources()));
+		container.register(INavigationService.class, navigationService);
+		container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
+		container.register(ApplicationSettings.class, settings);
+		container.register(Tracker.class, tracker);
+		container.register(ICacheDirectoryManager.class, cacheManager);
+		container.register(IPagesSerializationService.class,  new PagesSerializationService(cacheManager, new SerializationService()));
+		container.register(HttpImageManager.class, imageManager);
+		container.register(IBitmapManager.class, new BitmapManager(imageManager));	
+		container.register(HistoryDataSource.class, historyDataSource);	
 		
-		this.mCacheManager = new CacheManager(super.getCacheDir(), this.getPackageName(), this.mSettings, mTracker);
-		this.mCacheManager.clearExcessCache();
-		this.mSerializationService = new SerializationService(this.mCacheManager);
-		
-		this.mHttpImageManager = new HttpImageManager(null);
-		this.updateImageManager();
-		this.mBitmapManager = new BitmapManager(this.mHttpImageManager);
-		
-
+		historyDataSource.open();
+		tracker.startSession(this);
+		cacheManager.trimCacheIfNeeded();
 	}
 
 	@Override
 	public void onTerminate() {
-		this.mTracker.stopSession();
+		Factory.getContainer().resolve(Tracker.class).stopSession();
 
 		super.onTerminate();
 	}
 
 	public static DefaultHttpClient getHttpClient(){
-		return sHttpClient;
+		return Factory.getContainer().resolve(DefaultHttpClient.class);
 	}
 	
 	public ApplicationSettings getSettings(){
-		return mSettings;
+		return Factory.getContainer().resolve(ApplicationSettings.class);
 	}
-	
-	public Errors getErrors(){
-		return mErrors;
-	}
-	
+		
 	public IJsonApiReader getJsonApiReader(){
-		return mJsonApiReader;
+		return Factory.getContainer().resolve(IJsonApiReader.class);
 	}
 	
 	public IPostSender getPostSender(){
-		return mPostSender;
+		return Factory.getContainer().resolve(IPostSender.class);
 	}
 
 	public IBoardSettingsStorage getBoardSettingsStorage() {
-		return mBoardSettingsStorage;
+		return Factory.getContainer().resolve(IBoardSettingsStorage.class);
 	}
 	
 	public IDraftPostsStorage getDraftPostsStorage(){
-		return mDraftPostsStorage;
+		return Factory.getContainer().resolve(IDraftPostsStorage.class);
 	}
 	
 	public IDownloadFileService getDownloadFileService(){
-		return mDownloadFileService;
+		return Factory.getContainer().resolve(IDownloadFileService.class);
 	}
 	
 	public Tracker getTracker(){
-		return mTracker;
+		return Factory.getContainer().resolve(Tracker.class);
 	}
 
 	public IBitmapManager getBitmapManager(){
-		return mBitmapManager;
+		return Factory.getContainer().resolve(IBitmapManager.class);
 	}
 	
 	public IOpenTabsManager getOpenTabsManager(){
-		return mOpenTabsMaganer;
+		return Factory.getContainer().resolve(IOpenTabsManager.class);
 	}
 	
-	public ICacheManager getCacheManager(){
-		return mCacheManager;
+	public ICacheDirectoryManager getCacheManager(){
+		return Factory.getContainer().resolve(ICacheDirectoryManager.class);
 	}
 	
-	public ISerializationService getSerializationService(){
-		return mSerializationService;
+	public IPagesSerializationService getSerializationService(){
+		return Factory.getContainer().resolve(IPagesSerializationService.class);
+	}
+	
+	public HistoryDataSource getHistoryDataSource(){
+		return Factory.getContainer().resolve(HistoryDataSource.class);
 	}
 	
 	@Override
 	public File getCacheDir() {
 		// NOTE: this method is used in Android 2.2 and higher
-		return this.mCacheManager.getCurrentCacheDirectory();
-	}
-	
-	private void updateImageManager(){
-		mHttpImageManager.setPersistenceCache(
-				mCacheManager.isCacheEnabled() ? new FileSystemPersistence(this.mCacheManager.getThumbnailsCacheDirectory()) : null);
-	}
-	
-	private class CacheSettingsChangedListener implements ICacheSettingsChangedListener{
-		@Override
-		public void onCacheSettingsChanged() {
-			updateImageManager();
-		}
+		return Factory.getContainer().resolve(ICacheDirectoryManager.class).getCurrentCacheDirectory();
 	}
 }

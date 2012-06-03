@@ -45,4 +45,10 @@ public class BasicBitmapCache implements BitmapCache{
 
         mMap.put(key, data);
     }
+
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 }

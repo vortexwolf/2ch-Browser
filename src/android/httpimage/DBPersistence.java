@@ -104,6 +104,12 @@ public class DBPersistence implements BitmapCache{
     }
     
 
-    private Context mContext;
+    @Override
+	public boolean isEnabled() {
+		return false;
+	}
+
+
+	private Context mContext;
 
 }

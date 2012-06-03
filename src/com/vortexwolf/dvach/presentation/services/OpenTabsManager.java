@@ -4,15 +4,27 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+
 import com.vortexwolf.dvach.activities.posts.PostsListActivity;
 import com.vortexwolf.dvach.activities.threads.ThreadsListActivity;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.db.HistoryDataSource;
+import com.vortexwolf.dvach.interfaces.INavigationService;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.OpenTabType;
 
 public class OpenTabsManager implements IOpenTabsManager {
 	private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
+	
+	private final HistoryDataSource mDataSource;
+	private final INavigationService mNavigationService;
+	
+	public OpenTabsManager(HistoryDataSource dataSource, INavigationService navigationService){
+		mDataSource = dataSource;
+		mNavigationService = navigationService;
+	}
 	
 	@Override
 	public OpenTabModel add(OpenTabModel newTab){
@@ -24,6 +36,7 @@ public class OpenTabsManager implements IOpenTabsManager {
 		}
 		
 		mTabs.add(0, newTab);
+		mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
 		
 		return newTab;
 	}
@@ -40,19 +53,9 @@ public class OpenTabsManager implements IOpenTabsManager {
 
 	@Override
 	public void navigate(OpenTabModel tab, Activity activity){
-		OpenTabType tabType = tab.getTabType();
+		Bundle extras = new Bundle();
+		extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
 		
-		if(tabType == OpenTabType.BOARD){
-			Intent i = new Intent(activity.getApplicationContext(), ThreadsListActivity.class);
-			i.setData(tab.getUri());
-			i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
-			activity.startActivity(i);
-		}
-		else if(tabType == OpenTabType.THREAD){
-			Intent i = new Intent(activity.getApplicationContext(), PostsListActivity.class);
-			i.setData(tab.getUri());
-			i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
-			activity.startActivity(i);
-		}
+		mNavigationService.navigate(tab.getUri(), activity, extras);
 	}
 }

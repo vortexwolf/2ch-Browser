@@ -5,12 +5,11 @@ import java.io.File;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.interfaces.ICacheManager;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
-public class CacheManager implements ICacheManager {
+public class CacheDirectoryManager implements ICacheDirectoryManager {
 	private static final String TAG = "CacheManager";
 	
 	private final String mPackageName;
@@ -19,7 +18,7 @@ public class CacheManager implements ICacheManager {
 	private final ApplicationSettings mSettings;
 	private final Tracker mTracker;
 	
-	public CacheManager(File internalCacheDir, String packageName, ApplicationSettings settings, Tracker tracker){
+	public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings, Tracker tracker){
 		this.mPackageName = packageName;
 		this.mInternalCacheDir = internalCacheDir;
 		this.mSettings = settings;
@@ -39,11 +38,20 @@ public class CacheManager implements ICacheManager {
 	
 	@Override
 	public File getCurrentCacheDirectory() {
+		File currentDirectory;
+		
 		if(mExternalCacheDir != null && mSettings.isFileCacheEnabled() && mSettings.isFileCacheSdCard() && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
-			return mExternalCacheDir;
+			currentDirectory = mExternalCacheDir;
+		}
+		else{
+			currentDirectory = mInternalCacheDir;
 		}
 		
-		return mInternalCacheDir;
+		if(!currentDirectory.exists()){
+			currentDirectory.mkdirs();
+		}
+		
+		return currentDirectory;
 	}
 	
 	@Override
@@ -56,26 +64,25 @@ public class CacheManager implements ICacheManager {
 		return new File(this.getCurrentCacheDirectory(), "pages");
 	}
 	
-	public void clearExcessCache(){
+	@Override
+	public void trimCacheIfNeeded(){
 		new Thread(new Runnable(){
 			@Override
 			public void run() {
-				double cacheSize = IoUtils.getSizeInMegabytes(getExternalCacheDir(), getInternalCacheDir());
+				long cacheSize = IoUtils.dirSize(getCurrentCacheDirectory());
+				long maxSize = Constants.FILE_CACHE_THRESHOLD;
 				
-				if(cacheSize > Constants.MAX_FILE_CACHE_SIZE){
-					try{
-						IoUtils.deleteDirectory(getReversedCacheDirectory()); //удаляем полностью противоположную кэшу директорию
-						IoUtils.freeSpace(getCurrentCacheDirectory(), IoUtils.convertMbToBytes(cacheSize - Constants.MAX_FILE_CACHE_SIZE)); //удаляем лишний объем
-					}
-					catch(Exception e){
-						MyLog.e(TAG, e);
-					}
+				if(cacheSize > maxSize){
+					long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
+					IoUtils.deleteDirectory(getReversedCacheDirectory()); //удаляем полностью противоположную кэшу директорию
+					IoUtils.freeSpace(getCurrentCacheDirectory(), deleteAmount); //удаляем лишний объем
 				}
 			}
 		})
 		.start();
 	}
 	
+	@Override
 	public boolean isCacheEnabled(){
 		return mSettings.isFileCacheEnabled();
 	}
@@ -92,10 +99,6 @@ public class CacheManager implements ICacheManager {
 			// {SD_PATH}/Android/data/com.vortexwolf.dvach/cache
 			File extStorageAppCachePath = new File(externalStorageDir,
 					"Android" + File.separator + "data" + File.separator + mPackageName + File.separator + "cache");
-
-			if (!extStorageAppCachePath.exists()) {
-				extStorageAppCachePath.mkdirs();
-			}
 
 			return extStorageAppCachePath;
 		}

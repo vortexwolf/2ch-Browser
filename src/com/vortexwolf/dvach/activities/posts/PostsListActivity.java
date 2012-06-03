@@ -3,9 +3,10 @@ package com.vortexwolf.dvach.activities.posts;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.activities.addpost.AddPostActivity;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
-import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
+import com.vortexwolf.dvach.activities.tabs.TabsHistoryBookmarksActivity;
 import com.vortexwolf.dvach.api.entities.PostInfo;
 import com.vortexwolf.dvach.api.entities.PostsList;
+import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
@@ -15,10 +16,11 @@ import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
-import com.vortexwolf.dvach.interfaces.ISerializationService;
+import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
+import com.vortexwolf.dvach.presentation.services.ListViewScrollListener;
 import com.vortexwolf.dvach.presentation.services.TimerService;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -45,14 +47,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 
-public class PostsListActivity extends ListActivity implements ListView.OnScrollListener {
+public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
     
     private MainApplication mApplication;
     private ApplicationSettings mSettings;
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
-	private ISerializationService mSerializationService;
+	private IPagesSerializationService mSerializationService;
 
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
@@ -60,11 +62,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     private final PostsReaderListener mPostsReaderListener = new PostsReaderListener();
 	
 	private SettingsEntity mCurrentSettings;
-	
-	private View mLoadingView = null;
-	private View mErrorView = null;
-	private enum ViewType { LIST, LOADING, ERROR};
-	
+
 	private OpenTabModel mTabModel;
 	private String mBoardName;
 	private String mThreadNumber;
@@ -72,17 +70,14 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		
-        requestWindowFeature(Window.FEATURE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        
+
         this.mApplication = (MainApplication) this.getApplication();
 
         // Парсим код доски и номер страницы
     	Uri data = this.getIntent().getData();
     	if(data != null){
     		this.mBoardName = UriUtils.getBoardName(data);
-    		this.mThreadNumber = UriUtils.getPageName(data);
+    		this.mThreadNumber = UriUtils.getThreadNumber(data);
     	}
         
         this.mSettings = this.mApplication.getSettings();
@@ -161,23 +156,17 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		this.mCurrentSettings = newSettings;
 	}
 	
-	private void resetUI()
+	@Override
+	protected int getLayoutId() {
+		return R.layout.posts_list_view;
+	}
+	
+	@Override
+	protected void resetUI()
     {
-		// Возвращаем прежнее положение scroll view после перезагрузки темы
-		AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
+		super.resetUI();
 		
-		this.setTheme(this.mSettings.getTheme());
-		this.setContentView(R.layout.posts_list_view);
 		this.registerForContextMenu(this.getListView());
-
-		this.mLoadingView = this.findViewById(R.id.loading);
-		this.mErrorView = this.findViewById(R.id.error);
-		//this.mPartialLoadingView = this.findViewById(R.id.addItemsLoading);
-        
-		this.getListView().setSelectionFromTop(position.position, position.top);
-        if(Integer.valueOf(Build.VERSION.SDK) > 7){
-        	this.getListView().setOnScrollListener(this);
-        }
     }
     
 	private void setAdapter() {
@@ -186,6 +175,11 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
 		this.setListAdapter(mAdapter);
 
+		// добавляем обработчик, чтобы не рисовать картинки во время прокрутки
+        if(Integer.valueOf(Build.VERSION.SDK) > 7){
+        	this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
+        }
+        
 		// Пробуем десериализовать в любом случае
 		PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
 		if (posts != null) {
@@ -219,7 +213,7 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case R.id.tabs_menu_id:
-    		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
+    		Intent openTabsIntent = new Intent(getApplicationContext(), TabsHistoryBookmarksActivity.class);
     		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
     		startActivity(openTabsIntent);
     		break;
@@ -324,26 +318,6 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		}
 	}
 	
-	private void switchToView(ViewType vt){
-		switch(vt){
-			case LIST:
-				this.getListView().setVisibility(View.VISIBLE);
-				mLoadingView.setVisibility(View.GONE);
-				mErrorView.setVisibility(View.GONE);
-				break;
-			case LOADING:
-				this.getListView().setVisibility(View.GONE);
-				mLoadingView.setVisibility(View.VISIBLE);
-				mErrorView.setVisibility(View.GONE);
-				break;
-			case ERROR:
-				this.getListView().setVisibility(View.GONE);
-				mLoadingView.setVisibility(View.GONE);
-				mErrorView.setVisibility(View.VISIBLE);
-				break;
-		}
-	}
-	
 	private void refreshPosts(){
 		//На всякий случай отменю, чтобы не было проблем с обновлениями
 		//Возможно, лучше бы не запускать совсем
@@ -360,27 +334,6 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 		{
 			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, mJsonReader, false);
     		mCurrentDownloadTask.execute();
-		}
-	}
-	
-	
-
-	@Override
-	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {	
-	}
-
-	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-	        case OnScrollListener.SCROLL_STATE_IDLE:
-	            this.mAdapter.setBusy(false, view);
-	            break;
-	        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-	        	this.mAdapter.setBusy(true, view);
-	            break;
-	        case OnScrollListener.SCROLL_STATE_FLING:
-	        	this.mAdapter.setBusy(true, view);
-	            break;
 		}
 	}
 	
@@ -412,23 +365,17 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 
 		@Override
 		public void showError(String error) {
-			PostsListActivity.this.switchToView(ViewType.ERROR);
-			
-			TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
-			if(errorTextView != null){
-				errorTextView.setText(error != null ? error : mApplication.getErrors().getUnknownError());
-			}
+			PostsListActivity.this.switchToErrorView(error);
 		}
 
 	    @Override
 	    public void showLoadingScreen() {
-	    	PostsListActivity.this.switchToView(ViewType.LOADING);
+	    	PostsListActivity.this.switchToLoadingView();
 	    }
 	    
 	    @Override
 	    public void hideLoadingScreen() {
-	    	MyLog.d(TAG, "hide loading was called");
-	    	PostsListActivity.this.switchToView(ViewType.LIST);
+	    	PostsListActivity.this.switchToListView();
 	    	mCurrentDownloadTask = null;
 	    }
 
@@ -441,9 +388,6 @@ public class PostsListActivity extends ListActivity implements ListView.OnScroll
 				// Нужно удостовериться, что элементы из posts не менялись после добавления в адаптер, чтобы сериализация прошла правильно
 				mSerializationService.serializePosts(mThreadNumber, posts);
 				AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
-			}
-			else {
-				AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getString(R.string.notification_no_new_posts));
 			}
 		}
 

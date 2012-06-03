@@ -129,7 +129,7 @@ public class AttachmentInfo {
 		
 		//И видео
 		String videoHtml = this.mModel.getVideo();	
-		String videoCode = UriUtils.parseYouTubeCode(videoHtml);
+		String videoCode = UriUtils.getYouTubeCode(videoHtml);
 		if(!StringUtils.isEmpty(videoCode)){
 			model.isVideo = true;
 			model.videoMobileUrl = "http://m.youtube.com/#/watch?v="+videoCode;

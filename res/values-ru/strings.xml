@@ -36,6 +36,7 @@
     <string name="data_board_title">2ch.so/%1$s/</string>
 	<string name="data_board_title_with_page">2ch.so/%1$s/%2$s</string> 
     <string name="data_thread_title">2ch.so/%1$s/%2$s</string> 
+	<string name="data_thread_withsubject_title">2ch.so/%1$s/ - %2$s</string> 
     <string name="data_add_thread_title">2ch.so/%1$s/ - Новый тред</string> 
     <string name="data_add_post_title">2ch.so/%1$s/%2$s - Новое сообщение</string> 
     <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string> 
@@ -116,6 +117,26 @@
 	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
 	
 	<string name="pref_file_cache_clear">Очистить сейчас</string>
+	
+	<string name="pref_homepage_key">homepage</string>
+	<string name="pref_load_thumbnails_key">load_thumbnails</string>
+	<string name="pref_display_post_date_key">display_post_date</string>
+	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
+	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
+	<string name="pref_popup_link_key">popup_link</string>
+	<string name="pref_text_size_key">text_size</string>
+	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
+	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
+	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
+	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
+	<string name="pref_theme_key">theme</string>
+	<string name="pref_theme_default_value">THEME_LIGHT</string>
+	<string name="pref_theme_dark_value">THEME_DARK</string>
+	<string name="pref_theme_photon_value">THEME_PHOTON</string>
+	<string name="pref_auto_refresh_key">auto_refresh</string>
+	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
+	<string name="pref_file_cache_key">file_cache</string>
+	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>

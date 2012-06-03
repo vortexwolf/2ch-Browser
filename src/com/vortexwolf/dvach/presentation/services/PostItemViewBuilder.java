@@ -82,6 +82,9 @@ public class PostItemViewBuilder {
 		if(postIndex >= Constants.BUMP_LIMIT){
 			vb.postIndexView.setTextColor(Color.parseColor("#C41E3A"));
 		}
+		else {
+			vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
+		}
 		
 		//Дата поста
 		if(this.mSettings.isDisplayPostItemDate()){

@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.activities.browser;
 
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 
@@ -38,7 +39,7 @@ public class BrowserLauncher {
     
     public static void launchExternalBrowser(Context context, String url, boolean bypassManifestFilter){
     	// Таким образом попробую узнать,пользуется ли кто-нибудь этой опцией
-    	Tracker.getInstance().trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_EXTERNAL_BROWSER_OPTION, url);
+    	Factory.getContainer().resolve(Tracker.class).trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_EXTERNAL_BROWSER_OPTION, url);
     	
     	if(bypassManifestFilter){
     		url = url.replaceFirst("2ch\\.so/", "2ch.so//");

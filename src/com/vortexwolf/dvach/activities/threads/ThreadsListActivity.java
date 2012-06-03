@@ -5,26 +5,27 @@ import com.vortexwolf.dvach.activities.addpost.AddPostActivity;
 import com.vortexwolf.dvach.activities.boards.PickBoardActivity;
 import com.vortexwolf.dvach.activities.browser.BrowserLauncher;
 import com.vortexwolf.dvach.activities.posts.PostsListActivity;
-import com.vortexwolf.dvach.activities.tabs.OpenTabsActivity;
-import com.vortexwolf.dvach.api.entities.PostInfo;
+import com.vortexwolf.dvach.activities.tabs.TabsHistoryBookmarksActivity;
 import com.vortexwolf.dvach.api.entities.ThreadInfo;
 import com.vortexwolf.dvach.api.entities.ThreadsList;
+import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
-import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
-import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.interfaces.ISerializationService;
+import com.vortexwolf.dvach.interfaces.INavigationService;
+import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
 import com.vortexwolf.dvach.presentation.models.PostItemViewModel;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 import com.vortexwolf.dvach.presentation.services.ClickListenersFactory;
+import com.vortexwolf.dvach.presentation.services.ListViewScrollListener;
 import com.vortexwolf.dvach.presentation.services.PostItemViewBuilder;
 import com.vortexwolf.dvach.presentation.services.Tracker;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -32,7 +33,6 @@ import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -52,14 +52,14 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ThreadsListActivity extends ListActivity implements ListView.OnScrollListener {
+public class ThreadsListActivity extends BaseListActivity {
     private static final String TAG = "ThreadsListActivity";
 
     private MainApplication mApplication;
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
 	private ApplicationSettings mSettings;
-	private ISerializationService mSerializationService;
+	private IPagesSerializationService mSerializationService;
 	private PostItemViewBuilder mPostItemViewBuilder;
 	
 	private DownloadThreadsTask mCurrentDownloadTask = null;
@@ -68,10 +68,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 	
 	private SettingsEntity mCurrentSettings;
 	
-	private View mLoadingView = null;
-	private View mErrorView = null;
-	private enum ViewType { LIST, LOADING, ERROR};
-	private ViewType mCurrentView = null;
 	private View mNavigationBar;
 	
 	private OpenTabModel mTabModel;
@@ -81,12 +77,9 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		
-        requestWindowFeature(Window.FEATURE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-        this.mApplication = (MainApplication) this.getApplication();
-
+        this.mApplication = this.getMainApplication();
+        
         // Парсим код доски и номер страницы
     	Uri data = this.getIntent().getData();
     	if(data != null){
@@ -118,7 +111,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
         this.resetUI();
 
         this.setAdapter();
-		
+        
         this.mTracker.setBoardVar(mBoardName);
         this.mTracker.setPageNumberVar(mPageNumber);
         this.mTracker.trackActivityView(TAG);
@@ -160,28 +153,19 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 		this.mCurrentSettings = this.mSettings.getCurrentSettings();
 	}
 	
-	private void resetUI()
-    {
-		// Возвращаем прежнее положение scroll view после перезагрузки темы
-		AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
+	
+	
+	@Override
+	protected int getLayoutId() {
+		return R.layout.threads_list_view;
+	}
 
-		this.setTheme(this.mSettings.getTheme());
-        this.setContentView(R.layout.threads_list_view);
-
-        this.mLoadingView = this.findViewById(R.id.loadingView);
-        this.mErrorView = this.findViewById(R.id.error);
+	@Override
+	protected void resetUI() {
+		// вызываем метод базового класса
+		super.resetUI();
         
         this.registerForContextMenu(this.getListView());
-        this.getListView().setSelectionFromTop(position.position, position.top);
-        
-        if(Integer.valueOf(Build.VERSION.SDK) > 7){
-        	this.getListView().setOnScrollListener(this);
-        }
-        
-        // Отображаем или список, или индикатор ошибки, или загрузку в новой теме
-        if(this.mCurrentView != null){
-        	this.switchToView(this.mCurrentView);
-        }
         
         //Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
@@ -220,6 +204,11 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
         this.setListAdapter(mAdapter);
         
+		// добавляем обработчик, чтобы не рисовать картинки во время прокрутки
+        if(Integer.valueOf(Build.VERSION.SDK) > 7){
+        	this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
+        }
+        
         ThreadInfo[] threads = null;
         if(this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)){
         	threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
@@ -251,7 +240,7 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case R.id.tabs_menu_id:
-    		Intent openTabsIntent = new Intent(getApplicationContext(), OpenTabsActivity.class);
+    		Intent openTabsIntent = new Intent(getApplicationContext(), TabsHistoryBookmarksActivity.class);
     		openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
     		startActivity(openTabsIntent);
     		break;
@@ -307,36 +296,12 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		if(mAdapter == null) return;
-		
 		ThreadItemViewModel info = mAdapter.getItem(position);
 		
 		String threadSubject = info.getSpannedSubject() != null 
 							? info.getSpannedSubject().toString() 
 							: StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
 		this.navigateToThread(info.getNumber(), threadSubject);
-	}
-
-	private void switchToView(ViewType vt){
-		this.mCurrentView = vt;
-		
-		switch(vt){
-			case LIST:
-				this.getListView().setVisibility(View.VISIBLE);
-				mLoadingView.setVisibility(View.GONE);
-				mErrorView.setVisibility(View.GONE);
-				break;
-			case LOADING:
-				this.getListView().setVisibility(View.GONE);
-				mLoadingView.setVisibility(View.VISIBLE);
-				mErrorView.setVisibility(View.GONE);
-				break;
-			case ERROR:
-				this.getListView().setVisibility(View.GONE);
-				mLoadingView.setVisibility(View.GONE);
-				mErrorView.setVisibility(View.VISIBLE);
-				break;
-		}
 	}
 	
 	@Override
@@ -403,8 +368,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
     private void navigateToThread(String threadNumber, String threadSubject){
 		Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
 		i.setData(Uri.parse(UriUtils.create2chThreadURL(mBoardName, threadNumber)));
-/*		i.putExtra(Constants.EXTRA_BOARD_NAME, mBoardName);
-		i.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);*/
 		if(threadSubject != null){
 			i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
 		}
@@ -427,25 +390,6 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 		if(this.mBoardName != null){
 			this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mPageNumber, this.mJsonReader);
 			this.mCurrentDownloadTask.execute();
-		}
-	}
-
-	@Override
-	public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {		
-	}
-
-	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-        switch (scrollState) {
-	        case OnScrollListener.SCROLL_STATE_IDLE:
-	            this.mAdapter.setBusy(false, view);
-	            break;
-	        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-	        	this.mAdapter.setBusy(true, view);
-	            break;
-	        case OnScrollListener.SCROLL_STATE_FLING:
-	        	this.mAdapter.setBusy(true, view);
-	            break;
 		}
 	}
 	
@@ -475,24 +419,18 @@ public class ThreadsListActivity extends ListActivity implements ListView.OnScro
 
 		@Override
 		public void showError(String error) {
-			ThreadsListActivity.this.switchToView(ViewType.ERROR);
-			
-			TextView errorTextView = (TextView)mErrorView.findViewById(R.id.error_text);
-			if(errorTextView != null){
-				errorTextView.setText(error != null ? error : mApplication.getErrors().getUnknownError());
-			}
+			ThreadsListActivity.this.switchToErrorView(error);
 		}
 		
 		@Override
 	    public void showLoadingScreen() {
-			ThreadsListActivity.this.switchToView(ViewType.LOADING);
+			ThreadsListActivity.this.switchToLoadingView();
 	    }
 		
 		@Override
 	    public void hideLoadingScreen() {
-			ThreadsListActivity.this.switchToView(ViewType.LIST);
+			ThreadsListActivity.this.switchToListView();
 	    	mCurrentDownloadTask = null;
 	    }
-	
 	}
 }

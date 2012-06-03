@@ -4,7 +4,7 @@ import java.io.File;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.interfaces.ICacheManager;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,7 +22,7 @@ public class CacheSizePreference extends Preference {
 		
 		final Activity activity = (Activity)context;
 		final MainApplication app = (MainApplication)activity.getApplication();
-		ICacheManager cacheManager = app.getCacheManager();
+		ICacheDirectoryManager cacheManager = app.getCacheManager();
 		mExternalCacheDir = cacheManager.getExternalCacheDir();
 		mInternalCacheDir = cacheManager.getInternalCacheDir();
 		
@@ -40,11 +40,9 @@ public class CacheSizePreference extends Preference {
 	protected void onClick() {
 		if(mExternalCacheDir != null){
 			IoUtils.deleteDirectory(mExternalCacheDir);
-			mExternalCacheDir.mkdir();
 		}
 		
 		IoUtils.deleteDirectory(mInternalCacheDir);
-		mInternalCacheDir.mkdir();
 		
 		this.setSummary(this.getSummary());
 		

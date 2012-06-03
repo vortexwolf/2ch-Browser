@@ -44,4 +44,7 @@ public interface BitmapCache {
      * Clear this bitmap cache, reclaim all resources assigned.
      */
     public void clear();
+
+
+	public abstract boolean isEnabled();
 }

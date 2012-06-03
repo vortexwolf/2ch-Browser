@@ -12,14 +12,15 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.view.Window;
 
+import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.api.entities.BoardSettings;
 import com.vortexwolf.dvach.api.entities.CaptchaEntity;
 import com.vortexwolf.dvach.api.entities.PostsList;
 import com.vortexwolf.dvach.api.entities.ThreadsList;
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.Errors;
 import com.vortexwolf.dvach.common.library.CancellableInputStream;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.library.ProgressInputStream;
@@ -31,13 +32,13 @@ public class JsonApiReader implements IJsonApiReader{
 
 	static final String TAG = "JsonApiReader";
 	private final DefaultHttpClient mHttpClient;
-	private final Errors mErrors;
+	private final Resources mResources;
 	private final ObjectMapper mObjectMapper;
 
-	public JsonApiReader(DefaultHttpClient client, Errors errors, ObjectMapper mapper)
+	public JsonApiReader(DefaultHttpClient client, Resources resources, ObjectMapper mapper)
 	{
 		this.mHttpClient = client;
-		this.mErrors = errors;
+		this.mResources = resources;
 		this.mObjectMapper = mapper;
 	}
 	
@@ -100,7 +101,7 @@ public class JsonApiReader implements IJsonApiReader{
 		} 
 		catch (IllegalArgumentException e) {
 			MyLog.e(TAG, e);
-			finishRead(request, null, new JsonApiReaderException(this.mErrors.getIncorrectArgumentError(), e));
+			finishRead(request, null, new JsonApiReaderException(mResources.getString(R.string.error_incorrect_argument), e));
 		}
 		
 		if(checkCancelled(task, request, null)) return null;
@@ -112,7 +113,7 @@ public class JsonApiReader implements IJsonApiReader{
 			response = mHttpClient.execute(request);
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(this.mErrors.getDownloadDataError()));
+			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_download_data)));
 		}
 
 		StatusLine status = response.getStatusLine();
@@ -129,7 +130,7 @@ public class JsonApiReader implements IJsonApiReader{
 		}
 		catch (Exception e) {
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(this.mErrors.getDownloadDataError()));
+			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_download_data)));
 		}
 
 		//Парсим результат
@@ -147,13 +148,13 @@ public class JsonApiReader implements IJsonApiReader{
 				return readData(url, valueType, null, task, null, recLevel + 1);
 			}
 			else {
-				finishRead(request, response, new JsonApiReaderException(this.mErrors.getJsonParseError()));
+				finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_json_parse)));
 			}
 		}
 		catch (Exception e) {
 			// Если не удалось преобразовать, значит неверный json-объект
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(this.mErrors.getJsonParseError()));
+			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_json_parse)));
 		}
 
 		finishRead(request, response);

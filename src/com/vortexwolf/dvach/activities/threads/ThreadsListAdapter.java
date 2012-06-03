@@ -6,6 +6,7 @@ import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
+import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
 import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -22,7 +23,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
+public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
 	private final LayoutInflater mInflater;
 	private final IBitmapManager mBitmapManager;
 	private final Theme mTheme;
@@ -114,6 +115,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 		}
 	}
 	
+	@Override
 	public void setBusy(boolean isBusy, AbsListView view){
 		boolean prevBusy = this.mIsBusy;
 		this.mIsBusy = isBusy;

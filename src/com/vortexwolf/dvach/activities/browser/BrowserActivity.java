@@ -1,8 +1,7 @@
 package com.vortexwolf.dvach.activities.browser;
 import java.io.File;
-import java.util.HashMap;
-
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
@@ -17,8 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.webkit.CacheManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -155,8 +152,9 @@ public class BrowserActivity extends Activity {
 	            
 	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString(), file.exists() ? file : null);
 	        	
-	        	Tracker.getInstance().setBoardVar(UriUtils.getBoardName(this.mUri));
-	    	    Tracker.getInstance().trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_BROWSER);
+	        	Tracker tracker = Factory.getContainer().resolve(Tracker.class);
+	        	tracker.setBoardVar(UriUtils.getBoardName(this.mUri));
+	        	tracker.trackEvent(Tracker.CATEGORY_UI, Tracker.ACTION_DOWNLOAD_FILE, Tracker.LABEL_DOWNLOAD_FILE_FROM_BROWSER);
 	        	break;
 	        }
     	}

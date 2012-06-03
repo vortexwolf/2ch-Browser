@@ -20,7 +20,7 @@
      		android:layout_marginTop="5.0dip" 
      		android:layout_marginBottom="5.0dip" />
 
-	<com.vortexwolf.dvach.controls.NonParentFocusableImageView android:id="@+id/tabs_item_delete"
+<com.vortexwolf.dvach.controls.NonParentFocusableImageView android:id="@+id/tabs_item_delete"
 		     android:background="?tabCloseButtonBackground"
 		     android:paddingLeft="18.0dip" 
 		     android:paddingRight="18.0dip" 
