@@ -6,7 +6,7 @@ import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class Constants {
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	// Нужно не забыть отключить логгирование при выпуске приложения
 	public static final boolean LOGGING = DEBUG;
@@ -67,4 +67,6 @@ public class Constants {
     public static final int CONTEXT_MENU_COPY_TEXT = 1006;
     public static final int CONTEXT_MENU_COPY_URL = 1007;
     public static final int CONTEXT_MENU_VIEW_FULL_POST = 1008;
+    public static final int CONTEXT_MENU_ADD_FAVORITES = 1009;
+    public static final int CONTEXT_MENU_REMOVE_FAVORITES = 1010;
 }

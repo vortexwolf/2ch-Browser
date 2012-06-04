@@ -42,6 +42,7 @@
 		<activity android:name=".activities.files.FilesListActivity" android:configChanges="keyboardHidden|orientation"></activity>
 		<activity android:name=".activities.tabs.OpenTabsActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
 		<activity android:name=".activities.tabs.HistoryActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
+		<activity android:name=".activities.tabs.FavoritesActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
 		<activity android:name=".activities.tabs.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
 		<activity android:name=".settings.ApplicationPreferencesActivity"></activity>		
     </application>

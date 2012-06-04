@@ -7,6 +7,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.db.HistoryDataSource;
 import com.vortexwolf.dvach.db.HistoryEntity;
 import com.vortexwolf.dvach.interfaces.INavigationService;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 public class HistoryActivity extends BaseListActivity {
 
 	private HistoryDataSource mDatasource;
+	private FavoritesDataSource mFavoritesDatasource;
     private MainApplication mApplication;
     private ApplicationSettings mSettings;
     private INavigationService mNavigationService;
@@ -36,6 +38,7 @@ public class HistoryActivity extends BaseListActivity {
 		this.mApplication = (MainApplication)this.getApplication();
 		this.mSettings = this.mApplication.getSettings();
 		this.mDatasource = this.mApplication.getHistoryDataSource();
+		this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
 		this.mNavigationService = Factory.getContainer().resolve(INavigationService.class);
 		
 		this.resetUI();
@@ -66,7 +69,7 @@ public class HistoryActivity extends BaseListActivity {
 		protected Void doInBackground(Void... arg0) {
 			List<HistoryEntity> historyItems = mDatasource.getAllHistory();
 
-			mAdapter = new HistoryAdapter(HistoryActivity.this, historyItems);
+			mAdapter = new HistoryAdapter(HistoryActivity.this, historyItems, mFavoritesDatasource);
 			
 			return null;
 		}
@@ -81,6 +84,5 @@ public class HistoryActivity extends BaseListActivity {
 		protected void onPreExecute() {
 			HistoryActivity.this.switchToLoadingView();
 		}
-		
 	}
 }

@@ -19,26 +19,27 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
 		Resources res = this.getResources();
 		MainApplication application = (MainApplication)this.getApplication();
 
-		String extraUrl = this.getIntent().getExtras().getString(Constants.EXTRA_CURRENT_URL);
+		Bundle extras = this.getIntent().getExtras();
+		String extraUrl = extras.getString(Constants.EXTRA_CURRENT_URL);
 		
 		this.setTheme(application.getSettings().getTheme());
 		
 		Intent intent = new Intent(this, OpenTabsActivity.class);
-		intent.putExtra(Constants.EXTRA_CURRENT_URL, extraUrl);
-
+		intent.putExtras(extras);
 		tabHost.addTab(tabHost
 				.newTabSpec("tabs")
 				.setIndicator("Tabs", res.getDrawable(R.drawable.browser_visited_tab))
 				.setContent(intent));
 
-		intent = new Intent(this, HistoryActivity.class);
-		intent.putExtra(Constants.EXTRA_CURRENT_URL, extraUrl);
-
-/*		tabHost.addTab(tabHost
+		intent = new Intent(this, FavoritesActivity.class);
+		intent.putExtras(extras);
+		tabHost.addTab(tabHost
 				.newTabSpec("bookmarks")
 				.setIndicator("Bookmarks", res.getDrawable(R.drawable.browser_bookmark_tab))
 				.setContent(intent));
-*/
+
+		intent = new Intent(this, HistoryActivity.class);
+		intent.putExtras(extras);
 		tabHost.addTab(tabHost
 				.newTabSpec("history")
 				.setIndicator("History", res.getDrawable(R.drawable.browser_history_tab))

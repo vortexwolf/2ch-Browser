@@ -7,6 +7,8 @@ import com.vortexwolf.dvach.api.BoardSettingsStorage;
 import com.vortexwolf.dvach.api.JsonApiReader;
 import com.vortexwolf.dvach.api.ObjectMapperFactory;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
+import com.vortexwolf.dvach.db.DvachSqlHelper;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.db.HistoryDataSource;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
@@ -40,7 +42,9 @@ public class MainApplication extends Application {
 		
 		DefaultHttpClient httpClient = new ExtendedHttpClient();
 		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), ObjectMapperFactory.createObjectMapper());
-		HistoryDataSource historyDataSource = new HistoryDataSource(this);
+		DvachSqlHelper dbHelper = new DvachSqlHelper(this);
+		HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
+		FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
 		Tracker tracker = new Tracker();
 		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
 		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
@@ -63,8 +67,10 @@ public class MainApplication extends Application {
 		container.register(HttpImageManager.class, imageManager);
 		container.register(IBitmapManager.class, new BitmapManager(imageManager));	
 		container.register(HistoryDataSource.class, historyDataSource);	
+		container.register(FavoritesDataSource.class, favoritesDataSource);	
 		
 		historyDataSource.open();
+		favoritesDataSource.open();
 		tracker.startSession(this);
 		cacheManager.trimCacheIfNeeded();
 	}

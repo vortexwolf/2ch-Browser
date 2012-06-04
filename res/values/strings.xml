@@ -61,6 +61,8 @@
     <string name="cmenu_copy_post">Copy the post</string>
     <string name="cmenu_copy_url">Copy the link</string>
     <string name="cmenu_view_op_post">View OP post</string>
+    <string name="cmenu_add_to_favorites">Add to bookmarks</string>
+    <string name="cmenu_remove_from_favorites">Remove from bookmarks</string>
     
     <!-- Preferences -->
     <string name="pref_category_appearance">Appearance</string>
@@ -148,7 +150,7 @@
 	<string name="error_download_data">Unable to connect to the page.</string>
 	<string name="error_unknown">An unknown error occured.</string>
 	<string name="error_incorrect_argument">The function argument is incorrect.</string>
-	<string name="error_json_parse">Developers of this site cannot into json. Just refresh the page.</string>
+	<string name="error_json_parse">Error while reading the page. Try to refresh.</string>
 	<string name="error_file_exist">Such file already exists.</string>
 	<string name="error_save_file">An error has occured while saving the file.</string>
 	<string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>

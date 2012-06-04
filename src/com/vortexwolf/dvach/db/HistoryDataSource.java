@@ -11,20 +11,23 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 public class HistoryDataSource {
-	private final DvachSqlHelper dbHelper;
-	private final String[] allColumns = { DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_TITLE, DvachSqlHelper.COLUMN_URL, DvachSqlHelper.COLUMN_CREATED };
-	private SQLiteDatabase database;
+	private static final String TABLE = DvachSqlHelper.TABLE_HISTORY;
+	private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_TITLE, DvachSqlHelper.COLUMN_URL, DvachSqlHelper.COLUMN_CREATED };
 	
-	public HistoryDataSource(Context context) {
-		dbHelper = new DvachSqlHelper(context);
+	private final DvachSqlHelper mDbHelper;
+
+	private SQLiteDatabase mDatabase;
+	
+	public HistoryDataSource(DvachSqlHelper dbHelper) {
+		this.mDbHelper = dbHelper;
 	}
 
 	public void open() throws SQLException {
-		database = dbHelper.getWritableDatabase();
+		mDatabase = mDbHelper.getWritableDatabase();
 	}
 
 	public void close() {
-		dbHelper.close();
+		mDbHelper.close();
 	}
 	
 	public void addHistory(String title, String url) {
@@ -37,14 +40,14 @@ public class HistoryDataSource {
 			values.put(DvachSqlHelper.COLUMN_URL, url);
 			values.put(DvachSqlHelper.COLUMN_CREATED, currentTime);
 			
-			long insertId = database.insert(DvachSqlHelper.TABLE_HISTORY, null, values);
+			long insertId = mDatabase.insert(TABLE, null, values);
 		}
 	}
 	
 	public List<HistoryEntity> getAllHistory() {
 		List<HistoryEntity> history = new ArrayList<HistoryEntity>();
 
-		Cursor cursor = database.query(DvachSqlHelper.TABLE_HISTORY, allColumns, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", "0,200");
+		Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", "0,200");
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			HistoryEntity he = createHistoryEntity(cursor);
@@ -60,8 +63,8 @@ public class HistoryDataSource {
 	private boolean hasHistoryLastDay(String url, long currentTime){
 		long dayAgo = currentTime - 24 * 3600 * 1000;
 		
-		Cursor cursor = database.rawQuery(
-				"select count(*) from " + DvachSqlHelper.TABLE_HISTORY +
+		Cursor cursor = mDatabase.rawQuery(
+				"select count(*) from " + TABLE +
 				" where " + DvachSqlHelper.COLUMN_URL + " = ? and " + DvachSqlHelper.COLUMN_CREATED + " > " + dayAgo,
 				new String[] { url });
 		cursor.moveToFirst();
@@ -71,7 +74,6 @@ public class HistoryDataSource {
 		}
 		
 		return false;
-
 	}
 	
 	private HistoryEntity createHistoryEntity(Cursor c){

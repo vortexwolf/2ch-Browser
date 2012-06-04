@@ -210,9 +210,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 					case R.id.addpost_textformat_b:
 						formatSelectedText("b");
 						break;
-					case R.id.addpost_textformat_c:
-						formatSelectedText("code");
-						break;
 					case R.id.addpost_textformat_i:
 						formatSelectedText("i");
 						break;
@@ -224,6 +221,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 						break;
 					case R.id.addpost_textformat_u:
 						formatSelectedText("u");
+						break;
+					case R.id.addpost_textformat_quote:
+						formatQuote();
 						break;
 				}
 			}
@@ -329,7 +329,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		mProgressDialog = new ProgressDialog(this);
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mProgressDialog.setMessage(getString(R.string.loading));
-		mProgressDialog.setCancelable(false);
+		mProgressDialog.setCancelable(true);
 		mProgressDialog.show();
 	}
 
@@ -505,6 +505,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		int selectionEnd = mCommentView.getSelectionEnd();
 		String selectedText = text.substring(selectionStart, selectionEnd);
 		
+		// Проверяем текст на краях выделенной области, на случай если уже была добавлена разметка
 		String textBeforeSelection = text.substring(Math.max(0, selectionStart - startTag.length()), selectionStart);
 		String textAfterSelection = text.substring(selectionEnd, Math.min(text.length(), selectionEnd + endTag.length()));
 		
@@ -516,6 +517,32 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		else {
 			editable.replace(selectionStart, selectionEnd, startTag + selectedText + endTag);
 			mCommentView.setSelection(selectionStart + startTag.length(), selectionEnd + startTag.length());
+		}
+	}
+	
+	private void formatQuote(){
+		Editable editable = mCommentView.getEditableText();
+		String text = editable.toString();
+		
+		int selectionStart = mCommentView.getSelectionStart();
+		int selectionEnd = mCommentView.getSelectionEnd();
+		String selectedText = text.substring(selectionStart, selectionEnd);
+		String oneSymbolBefore = text.substring(Math.max(selectionStart - 1, 0), selectionStart);
+		
+		if(selectedText.startsWith(">")){
+			String unQuotedText = selectedText.replaceFirst(">", "").replaceAll("(\n+)>", "$1");
+			int diff = selectedText.length() - unQuotedText.length();
+			
+			editable.replace(selectionStart, selectionEnd, unQuotedText);
+			mCommentView.setSelection(selectionStart, selectionEnd - diff);
+		}
+		else {
+			String firstSymbol = oneSymbolBefore.isEmpty() || oneSymbolBefore.equals("\n") ? "" : "\n";
+			String quotedText = firstSymbol + ">" + selectedText.replaceAll("(\n+)", "$1>");
+			int diff = quotedText.length() - selectedText.length();
+			
+			editable.replace(selectionStart, selectionEnd, quotedText);
+			mCommentView.setSelection(selectionStart + firstSymbol.length(), selectionEnd + diff);
 		}
 	}
 }

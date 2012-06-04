@@ -63,6 +63,8 @@
     <string name="cmenu_copy_post">Копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
     <string name="cmenu_view_op_post">Открыть ОП-пост</string>
+    <string name="cmenu_add_to_favorites">Добавить в закладки</string>
+    <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
             
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
@@ -143,7 +145,7 @@
 	<string name="error_download_data">Невозможно открыть страницу.</string>
 	<string name="error_unknown">Произошла неизвестная ошибка.</string>
 	<string name="error_incorrect_argument">Неправильно передан параметр функции.</string>
-	<string name="error_json_parse">Быдлокодеры сайта 2ch.so не могут в валидный json. Просто перезагрузите страницу.</string>
+	<string name="error_json_parse">Ошибка во время чтения страницы. Попробуйте перезагрузить.</string>
 	<string name="error_file_exist">Такой файл уже существует.</string>
 	<string name="error_save_file">Во время сохранения произошла ошибка.</string>
 	<string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>

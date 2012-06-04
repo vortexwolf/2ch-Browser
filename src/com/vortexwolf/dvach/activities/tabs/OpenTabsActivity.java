@@ -2,10 +2,14 @@ package com.vortexwolf.dvach.activities.tabs;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.presentation.models.OpenTabModel;
+import com.vortexwolf.dvach.presentation.models.ThreadItemViewModel;
+
 import android.app.ListActivity;
 import android.content.res.TypedArray;
 import android.net.Uri;
@@ -24,6 +28,7 @@ public class OpenTabsActivity extends ListActivity {
     private MainApplication mApplication;
     private OpenTabsAdapter mAdapter;
     private IOpenTabsManager mTabsManager;
+	private FavoritesDataSource mFavoritesDatasource;
     
     private Uri mCurrentUri;
     
@@ -33,7 +38,8 @@ public class OpenTabsActivity extends ListActivity {
 		
         this.mApplication = (MainApplication) this.getApplication();
         this.mTabsManager = this.mApplication.getOpenTabsManager();
-		
+		this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
+        
 		Bundle extras = this.getIntent().getExtras();
 		if(extras != null){
 			this.mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
@@ -67,8 +73,18 @@ public class OpenTabsActivity extends ListActivity {
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
     	super.onCreateContextMenu(menu, v, menuInfo);
-
+    	
+    	AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+    	OpenTabModel item = mAdapter.getItem(info.position);
+    	
     	menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
+    	
+    	if(!mFavoritesDatasource.hasFavorites(item.getUri().toString())){
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
+    	}
+    	else{
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
+    	}
 	}
 	
 	@Override
@@ -83,6 +99,14 @@ public class OpenTabsActivity extends ListActivity {
 	        	
 	        	AppearanceUtils.showToastMessage(this, model.getUri().toString());
 				return true;
+	        }
+	        case Constants.CONTEXT_MENU_ADD_FAVORITES: {
+	        	mFavoritesDatasource.addToFavorites(model.getTitle(), model.getUri().toString());
+	        	return true;
+	        }
+	        case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
+	        	mFavoritesDatasource.removeFromFavorites(model.getUri().toString());
+	        	return true;
 	        }
         }
         
