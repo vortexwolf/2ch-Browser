@@ -17,6 +17,9 @@
 	<string name="postitem_replies">Ответы:</string>
 	<string name="fileslist_nofiles">Нет файлов.</string>
 	<string name="postitem_sameperson_generic_name">Аноним</string>
+	<string name="tabs_opentabs">Вкладки</string>
+	<string name="tabs_bookmarks">Закладки</string>
+	<string name="tabs_history">История</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">

@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.api.entities.PostsList;
+import com.vortexwolf.dvach.models.domain.PostsList;
 
 public interface IPostsListView extends IListView<PostsList> {
 	

@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
-import com.vortexwolf.dvach.presentation.services.Tracker;
+import com.vortexwolf.dvach.services.Tracker;
 
 public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -32,42 +32,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-						
-		if(key.equals(mResources.getString(R.string.pref_theme_key))){
-			String value = mSettings.getString(key, null);
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_THEME, value);
-		}
-		else if(key.equals(mResources.getString(R.string.pref_text_size_key))){
-			String value = mSettings.getString(key, null);
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_TEXT_SIZE, value);
-		}
-		else if(key.equals(mResources.getString(R.string.pref_homepage_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_HOME_PAGE, mSettings.getString(key, "").toLowerCase());
-		}
-		else if(key.equals(mResources.getString(R.string.pref_load_thumbnails_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_LOAD_THUMBNAILS, String.valueOf(isLoadThumbnails()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_display_post_date_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_DISPLAY_DATE, String.valueOf(isDisplayPostItemDate()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_popup_link_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_POPUP_LINK, String.valueOf(isLinksInPopup()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_auto_refresh_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_AUTO_REFRESH, String.valueOf(isAutoRefresh()), getAutoRefreshInterval());
-		}
-		else if(key.equals(mResources.getString(R.string.pref_display_navigation_bar_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_NAVIGATION_BAR, String.valueOf(isDisplayNavigationBar()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_youtube_mobile_links_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_YOUTUBE_MOBILE, String.valueOf(isYoutubeMobileLinks()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_file_cache_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE, String.valueOf(isFileCacheEnabled()));
-		}
-		else if(key.equals(mResources.getString(R.string.pref_file_cache_sdcard_key))){
-			mTracker.trackEvent(Tracker.CATEGORY_PREFERENCES, Tracker.ACTION_PREFERENCE_FILE_CACHE_SD, String.valueOf(isFileCacheSdCard()));
-		}
 	}
 	
 

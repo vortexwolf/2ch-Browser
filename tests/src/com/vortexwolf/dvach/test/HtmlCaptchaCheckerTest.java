@@ -2,9 +2,9 @@ package com.vortexwolf.dvach.test;
 
 import org.apache.http.HttpResponse;
 
-import com.vortexwolf.dvach.api.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
+import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.test.R;
 
 import android.test.InstrumentationTestCase;

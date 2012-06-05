@@ -1,7 +1,7 @@
 package com.vortexwolf.dvach.test;
 
-import com.vortexwolf.dvach.activities.addpost.PostResponseParser;
-import com.vortexwolf.dvach.activities.addpost.SendPostException;
+import com.vortexwolf.dvach.exceptions.SendPostException;
+import com.vortexwolf.dvach.services.domain.PostResponseParser;
 import com.vortexwolf.dvach.test.R;
 
 import android.test.InstrumentationTestCase;

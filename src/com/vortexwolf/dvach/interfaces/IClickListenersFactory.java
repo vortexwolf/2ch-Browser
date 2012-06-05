@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.content.Context;

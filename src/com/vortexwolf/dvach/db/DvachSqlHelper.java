@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.db;
 
-import com.vortexwolf.dvach.presentation.services.SqlCreateTableScriptBuilder;
+import com.vortexwolf.dvach.services.SqlCreateTableScriptBuilder;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

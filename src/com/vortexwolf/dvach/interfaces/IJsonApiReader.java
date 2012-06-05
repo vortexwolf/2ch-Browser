@@ -2,11 +2,11 @@ package com.vortexwolf.dvach.interfaces;
 
 import android.app.Activity;
 
-import com.vortexwolf.dvach.api.JsonApiReaderException;
-import com.vortexwolf.dvach.api.entities.BoardSettings;
-import com.vortexwolf.dvach.api.entities.CaptchaEntity;
-import com.vortexwolf.dvach.api.entities.PostsList;
-import com.vortexwolf.dvach.api.entities.ThreadsList;
+import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
+import com.vortexwolf.dvach.models.domain.BoardSettings;
+import com.vortexwolf.dvach.models.domain.CaptchaEntity;
+import com.vortexwolf.dvach.models.domain.PostsList;
+import com.vortexwolf.dvach.models.domain.ThreadsList;
 
 public interface IJsonApiReader {
 	BoardSettings readBoardSettings(String boardName) throws JsonApiReaderException;

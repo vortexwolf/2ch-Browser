@@ -2,7 +2,7 @@ package com.vortexwolf.dvach.interfaces;
 
 import android.graphics.Bitmap;
 
-import com.vortexwolf.dvach.api.entities.CaptchaEntity;
+import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 
 public interface ICaptchaView {
 	

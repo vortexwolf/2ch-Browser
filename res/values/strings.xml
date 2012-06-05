@@ -16,6 +16,9 @@
 	<string name="pick_board_title">Pick board</string>
 	<string name="postitem_replies">Replies:</string>
 	<string name="fileslist_nofiles">No files.</string>
+	<string name="tabs_opentabs">Tabs</string>
+	<string name="tabs_bookmarks">Bookmarks</string>
+	<string name="tabs_history">History</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">

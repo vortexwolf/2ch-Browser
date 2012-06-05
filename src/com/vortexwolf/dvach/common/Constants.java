@@ -6,7 +6,7 @@ import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class Constants {
 	
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	// Нужно не забыть отключить логгирование при выпуске приложения
 	public static final boolean LOGGING = DEBUG;
@@ -18,9 +18,7 @@ public class Constants {
 	
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
-
-    public static final String HTML_RESPONSE_SKIP_CAPTCHA = "Вам не надо вводить капчу.";
-
+    
 	// Для http-запросов
     public static final String USER_AGENT_STRING = "2ch browser (Android)";
     public static final String SAGE_EMAIL = "sage";

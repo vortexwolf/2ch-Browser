@@ -1,8 +1,8 @@
 package com.vortexwolf.dvach.test;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
-import com.vortexwolf.dvach.presentation.models.AttachmentInfo;
+import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
+import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.test.mocks.MockAttachmentEntity;
 

@@ -12,7 +12,7 @@
 				  android:layout_alignParentRight="true">
 				  
 	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
-		    <com.vortexwolf.dvach.controls.ExtendedImageView
+		    <com.vortexwolf.dvach.common.controls.ExtendedImageView
 		    	android:id="@+id/thumbnail"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -51,7 +51,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
     />
 
-     <com.vortexwolf.dvach.controls.EllipsizingTextView android:id="@+id/comment"
+     <com.vortexwolf.dvach.common.controls.EllipsizingTextView android:id="@+id/comment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     	android:layout_below="@id/title"

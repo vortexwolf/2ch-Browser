@@ -3,7 +3,7 @@ package com.vortexwolf.dvach.settings;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.presentation.services.Tracker;
+import com.vortexwolf.dvach.services.Tracker;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;

@@ -1,7 +1,7 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.api.entities.PostInfo;
-import com.vortexwolf.dvach.api.entities.ThreadInfo;
+import com.vortexwolf.dvach.models.domain.PostInfo;
+import com.vortexwolf.dvach.models.domain.ThreadInfo;
 
 public interface IPagesSerializationService {
 

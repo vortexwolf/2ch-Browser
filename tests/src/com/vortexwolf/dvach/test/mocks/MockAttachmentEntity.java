@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.test.mocks;
 
-import com.vortexwolf.dvach.api.entities.IAttachmentEntity;
+import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
 
 public class MockAttachmentEntity implements IAttachmentEntity
 {

@@ -1,7 +1,7 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.api.JsonApiReaderException;
-import com.vortexwolf.dvach.api.entities.BoardSettings;
+import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
+import com.vortexwolf.dvach.models.domain.BoardSettings;
 
 public interface IBoardSettingsStorage {
 

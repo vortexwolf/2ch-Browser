@@ -57,7 +57,7 @@
 				  android:layout_marginRight="5dip">
 				  
 	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
-		    <com.vortexwolf.dvach.controls.ExtendedImageView
+		    <com.vortexwolf.dvach.common.controls.ExtendedImageView
 		    	android:id="@+id/thumbnail"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"

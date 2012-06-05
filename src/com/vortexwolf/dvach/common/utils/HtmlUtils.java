@@ -7,9 +7,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
-import com.vortexwolf.dvach.controls.ClickableURLSpan;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import android.content.res.TypedArray;

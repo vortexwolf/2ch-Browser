@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.presentation.models.DraftPostModel;
+import com.vortexwolf.dvach.models.presentation.DraftPostModel;
 
 public interface IDraftPostsStorage {
 

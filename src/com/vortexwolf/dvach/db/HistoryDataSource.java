@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -47,7 +46,7 @@ public class HistoryDataSource {
 	public List<HistoryEntity> getAllHistory() {
 		List<HistoryEntity> history = new ArrayList<HistoryEntity>();
 
-		Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", "0,200");
+		Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", "200");
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			HistoryEntity he = createHistoryEntity(cursor);
@@ -67,13 +66,12 @@ public class HistoryDataSource {
 				"select count(*) from " + TABLE +
 				" where " + DvachSqlHelper.COLUMN_URL + " = ? and " + DvachSqlHelper.COLUMN_CREATED + " > " + dayAgo,
 				new String[] { url });
+		
 		cursor.moveToFirst();
+		long count = cursor.getLong(0);
+		cursor.close();
 		
-		if(cursor.getLong(0) > 0){
-			return true;
-		}
-		
-		return false;
+		return count > 0;
 	}
 	
 	private HistoryEntity createHistoryEntity(Cursor c){
