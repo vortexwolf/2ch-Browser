@@ -1,5 +1,8 @@
 package com.vortexwolf.dvach.activities;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
@@ -8,6 +11,7 @@ import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
@@ -161,6 +165,7 @@ public class PostsListActivity extends BaseListActivity {
     {
 		super.resetUI();
 		
+		CompatibilityUtils.setDisplayHomeAsUpEnabled(this);
 		this.registerForContextMenu(this.getListView());
     }
     
@@ -226,6 +231,9 @@ public class PostsListActivity extends BaseListActivity {
     	case R.id.add_menu_id:
     		this.navigateToAddPostView(null, null);
     		break;
+    	case android.R.id.home:
+    		this.navigateUpToThreads();
+    		break;
     	}
     	
     	return true;
@@ -247,6 +255,9 @@ public class PostsListActivity extends BaseListActivity {
     	}
     	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()){
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(R.string.cmenu_download_file));
+    	}
+    	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 4,  this.getString(R.string.cmenu_search_image));
     	}
 	}
 	
@@ -276,6 +287,18 @@ public class PostsListActivity extends BaseListActivity {
 	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	return true;
 	        }
+	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
+				try {
+					String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
+					String encodedImageUrl = URLEncoder.encode(imageUrl, "UTF-8");
+					String googleSearchUrl = "https://images.google.com/searchbyimage?image_url=" + encodedImageUrl +"&num=10";
+		        	
+		        	BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
+				} catch (UnsupportedEncodingException e) {
+					MyLog.e(TAG,  e);
+				}
+	        	//http://images.google.com/searchbyimage?image_url=http%3A%2F%2F2ch.so%2Fapp%2Fsrc%2F1344975200583.jpg
+	        }
         }
         
         return false;
@@ -294,6 +317,13 @@ public class PostsListActivity extends BaseListActivity {
 		}
 		
 		startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+    }
+    
+    private void navigateUpToThreads(){
+    	Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
+		i.setData(Uri.parse(UriUtils.create2chURL(this.mBoardName, 0)));
+		
+		startActivity(i);
     }
     
 	@Override

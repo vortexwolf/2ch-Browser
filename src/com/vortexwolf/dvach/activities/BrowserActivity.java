@@ -116,8 +116,7 @@ public class BrowserActivity extends Activity {
 		this.setContentView(R.layout.browser);
 		
 		this.mWebview = (WebViewFixed) findViewById(R.id.webview);
-    	// HACK: set background color directly for android 2.0
-		this.mWebview.setBackgroundResource(R.color.white);
+		this.mWebview.setBackgroundColor(0);
 	}
 	
 	@Override

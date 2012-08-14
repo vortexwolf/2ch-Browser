@@ -15,6 +15,13 @@
 			android:defaultValue="true"
 			android:summary="@string/pref_load_thumbnails_summary"
 			android:title="@string/pref_load_thumbnails" />
+	<EditTextPreference
+			android:key="@string/pref_name_key"
+			android:title="@string/pref_name"
+			android:hint="@string/pref_name_hint"
+			android:summary="@string/pref_name_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
 		
 <PreferenceCategory android:title="@string/pref_category_appearance">
 	<ListPreference

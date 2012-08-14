@@ -5,6 +5,7 @@ import java.util.HashMap;
 import android.net.Uri;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
@@ -73,6 +74,10 @@ public class AttachmentInfo {
 	
 	public boolean isFile(){
 		return !StringUtils.isEmpty(mSourceExtension);
+	}
+	
+	public boolean isImage(){
+		return !StringUtils.isEmpty(mSourceExtension) && Constants.IMAGE_EXTENSIONS.contains(mSourceExtension);
 	}
 	
 	public String getThumbnailUrl() {

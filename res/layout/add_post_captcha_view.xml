@@ -12,18 +12,20 @@
              android:layout_margin="4dip" > 
     	<FrameLayout android:layout_width="0dip" android:layout_height="wrap_content" android:layout_weight="1">            
         	<ImageView android:id="@+id/addpost_captcha_image"
-	        		android:layout_width="wrap_content"
-	        		android:layout_height="wrap_content"
+	        		android:layout_width="fill_parent"
+	        		android:layout_height="72dip"
+	        		android:adjustViewBounds="true"
+	        		android:scaleType="fitCenter"
 	                />
 			<include android:id="@+id/addpost_captcha_loading"
-			    	android:layout_width="wrap_content" 
+			    	android:layout_width="fill_parent" 
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					layout="@layout/loading" 
 					android:visibility="gone" 
 				 />
 			<TextView android:id="@+id/addpost_captcha_skip_text"
-					android:layout_width="wrap_content"
+					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
 					android:layout_gravity="center_horizontal"
 					android:textAppearance="?android:attr/textAppearanceMedium" 
@@ -31,11 +33,11 @@
 					android:visibility="gone" 
 		        />
        </FrameLayout>   
-       <Button android:id="@+id/addpost_refresh_button" 
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content" 
-               android:layout_gravity="center_vertical"
-               android:text="@string/addpost_refresh_button" 
+       <ImageButton android:id="@+id/addpost_refresh_button" 
+               android:layout_width="@dimen/navigation_button_size"
+               android:layout_height="@dimen/navigation_button_size"
+               android:background="@null"
+               android:src="@drawable/ic_menu_refresh"
                />
   </LinearLayout>
           
@@ -44,6 +46,6 @@
 	  	android:layout_height="wrap_content"
 	  	android:singleLine="true"
 	  	android:hint="@string/addpost_captcha_hint" 
-	  	android:inputType="textFilter"
+	  	android:inputType="text|textEmailAddress"
   	/>
 </LinearLayout>

@@ -14,12 +14,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
 import android.content.res.Resources;
+import android.net.Uri;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.exceptions.SendPostException;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.PostEntity;
@@ -49,8 +51,8 @@ public class PostSender implements IPostSender {
 
 		String uri = "http://2ch.so/"+boardName+"/wakaba.pl";
 		
-		// 1 - 'ро' на кириллице, 2 - 'о' на кириллице, 3 - все латинскими буквами, 4 - 'р' на кириллице
-		String[] possibleTasks = new String[] { "роst", "pоst", "post", "рost" };
+		// 1 - 'р' на кириллице, 2 - 'ро' на кириллице, 3 - 'о' на кириллице, 4 - все латинскими буквами, 
+		String[] possibleTasks = new String[] { "рost", "роst", "pоst", "post",  };
 		int statusCode = 502; // Возвращается при неправильном значении task=post, часто меняется, поэтому неизвестно какой будет на данный момент
 		HttpResponse response = null;
 			
@@ -110,6 +112,13 @@ public class PostSender implements IPostSender {
             }
             if(entity.getSubject() != null){
             	multipartEntity.addPart(fields.getSubject(), new StringBody(entity.getSubject(), utf));
+            }
+            if(!StringUtils.isEmpty(entity.getName())){
+            	multipartEntity.addPart(fields.getName(), new StringBody(entity.getName(), utf));
+            }
+            // Only for /po and /test
+            if(entity.getPolitics() != null){
+            	multipartEntity.addPart("anon_icon", new StringBody(entity.getPolitics(), utf));
             }
 
 	        httpPost.setEntity(multipartEntity);

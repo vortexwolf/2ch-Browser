@@ -49,6 +49,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
@@ -83,6 +84,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private ProgressDialog mProgressDialog;
 	private Button mSendButton;
 	private EditText mSubjectView;
+	private Spinner mPoliticsView;
 	
 	// Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить (после успешной отправки)
 	private boolean mFinishedSuccessfully = false;
@@ -101,8 +103,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
 		this.mTracker = this.mApplication.getTracker();
 
-		this.resetUI();
-
 		//Парсим название борды и номер треда
         Bundle extras = getIntent().getExtras();
 		
@@ -110,6 +110,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     		this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
     		this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
     	}
+    	
+		this.resetUI();
 
     	StringBuilder commentBuilder = new StringBuilder();
     	 
@@ -202,9 +204,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mAttachmentView = findViewById(R.id.addpost_attachment_view);
 		this.mSendButton = (Button)this.findViewById(R.id.addpost_send_button);
 		this.mSubjectView = (EditText)this.findViewById(R.id.addpost_subject);
+		this.mPoliticsView = (Spinner)this.findViewById(R.id.addpost_politics);
 		final Button removeAttachmentButton = (Button)this.findViewById(R.id.addpost_attachment_remove);
-		final Button refreshCaptchaButton = (Button)this.findViewById(R.id.addpost_refresh_button);
+		final ImageButton refreshCaptchaButton = (ImageButton)this.findViewById(R.id.addpost_refresh_button);
 		final LinearLayout textFormatView = (LinearLayout)this.findViewById(R.id.addpost_textformat_view);
+		
+		if(ThreadPostUtils.isPoliticsBoard(mBoardName)){
+			mPoliticsView.setVisibility(View.VISIBLE);
+		}
 		
 		View.OnClickListener formatButtonListener = new View.OnClickListener() {
 			@Override
@@ -286,19 +293,26 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		
 		String subject = StringUtils.nullIfEmpty(this.mSubjectView.getText().toString());
 		
+		String politics = null;
+		if(ThreadPostUtils.isPoliticsBoard(mBoardName)){
+			int itemIndex = mPoliticsView.getSelectedItemPosition();
+			politics = Math.max(itemIndex - 1, -1) + ""; // the list starts from -1
+		}
+		
+		String name = this.mApplication.getSettings().getName();
+		String captchaKey = mCaptcha != null ? mCaptcha.getKey() : null;
+		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name);
+		
 		//Отправляем
-		sendPost(captchaAnswer, comment, isSage, attachment, subject);
+		sendPost(pe);
 	}
 
-	private void sendPost(String captchaAnswer, String comment, boolean isSage, File attachment, String subject){
+	private void sendPost(PostEntity pe){
 
 		if(this.mCurrentPostSendTask != null){
 			this.mCurrentPostSendTask.cancel(true);
 		}
-		
-		String captchaKey = mCaptcha != null ? mCaptcha.getKey() : null;
-		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject);
-		
+
 		this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardSettingsStorage, mBoardName, mThreadNumber, pe);
 		this.mCurrentPostSendTask.execute();
 	}

@@ -5,7 +5,7 @@
 Light theme 
 ==================
 -->		
-	<style name="Theme_Light_Base" parent="@android:style/Theme.Light">
+	<style name="Theme_Light_Base" parent="@android:style/Theme.Holo.Light">
         <item name="activityRootBackground">@color/white_background</item>
         <item name="threadTitleForeground">@color/white_thread_title</item>
         <item name="itemInfoForeground">@color/white_item_info</item>
@@ -29,7 +29,7 @@ Light theme
 Dark theme 
 ==================
 -->	
-	<style name="Theme_Neutron_Base" parent="@android:style/Theme">
+	<style name="Theme_Neutron_Base" parent="@android:style/Theme.Holo">
 	    <item name="activityRootBackground">@color/neutron_background</item>
 	    <item name="threadTitleForeground">@color/neutron_thread_title</item>
 	    <item name="itemInfoForeground">@color/neutron_item_info</item>

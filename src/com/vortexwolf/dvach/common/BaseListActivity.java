@@ -21,7 +21,7 @@ public abstract class BaseListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
-        this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        //this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     }
     
 	/** Returns the layout resource Id associated with this activity */
@@ -29,11 +29,13 @@ public abstract class BaseListActivity extends ListActivity {
 	
 	/** Reloads UI on the page */
 	protected void resetUI(){
+		// setting of the theme goes first
+		this.setTheme(this.getMainApplication().getSettings().getTheme());
+		
 		// memorize the current position of the list before it is reloaded
 		AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
 
-		// completely reload the root view, set the current theme and get loading and error views
-		this.setTheme(this.getMainApplication().getSettings().getTheme());
+		// completely reload the root view, get loading and error views
 		this.setContentView(this.getLayoutId());
 		mLoadingView = this.findViewById(R.id.loadingView);
 		mErrorView = this.findViewById(R.id.error);

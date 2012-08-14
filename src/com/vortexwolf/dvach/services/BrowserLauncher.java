@@ -6,7 +6,9 @@ import com.vortexwolf.dvach.common.utils.UriUtils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.Browser;
 
 public class BrowserLauncher {

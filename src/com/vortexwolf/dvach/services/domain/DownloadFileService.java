@@ -47,14 +47,16 @@ public class DownloadFileService implements IDownloadFileService {
 	    // В версиях до 2.3 копируем файл из кэша, если возможно
 	    // В версиях начиная с 2.3 Download Manager всегда будет загружать файл заново, т.к. там более удобный интерфейс
 	    Uri from = Uri.parse(uri);
-		if (sNewClassAvailable) {
+		
+	    boolean isCached = cachedFile != null && cachedFile.exists();
+	    if(isCached){
+	    	from = Uri.fromFile(cachedFile);
+	    	new DownloadFileTask(context, from, to).execute();
+	    }
+	    else if (sNewClassAvailable) {
 	        DownloadManagerWrapper.downloadFile(context, from, to);
-		} else {
-		    boolean isCached = cachedFile != null && cachedFile.exists();
-		    if(isCached){
-		    	from = Uri.fromFile(cachedFile);
-		    }
-		    
+		} 
+	    else {
 			new DownloadFileTask(context, from, to).execute();
 		}
 	}

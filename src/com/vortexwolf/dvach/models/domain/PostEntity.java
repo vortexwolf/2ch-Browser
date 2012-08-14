@@ -9,17 +9,18 @@ public class PostEntity {
 	private boolean mIsSage;
 	private File mAttachment;
 	private String mSubject;
+	private String mPolitics;
+	private String mName;
 	
-	public PostEntity(String captchaKey, String captchaAnswer, String comment){
-		this(captchaKey, captchaAnswer, comment, false, null, null);
-	}
-	public PostEntity(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject){
+	public PostEntity(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject, String politics, String name){
 		this.mCaptchaKey = captchaKey;
 		this.mCaptchaAnswer = captchaAnswer;
 		this.mComment = comment;
 		this.mIsSage = isSage;
 		this.mAttachment = attachment;
 		this.mSubject = subject;
+		this.mPolitics = politics;
+		this.mName = name;
 	}
 	
 	public void setCaptchaKey(String captchaKey) {
@@ -57,5 +58,19 @@ public class PostEntity {
 	}
 	public String getSubject() {
 		return mSubject;
+	}
+	public String getPolitics() {
+		return mPolitics;
+	}
+	public void setPolitics(String politics) {
+		this.mPolitics = politics;
+	}
+
+	public String getName() {
+		return mName;
+	}
+
+	public void setName(String name) {
+		this.mName = name;
 	}
 }

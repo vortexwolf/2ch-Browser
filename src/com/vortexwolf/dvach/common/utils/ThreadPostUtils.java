@@ -39,6 +39,22 @@ public class ThreadPostUtils {
     	}
 	}
 	
+	/** Отображение комбобокса с политическими взглядами */
+	public static boolean isPoliticsBoard(String boardName){
+		boolean hasPoliticsView = boardName.equals("po");
+		
+		return hasPoliticsView;
+	}
+	
+	/** Будет отображать другим цветом посты после бамплимита */
+	public static int getBumpLimitNumber(String boardName){
+		if(boardName.equals("vg")){
+			return 1000;
+		}
+		
+		return 500;
+	}
+	
 	/** Разбирается с прикрепленным файлом для треда или поста; перенес сюда, чтобы не повторять код
 	 * @param attachment Модель прикрепленного к треду или посту файла
 	 * @param imageView Место для картинки

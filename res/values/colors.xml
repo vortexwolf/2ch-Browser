@@ -1,12 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">#ffffffff</color>
-    <color name="blue">#ff0000ff</color>
+    <color name="white">#FFFFFF</color>
+    <color name="blue">#0000FF</color>
     
-    <color name="darkBlueText">#ff456793</color>
-    <color name="darkGrayText">#ff808080</color>
+    <color name="darkBlueText">#456793</color>
+    <color name="darkGrayText">#808080</color>
     
     <color name="white_background">@android:color/white</color>
-    <color name="photon_background">#EEEEEE</color>
     <color name="neutron_background">#212121</color>
+    <color name="photon_background">#EEEEEE</color>
+    
+    <color name="white_primary_text">@android:color/black</color>
+    <color name="neutron_primary_text">#698CC0</color>
+    <color name="photon_primary_text">#333333</color>
+    
+    <color name="white_thread_title">@color/blue</color>
+    <color name="neutron_thread_title">#3941AC</color>
+    <color name="photon_thread_title">#002244</color>
+    
+    <color name="white_item_info">#666666</color>
+    <color name="neutron_item_info">#999999</color>
+    <color name="photon_item_info">@color/white_item_info</color>
+    
+    <color name="white_post_number">@color/white_primary_text</color>
+    <color name="neutron_post_number">#C9BE89</color>
+    <color name="photon_post_number">@color/photon_primary_text</color>
+    
+    <color name="white_list_section">#ebeff9</color>
+    <color name="neutron_list_section">#191919</color>
+    <color name="photon_list_section">@color/white_list_section</color>
+    
+    <color name="white_url_link">#5555FF</color>
+    <color name="neutron_url_link">#C9BE89</color>
+    <color name="photon_url_link">#FF6600</color>
+    
+    <color name="white_tab_separator">#D9D9D9</color>
+    <color name="neutron_tab_separator">#333333</color>
+    <color name="photon_tab_separator">@color/white_tab_separator</color>
+    
+    <color name="white_post_quote">#789922</color>
+    <color name="neutron_post_quote">@color/white_post_quote</color>
+    <color name="photon_post_quote">@color/white_post_quote</color>
+    
+    <color name="white_spoiler_text">@color/white_primary_text</color>
+    <color name="neutron_spoiler_text">#48B0FD</color>
+    <color name="photon_spoiler_text">@color/photon_primary_text</color>
+    
+    <color name="white_spoiler">#BBBBBB</color>
+    <color name="neutron_spoiler">#575757</color>
+    <color name="photon_spoiler">@color/white_spoiler</color>
 </resources>

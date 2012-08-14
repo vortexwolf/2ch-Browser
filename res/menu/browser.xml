@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/open_browser_menu_id" android:title="@string/menu_open_browser" android:icon="@drawable/ic_menu_browser" />
-	<item android:id="@+id/save_menu_id" android:title="@string/menu_save" android:icon="@drawable/ic_menu_save" />
+	<item android:id="@+id/save_menu_id" android:title="@string/menu_save" android:icon="@drawable/ic_menu_save" android:showAsAction="ifRoom" />
 </menu>

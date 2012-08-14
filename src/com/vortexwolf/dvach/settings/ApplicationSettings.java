@@ -40,6 +40,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return !StringUtils.isEmpty(boardName) ? boardName : Constants.DEFAULT_BOARD;
 	}
 	
+	public String getName(){
+		return mSettings.getString(mResources.getString(R.string.pref_name_key), null);
+	}
+	
 	public boolean isLoadThumbnails() {
 		return mSettings.getBoolean(mResources.getString(R.string.pref_load_thumbnails_key), true);
 	}

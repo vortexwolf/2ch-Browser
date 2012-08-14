@@ -94,7 +94,7 @@ public class EllipsizingTextView extends TextView {
     }
 
     private void resetText() {
-        int maxLines = getMaxLines();
+        int maxLines = this.getMaxLines();
         CharSequence workingText = fullText;
         boolean ellipsized = false;
         

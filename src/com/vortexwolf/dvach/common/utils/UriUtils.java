@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.vortexwolf.dvach.common.Constants;
+
 import android.net.Uri;
+import android.view.View;
 
 public class UriUtils {
 	
@@ -17,8 +20,6 @@ public class UriUtils {
 	private static final Pattern groupsDvachUriPattern = Pattern.compile("^/(\\w+)/?(?:(?:(\\d+).html)|(?:res/(\\d+)\\.html))?$"); // 1: board name; 2: page number; 3: thread number
 	private static final Pattern groupsFileExtensionPattern = Pattern.compile(".*\\.([a-zA-Z0-9]+)$"); // 1: file extension
 	private static final Pattern groupsYoutubeCodePattern = Pattern.compile("\"http://www.youtube.com/v/(.*?)\""); // 1: video code
-	
-	public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg", "jpeg", "png", "gif" }));
 	
 	public static boolean isDvachHost(Uri uri){
 		String host = uri.getHost();
@@ -71,7 +72,7 @@ public class UriUtils {
     public static boolean isImageUri(Uri uri) {
     	String extension = getFileExtension(uri);
 
-    	return IMAGE_EXTENSIONS.contains(extension);
+    	return Constants.IMAGE_EXTENSIONS.contains(extension);
     }
 	
 	public static String getBoardName(Uri uri){

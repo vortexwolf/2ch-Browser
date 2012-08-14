@@ -26,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -60,7 +61,7 @@ public class FilesListActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		MainApplication application = (MainApplication)this.getApplication();
 		application.getTracker().trackActivityView(TAG);
 		ApplicationSettings settings = application.getSettings();
@@ -74,7 +75,7 @@ public class FilesListActivity extends ListActivity {
 		setListAdapter(mAdapter);
 		
 		// image file extensions
-		acceptedFileExtensions = UriUtils.IMAGE_EXTENSIONS.toArray(new String[UriUtils.IMAGE_EXTENSIONS.size()]);
+		acceptedFileExtensions = Constants.IMAGE_EXTENSIONS.toArray(new String[Constants.IMAGE_EXTENSIONS.size()]);
 		
 		// Get intent extras
 		String currentFilePath = null;

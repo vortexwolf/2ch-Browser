@@ -3,6 +3,8 @@ package com.vortexwolf.dvach.adapters;
 import java.util.List;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.adapters.ThreadsListAdapter.ViewBag;
+import com.vortexwolf.dvach.common.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.db.HistoryEntity;
 
@@ -13,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
@@ -33,17 +37,24 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
     	
     	View view = convertView == null ? mInflater.inflate(R.layout.history_list_item, null) : convertView;
     	
-    	TextView titleView = (TextView)view.findViewById(R.id.title);
-    	TextView urlView = (TextView)view.findViewById(R.id.url);
-    	CheckBox starView = (CheckBox)view.findViewById(R.id.star);
+    	ViewBag vb = (ViewBag)view.getTag();
+    	if(vb == null){
+    		vb = new ViewBag();
+    		vb.titleView = (TextView)view.findViewById(R.id.title);
+    		vb.urlView = (TextView)view.findViewById(R.id.url);
+    		vb.starView = (CheckBox)view.findViewById(R.id.star);
+    		
+    		view.setTag(vb);
+    	}
     	
-    	titleView.setText(item.getTitle());
-    	urlView.setText(item.getUrl());
+    	vb.titleView.setText(item.getTitle());
+    	vb.urlView.setText(item.getUrl());
     	
     	boolean isInFavorites = mFavoritesDataSource.hasFavorites(item.getUrl());
-    	starView.setChecked(isInFavorites);
+    	vb.starView.setOnCheckedChangeListener(null);
+    	vb.starView.setChecked(isInFavorites);
     	
-    	starView.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+    	vb.starView.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
@@ -56,5 +67,11 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 		});
     	
     	return view;
+	}
+	
+	static class ViewBag{
+    	TextView titleView;
+    	TextView urlView;
+    	CheckBox starView;
 	}
 }

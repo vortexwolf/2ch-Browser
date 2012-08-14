@@ -20,6 +20,7 @@
 	<string name="tabs_opentabs">Вкладки</string>
 	<string name="tabs_bookmarks">Закладки</string>
 	<string name="tabs_history">История</string>
+	<string name="addpost_politics_prompt">Политические предпочтения</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -36,12 +37,12 @@
     </plurals>
     <string name="data_posts_files">%1$s и %2$s</string>
     <string name="data_file_size_measure">Кб</string>   
-    <string name="data_board_title">2ch.so/%1$s/</string>
-	<string name="data_board_title_with_page">2ch.so/%1$s/%2$s</string> 
-    <string name="data_thread_title">2ch.so/%1$s/%2$s</string> 
-	<string name="data_thread_withsubject_title">2ch.so/%1$s/ - %2$s</string> 
-    <string name="data_add_thread_title">2ch.so/%1$s/ - Новый тред</string> 
-    <string name="data_add_post_title">2ch.so/%1$s/%2$s - Новое сообщение</string> 
+    <string name="data_board_title">/%1$s/</string>
+	<string name="data_board_title_with_page">/%1$s/%2$s</string> 
+    <string name="data_thread_title">/%1$s/%2$s</string> 
+	<string name="data_thread_withsubject_title">/%1$s/ - %2$s</string> 
+    <string name="data_add_thread_title">/%1$s/ - Новый тред</string> 
+    <string name="data_add_post_title">/%1$s/%2$s - Новое сообщение</string> 
     <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string> 
     
     <!-- Menus -->
@@ -68,6 +69,7 @@
     <string name="cmenu_view_op_post">Открыть ОП-пост</string>
     <string name="cmenu_add_to_favorites">Добавить в закладки</string>
     <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
+    <string name="cmenu_search_image">Поиск изображения в TinEye</string>
             
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
@@ -80,6 +82,10 @@
 
 	<string name="pref_load_thumbnails">Загружать изображения</string>
 	<string name="pref_load_thumbnails_summary">Отмените для экономии трафика</string>
+	
+    <string name="pref_name">Имя</string>
+    <string name="pref_name_summary">Оставьте пустым</string>
+	<string name="pref_name_hint">Аноним</string>
 	
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
@@ -125,6 +131,7 @@
 	
 	<string name="pref_homepage_key">homepage</string>
 	<string name="pref_load_thumbnails_key">load_thumbnails</string>
+	<string name="pref_name_key">name</string>
 	<string name="pref_display_post_date_key">display_post_date</string>
 	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
 	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
@@ -152,6 +159,7 @@
 	<string name="error_file_exist">Такой файл уже существует.</string>
 	<string name="error_save_file">Во время сохранения произошла ошибка.</string>
 	<string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>
+	<string name="error_image_search">Поиск в TinEye не работает.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Введите код подтверждения</string>

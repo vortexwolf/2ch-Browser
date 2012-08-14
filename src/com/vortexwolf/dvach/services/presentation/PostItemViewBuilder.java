@@ -78,7 +78,7 @@ public class PostItemViewBuilder {
 		//Номер по порядку
 		int postIndex = item.getPosition() + 1;
 		vb.postIndexView.setText(String.valueOf(postIndex));
-		if(postIndex >= Constants.BUMP_LIMIT){
+		if(postIndex >= ThreadPostUtils.getBumpLimitNumber(this.mBoardName)){
 			vb.postIndexView.setTextColor(Color.parseColor("#C41E3A"));
 		}
 		else {
@@ -154,7 +154,7 @@ public class PostItemViewBuilder {
             ViewBag vb = (ViewBag)v.getTag();
             AttachmentInfo attachment = item.getAttachment(this.mBoardName);
             
-            if(!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
+            if(vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
 	            ThreadPostUtils.handleAttachmentImage(false, attachment, 
 	            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
 	            		this.mBitmapManager, this.mSettings, this.mAppContext);

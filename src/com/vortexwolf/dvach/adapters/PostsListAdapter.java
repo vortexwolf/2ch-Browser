@@ -145,13 +145,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	}
 	
 	@Override
-	public void setBusy(boolean value, AbsListView view){
+	public void setBusy(boolean value, AbsListView listView){
 		if(this.mIsBusy == true && value == false){
-	        int count = view.getChildCount();
+	        int count = listView.getChildCount();
 	        for (int i=0; i<count; i++) {
-	            View v = view.getChildAt(i);
-	            int position = view.getPositionForView(v);
-	            
+	            View v = listView.getChildAt(i);
+	            int position = listView.getPositionForView(v);
+
 	            this.mPostItemViewBuilder.displayThumbnail(v, this.getItem(position));
 	        }
 		}

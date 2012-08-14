@@ -1,13 +1,18 @@
 package com.vortexwolf.dvach.activities;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
+import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
@@ -101,7 +106,7 @@ public class ThreadsListActivity extends BaseListActivity {
 		// Сохраняем во вкладках
 		OpenTabModel tabModel = new OpenTabModel(mBoardName, mBoardName, mPageNumber);
 		this.mTabModel = this.mApplication.getOpenTabsManager().add(tabModel);
-		
+
         this.resetUI();
 
         this.setAdapter();
@@ -148,7 +153,6 @@ public class ThreadsListActivity extends BaseListActivity {
 	}
 	
 	
-	
 	@Override
 	protected int getLayoutId() {
 		return R.layout.threads_list_view;
@@ -158,7 +162,8 @@ public class ThreadsListActivity extends BaseListActivity {
 	protected void resetUI() {
 		// вызываем метод базового класса
 		super.resetUI();
-        
+ 
+		CompatibilityUtils.setDisplayHomeAsUpEnabled(this);
         this.registerForContextMenu(this.getListView());
         
         //Панель навигации по страницам
@@ -239,6 +244,7 @@ public class ThreadsListActivity extends BaseListActivity {
     		startActivity(openTabsIntent);
     		break;
     	case R.id.pick_board_menu_id:
+    	case android.R.id.home:
     		//Start new activity
     		Intent pickBoardIntent = new Intent(getApplicationContext(), PickBoardActivity.class);
     		startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
@@ -314,6 +320,10 @@ public class ThreadsListActivity extends BaseListActivity {
     	if(item.isEllipsized()){
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
     	}
+    	
+    	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 3,  this.getString(R.string.cmenu_search_image));
+    	}
 	}
 	
     @Override
@@ -338,6 +348,20 @@ public class ThreadsListActivity extends BaseListActivity {
 	        	PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.sDvachUrlSpanClickListener);
 	        	this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
 	        	return true;
+	        }
+	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
+	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
+	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
+//				try {
+//					String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
+//					String encodedImageUrl = URLEncoder.encode(imageUrl, "UTF-8");
+//					String googleSearchUrl = "https://images.google.com/searchbyimage?image_url=" + encodedImageUrl +"&num=10";
+//		        	
+//		        	BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
+//				} catch (UnsupportedEncodingException e) {
+//					MyLog.e(TAG,  e);
+//				}
+	        	//http://images.google.com/searchbyimage?image_url=http%3A%2F%2F2ch.so%2Fapp%2Fsrc%2F1344975200583.jpg
 	        }
         }
         
