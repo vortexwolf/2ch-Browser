@@ -31,6 +31,7 @@ import com.vortexwolf.dvach.services.presentation.OpenTabsManager;
 import com.vortexwolf.dvach.services.presentation.PagesSerializationService;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import android.app.Application;
+import android.content.res.Resources;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
@@ -52,6 +53,7 @@ public class MainApplication extends Application {
 		NavigationService navigationService = new NavigationService();
 		
 		Container container = Factory.getContainer();
+		container.register(Resources.class, this.getResources());
 		container.register(DefaultHttpClient.class, httpClient);
 		container.register(IJsonApiReader.class, jsonApiReader);
 		container.register(IPostSender.class, new PostSender(httpClient, this.getResources()));

@@ -37,7 +37,7 @@
                android:layout_width="@dimen/navigation_button_size"
                android:layout_height="@dimen/navigation_button_size"
                android:background="@null"
-               android:src="@drawable/ic_menu_refresh"
+               android:src="?iconRefresh"
                />
   </LinearLayout>
           
@@ -46,6 +46,6 @@
 	  	android:layout_height="wrap_content"
 	  	android:singleLine="true"
 	  	android:hint="@string/addpost_captcha_hint" 
-	  	android:inputType="text|textEmailAddress"
+	  	android:inputType="text|textEmailAddress|textVisiblePassword"
   	/>
 </LinearLayout>

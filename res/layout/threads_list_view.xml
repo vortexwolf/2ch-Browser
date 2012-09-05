@@ -23,7 +23,7 @@
 		   		android:layout_width="@dimen/navigation_button_size"
 		   		android:layout_height="@dimen/navigation_button_size"
 		   		android:layout_alignParentLeft="true"
-		   		android:src="@drawable/ic_menu_back"
+		   		android:src="?iconBack"
 		   		android:background="@null"
 		   		/>
 		   	<TextView android:id="@+id/threads_page_number"
@@ -36,7 +36,7 @@
 		   		android:layout_width="@dimen/navigation_button_size"
 		   		android:layout_height="@dimen/navigation_button_size"
 		   		android:layout_alignParentRight="true"
-		   		android:src="@drawable/ic_menu_forward"
+		   		android:src="?iconForward"
 		   		android:background="@null"
 		   		/>
 	</RelativeLayout>

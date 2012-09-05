@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 public class Container {
 
-	@SuppressWarnings("rawtypes")
-	private HashMap<Class, Object> _instances = new HashMap<Class, Object>();
+	private HashMap<Class<?>, Object> _instances = new HashMap<Class<?>, Object>();
 
 	public <T> void register(Class<T> from, T to){
 		_instances.put(from, to);

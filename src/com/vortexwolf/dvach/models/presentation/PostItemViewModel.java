@@ -15,6 +15,7 @@ import android.text.format.DateFormat;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
@@ -93,6 +94,10 @@ public class PostItemViewModel {
 		return mModel.getNum();
 	}
 	
+	public String getName(){
+		return mModel.getName();
+	}
+	
 	public boolean hasAttachment(){
 		return ThreadPostUtils.hasAttachment(this.mModel);
 	}
@@ -106,6 +111,10 @@ public class PostItemViewModel {
 	}
 
 	public SpannableStringBuilder getSpannedComment() {
+		if(StringUtils.isEmpty(this.mModel.getComment())){
+			return new SpannableStringBuilder("");
+		}
+		
 		if(this.mSpannedComment == null){
 			this.mSpannedComment = this.createSpannedComment();
 		}

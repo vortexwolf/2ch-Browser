@@ -48,7 +48,7 @@
 			android:defaultValue="true"
 			android:summary="@string/pref_popup_link_summary"
 			android:title="@string/pref_popup_link" />
-  <CheckBoxPreference
+    <CheckBoxPreference
 			android:key="@string/pref_display_navigation_bar_key"
 			android:defaultValue="true"
 			android:summary="@string/pref_display_navigation_bar_summary"
@@ -58,6 +58,11 @@
 			android:defaultValue="false"
 			android:summary="@string/pref_youtube_mobile_links_summary"
 			android:title="@string/pref_youtube_mobile_links" />
+    <CheckBoxPreference
+			android:key="@string/pref_display_name_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_display_name_summary"
+			android:title="@string/pref_display_name" />
   </PreferenceCategory>
 
 <PreferenceCategory android:title="@string/pref_category_cache">
@@ -72,10 +77,6 @@
 		android:dependency="@string/pref_file_cache_key"
 		android:summary="@string/pref_file_cache_sdcard_summary"
 		android:title="@string/pref_file_cache_sdcard" />
-	 <com.vortexwolf.dvach.settings.CacheSizePreference
-			android:key="clear_cache"
-			android:dependency="@string/pref_file_cache_key"
-		    android:title="@string/pref_file_cache_clear" />
 </PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/pref_category_autorefresh">

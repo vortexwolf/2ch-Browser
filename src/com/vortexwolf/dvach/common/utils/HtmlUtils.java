@@ -6,18 +6,22 @@ import java.util.regex.Pattern;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.httpimage.HttpImageManager;
 import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
@@ -28,7 +32,7 @@ public class HtmlUtils {
 	
 	private static final DefaultHttpClient httpClient = MainApplication.getHttpClient();
 	//Картинки со смайликами во время всяких праздников
-	private static final Html.ImageGetter imageGetter = new Html.ImageGetter(){
+	public static final Html.ImageGetter sImageGetter = new Html.ImageGetter(){
 		
 		private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
 		
@@ -36,15 +40,22 @@ public class HtmlUtils {
 		public Drawable getDrawable(String ref) {
 			Uri uri = UriUtils.adjust2chRelativeUri(Uri.parse(ref));
 			
-			Bitmap bmp = mNetworkResourceLoader.loadBitmap(uri);
-			Drawable d = new BitmapDrawable(bmp);
-			d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-			return d;
+			HttpImageManager imageManager = Factory.getContainer().resolve(HttpImageManager.class);
+
+			Bitmap cached = imageManager.loadImage(uri);
+			if(cached != null) {
+				Bitmap bmp = cached;
+				Drawable d = new BitmapDrawable(bmp);
+				d.setBounds(0, 0, Math.max(d.getIntrinsicWidth(), bmp.getWidth()), Math.max(d.getIntrinsicHeight(), bmp.getHeight()));
+				return d;
+			}
+			
+			return Factory.getContainer().resolve(Resources.class).getDrawable(R.drawable.a_empty);
 		}
 	};
 	
 	public static SpannableStringBuilder createSpannedFromHtml(String htmlText, Theme theme){
-		SpannableStringBuilder builder = (SpannableStringBuilder)Html.fromHtml(StringUtils.emptyIfNull(htmlText), imageGetter, new UnknownTagsHandler(theme));
+		SpannableStringBuilder builder = (SpannableStringBuilder)Html.fromHtml(StringUtils.emptyIfNull(htmlText), sImageGetter, new UnknownTagsHandler(theme));
         
         return builder;
 	}

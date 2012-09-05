@@ -33,6 +33,14 @@
 	    android:textColor="?postNumberForeground"
 		/>
 	
+	<TextView android:id="@+id/post_name"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:layout_marginRight="4dip"
+	    android:visibility="gone"
+		/>
+	
 	<TextView
 	    android:id="@+id/post_item_date_id"
 	    android:layout_width="fill_parent"

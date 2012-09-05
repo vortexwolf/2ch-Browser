@@ -117,22 +117,15 @@ public class ThreadsListActivity extends BaseListActivity {
     }
     
 	@Override
-	protected void onDestroy() {
-		MyLog.d(TAG, "Detstroyed");
-		
-		super.onDestroy();
-	}
-	
-	@Override
-	protected void onPause() {
+	protected void onStop() {
 		this.mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(this.getListView()));
-		
-		super.onPause();
+
+		super.onStop();
 	}
-	
+
 	@Override
-	protected void onResume() {
-		super.onResume();
+	protected void onStart() {
+		super.onStart();
 		
 		SettingsEntity newSettings = this.mSettings.getCurrentSettings();
 		
@@ -352,21 +345,19 @@ public class ThreadsListActivity extends BaseListActivity {
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
 	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
 	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
-//				try {
-//					String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
-//					String encodedImageUrl = URLEncoder.encode(imageUrl, "UTF-8");
-//					String googleSearchUrl = "https://images.google.com/searchbyimage?image_url=" + encodedImageUrl +"&num=10";
-//		        	
-//		        	BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
-//				} catch (UnsupportedEncodingException e) {
-//					MyLog.e(TAG,  e);
-//				}
-	        	//http://images.google.com/searchbyimage?image_url=http%3A%2F%2F2ch.so%2Fapp%2Fsrc%2F1344975200583.jpg
+	        	return true;
 	        }
         }
         
         return false;
     }
+    
+    @Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
+		
+		super.onSaveInstanceState(outState);
+	}
     
     private void navigateToAddThreadView(){
     	Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
@@ -417,7 +408,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
 		@Override
 		public void setWindowProgress(int value) {
-			ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, value);
+			ThreadsListActivity.this.setProgress(value);
 		}
 
 		@Override
@@ -439,6 +430,7 @@ public class ThreadsListActivity extends BaseListActivity {
 		
 		@Override
 	    public void showLoadingScreen() {
+			ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
 			ThreadsListActivity.this.switchToLoadingView();
 	    }
 		

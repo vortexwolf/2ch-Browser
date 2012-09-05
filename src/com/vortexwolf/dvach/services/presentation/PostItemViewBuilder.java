@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.Html;
+import com.vortexwolf.dvach.common.utils.HtmlUtils;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
@@ -51,6 +54,7 @@ public class PostItemViewBuilder {
 		if(vb == null){
 			vb = new ViewBag();
 			vb.postIdView = (TextView) view.findViewById(R.id.post_id);
+			vb.postNameView = (TextView) view.findViewById(R.id.post_name);
 			vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
 			vb.commentView = (TextView) view.findViewById(R.id.comment);
 			vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
@@ -83,6 +87,16 @@ public class PostItemViewBuilder {
 		}
 		else {
 			vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
+		}
+		
+		//Имя
+		String name = item.getName();
+		if(mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")){
+			vb.postNameView.setText(Html.fromHtml(name, HtmlUtils.sImageGetter, null));
+			vb.postNameView.setVisibility(View.VISIBLE);
+		}
+		else {
+			vb.postNameView.setVisibility(View.GONE);
 		}
 		
 		//Дата поста
@@ -164,6 +178,7 @@ public class PostItemViewBuilder {
     
     private static class ViewBag{
     	TextView postIdView;
+    	TextView postNameView;
     	TextView postIndexView;
     	TextView commentView;
         TextView attachmentInfoView;

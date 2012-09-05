@@ -98,6 +98,9 @@
 	
 	<string name="pref_youtube_mobile_links">YouTube-видео</string>
 	<string name="pref_youtube_mobile_links_summary">Открывать мобильный YouTube вместо обычного</string>
+		
+	<string name="pref_display_name">Имена</string>
+	<string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
 	
 	<string name="pref_text_size">Размер текста</string>
 	<string-array name="pref_text_size_choices">
@@ -121,7 +124,7 @@
 	<string name="pref_auto_refresh_interval_dialog_title">Интервал автообновления</string>
 	<string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
 
-	<string name="pref_file_cache">Файловая система</string>
+	<string name="pref_file_cache">Кэширование thumbnails</string>
 	<string name="pref_file_cache_summary">Кэшировать изображения в файловой системе</string>
 	
 	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
@@ -149,6 +152,7 @@
 	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
 	<string name="pref_file_cache_key">file_cache</string>
 	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
+	<string name="pref_display_name_key">display_name</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>

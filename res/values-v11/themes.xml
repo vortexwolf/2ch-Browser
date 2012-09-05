@@ -1,75 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources> 
-<!-- 
-==================
-Light theme 
-==================
--->		
-	<style name="Theme_Light_Base" parent="@android:style/Theme.Holo.Light">
-        <item name="activityRootBackground">@color/white_background</item>
-        <item name="threadTitleForeground">@color/white_thread_title</item>
-        <item name="itemInfoForeground">@color/white_item_info</item>
-        <item name="postNumberForeground">@color/white_post_number</item>
-		<item name="listSectionBackground">@color/white_list_section</item>
-		<item name="postItemBackground">@drawable/border_light</item>
-		<item name="urlLinkForeground">@color/white_url_link</item>
-		<item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
-		<item name="tabSeparatorBackground">@color/white_tab_separator</item>
-        <!-- Comment colors -->
-        <item name="postQuoteForeground">@color/white_post_quote</item>
-        <item name="spoilerForeground">@color/white_spoiler_text</item>
-        <item name="spoilerBackground">@color/white_spoiler</item>
-        <!-- Android built-in styles -->
-        <item name="android:windowBackground">@color/white_background</item>
-        <item name="android:colorBackground">@color/white_background</item>
-        <item name="android:textColorPrimary">@color/white_primary_text</item>
- 	</style>       
-<!-- 
-==================
-Dark theme 
-==================
--->	
-	<style name="Theme_Neutron_Base" parent="@android:style/Theme.Holo">
-	    <item name="activityRootBackground">@color/neutron_background</item>
-	    <item name="threadTitleForeground">@color/neutron_thread_title</item>
-	    <item name="itemInfoForeground">@color/neutron_item_info</item>
-	    <item name="postNumberForeground">@color/neutron_post_number</item>
-	    <item name="listSectionBackground">@color/neutron_list_section</item>
-	    <item name="postItemBackground">@drawable/border_dark</item>
-	    <item name="urlLinkForeground">@color/neutron_url_link</item>	    
-		<item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
-		<item name="tabSeparatorBackground">@color/neutron_tab_separator</item>
-	    <!-- Comment colors -->
-	    <item name="postQuoteForeground">@color/neutron_post_quote</item>
-	    <item name="spoilerForeground">@color/neutron_spoiler_text</item>
-	    <item name="spoilerBackground">@color/neutron_spoiler</item>
-	    <!-- Android built-in styles -->
-	    <item name="android:windowBackground">@color/neutron_background</item>
-        <item name="android:colorBackground">@color/neutron_background</item>
-        <item name="android:textColorPrimary">@color/neutron_primary_text</item>
+	<style name="Theme_Light_Switch" parent="@android:style/Theme.Holo.Light">
+	     <item name="iconRefresh">@drawable/ic_actionbar_refresh</item>
+	     <item name="iconSave">@drawable/ic_actionbar_save</item>
+	     <item name="iconPicture">@drawable/ic_actionbar_picture</item>
+	     <item name="iconEdit">@drawable/ic_actionbar_edit</item>
+	     <item name="iconBack">@drawable/ic_navigation_previous_item</item>
+	     <item name="iconForward">@drawable/ic_navigation_next_item</item>
+	</style>       
+	<style name="Theme_Dark_Switch" parent="@android:style/Theme.Holo">
+	     <item name="iconRefresh">@drawable/ic_actionbar_refresh_dark</item>
+	     <item name="iconSave">@drawable/ic_actionbar_save_dark</item>
+	     <item name="iconPicture">@drawable/ic_actionbar_picture_dark</item>
+	     <item name="iconEdit">@drawable/ic_actionbar_edit_dark</item>
+	     <item name="iconBack">@drawable/ic_navigation_previous_item_dark</item>
+	     <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
 	</style>
-<!-- 
-==================
-Photon theme 
-==================
--->	
-    <style name="Theme_Photon_Base" parent="@style/Theme_Light_Base">
-        <item name="activityRootBackground">@color/photon_background</item>
-        <item name="threadTitleForeground">@color/photon_thread_title</item>
-        <item name="itemInfoForeground">@color/photon_item_info</item>
-        <item name="postNumberForeground">@color/photon_post_number</item>
-		<item name="listSectionBackground">@color/photon_list_section</item>
-		<item name="postItemBackground">@drawable/border_photon</item>
-		<item name="urlLinkForeground">@color/photon_url_link</item>
-		<item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
-		<item name="tabSeparatorBackground">@color/photon_tab_separator</item>
-        <!-- Comment colors -->
-        <item name="postQuoteForeground">@color/photon_post_quote</item>
-        <item name="spoilerForeground">@color/photon_spoiler_text</item>
-        <item name="spoilerBackground">@color/photon_spoiler</item>
-        <!-- Android built-in styles -->
-        <item name="android:windowBackground">@color/photon_background</item>
-        <item name="android:colorBackground">@color/photon_background</item>
-        <item name="android:textColorPrimary">@color/photon_primary_text</item>
-	</style>	
 </resources>

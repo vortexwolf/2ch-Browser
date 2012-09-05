@@ -80,6 +80,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return mSettings.getBoolean(mResources.getString(R.string.pref_youtube_mobile_links_key), false);
 	}
 	
+	public boolean isDisplayNames() {
+		return mSettings.getBoolean(mResources.getString(R.string.pref_display_name_key), false);
+	}
+	
 	public int getTheme(){
 		final String defaultTextSizeValue = mResources.getString(R.string.pref_text_size_default_value);
 		final String defaultThemeValue = mResources.getString(R.string.pref_theme_default_value);

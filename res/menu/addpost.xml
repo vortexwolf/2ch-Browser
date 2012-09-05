@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 	<item android:id="@+id/menu_attach_file_id" android:title="@string/menu_attach_file" android:icon="@drawable/ic_menu_attachment" />
-	<item android:id="@+id/menu_gallery_id" android:title="@string/menu_gallery" android:icon="@drawable/ic_menu_slideshow" android:showAsAction="ifRoom" />
+	<item android:id="@+id/menu_gallery_id" android:title="@string/menu_gallery" android:icon="?iconPicture" android:showAsAction="ifRoom" />
 </menu>

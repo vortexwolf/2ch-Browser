@@ -13,14 +13,14 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		MainApplication application = (MainApplication)this.getApplication();
+		this.setTheme(application.getSettings().getTheme());
 
 		TabHost tabHost = this.getTabHost();
 		Resources res = this.getResources();
-		MainApplication application = (MainApplication)this.getApplication();
 
 		Bundle extras = this.getIntent().getExtras();
-		
-		this.setTheme(application.getSettings().getTheme());
 		
 		Intent intent = new Intent(this, OpenTabsActivity.class);
 		intent.putExtras(extras);

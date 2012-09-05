@@ -10,6 +10,8 @@ import com.vortexwolf.dvach.services.BrowserLauncher;
 import com.vortexwolf.dvach.services.Tracker;
 
 import android.app.Activity;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -51,32 +53,9 @@ public class BrowserActivity extends Activity {
         
 		WebSettings settings = mWebview.getSettings();
 		settings.setBuiltInZoomControls(true);
-		settings.setPluginsEnabled(true);
-		settings.setJavaScriptEnabled(true);
 		settings.setUseWideViewPort(true);
 
 		this.mWebview.setInitialScale(100);
-		this.mWebview.setWebViewClient(new WebViewClient() {
-		    @Override
-		    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		        view.loadUrl(url);
-		        return true;
-		    }
-		    
-		    @Override
-		    public void onPageFinished(WebView view, String url) {
-		    	String host = Uri.parse(url).getHost();
-		    	if (host != null && mTitle != null){
-		    		setTitle(host + " : " + mTitle);
-		    	}
-		    	else if (mTitle != null){
-		    		setTitle(mTitle);
-		    	}
-		    	else {
-		    		setTitle(url);
-		    	}
-		    }
-		});
 		
 		this.mWebview.setWebChromeClient(new WebChromeClient() {
 			@Override
@@ -94,6 +73,8 @@ public class BrowserActivity extends Activity {
 		});
 		
 		this.mUri = getIntent().getData();
+		this.mTitle = this.mUri.toString();
+		this.setTitle(this.mTitle);
 		
 		if (savedInstanceState != null) {
 			this.mWebview.restoreState(savedInstanceState);
@@ -108,7 +89,6 @@ public class BrowserActivity extends Activity {
 		// Must remove the WebView from the view system before destroying.
 		this.mWebview.setVisibility(View.GONE);
 		this.mWebview.destroy();
-		this.mWebview = null;
 	}
 	
 	private void resetUI() {
@@ -116,7 +96,10 @@ public class BrowserActivity extends Activity {
 		this.setContentView(R.layout.browser);
 		
 		this.mWebview = (WebViewFixed) findViewById(R.id.webview);
-		this.mWebview.setBackgroundColor(0);
+		
+		TypedArray a = this.mApplication.getTheme().obtainStyledAttributes(R.styleable.Theme);
+		int background = a.getColor(R.styleable.Theme_activityRootBackground, 0);
+		this.mWebview.setBackgroundColor(background);
 	}
 	
 	@Override

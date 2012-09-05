@@ -141,7 +141,7 @@ public class JsonApiReader implements IJsonApiReader{
 		} 
 		catch (JsonParseException e){
 			MyLog.e(TAG, e);
-			if(recLevel < 2){
+			if(recLevel < 1){
 				MyLog.v(TAG, "Read json once again");
 				if(activity != null){
 					activity.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_ON);

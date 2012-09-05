@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
+import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
@@ -31,6 +32,7 @@ import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -220,6 +222,11 @@ public class PostsListActivity extends BaseListActivity {
     	case R.id.refresh_menu_id:
     		this.refreshPosts();
     		break;
+    	case R.id.pick_board_menu_id:
+    		//Start new activity
+    		Intent pickBoardIntent = new Intent(getApplicationContext(), PickBoardActivity.class);
+    		startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
+    		break;
     	case R.id.open_browser_menu_id:
     		BrowserLauncher.launchExternalBrowser(this, UriUtils.create2chThreadURL(this.mBoardName, this.mThreadNumber), true);
     		break;
@@ -238,7 +245,7 @@ public class PostsListActivity extends BaseListActivity {
     	
     	return true;
     }
-	
+    
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
     	super.onCreateContextMenu(menu, v, menuInfo);
@@ -250,7 +257,7 @@ public class PostsListActivity extends BaseListActivity {
     	if(!StringUtils.isEmpty(item.getSpannedComment().toString())){
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST_QUOTE, 1, this.getString(R.string.cmenu_reply_post_quote));
     	}
-    	if(!StringUtils.isEmpty(item.getSpannedComment().toString())){
+    	if(!StringUtils.isEmpty(item.getSpannedComment())){
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
     	}
     	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()){
@@ -288,23 +295,23 @@ public class PostsListActivity extends BaseListActivity {
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
-				try {
-					String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
-					String encodedImageUrl = URLEncoder.encode(imageUrl, "UTF-8");
-					String googleSearchUrl = "https://images.google.com/searchbyimage?image_url=" + encodedImageUrl +"&num=10";
-		        	
-		        	BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
-				} catch (UnsupportedEncodingException e) {
-					MyLog.e(TAG,  e);
-				}
-	        	//http://images.google.com/searchbyimage?image_url=http%3A%2F%2F2ch.so%2Fapp%2Fsrc%2F1344975200583.jpg
+	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
+	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
+	        	return true;
 	        }
         }
         
         return false;
     }
-       
-    private void navigateToAddPostView(String postNumber, String postComment){
+    
+    @Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
+		
+		super.onSaveInstanceState(outState);
+	}
+
+	private void navigateToAddPostView(String postNumber, String postComment){
     	Intent addPostIntent = new Intent(getApplicationContext(), AddPostActivity.class);
 		addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
 		addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, this.mThreadNumber);
@@ -327,12 +334,21 @@ public class PostsListActivity extends BaseListActivity {
     }
     
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if(resultCode == RESULT_OK) {
 			switch(requestCode) {
 				case Constants.REQUEST_CODE_ADD_POST_ACTIVITY:
 					this.refreshPosts();
 					break;
+		    	case Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY: {
+					String boardCode = intent.getExtras().getString(Constants.EXTRA_SELECTED_BOARD);
+			    	
+			    	Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
+					i.setData(Uri.parse(UriUtils.create2chURL(boardCode, 0)));
+					
+					this.startActivity(i);
+					break;
+		    	}
 			}
 		}
 	}

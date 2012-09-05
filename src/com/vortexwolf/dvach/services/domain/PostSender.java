@@ -51,15 +51,20 @@ public class PostSender implements IPostSender {
 
 		String uri = "http://2ch.so/"+boardName+"/wakaba.pl";
 		
-		// 1 - 'р' на кириллице, 2 - 'ро' на кириллице, 3 - 'о' на кириллице, 4 - все латинскими буквами, 
-		String[] possibleTasks = new String[] { "рost", "роst", "pоst", "post",  };
+		// 1 - 'ро' на кириллице, 2 - 'р' на кириллице,  3 - 'о' на кириллице, 4 - все латинскими буквами, 
+		String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post",  };
 		int statusCode = 502; // Возвращается при неправильном значении task=post, часто меняется, поэтому неизвестно какой будет на данный момент
 		HttpResponse response = null;
 			
 		for(int i = 0; i < possibleTasks.length && statusCode == 502; i++){
-			response = executeHttpPost(uri, threadNumber, possibleTasks[i], fields, entity);
+			HttpPost httpPost = new HttpPost(uri);
+			response = executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
 			//Проверяем код ответа
 			statusCode = response.getStatusLine().getStatusCode();
+			
+			if(statusCode == 502) {
+				httpPost.abort();
+			}
 			
 			MyLog.v(TAG, response.getStatusLine());
         }
@@ -82,8 +87,7 @@ public class PostSender implements IPostSender {
 	    return null;
 	}
 	
-	private HttpResponse executeHttpPost(String uri, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException{
-		HttpPost httpPost = new HttpPost(uri);
+	private HttpResponse executeHttpPost(HttpPost httpPost, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException{
 		//Редирект-коды я обработаю самостоятельно путем парсинга и возврата заголовка Location
 		HttpClientParams.setRedirecting(httpPost.getParams(), false);
 		//Настраиваем заголовки

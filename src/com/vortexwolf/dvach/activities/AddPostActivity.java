@@ -337,7 +337,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
 	@Override
 	public void showError(String error) {
-		AppearanceUtils.showToastMessage(this, error != null ? error : getString(R.string.error_send_post));
+		error = error != null ? error : this.getString(R.string.error_send_post);
+		AppearanceUtils.showToastMessage(this, error);
+		
+		if(error.startsWith("Ошибка: Неверный код подтверждения.")){
+			this.mCaptchaAnswerView.setText("");
+			this.refreshCaptcha();
+		}
 	}
 	
 	@Override

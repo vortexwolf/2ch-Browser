@@ -13,6 +13,10 @@ public class StringUtils {
 		return s == null || "".equals(s);
 	}
 	
+	public static boolean isEmptyOrWhiteSpace(String s) {
+		return isEmpty(s.trim());
+	}
+	
 	public static String emptyIfNull(String s) {
 		return s == null ? "" : s;
 	}

@@ -117,7 +117,11 @@
 	
 	<string name="pref_popup_link_key">popup_link</string>
 	<string name="pref_popup_link">Popup links</string>
-	<string name="pref_popup_link_summary">Open links of the current thread in the popup window</string>
+	<string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
+	
+	<string name="pref_display_name_key">display_name</string>
+	<string name="pref_display_name">Names</string>
+	<string name="pref_display_name_summary">Display names of namefags above their posts</string>
 	
 	<string name="pref_text_size_key">text_size</string>
 	<string name="pref_text_size">Text size</string>
@@ -164,7 +168,7 @@
 	<string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
 	
 	<string name="pref_file_cache_key">file_cache</string>
-	<string name="pref_file_cache">File system cache</string>
+	<string name="pref_file_cache">Thumbnails cache</string>
 	<string name="pref_file_cache_summary">Enable to cache images on the file system</string>
 	
 	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
