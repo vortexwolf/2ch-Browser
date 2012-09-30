@@ -125,7 +125,7 @@
 	<string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
 
 	<string name="pref_file_cache">Кэширование thumbnails</string>
-	<string name="pref_file_cache_summary">Кэшировать изображения в файловой системе</string>
+	<string name="pref_file_cache_summary">Кэшировать уменьшенные изображения</string>
 	
 	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
 	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>

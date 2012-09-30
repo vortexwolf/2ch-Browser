@@ -1,8 +1,9 @@
 package com.vortexwolf.dvach.services.presentation;
 
-import com.vortexwolf.dvach.common.controls.MyLeadingMarginSpan2Wrapper;
+import com.vortexwolf.dvach.common.controls.MyLeadingMarginSpan2;
 import com.vortexwolf.dvach.models.presentation.FloatImageModel;
 
+import android.os.Build;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.FloatMath;
@@ -14,15 +15,16 @@ public class FlowTextHelper {
 
 	   public static boolean sNewClassAvailable;
 
-	   /* class initialization fails when this throws an exception */
+	    static class MyLeadingMarginSpan2Factory {
+	        static MyLeadingMarginSpan2 create(int lines, int margin) {
+	            return new MyLeadingMarginSpan2(lines, margin);
+	        }
+	    }
+	    
 	   static {
-	       try {
-	    	   // Class.forName("android.text.style.LeadingMarginSpan$LeadingMarginSpan2");
-	    	   MyLeadingMarginSpan2Wrapper.checkAvailable();
-	           sNewClassAvailable = true;
-	       } catch (Throwable t) {
-	    	   sNewClassAvailable = false;
-	       }
+	        if (Integer.valueOf(Build.VERSION.SDK) >= 8) { // Froyo
+	        	sNewClassAvailable = true;
+	        }
 	   }
 
 	   public static SpannableStringBuilder tryFlowText(SpannableStringBuilder ss, FloatImageModel floatModel){
@@ -31,12 +33,12 @@ public class FlowTextHelper {
 		   
 		   // Get height and width of the image and height of the text line
 	        if(floatModel.getHeight() == 0 || floatModel.getWidth() == 0) return ss;
-	       
+	        
 	        // Set the span according to the number of lines and width of the image
 	        int lines = (int)FloatMath.ceil(floatModel.getHeight() / floatModel.getTextLineHeight());
 	        int offset = floatModel.getWidth() + floatModel.getRightMargin();
 
-	        ss.setSpan(new MyLeadingMarginSpan2Wrapper(lines, offset).getInstance(), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+	        ss.setSpan(MyLeadingMarginSpan2Factory.create(lines, offset), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 		    return ss;
 	   }

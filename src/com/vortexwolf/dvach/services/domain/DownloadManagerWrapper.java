@@ -11,18 +11,6 @@ import android.content.Intent;
 import android.net.Uri;
 
 public class DownloadManagerWrapper {
-   /* class initialization fails when this throws an exception */
-   static {
-       try {
-    	   Class.forName("android.app.DownloadManager");
-       } catch (Exception ex) {
-           throw new RuntimeException(ex);
-       }
-   }
-
-   /* calling here forces class initialization */
-   public static void checkAvailable() {}
-
 	public static void downloadFile(Context context, Uri from, File to){
 		DownloadManager dm = (DownloadManager) context.getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
 		DownloadManager.Request request = new DownloadManager.Request(from)

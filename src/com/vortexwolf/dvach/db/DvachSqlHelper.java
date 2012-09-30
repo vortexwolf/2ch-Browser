@@ -1,5 +1,7 @@
 package com.vortexwolf.dvach.db;
 
+import java.io.File;
+
 import com.vortexwolf.dvach.services.SqlCreateTableScriptBuilder;
 
 import android.content.Context;

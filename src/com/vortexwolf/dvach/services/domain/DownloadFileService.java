@@ -4,6 +4,7 @@ import java.io.File;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.R;
@@ -19,11 +20,8 @@ public class DownloadFileService implements IDownloadFileService {
 
    /* class initialization fails when this throws an exception */
    static {
-       try {
-    	   DownloadManagerWrapper.checkAvailable();
+	   if (Integer.valueOf(Build.VERSION.SDK) >= 9) {
            sNewClassAvailable = true;
-       } catch (Throwable t) {
-    	   sNewClassAvailable = false;
        }
    }
 	

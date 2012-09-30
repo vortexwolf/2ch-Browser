@@ -17,7 +17,7 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     /* Возвращает значение, на которе должен быть добавлен отступ */
     @Override
     public int getLeadingMargin(boolean first) {
-        if (first) {
+    	if (first) {
             /*
              * Данный отступ будет применен к количеству строк
              * возвращаемых getLeadingMarginLineCount()
