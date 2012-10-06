@@ -15,12 +15,14 @@ import com.vortexwolf.dvach.db.HistoryEntity;
 import com.vortexwolf.dvach.interfaces.INavigationService;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -67,6 +69,28 @@ public class HistoryActivity extends BaseListActivity {
 		
 		mNavigationService.navigate(Uri.parse(item.getUrl()), this);
 	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.history, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    		case R.id.menu_clear_history_id:
+    			mDatasource.deleteAllHistory();
+    			mAdapter.clear();
+    			mAdapter.notifyDataSetChanged();
+    			break;
+    	}
+    	
+    	return true;
+    }
 	
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){

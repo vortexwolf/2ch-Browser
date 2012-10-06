@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="pref_homepage_key">homepage</string>
+	<string name="pref_load_thumbnails_key">load_thumbnails</string>
+	<string name="pref_download_path_key">download_path</string>
+	<string name="pref_name_key">name</string>
+	<string name="pref_display_post_date_key">display_post_date</string>
+	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
+	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
+	<string name="pref_popup_link_key">popup_link</string>
+	<string name="pref_text_size_key">text_size</string>
+	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
+	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
+	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
+	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
+	<string name="pref_theme_key">theme</string>
+	<string name="pref_theme_default_value">THEME_LIGHT</string>
+	<string name="pref_theme_dark_value">THEME_DARK</string>
+	<string name="pref_theme_photon_value">THEME_PHOTON</string>
+	<string name="pref_auto_refresh_key">auto_refresh</string>
+	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
+	<string name="pref_file_cache_key">file_cache</string>
+	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
+	<string name="pref_display_name_key">display_name</string>
+	
+	<string-array name="pref_text_size_values" translatable="false">
+        <item>@string/pref_text_size_default_value</item>
+        <item>@string/pref_text_size_large_value</item>
+        <item>@string/pref_text_size_larger_value</item>
+        <item>@string/pref_text_size_huge_value</item>
+    </string-array>
+    
+	<string-array name="pref_theme_values" translatable="false">
+        <item>@string/pref_theme_default_value</item>
+        <item>@string/pref_theme_dark_value</item>
+        <item>@string/pref_theme_photon_value</item>
+    </string-array>
+    
+	<string-array name="addpost_politics" translatable="false">
+		<item>Полит. предпочтения (Нет)</item>
+		<item>Коммунизм</item>
+		<item>Социализм</item>
+		<item>Либерализм</item>
+		<item>Монархизм</item>
+		<item>Консерватизм</item>
+		<item>Либертарианство</item>
+		<item>Анархизм</item>
+		<item>Аноним</item>
+		<item>Оппозиция</item>
+		<item>Власть</item>
+		<item>Национал-социализм</item>
+		<item>Национализм</item>
+		<item>Кургинян</item>
+		<item>Исламизм</item>
+		<item>Сионизм</item>
+		<item>Технократия</item>
+    </string-array>
+</resources>

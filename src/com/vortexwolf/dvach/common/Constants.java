@@ -23,6 +23,8 @@ public class Constants {
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
     
+    public static final String DEFAULT_DOWNLOAD_FOLDER = "/download/2ch Browser/";
+    
 	// Для http-запросов
     public static final String USER_AGENT_STRING = "2ch browser (Android)";
     public static final String SAGE_EMAIL = "sage";

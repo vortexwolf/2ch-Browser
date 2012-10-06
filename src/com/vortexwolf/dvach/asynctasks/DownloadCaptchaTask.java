@@ -1,5 +1,7 @@
 package com.vortexwolf.dvach.asynctasks;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancellable;
@@ -8,6 +10,8 @@ import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
+import com.vortexwolf.dvach.services.domain.HttpStringReader;
+import com.vortexwolf.dvach.services.domain.RecaptchaService;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -22,19 +26,21 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	private final String mThreadNumberd;
 	private final INetworkResourceLoader mNetworkResourceLoader;
 	private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
+	private final DefaultHttpClient mHttpClient;
 	
 	private boolean mCanSkip = false;
 	private CaptchaEntity mCaptcha;
 	private Bitmap mCaptchaImage;
 	private String mUserError;
 	
-	public DownloadCaptchaTask(ICaptchaView view, String board, String threadNumber, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker) {
+	public DownloadCaptchaTask(ICaptchaView view, String board, String threadNumber, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
 		this.mView = view;
 		this.mJsonReader = jsonReader;
 		this.mBoard = board;
 		this.mThreadNumberd = threadNumber;
 		this.mNetworkResourceLoader = networkResourceLoader;
 		this.mHtmlCaptchaChecker = htmlCaptchaChecker;
+		this.mHttpClient = httpClient;
 	}
 	
 	@Override
@@ -58,21 +64,23 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	@Override
 	protected Boolean doInBackground(String... params) {
 
-		try{
+//		try{
 			this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mBoard, this.mThreadNumberd);
 			if(this.mCanSkip) return true;
 			
-			this.mCaptcha = this.mJsonReader.readCaptcha(this.mBoard, this);
+			//this.mCaptcha = this.mJsonReader.readCaptcha(this.mBoard, this);
+			this.mCaptcha = RecaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient));
+			
 			if(this.isCancelled()) return false;
 
 			this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
 			
 			return true;
-		}
-		catch(JsonApiReaderException e){
-			MyLog.e(TAG, e);
-			this.mUserError = e.getMessage();
-			return false;
-		}
+//		}
+//		catch(JsonApiReaderException e){
+//			MyLog.e(TAG, e);
+//			this.mUserError = e.getMessage();
+//			return false;
+//		}
 	}
 }

@@ -16,6 +16,13 @@
 			android:summary="@string/pref_load_thumbnails_summary"
 			android:title="@string/pref_load_thumbnails" />
 	<EditTextPreference
+			android:key="@string/pref_download_path_key"
+			android:title="@string/pref_download_path"
+			android:hint="@string/pref_download_path_hint"
+			android:summary="@string/pref_download_path_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
+	<EditTextPreference
 			android:key="@string/pref_name_key"
 			android:title="@string/pref_name"
 			android:hint="@string/pref_name_hint"

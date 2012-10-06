@@ -59,10 +59,10 @@ public class MainApplication extends Application {
 		container.register(IPostSender.class, new PostSender(httpClient, this.getResources()));
 		container.register(IBoardSettingsStorage.class, new BoardSettingsStorage(jsonApiReader));
 		container.register(IDraftPostsStorage.class, new DraftPostsStorage());
-		container.register(IDownloadFileService.class, new DownloadFileService(this.getResources()));
 		container.register(INavigationService.class, navigationService);
 		container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
 		container.register(ApplicationSettings.class, settings);
+		container.register(IDownloadFileService.class, new DownloadFileService(this.getResources(), settings));
 		container.register(Tracker.class, tracker);
 		container.register(ICacheDirectoryManager.class, cacheManager);
 		container.register(IPagesSerializationService.class,  new PagesSerializationService(cacheManager, new SerializationService()));

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.exceptions.DownloadFileException;
@@ -41,7 +42,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 		super();
 		this.mContext = context;
 		this.mResources = context.getResources();
-		this.mDownloadFileService = new DownloadFileService(mResources);
+		this.mDownloadFileService = Factory.getContainer().resolve(IDownloadFileService.class);
 		this.mFrom = from;
 		this.mFileWriteTo = to;
 	}

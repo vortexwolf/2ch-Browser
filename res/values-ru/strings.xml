@@ -25,14 +25,17 @@
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
         <item quantity="one">%d сообщение</item>
+        <item quantity="few">%d сообщения</item>
         <item quantity="other">%d сообщений</item>
     </plurals>
     <plurals name="data_files_quantity">
         <item quantity="one">%d файл</item>
+        <item quantity="few">%d файла</item>
         <item quantity="other">%d файлов</item>
     </plurals>
     <plurals name="data_new_posts_quantity">
         <item quantity="one">%d новое сообщение</item>
+        <item quantity="few">%d новых сообщения</item>
         <item quantity="other">%d новых сообщений</item>
     </plurals>
     <string name="data_posts_files">%1$s и %2$s</string>
@@ -57,6 +60,7 @@
     <string name="menu_save">Сохранить</string>
     <string name="menu_gallery">Галерея</string>
 	<string name="menu_tabs">Вкладки</string>
+	<string name="menu_clear_history">Очистить историю</string>
         
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -79,29 +83,24 @@
     <string name="pref_homepage">Форум по умолчанию</string>
     <string name="pref_homepage_summary">Измените стартовую страницу</string>
 	<string name="pref_homepage_hint">По умолчанию /b</string>
-
 	<string name="pref_load_thumbnails">Загружать изображения</string>
 	<string name="pref_load_thumbnails_summary">Отмените для экономии трафика</string>
-	
+	<string name="pref_download_path">Папка загрузок</string>
+	<string name="pref_download_path_hint">/download/2ch Browser/</string>
+	<string name="pref_download_path_summary">Измените папку, куда будут сохраняться изображения</string>
     <string name="pref_name">Имя</string>
     <string name="pref_name_summary">Оставьте пустым</string>
 	<string name="pref_name_hint">Аноним</string>
-	
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
-	
 	<string name="pref_popup_link">Ссылки во всплывающих окнах</string>
 	<string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
-
 	<string name="pref_display_navigation_bar">Панель навигации</string>
 	<string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
-	
 	<string name="pref_youtube_mobile_links">YouTube-видео</string>
 	<string name="pref_youtube_mobile_links_summary">Открывать мобильный YouTube вместо обычного</string>
-		
 	<string name="pref_display_name">Имена</string>
 	<string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
-	
 	<string name="pref_text_size">Размер текста</string>
 	<string-array name="pref_text_size_choices">
     	<item>Средний</item>
@@ -109,50 +108,21 @@
     	<item>Больше</item>
     	<item>Самый большой</item>
    	</string-array>
-
 	<string name="pref_theme">Тема</string>
 	<string-array name="pref_theme_choices">
     	<item>Light</item>
     	<item>Neutron</item>
     	<item>Photon</item>
    	</string-array>
-
 	<string name="pref_auto_refresh">Автообновление</string>
 	<string name="pref_auto_refresh_summary">Обновлять открытый тред автоматически</string>
-	
 	<string name="pref_auto_refresh_interval">Интервал</string>
 	<string name="pref_auto_refresh_interval_dialog_title">Интервал автообновления</string>
 	<string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
-
 	<string name="pref_file_cache">Кэширование thumbnails</string>
 	<string name="pref_file_cache_summary">Кэшировать уменьшенные изображения</string>
-	
 	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
 	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
-	
-	<string name="pref_file_cache_clear">Очистить сейчас</string>
-	
-	<string name="pref_homepage_key">homepage</string>
-	<string name="pref_load_thumbnails_key">load_thumbnails</string>
-	<string name="pref_name_key">name</string>
-	<string name="pref_display_post_date_key">display_post_date</string>
-	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
-	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
-	<string name="pref_popup_link_key">popup_link</string>
-	<string name="pref_text_size_key">text_size</string>
-	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
-	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
-	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
-	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
-	<string name="pref_theme_key">theme</string>
-	<string name="pref_theme_default_value">THEME_LIGHT</string>
-	<string name="pref_theme_dark_value">THEME_DARK</string>
-	<string name="pref_theme_photon_value">THEME_PHOTON</string>
-	<string name="pref_auto_refresh_key">auto_refresh</string>
-	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
-	<string name="pref_file_cache_key">file_cache</string>
-	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
-	<string name="pref_display_name_key">display_name</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>

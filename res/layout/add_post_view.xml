@@ -54,7 +54,7 @@
 			        <TextView android:id="@+id/addpost_attachment_size" android:textAppearance="?android:textAppearanceMedium" android:layout_width="fill_parent" android:layout_height="wrap_content" />
 			    </LinearLayout>
 			    
-			    <Button android:id="@+id/addpost_attachment_remove" android:textAppearance="?android:textAppearanceSmall" android:layout_gravity="center_vertical" android:background="@android:drawable/btn_dialog" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+			    <ImageButton android:id="@+id/addpost_attachment_remove" android:src="@android:drawable/btn_dialog" android:background="@null" android:layout_gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 		</LinearLayout>
 			
 		<LinearLayout android:id="@+id/addpost_textformat_view" 

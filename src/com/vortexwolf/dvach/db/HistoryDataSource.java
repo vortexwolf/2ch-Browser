@@ -59,6 +59,10 @@ public class HistoryDataSource {
 		return history;
 	}
 	
+	public void deleteAllHistory() {
+		mDatabase.delete(TABLE, null, null);
+	}
+	
 	private boolean hasHistoryLastDay(String url, long currentTime){
 		long dayAgo = currentTime - 24 * 3600 * 1000;
 		

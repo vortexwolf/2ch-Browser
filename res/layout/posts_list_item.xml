@@ -93,7 +93,7 @@
 	    />
     </LinearLayout>
     
-     <TextView 
+     <com.vortexwolf.dvach.common.controls.JellyBeanSpanFixTextView
         android:id="@+id/comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

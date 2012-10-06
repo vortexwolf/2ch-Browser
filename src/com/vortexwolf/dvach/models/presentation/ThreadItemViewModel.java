@@ -32,7 +32,7 @@ public class ThreadItemViewModel {
 	}
 
 	public SpannableStringBuilder getSpannedComment() {
-		if(this.mSpannedComment == null){
+		if(this.mSpannedComment == null){        
 			String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
 			Spanned spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
 			this.mSpannedComment = (SpannableStringBuilder)spanned;

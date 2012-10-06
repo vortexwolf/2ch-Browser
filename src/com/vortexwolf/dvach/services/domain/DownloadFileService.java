@@ -10,23 +10,26 @@ import android.os.Environment;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class DownloadFileService implements IDownloadFileService {
 	
 	public static final String TAG = "DownloadFileService";
+	
 	private final Resources mResources;
+	private final ApplicationSettings mSettings;
 	
 	public static boolean sNewClassAvailable;
 
-   /* class initialization fails when this throws an exception */
    static {
 	   if (Integer.valueOf(Build.VERSION.SDK) >= 9) {
            sNewClassAvailable = true;
        }
    }
 	
-	public DownloadFileService(Resources resources){
+	public DownloadFileService(Resources resources, ApplicationSettings settings){
 		this.mResources = resources;
+		this.mSettings = settings;
 	}
 	
 	@Override
@@ -63,7 +66,7 @@ public class DownloadFileService implements IDownloadFileService {
 		Uri img = Uri.parse(uri);
 	    String fileName = img.getLastPathSegment();
 	    
-	    File dir = new File(Environment.getExternalStorageDirectory() + "/download/2ch Browser/");
+	    File dir = new File(Environment.getExternalStorageDirectory(), this.mSettings.getDownloadPath());
 	    dir.mkdirs();
 	    File file = new File(dir, fileName);
 	    

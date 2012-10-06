@@ -20,25 +20,6 @@
 	<string name="tabs_bookmarks">Bookmarks</string>
 	<string name="tabs_history">History</string>
 	<string name="addpost_politics_prompt">Political preferences</string>
-	<string-array name="addpost_politics" translatable="false">
-		<item>Полит. предпочтения (Нет)</item>
-		<item>Коммунизм</item>
-		<item>Социализм</item>
-		<item>Либерализм</item>
-		<item>Монархизм</item>
-		<item>Консерватизм</item>
-		<item>Либертарианство</item>
-		<item>Анархизм</item>
-		<item>Аноним</item>
-		<item>Оппозиция</item>
-		<item>Власть</item>
-		<item>Национал-социализм</item>
-		<item>Национализм</item>
-		<item>Кургинян</item>
-		<item>Исламизм</item>
-		<item>Сионизм</item>
-		<item>Технократия</item>
-    </string-array>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -74,6 +55,7 @@
     <string name="menu_save">Save</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_tabs">Tabs</string>
+    <string name="menu_clear_history">Clear history</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -93,37 +75,27 @@
     <string name="pref_category_autorefresh">AutoRefresh</string>
     <string name="pref_category_cache">Cache</string>
         
-    <string name="pref_homepage_key">homepage</string>
     <string name="pref_homepage">Default starting board</string>
     <string name="pref_homepage_summary">Change start page</string>
 	<string name="pref_homepage_hint">Leave blank to use /b</string>
-	<string name="pref_load_thumbnails_key">load_thumbnails</string>
 	<string name="pref_load_thumbnails">Display thumbnails</string>
 	<string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
-	<string name="pref_name_key">name</string>
+	<string name="pref_download_path">Downloads folder</string>
+	<string name="pref_download_path_hint">/download/2ch Browser/</string>
+	<string name="pref_download_path_summary">Change a folder where images should be saved</string>
     <string name="pref_name">Name</string>
     <string name="pref_name_summary">Leave it blank</string>
 	<string name="pref_name_hint">Anonymous</string>
-	<string name="pref_display_post_date_key">display_post_date</string>
 	<string name="pref_display_post_date">Time of posts</string>
 	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
-	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
 	<string name="pref_display_navigation_bar">Navigation bar</string>
 	<string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
-	
-	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
 	<string name="pref_youtube_mobile_links">Video attachments</string>
 	<string name="pref_youtube_mobile_links_summary">Open YouTube mobile link instead of PC link</string>
-	
-	<string name="pref_popup_link_key">popup_link</string>
 	<string name="pref_popup_link">Popup links</string>
 	<string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
-	
-	<string name="pref_display_name_key">display_name</string>
 	<string name="pref_display_name">Names</string>
 	<string name="pref_display_name_summary">Display names of namefags above their posts</string>
-	
-	<string name="pref_text_size_key">text_size</string>
 	<string name="pref_text_size">Text size</string>
 	<string-array name="pref_text_size_choices">
     	<item>Medium</item>
@@ -131,51 +103,21 @@
     	<item>Larger</item>
     	<item>Huge</item>
    	</string-array>
-	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
-	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
-	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
-	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
-	<string-array name="pref_text_size_values" translatable="false">
-        <item>@string/pref_text_size_default_value</item>
-        <item>@string/pref_text_size_large_value</item>
-        <item>@string/pref_text_size_larger_value</item>
-        <item>@string/pref_text_size_huge_value</item>
-    </string-array>
-    
-	<string name="pref_theme_key">theme</string>
 	<string name="pref_theme">Theme</string>
 	<string-array name="pref_theme_choices">
     	<item>Light</item>
     	<item>Neutron</item>
     	<item>Photon</item>
    	</string-array>
-	<string name="pref_theme_default_value">THEME_LIGHT</string>
-	<string name="pref_theme_dark_value">THEME_DARK</string>
-	<string name="pref_theme_photon_value">THEME_PHOTON</string>
-	<string-array name="pref_theme_values" translatable="false">
-        <item>@string/pref_theme_default_value</item>
-        <item>@string/pref_theme_dark_value</item>
-        <item>@string/pref_theme_photon_value</item>
-    </string-array>
-    
-	<string name="pref_auto_refresh_key">auto_refresh</string>
 	<string name="pref_auto_refresh">AutoRefresh</string>
 	<string name="pref_auto_refresh_summary">Refresh the current thread</string>
-	
-	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
 	<string name="pref_auto_refresh_interval">Interval</string>
 	<string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
 	<string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
-	
-	<string name="pref_file_cache_key">file_cache</string>
 	<string name="pref_file_cache">Thumbnails cache</string>
 	<string name="pref_file_cache_summary">Enable to cache thumbnails of images</string>
-	
-	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
 	<string name="pref_file_cache_sdcard">Use SD Card</string>
 	<string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
-	
-	<string name="pref_file_cache_clear">Clear cache</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">An error has occured while sending the post.</string>

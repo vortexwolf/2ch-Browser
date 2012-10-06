@@ -37,6 +37,7 @@ import android.graphics.Bitmap;
 import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.text.Editable;
 import android.view.Menu;
@@ -205,7 +206,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mSendButton = (Button)this.findViewById(R.id.addpost_send_button);
 		this.mSubjectView = (EditText)this.findViewById(R.id.addpost_subject);
 		this.mPoliticsView = (Spinner)this.findViewById(R.id.addpost_politics);
-		final Button removeAttachmentButton = (Button)this.findViewById(R.id.addpost_attachment_remove);
+		final ImageButton removeAttachmentButton = (ImageButton)this.findViewById(R.id.addpost_attachment_remove);
 		final ImageButton refreshCaptchaButton = (ImageButton)this.findViewById(R.id.addpost_refresh_button);
 		final LinearLayout textFormatView = (LinearLayout)this.findViewById(R.id.addpost_textformat_view);
 		
@@ -272,10 +273,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private void onSend(){
 		//Собираем все заполненные поля
 		String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
-		if(this.mCurrentCaptchaView == CaptchaViewType.LOADING || (this.mCurrentCaptchaView == CaptchaViewType.IMAGE && StringUtils.isEmpty(captchaAnswer))){
-			AppearanceUtils.showToastMessage(this, getString(R.string.warning_enter_captcha));
-			return;
-		}
+//		if(this.mCurrentCaptchaView == CaptchaViewType.LOADING || (this.mCurrentCaptchaView == CaptchaViewType.IMAGE && StringUtils.isEmpty(captchaAnswer))){
+//			AppearanceUtils.showToastMessage(this, getString(R.string.warning_enter_captcha));
+//			return;
+//		}
 
 		String comment = this.mCommentView.getText().toString();
 		if(StringUtils.isEmpty(comment) && this.mAttachedFile == null){
@@ -342,7 +343,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		
 		if(error.startsWith("Ошибка: Неверный код подтверждения.")){
 			this.mCaptchaAnswerView.setText("");
-			this.refreshCaptcha();
+			//this.refreshCaptcha();
 		}
 	}
 	
@@ -464,15 +465,21 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 				case Constants.REQUEST_CODE_GALLERY:
 
 					Uri selectedImage = data.getData();
+					String filePath = null;
 					
-					final String[] columns = { MediaColumns.DATA};
-		            Cursor cursor = getContentResolver().query(selectedImage, columns, null, null, null);
-		            cursor.moveToFirst();
-
-		            int columnIndex = cursor.getColumnIndex(columns[0]);
-		            String filePath = cursor.getString(columnIndex);
-		            
-		            cursor.close();
+					String[] columns = { MediaStore.Images.Media.DATA };
+		            Cursor cursor = managedQuery(selectedImage, columns, null, null, null);
+		            if(cursor != null) {
+			            cursor.moveToFirst();
+	
+			            int columnIndex = cursor.getColumnIndex(columns[0]);
+			            filePath = cursor.getString(columnIndex);
+			            
+			            cursor.close();
+		            }
+		            else {
+		            	filePath = selectedImage.getPath();
+		            }
 		            
 		            // Почему-то было 2 error reports с NullReferenceException из-за метода File.fixSlashes, добавлю проверку
 		            if(filePath != null){
@@ -512,7 +519,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     		mCurrentDownloadCaptchaTask.cancel(true);
     	}
     	
-    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, mBoardName, mThreadNumber, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker);
+    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, mBoardName, mThreadNumber, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker, MainApplication.getHttpClient());
     	mCurrentDownloadCaptchaTask.execute();
 	}
 	

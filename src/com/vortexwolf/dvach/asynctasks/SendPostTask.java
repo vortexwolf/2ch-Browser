@@ -64,13 +64,15 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 	}
 	
 	private PostFields getPostFields(){
-		try {
-			BoardSettings bs = this.mBoardSettingsStorage.getSettings(this.mBoardName);
-			return bs.getPostFields();
-		} 
-		catch (JsonApiReaderException e) {
-			this.mUserError = e.getMessage();
+//		try {
+//			BoardSettings bs = this.mBoardSettingsStorage.getSettings(this.mBoardName);
+//			return bs.getPostFields();
+//		} 
+//		catch (JsonApiReaderException e) {
+//			this.mUserError = e.getMessage();
+		
+		//// the settings api doesn't work any more
 			return PostFields.getDefault();
-		}
+//		}
 	}
 }

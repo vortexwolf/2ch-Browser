@@ -40,6 +40,12 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return !StringUtils.isEmpty(boardName) ? boardName : Constants.DEFAULT_BOARD;
 	}
 	
+	public String getDownloadPath(){
+		String path = mSettings.getString(mResources.getString(R.string.pref_download_path_key), null);
+		
+		return !StringUtils.isEmptyOrWhiteSpace(path) ? path : Constants.DEFAULT_DOWNLOAD_FOLDER;
+	}
+	
 	public String getName(){
 		return mSettings.getString(mResources.getString(R.string.pref_name_key), null);
 	}

@@ -8,9 +8,10 @@ import android.text.Layout.Alignment;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import android.widget.TextView.BufferType;
 import android.text.StaticLayout;
 
-public class EllipsizingTextView extends TextView {
+public class EllipsizingTextView extends JellyBeanSpanFixTextView {
     private static final String ELLIPSIS = "...";
 
     public interface EllipsizeListener {
