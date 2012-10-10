@@ -9,12 +9,14 @@ import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
 import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
 import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
@@ -60,6 +62,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	private ApplicationSettings mSettings;
 	private IPagesSerializationService mSerializationService;
 	private PostItemViewBuilder mPostItemViewBuilder;
+	private HiddenThreadsDataSource mHiddenThreadsDataSource;
 	
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
@@ -96,6 +99,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mTracker = this.mApplication.getTracker();
         this.mSerializationService = this.mApplication.getSerializationService();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings);
+        this.mHiddenThreadsDataSource = Factory.getContainer().resolve(HiddenThreadsDataSource.class);
     	    	
         // Заголовок страницы
         String pageTitle = mPageNumber != 0 
@@ -193,7 +197,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	private void setAdapter(){
 		if (mAdapter != null) return;    	
 		
-    	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme());
+    	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource);
         this.setListAdapter(mAdapter);
         
 		// добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -291,10 +295,17 @@ public class ThreadsListActivity extends BaseListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		ThreadItemViewModel info = mAdapter.getItem(position);
 		
-		String threadSubject = info.getSpannedSubject() != null 
-							? info.getSpannedSubject().toString() 
-							: StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
-		this.navigateToThread(info.getNumber(), threadSubject);
+		if(info.isHidden()){
+			this.mHiddenThreadsDataSource.removeFromHiddenThreads(info.getNumber());
+			info.setHidden(false);
+			this.mAdapter.notifyDataSetChanged();
+		}
+		else {
+			String threadSubject = !StringUtils.isEmpty(info.getSubject()) 
+									? info.getSubject()
+									: StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
+			this.navigateToThread(info.getNumber(), threadSubject);
+		}
 	}
 	
 	@Override
@@ -316,6 +327,10 @@ public class ThreadsListActivity extends BaseListActivity {
     	
     	if(item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
     		menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 3,  this.getString(R.string.cmenu_search_image));
+    	}
+    	
+    	if(!item.isHidden()) {
+    		menu.add(Menu.NONE, Constants.CONTEXT_MENU_HIDE_THREAD, 4, this.getString(R.string.cmenu_hide_thread));
     	}
 	}
 	
@@ -346,6 +361,11 @@ public class ThreadsListActivity extends BaseListActivity {
 	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
 	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
 	        	return true;
+	        }
+	        case Constants.CONTEXT_MENU_HIDE_THREAD: {
+	        	this.mHiddenThreadsDataSource.addToHiddenThreads(info.getNumber());
+	        	info.setHidden(true);
+	        	this.mAdapter.notifyDataSetChanged();
 	        }
         }
         

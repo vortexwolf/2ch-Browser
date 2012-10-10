@@ -12,7 +12,6 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
@@ -59,7 +58,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private MainApplication mApplication;
 	private IJsonApiReader mJsonReader;
 	private IPostSender mPostSender;
-	private IBoardSettingsStorage mBoardSettingsStorage;
 	private IHtmlCaptchaChecker mHtmlCaptchaChecker;
 	private NetworkResourceLoader mNetworkResourceLoader;
 	private IDraftPostsStorage mDraftPostsStorage;
@@ -97,7 +95,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mApplication = (MainApplication)getApplication();
 		this.mJsonReader = this.mApplication.getJsonApiReader();
 		this.mPostSender = this.mApplication.getPostSender();
-		this.mBoardSettingsStorage = this.mApplication.getBoardSettingsStorage();
 		DefaultHttpClient httpClient = MainApplication.getHttpClient();
 		this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient));
 		this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
@@ -144,7 +141,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 				commentBuilder.append(">>"+postNumber+"\n");
 			}
 			
-			if(postComment != null){
+			if(!StringUtils.isEmpty(postComment)){
 				postComment = ThreadPostUtils.removeLinksFromComment(postComment);
 				
 				postComment = postComment.replaceAll("(\n+)", "$1>");
@@ -314,7 +311,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 			this.mCurrentPostSendTask.cancel(true);
 		}
 
-		this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardSettingsStorage, mBoardName, mThreadNumber, pe);
+		this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, mBoardName, mThreadNumber, pe);
 		this.mCurrentPostSendTask.execute();
 	}
 
@@ -343,7 +340,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		
 		if(error.startsWith("Ошибка: Неверный код подтверждения.")){
 			this.mCaptchaAnswerView.setText("");
-			//this.refreshCaptcha();
+			this.refreshCaptcha();
 		}
 	}
 	

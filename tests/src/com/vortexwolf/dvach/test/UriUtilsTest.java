@@ -10,12 +10,12 @@ import com.vortexwolf.dvach.test.R;
 
 public class UriUtilsTest extends InstrumentationTestCase {
 
-	private static final String imageUri = "http://2ch.so/b/src/12345.png";
-	private static final String boardUriVg = "http://2ch.so/vg";
-	private static final String boardUriBPage1 = "http://2ch.so/b/1.html";
+	private static final String imageUri = "http://2-ch.so/b/src/12345.png";
+	private static final String boardUriVg = "http://2-ch.so/vg";
+	private static final String boardUriBPage1 = "http://2-ch.so/b/1.html";
 	private static final String threadRelativeUriB = "/b/res/1000.html";
-	private static final String threadUriB = "http://2ch.so/b/res/1000.html";
-	private static final String postUriPr = "http://2ch.so/pr/res/2000.html#222";
+	private static final String threadUriB = "http://2-ch.so/b/res/1000.html";
+	private static final String postUriPr = "http://2-ch.so/pr/res/2000.html#222";
 	
 	public void testIs2chHostNegative(){
 		boolean isDvachHost = UriUtils.isDvachHost(Uri.parse(threadRelativeUriB));
@@ -30,22 +30,22 @@ public class UriUtilsTest extends InstrumentationTestCase {
 	public void testCreate2chUrl(){
 		
 		String resultUrl = UriUtils.create2chURL("b", 0);
-		assertEquals(resultUrl, "http://2ch.so/b");
+		assertEquals(resultUrl, "http://2-ch.so/b");
 		
 		resultUrl = UriUtils.create2chURL("b", 1);
-		assertEquals(resultUrl, "http://2ch.so/b/1.html");
+		assertEquals(resultUrl, "http://2-ch.so/b/1.html");
 		
 		resultUrl = UriUtils.create2chThreadURL("b", "123");
-		assertEquals(resultUrl, "http://2ch.so/b/res/123.html");
+		assertEquals(resultUrl, "http://2-ch.so/b/res/123.html");
 		
 		resultUrl = UriUtils.create2chPostURL("b", "123", "456");
-		assertEquals(resultUrl, "http://2ch.so/b/res/123.html#456");
+		assertEquals(resultUrl, "http://2-ch.so/b/res/123.html#456");
 		
 		resultUrl = UriUtils.create2chURL("b", "thumb/12345.jpg").toString();
-		assertEquals(resultUrl, "http://2ch.so/b/thumb/12345.jpg");
+		assertEquals(resultUrl, "http://2-ch.so/b/thumb/12345.jpg");
 		
 		resultUrl = UriUtils.create2chURL("b", "/thumb/12345.jpg").toString();
-		assertEquals(resultUrl, "http://2ch.so/b/thumb/12345.jpg");
+		assertEquals(resultUrl, "http://2-ch.so/b/thumb/12345.jpg");
 	}
 
 	public void testGetBoardName(){
@@ -106,11 +106,11 @@ public class UriUtilsTest extends InstrumentationTestCase {
 		
 		uri = Uri.parse("/test/res/52916.html#52916");
 		resultUri = UriUtils.adjust2chRelativeUri(uri).toString();
-		assertEquals(resultUri, "http://2ch.so/test/res/52916.html#52916");
+		assertEquals(resultUri, "http://2-ch.so/test/res/52916.html#52916");
 		
 		uri = Uri.parse("test");
 		resultUri = UriUtils.adjust2chRelativeUri(uri).toString();
-		assertEquals(resultUri, "http://2ch.so/test");
+		assertEquals(resultUri, "http://2-ch.so/test");
 	}
 	
 	public void testIsYoutubeUri(){

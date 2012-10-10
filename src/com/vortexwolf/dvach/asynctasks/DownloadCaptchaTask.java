@@ -63,24 +63,16 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	
 	@Override
 	protected Boolean doInBackground(String... params) {
+		this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mBoard, this.mThreadNumberd);
+		if(this.mCanSkip) return true;
+		
+		this.mCaptcha = RecaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient));
+		if(this.mCaptcha == null) return false;
+		
+		if(this.isCancelled()) return false;
 
-//		try{
-			this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mBoard, this.mThreadNumberd);
-			if(this.mCanSkip) return true;
-			
-			//this.mCaptcha = this.mJsonReader.readCaptcha(this.mBoard, this);
-			this.mCaptcha = RecaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient));
-			
-			if(this.isCancelled()) return false;
-
-			this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
-			
-			return true;
-//		}
-//		catch(JsonApiReaderException e){
-//			MyLog.e(TAG, e);
-//			this.mUserError = e.getMessage();
-//			return false;
-//		}
+		this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
+		
+		return true;
 	}
 }

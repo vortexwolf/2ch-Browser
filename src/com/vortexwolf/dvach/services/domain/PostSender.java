@@ -49,7 +49,7 @@ public class PostSender implements IPostSender {
 			throw new SendPostException(mResources.getString(R.string.error_incorrect_argument));
 		}
 
-		String uri = "http://2ch.so/"+boardName+"/wakaba.pl";
+		String uri = Constants.DVACH_URL + boardName + "/wakaba.pl";
 		
 		// 1 - 'ро' на кириллице, 2 - 'р' на кириллице,  3 - 'о' на кириллице, 4 - все латинскими буквами, 
 		String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post",  };

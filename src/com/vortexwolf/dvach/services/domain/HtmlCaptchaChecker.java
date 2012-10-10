@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.services.domain;
 
 import android.text.Html;
 
+import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
@@ -20,7 +21,7 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 	public boolean canSkipCaptcha(String boardName, String threadNumber){
 		
 		//String uri = String.format(CHECK_URI_FORMAT, boardName, StringUtils.emptyIfNull(threadNumber));
-		String uri = "http://2ch.so/makaba/captcha?code=";
+		String uri = Constants.DVACH_URL + "makaba/captcha?code=";
 		String captchaBlock = this.mHttpStringReader.fromUri(uri);
 		
 		return checkHtmlBlock(captchaBlock);

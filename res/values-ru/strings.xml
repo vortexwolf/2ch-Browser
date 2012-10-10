@@ -74,6 +74,7 @@
     <string name="cmenu_add_to_favorites">Добавить в закладки</string>
     <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
     <string name="cmenu_search_image">Поиск изображения в TinEye</string>
+    <string name="cmenu_hide_thread">Скрыть тред</string>
             
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>

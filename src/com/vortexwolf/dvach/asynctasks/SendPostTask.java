@@ -1,7 +1,6 @@
 package com.vortexwolf.dvach.asynctasks;
 
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.IPostSendView;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.BoardSettings;
@@ -14,7 +13,6 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 
 	private final IPostSender mPostSender;
 	private final IPostSendView mView;
-	private final IBoardSettingsStorage mBoardSettingsStorage;
 	
 	private final String mBoardName;
 	private final String mThreadNumber;
@@ -23,11 +21,9 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 	private String mRedirectedPage = null;
 	private String mUserError;
 	
-	public SendPostTask(IPostSender postSender, IPostSendView view, IBoardSettingsStorage boardSettingsStorage,
-			String boardName, String threadNumber, PostEntity entity) {
+	public SendPostTask(IPostSender postSender, IPostSendView view, String boardName, String threadNumber, PostEntity entity) {
 		this.mPostSender = postSender;
 		this.mView = view;
-		this.mBoardSettingsStorage = boardSettingsStorage;
 		
 		this.mBoardName = boardName;
 		this.mThreadNumber = threadNumber;
@@ -64,15 +60,6 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 	}
 	
 	private PostFields getPostFields(){
-//		try {
-//			BoardSettings bs = this.mBoardSettingsStorage.getSettings(this.mBoardName);
-//			return bs.getPostFields();
-//		} 
-//		catch (JsonApiReaderException e) {
-//			this.mUserError = e.getMessage();
-		
-		//// the settings api doesn't work any more
-			return PostFields.getDefault();
-//		}
+		return PostFields.getDefault();
 	}
 }

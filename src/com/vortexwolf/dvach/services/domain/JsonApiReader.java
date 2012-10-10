@@ -43,30 +43,14 @@ public class JsonApiReader implements IJsonApiReader{
 		this.mObjectMapper = mapper;
 	}
 	
-	private static String formatApiUri(String boardName, String code){
-		return "http://2ch.so/"+boardName+"/wakaba.pl?task=api&code="+code; //85.17.28.149
-	}
-	
 	private static String formatThreadsUri(String boardName, int page){
 		String pageName = page == 0 ? "wakaba" : String.valueOf(page);
 		
-		return "http://2ch.so/" + boardName + "/" + pageName + ".json";
+		return Constants.DVACH_URL + boardName + "/" + pageName + ".json";
 	}
 	
 	private static String formatPostsUri(String boardName, String threadId){
-		return "http://2ch.so/"+boardName+"/res/"+threadId+".json";
-	}
-	
-	@Override
-	public BoardSettings readBoardSettings(String boardName) throws JsonApiReaderException{
-		String uri = formatApiUri(boardName, Constants.JSON_SETTINGS_TYPE);
-		return this.readData(uri, BoardSettings.class);
-	}
-	
-	@Override
-	public CaptchaEntity readCaptcha(String boardName, ICancellable task) throws JsonApiReaderException{
-		String uri = formatApiUri(boardName, Constants.JSON_CAPTCHA_TYPE);
-		return this.readData(uri, CaptchaEntity.class, null, task);
+		return Constants.DVACH_URL+boardName+"/res/"+threadId+".json";
 	}
 	
 	@Override

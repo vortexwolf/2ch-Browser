@@ -6,9 +6,9 @@ import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.ExtendedObjectMapper;
 import com.vortexwolf.dvach.db.DvachSqlHelper;
 import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
 import com.vortexwolf.dvach.db.HistoryDataSource;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
@@ -25,7 +25,6 @@ import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.DownloadFileService;
 import com.vortexwolf.dvach.services.domain.JsonApiReader;
 import com.vortexwolf.dvach.services.domain.PostSender;
-import com.vortexwolf.dvach.services.presentation.BoardSettingsStorage;
 import com.vortexwolf.dvach.services.presentation.DraftPostsStorage;
 import com.vortexwolf.dvach.services.presentation.OpenTabsManager;
 import com.vortexwolf.dvach.services.presentation.PagesSerializationService;
@@ -46,6 +45,7 @@ public class MainApplication extends Application {
 		DvachSqlHelper dbHelper = new DvachSqlHelper(this);
 		HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
 		FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
+		HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
 		Tracker tracker = new Tracker();
 		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
 		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
@@ -57,7 +57,6 @@ public class MainApplication extends Application {
 		container.register(DefaultHttpClient.class, httpClient);
 		container.register(IJsonApiReader.class, jsonApiReader);
 		container.register(IPostSender.class, new PostSender(httpClient, this.getResources()));
-		container.register(IBoardSettingsStorage.class, new BoardSettingsStorage(jsonApiReader));
 		container.register(IDraftPostsStorage.class, new DraftPostsStorage());
 		container.register(INavigationService.class, navigationService);
 		container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
@@ -70,9 +69,12 @@ public class MainApplication extends Application {
 		container.register(IBitmapManager.class, new BitmapManager(imageManager));	
 		container.register(HistoryDataSource.class, historyDataSource);	
 		container.register(FavoritesDataSource.class, favoritesDataSource);	
+		container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);	
 		
 		historyDataSource.open();
 		favoritesDataSource.open();
+		hiddenThreadsDataSource.open();
+		
 		tracker.startSession(this);
 		cacheManager.trimCacheIfNeeded();
 	}
@@ -98,10 +100,6 @@ public class MainApplication extends Application {
 	
 	public IPostSender getPostSender(){
 		return Factory.getContainer().resolve(IPostSender.class);
-	}
-
-	public IBoardSettingsStorage getBoardSettingsStorage() {
-		return Factory.getContainer().resolve(IBoardSettingsStorage.class);
 	}
 	
 	public IDraftPostsStorage getDraftPostsStorage(){

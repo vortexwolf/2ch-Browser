@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.vortexwolf.dvach"
-      android:versionCode="34"
-      android:versionName="1.3.33"
+      android:versionCode="35"
+      android:versionName="1.3.4"
       android:installLocation="auto"
       >
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
@@ -25,6 +25,8 @@
                 <data android:scheme="http" android:host="2ch.so" android:pathPattern="/.*/.\\.html" />
                 <data android:scheme="http" android:host="2ch.so" android:pathPattern="/.*/1.\\.html" />
                 <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/" />
+                <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/.\\.html" />
+                <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/1.\\.html" />
             </intent-filter>
         </activity>
 		<activity android:name=".activities.PostsListActivity" android:configChanges="keyboardHidden|orientation">
@@ -35,6 +37,7 @@
                 <data android:scheme="http" android:host="2ch.so" android:pathPattern="/.*/res/.*\\.html" />
                 <data android:scheme="http" android:host="2ch.so" android:pathPattern="/.*/res/.*\\.html#.*" />
                 <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/res/.*\\.html" />
+                <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/res/.*\\.html#.*" />
             </intent-filter>
 		</activity>
 		        

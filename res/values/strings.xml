@@ -69,6 +69,7 @@
     <string name="cmenu_add_to_favorites">Add to bookmarks</string>
     <string name="cmenu_remove_from_favorites">Remove from bookmarks</string>
     <string name="cmenu_search_image">Search image in TinEye</string>
+    <string name="cmenu_hide_thread">Hide thread</string>
     
     <!-- Preferences -->
     <string name="pref_category_appearance">Appearance</string>

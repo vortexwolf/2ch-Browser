@@ -12,7 +12,7 @@ import android.view.View;
 
 public class UriUtils {
 	
-	private static final Uri dvachHostUri = Uri.parse("http://2ch.so/");
+	private static final Uri dvachHostUri = Uri.parse(Constants.DVACH_URL);
 	public static final String DVACH_HOST = dvachHostUri.getHost();
 		
 	private static final Pattern threadUriPattern = Pattern.compile("/\\w+/res/\\d+\\.html"); // example: /b/res/12345.html

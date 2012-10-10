@@ -19,9 +19,9 @@ public class ThreadItemViewModel {
 	private final int mImageCount;
 	
 	private SpannableStringBuilder mSpannedComment = null;
-	private Spanned mSpannedSubject = null;
 	private AttachmentInfo mAttachment = null;
 	private boolean mEllipsized = false;
+	private boolean mHidden = false;
 	
 	public ThreadItemViewModel(ThreadInfo model, Theme theme) {
 		this.mTheme = theme;
@@ -41,14 +41,8 @@ public class ThreadItemViewModel {
 		return mSpannedComment;
 	}
 	
-	public Spanned getSpannedSubject() {
-		if(this.mSpannedSubject == null){
-			String subject = this.mOpPost.getSubject();
-			Spanned spanned = !StringUtils.isEmpty(subject) ? Html.fromHtml(subject) : null;
-			this.mSpannedSubject = spanned;
-		}
-		
-		return mSpannedSubject;
+	public String getSubject() {
+		return this.mOpPost.getSubject();
 	}
 	
 	public boolean hasAttachment(){
@@ -85,5 +79,13 @@ public class ThreadItemViewModel {
 
 	public boolean isEllipsized() {
 		return mEllipsized;
+	}
+
+	public boolean isHidden() {
+		return mHidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.mHidden = hidden;
 	}
 }

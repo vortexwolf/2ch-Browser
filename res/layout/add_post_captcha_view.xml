@@ -46,6 +46,6 @@
 	  	android:layout_height="wrap_content"
 	  	android:singleLine="true"
 	  	android:hint="@string/addpost_captcha_hint" 
-	  	android:inputType="text|textEmailAddress|textVisiblePassword"
+	  	android:inputType="textNoSuggestions"
   	/>
 </LinearLayout>

@@ -20,6 +20,7 @@ public class Constants {
 	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(20);
 	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(10);
 	
+	public static final String DVACH_URL = "http://2-ch.so/";
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
     
@@ -39,10 +40,6 @@ public class Constants {
     public static final String ADD_POST_FORM_TASK = "pоst";
     // Если добавляем новый тред, а не пост
     public static final String ADD_THREAD_PARENT = "";
-    
-    // Используется для некоторых оставшихся методов прошлого API
-    public static final String JSON_SETTINGS_TYPE = "getsettings";
-    public static final String JSON_CAPTCHA_TYPE = "getcaptcha";
     
     // Request-коды для запуска метода startActivityForResult 
     public static final int REQUEST_CODE_PICK_BOARD_ACTIVITY = 0;
@@ -74,4 +71,5 @@ public class Constants {
     public static final int CONTEXT_MENU_ADD_FAVORITES = 1009;
     public static final int CONTEXT_MENU_REMOVE_FAVORITES = 1010;
     public static final int CONTEXT_MENU_SEARCH_IMAGE = 1011;
+    public static final int CONTEXT_MENU_HIDE_THREAD = 1012;
 }

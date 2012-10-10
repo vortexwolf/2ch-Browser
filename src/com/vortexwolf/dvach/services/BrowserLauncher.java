@@ -42,6 +42,7 @@ public class BrowserLauncher {
     public static void launchExternalBrowser(Context context, String url, boolean bypassManifestFilter){
     	if(bypassManifestFilter){
     		url = url.replaceFirst("2ch\\.so/", "2ch.so//");
+    		url = url.replaceFirst("2-ch\\.so/", "2-ch.so//");
     	}
 
     	launchExternalBrowser(context, url);

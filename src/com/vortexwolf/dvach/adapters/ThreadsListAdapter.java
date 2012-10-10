@@ -4,6 +4,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
+import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 import com.vortexwolf.dvach.models.domain.ThreadInfo;
@@ -24,16 +25,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
+	private static final int ITEM_VIEW_TYPE_THREAD = 0;
+	private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
+	
 	private final LayoutInflater mInflater;
 	private final IBitmapManager mBitmapManager;
 	private final Theme mTheme;
 	private final ApplicationSettings mSettings;
+	private final HiddenThreadsDataSource mHiddenThreadsDataSource;
 	
 	private final String mBoardName;
 	
 	private boolean mIsBusy = false;
 
-	public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme) {
+	public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource) {
         super(context.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
@@ -41,18 +46,47 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mTheme = theme;
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = settings;
+        this.mHiddenThreadsDataSource = hiddenThreadsDataSource;
     }
 
+	@Override
+	public int getViewTypeCount() {
+		return 2;
+	}
+	
+	@Override
+	public int getItemViewType(int position) {
+		return this.getItem(position).isHidden() ? ITEM_VIEW_TYPE_HIDDEN_THREAD : ITEM_VIEW_TYPE_THREAD;
+	}
+	
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         
-    	View view = convertView != null ? convertView : mInflater.inflate(R.layout.threads_list_item, null);
-        
-        ThreadItemViewModel item = this.getItem(position);
+    	View view;
+    	ThreadItemViewModel item = this.getItem(position);
+    	
+    	if(!item.isHidden()){
+    		view = convertView != null ? convertView : mInflater.inflate(R.layout.threads_list_item, null);
 
-        this.fillItemView(view, item);
-        
+	        this.fillItemView(view, item);
+    	}
+    	else {
+    		view = convertView != null ? convertView : mInflater.inflate(R.layout.threads_list_hidden_item, null);
+    		
+    		this.fillHiddenThreadView(view, item);
+    	}
+    	
         return view;
+    }
+    
+    private void fillHiddenThreadView(final View view, final ThreadItemViewModel item){
+    	TextView threadNumberView = (TextView)view.findViewById(R.id.thread_number);
+    	TextView threadDescriptionView = (TextView)view.findViewById(R.id.thread_description);
+    	
+    	threadNumberView.setText("№" + item.getNumber());
+    	
+    	CharSequence description = !StringUtils.isEmpty(item.getSubject()) ? item.getSubject() : item.getSpannedComment();
+    	threadDescriptionView.setText(description);
     }
     
     private void fillItemView(final View view, final ThreadItemViewModel item) {
@@ -72,7 +106,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     	}
         
         //Apply info from the data item
-        Spanned subject = item.getSpannedSubject();
+        String subject = item.getSubject();
         if(!StringUtils.isEmpty(subject)){
         	vb.titleView.setVisibility(View.VISIBLE);
         	vb.titleView.setText(subject);
@@ -110,8 +144,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 	/** Обновляет адаптер полностью*/
 	public void setAdapterData(ThreadInfo[] threads){
 		this.clear();
+		
 		for(ThreadInfo ti : threads){
-			this.add(new ThreadItemViewModel(ti, this.mTheme));
+			ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme);
+			boolean isHidden = this.mHiddenThreadsDataSource.isHidden(model.getNumber());
+			model.setHidden(isHidden);
+			
+			this.add(model);
 		}
 	}
 	
@@ -127,6 +166,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 	        for (int i=0; i<count; i++) {
 	            View v = view.getChildAt(i);
 	            int position = view.getPositionForView(v);
+	            
+	            if(this.getItemViewType(position) == ITEM_VIEW_TYPE_HIDDEN_THREAD) {
+	            	continue;
+	            }
 	            
 	            ViewBag vb = (ViewBag)v.getTag();
 	            
