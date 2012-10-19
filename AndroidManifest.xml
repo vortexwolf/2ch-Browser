@@ -27,6 +27,9 @@
                 <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/" />
                 <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/.\\.html" />
                 <data android:scheme="http" android:host="2-ch.so" android:pathPattern="/.*/1.\\.html" />
+                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/" />
+                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/.\\.html" />
+                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/1.\\.html" />
             </intent-filter>
         </activity>
 		<activity android:name=".activities.PostsListActivity" android:configChanges="keyboardHidden|orientation">

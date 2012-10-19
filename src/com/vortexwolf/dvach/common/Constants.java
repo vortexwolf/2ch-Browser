@@ -20,7 +20,7 @@ public class Constants {
 	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(20);
 	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(10);
 	
-	public static final String DVACH_URL = "http://2-ch.so/";
+	public static final String DVACH_URL = "http://2ch.hk/";
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
     
