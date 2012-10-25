@@ -351,6 +351,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mProgressDialog.setMessage(getString(R.string.loading));
 		mProgressDialog.setCancelable(true);
+		mProgressDialog.setCanceledOnTouchOutside(false);
 		mProgressDialog.show();
 	}
 

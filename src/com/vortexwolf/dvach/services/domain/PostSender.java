@@ -54,9 +54,10 @@ public class PostSender implements IPostSender {
 		// 1 - 'ро' на кириллице, 2 - 'р' на кириллице,  3 - 'о' на кириллице, 4 - все латинскими буквами, 
 		String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post",  };
 		int statusCode = 502; // Возвращается при неправильном значении task=post, часто меняется, поэтому неизвестно какой будет на данный момент
+		boolean had301 = false;
 		HttpResponse response = null;
 			
-		for(int i = 0; i < possibleTasks.length && statusCode == 502; i++){
+		for(int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++){
 			HttpPost httpPost = new HttpPost(uri);
 			response = executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
 			//Проверяем код ответа
@@ -64,6 +65,13 @@ public class PostSender implements IPostSender {
 			
 			if(statusCode == 502) {
 				httpPost.abort();
+			}
+			
+			// TODO: rewrite this error handling
+			if(statusCode == 301 && !had301) {
+				uri = response.getFirstHeader("Location").getValue();
+				had301 = true;
+				i--;
 			}
 			
 			MyLog.v(TAG, response.getStatusLine());

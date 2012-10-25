@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DvachSqlHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "dvach.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	
 	public static final String TABLE_HISTORY = "history";
 	public static final String TABLE_FAVORITES = "favorites";
@@ -19,10 +19,12 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_TITLE = "title";
 	public static final String COLUMN_URL = "url";
 	public static final String COLUMN_CREATED = "created";
+	public static final String COLUMN_BOARD_NAME = "boardName";
 	public static final String COLUMN_THREAD_NUMBER = "threadNumber";
 
 	private static final SqlCreateTableScriptBuilder mHistorySqlBuilder = new SqlCreateTableScriptBuilder(TABLE_HISTORY);
 	private static final SqlCreateTableScriptBuilder mFavoritesSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_FAVORITES);
+	private static final SqlCreateTableScriptBuilder mHiddenThreadsSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_HIDDEN_THREADS);
 	
 	public DvachSqlHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -50,7 +52,8 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if(newVersion == 3) {
+		if(oldVersion < 4) {
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_HIDDEN_THREADS);
 			this.createHiddenThreadsTable(db);
 		}
 	}
@@ -62,7 +65,11 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
 	}
 	
 	private void createHiddenThreadsTable(SQLiteDatabase db){
-		String sql = "create table " + TABLE_HIDDEN_THREADS + "(" + COLUMN_THREAD_NUMBER + " integer primary key);";
+		String sql = mHiddenThreadsSqlBuilder
+				.addPrimaryKey(COLUMN_ID)
+				.addColumn(COLUMN_BOARD_NAME, "text", false)
+				.addColumn(COLUMN_THREAD_NUMBER, "integer", false)
+				.toSql();
 		db.execSQL(sql);
 	}
 }

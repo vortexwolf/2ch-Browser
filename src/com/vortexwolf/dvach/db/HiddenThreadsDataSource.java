@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class HiddenThreadsDataSource {
 	private static final String TABLE = DvachSqlHelper.TABLE_HIDDEN_THREADS;
-	private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_THREAD_NUMBER };
+	private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_THREAD_NUMBER, DvachSqlHelper.COLUMN_BOARD_NAME };
 	
 	private final DvachSqlHelper mDbHelper;
 	
@@ -25,22 +25,24 @@ public class HiddenThreadsDataSource {
 		mDbHelper.close();
 	}
 	
-	public void addToHiddenThreads(String threadNumber) {
-		if(!this.isHidden(threadNumber)){
+	public void addToHiddenThreads(String boardName, String threadNumber) {
+		if(!this.isHidden(boardName, threadNumber)){
 			ContentValues values = new ContentValues();
+			values.put(DvachSqlHelper.COLUMN_BOARD_NAME, boardName);
 			values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, threadNumber);
 			mDatabase.insert(TABLE, null, values);
 		}
 	}
 	
-	public void removeFromHiddenThreads(String threadNumber){
-		mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?", new String[] { threadNumber });
+	public void removeFromHiddenThreads(String boardName, String threadNumber){
+		mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_BOARD_NAME + " = ? AND " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?", new String[] { boardName, threadNumber });
 	}
 	
-	public boolean isHidden(String threadNumber){
+	public boolean isHidden(String boardName, String threadNumber){
 		Cursor cursor = mDatabase.rawQuery(
-				"select count(*) from " + TABLE + " where " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
-				new String[] { threadNumber });
+				"select count(*) from " + TABLE + 
+				" where " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ? AND " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+				new String[] { boardName, threadNumber });
 		
 		cursor.moveToFirst();
 		long count = cursor.getLong(0);

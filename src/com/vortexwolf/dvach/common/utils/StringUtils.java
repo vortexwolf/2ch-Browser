@@ -14,7 +14,7 @@ public class StringUtils {
 	}
 	
 	public static boolean isEmptyOrWhiteSpace(String s) {
-		return isEmpty(s.trim());
+		return isEmpty(emptyIfNull(s).trim());
 	}
 	
 	public static String emptyIfNull(String s) {

@@ -10,6 +10,8 @@ Google Play
 
 You can download the application here: 
 https://play.google.com/store/apps/details?id=com.vortexwolf.dvach
+Direct link: 
+https://dl.dropbox.com/u/8047386/2ch-browser.apk
 
 License
 ------------

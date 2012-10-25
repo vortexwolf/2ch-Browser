@@ -147,7 +147,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 		
 		for(ThreadInfo ti : threads){
 			ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme);
-			boolean isHidden = this.mHiddenThreadsDataSource.isHidden(model.getNumber());
+			boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mBoardName, model.getNumber());
 			model.setHidden(isHidden);
 			
 			this.add(model);

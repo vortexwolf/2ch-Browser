@@ -296,7 +296,7 @@ public class ThreadsListActivity extends BaseListActivity {
 		ThreadItemViewModel info = mAdapter.getItem(position);
 		
 		if(info.isHidden()){
-			this.mHiddenThreadsDataSource.removeFromHiddenThreads(info.getNumber());
+			this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mBoardName, info.getNumber());
 			info.setHidden(false);
 			this.mAdapter.notifyDataSetChanged();
 		}
@@ -363,7 +363,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_HIDE_THREAD: {
-	        	this.mHiddenThreadsDataSource.addToHiddenThreads(info.getNumber());
+	        	this.mHiddenThreadsDataSource.addToHiddenThreads(this.mBoardName, info.getNumber());
 	        	info.setHidden(true);
 	        	this.mAdapter.notifyDataSetChanged();
 	        }

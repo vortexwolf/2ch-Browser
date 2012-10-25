@@ -13,6 +13,7 @@ import android.widget.ListView;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBusyAdapter;
@@ -121,18 +122,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	 * @param posts Список сообщений (можно и всех, они потом отфильтруются)
 	 */
 	public int updateAdapterData(String from, PostInfo[] posts){
-
-		boolean afterFrom = false;
+		Integer lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
 		int newPostsCount = 0;
 
 		for(PostInfo pi : posts){
-			if(afterFrom){
+			if(Integer.valueOf(pi.getNum()) > lastPostNumber) {
 				this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this));
 				newPostsCount++;
-			}
-			// Исключая сам from, поэтому этот код в конце
-			if(pi.getNum().equals(from)) {
-				afterFrom = true;
 			}
 		}
 		
