@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.HistoryAdapter;
-import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;

@@ -13,6 +13,7 @@ import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -38,7 +39,7 @@ public class HtmlUtils {
 		
 		@Override
 		public Drawable getDrawable(String ref) {
-			Uri uri = UriUtils.adjust2chRelativeUri(Uri.parse(ref));
+			Uri uri = Factory.getContainer().resolve(DvachUriBuilder.class).adjust2chRelativeUri(Uri.parse(ref));
 			
 			HttpImageManager imageManager = Factory.getContainer().resolve(HttpImageManager.class);
 
@@ -86,7 +87,19 @@ public class HtmlUtils {
 		String result = htmlText;
 		//Убираем абзацы
 		if(result.startsWith("<p>") && result.endsWith("</p>")){
-			result = "<span>"+result.substring(3, result.length() - 4)+"</span>"; //except <p>
+			String newHtml = result.substring(3, result.length() - 4);
+			result = "<span>" + trimBr(newHtml) + "</span>"; //except <p>
+		}
+		
+		return result;
+	}
+	
+	public static String trimBr(String htmlText){
+		if(htmlText == null) return null;
+		
+		String result = htmlText;
+		if(htmlText.startsWith("<br />") || htmlText.endsWith("<br />")){
+			result = htmlText.replaceAll("^(?:<br />)*(.*?)(?:<br />)*$", "$1");
 		}
 		
 		return result;

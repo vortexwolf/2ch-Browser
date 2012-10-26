@@ -22,6 +22,7 @@
 	<string name="pref_file_cache_key">file_cache</string>
 	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
 	<string name="pref_display_name_key">display_name</string>
+	<string name="pref_domain_key">domain_key</string>
 	
 	<string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>

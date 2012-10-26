@@ -1,12 +1,20 @@
-package com.vortexwolf.dvach.common;
+package com.vortexwolf.dvach.activities;
+
+import java.lang.reflect.Field;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public abstract class BaseListActivity extends ListActivity {
@@ -21,7 +29,6 @@ public abstract class BaseListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
-        //this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
     }
     
 	/** Returns the layout resource Id associated with this activity */

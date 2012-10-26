@@ -72,6 +72,15 @@ public class BrowserActivity extends Activity {
 		    }
 		});
 		
+		// in case of a redirect don't open the external browser
+		this.mWebview.setWebViewClient(new WebViewClient() {
+	        @Override
+	        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+	        	view.loadUrl(url);
+	            return true;
+	        }
+		});
+		
 		this.mUri = getIntent().getData();
 		this.mTitle = this.mUri.toString();
 		this.setTitle(this.mTitle);

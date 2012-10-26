@@ -20,6 +20,7 @@ import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.models.domain.PostInfo;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.FlowTextHelper;
 
 public class PostItemViewModel {
@@ -30,6 +31,7 @@ public class PostItemViewModel {
 	private final PostInfo mModel;
 	private final Theme mTheme;
 	private final IURLSpanClickListener mUrlListener;
+	private final DvachUriBuilder mDvachUriBuilder;
 
 	private SpannableStringBuilder mSpannedComment = null;
 	private AttachmentInfo mAttachment;
@@ -41,11 +43,12 @@ public class PostItemViewModel {
 	private boolean isFloatImageComment = false;
 
 	
-	public PostItemViewModel(int position, PostInfo model, Theme theme, IURLSpanClickListener listener) {
+	public PostItemViewModel(int position, PostInfo model, Theme theme, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
 		this.mModel = model;
 		this.mTheme = theme;
 		this.mUrlListener = listener;
 		this.mPosition = position;
+		this.mDvachUriBuilder = dvachUriBuilder;
 		
 		this.parseReferences();
 	}
@@ -104,7 +107,7 @@ public class PostItemViewModel {
 
 	public AttachmentInfo getAttachment(String boardCode){
 		if(this.mAttachment == null && this.hasAttachment()){
-			this.mAttachment = new AttachmentInfo(this.mModel, boardCode);
+			this.mAttachment = new AttachmentInfo(this.mModel, boardCode, this.mDvachUriBuilder);
 		}
 		
 		return mAttachment;
@@ -158,7 +161,7 @@ public class PostItemViewModel {
 		while(iterator.hasNext()){
 			String refNumber = iterator.next();
 
-			String refUrl = UriUtils.create2chPostURL(boardName, threadNumber, refNumber);
+			String refUrl = this.mDvachUriBuilder.create2chPostUrl(boardName, threadNumber, refNumber);
 			//String htmlLink = String.format("<a href=\"%s\">%s</a>", refUrl, "&gt;&gt;" + refNumber);
 			sb.append("<a href=\"");
 			sb.append(refUrl);

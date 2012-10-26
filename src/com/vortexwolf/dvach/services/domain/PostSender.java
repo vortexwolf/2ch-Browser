@@ -26,6 +26,7 @@ import com.vortexwolf.dvach.exceptions.SendPostException;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 public class PostSender implements IPostSender {
 	private static final String TAG = "PostSender";
@@ -33,13 +34,15 @@ public class PostSender implements IPostSender {
 	private final Resources mResources;
 	private final HttpStringReader mHttpStringReader;
 	private final PostResponseParser mResponseParser;
+	private final DvachUriBuilder mDvachUriBuilder;
 	
-	public PostSender(DefaultHttpClient client, Resources resources){
+	public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder){
 		//this.mHttpClient = client;
 		this.mHttpClient = new ExtendedHttpClient(); // похоже, что передаваемые клиент не работает, лучше создать новый
 		this.mResources = resources;
 		this.mResponseParser = new PostResponseParser();
 		this.mHttpStringReader = new HttpStringReader(this.mHttpClient);
+		this.mDvachUriBuilder = dvachUriBuilder;
 	}
 	
 	@Override
@@ -49,7 +52,7 @@ public class PostSender implements IPostSender {
 			throw new SendPostException(mResources.getString(R.string.error_incorrect_argument));
 		}
 
-		String uri = Constants.DVACH_URL + boardName + "/wakaba.pl";
+		String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, "/wakaba.pl").toString();
 		
 		// 1 - 'ро' на кириллице, 2 - 'р' на кириллице,  3 - 'о' на кириллице, 4 - все латинскими буквами, 
 		String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post",  };

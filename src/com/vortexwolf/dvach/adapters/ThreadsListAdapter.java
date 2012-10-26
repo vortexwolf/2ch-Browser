@@ -10,6 +10,7 @@ import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 import com.vortexwolf.dvach.models.domain.ThreadInfo;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.models.presentation.ThreadItemViewModel;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.content.Context;
@@ -33,12 +34,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 	private final Theme mTheme;
 	private final ApplicationSettings mSettings;
 	private final HiddenThreadsDataSource mHiddenThreadsDataSource;
+	private final DvachUriBuilder mDvachUriBuilder;
 	
 	private final String mBoardName;
 	
 	private boolean mIsBusy = false;
 
-	public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource) {
+	public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource, DvachUriBuilder dvachUriBuilder) {
         super(context.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
@@ -47,6 +49,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = settings;
         this.mHiddenThreadsDataSource = hiddenThreadsDataSource;
+        this.mDvachUriBuilder = dvachUriBuilder;
     }
 
 	@Override
@@ -146,7 +149,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 		this.clear();
 		
 		for(ThreadInfo ti : threads){
-			ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme);
+			ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme, this.mDvachUriBuilder);
 			boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mBoardName, model.getNumber());
 			model.setHidden(isHidden);
 			

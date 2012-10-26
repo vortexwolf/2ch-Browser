@@ -7,8 +7,8 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
 import com.vortexwolf.dvach.asynctasks.SearchImageTask;
-import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
@@ -27,6 +27,7 @@ import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.services.BrowserLauncher;
 import com.vortexwolf.dvach.services.TimerService;
 import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -56,6 +57,7 @@ public class PostsListActivity extends BaseListActivity {
 	private IJsonApiReader mJsonReader;
 	private Tracker mTracker;
 	private IPagesSerializationService mSerializationService;
+	private DvachUriBuilder mDvachUriBuilder;
 
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
@@ -86,6 +88,7 @@ public class PostsListActivity extends BaseListActivity {
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
         this.mSerializationService = this.mApplication.getSerializationService();
+        this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
         IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
         
         // Заголовок страницы
@@ -97,7 +100,8 @@ public class PostsListActivity extends BaseListActivity {
 		this.setTitle(pageTitle);
 		
 		// Сохраняем во вкладках
-		OpenTabModel tabModel = new OpenTabModel(pageSubject != null ? pageSubject : pageTitle, mBoardName, mThreadNumber);
+		String tabTitle = pageSubject != null ? pageSubject : pageTitle;
+		OpenTabModel tabModel = new OpenTabModel(tabTitle, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
 		this.mTabModel = tabsManager.add(tabModel);
 		
         this.resetUI();
@@ -174,7 +178,7 @@ public class PostsListActivity extends BaseListActivity {
 	private void setAdapter() {
 		if (mAdapter != null) return;
 
-		mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView());
+		mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder);
 		this.setListAdapter(mAdapter);
 
 		// добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -228,7 +232,7 @@ public class PostsListActivity extends BaseListActivity {
     		startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
     		break;
     	case R.id.open_browser_menu_id:
-    		BrowserLauncher.launchExternalBrowser(this, UriUtils.create2chThreadURL(this.mBoardName, this.mThreadNumber), true);
+    		BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber), true);
     		break;
     	case R.id.preferences_menu_id:
     		//Start new activity
@@ -239,7 +243,7 @@ public class PostsListActivity extends BaseListActivity {
     		this.navigateToAddPostView(null, null);
     		break;
     	case android.R.id.home:
-    		this.navigateUpToThreads();
+    		this.navigateToThreads(this.mBoardName);
     		break;
     	}
     	
@@ -326,11 +330,10 @@ public class PostsListActivity extends BaseListActivity {
 		startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
     
-    private void navigateUpToThreads(){
+    private void navigateToThreads(String boardName){
     	Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-		i.setData(Uri.parse(UriUtils.create2chURL(this.mBoardName, 0)));
-		
-		startActivity(i);
+		i.setData(this.mDvachUriBuilder.create2chBoardUri(boardName, 0));
+		this.startActivity(i);
     }
     
 	@Override
@@ -343,10 +346,7 @@ public class PostsListActivity extends BaseListActivity {
 		    	case Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY: {
 					String boardCode = intent.getExtras().getString(Constants.EXTRA_SELECTED_BOARD);
 			    	
-			    	Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-					i.setData(Uri.parse(UriUtils.create2chURL(boardCode, 0)));
-					
-					this.startActivity(i);
+			    	this.navigateToThreads(boardCode);
 					break;
 		    	}
 			}

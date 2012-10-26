@@ -16,7 +16,6 @@ import android.widget.ListView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.FavoritesAdapter;
-import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;

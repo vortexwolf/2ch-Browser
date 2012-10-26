@@ -48,4 +48,18 @@ public class HtmlUtilsTest extends InstrumentationTestCase {
 		result = ThreadPostUtils.removeLinksFromComment(comment);
 		assertEquals(result, "a >>123 z");
 	}
+	
+	public void testTrimBr(){
+		String text = "test<br /><br />";
+		String result = HtmlUtils.trimBr(text);
+		assertEquals(result, "test");
+		
+		text = "<br />test2<br />";
+		result = HtmlUtils.trimBr(text);
+		assertEquals(result, "test2");
+		
+		text = "test<br />3";
+		result = HtmlUtils.trimBr(text);
+		assertEquals(result, "test<br/>3");
+	}
 }

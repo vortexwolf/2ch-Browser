@@ -3,11 +3,13 @@ package com.vortexwolf.dvach.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.services.Tracker;
 
 public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -48,6 +50,14 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	
 	public String getName(){
 		return mSettings.getString(mResources.getString(R.string.pref_name_key), null);
+	}
+	
+	public Uri getDomainUri(){
+		String domain = mSettings.getString(mResources.getString(R.string.pref_domain_key), null);
+		domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
+		Uri uri = UriUtils.getUriForDomain(domain);
+		
+		return uri;
 	}
 	
 	public boolean isLoadThumbnails() {

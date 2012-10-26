@@ -12,16 +12,11 @@ public class OpenTabModel {
 	
 	private AppearanceUtils.ListViewPosition mPosition;
 	
-	public OpenTabModel(String title, String boardName, int pageNumber){
+	public OpenTabModel(String title, Uri uri){
 		this.mTitle = title;
-		this.mUri = Uri.parse(UriUtils.create2chURL(boardName, pageNumber));
+		this.mUri = uri;
 	}
 	
-	public OpenTabModel(String title, String boardName, String threadNumber){
-		this.mTitle = title;
-		this.mUri = Uri.parse(UriUtils.create2chThreadURL(boardName, threadNumber));
-	}
-
 	public String getTitle() {
 		return mTitle;
 	}

@@ -9,6 +9,7 @@ import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class AttachmentInfo {
@@ -22,6 +23,7 @@ public class AttachmentInfo {
 	private final String mVideoMobileUrl;
 	private final String mThumbnailUrl;
 	private final String mSourceExtension;
+	private final DvachUriBuilder mDvachUriBuilder;
 	private static final HashMap<String, Integer> sDefaultThumbnails;
 	
 	static{
@@ -31,9 +33,10 @@ public class AttachmentInfo {
 		sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
 	}
 	
-	public AttachmentInfo(IAttachmentEntity item, String boardCode) {
+	public AttachmentInfo(IAttachmentEntity item, String boardCode, DvachUriBuilder dvachUriBuilder) {
 		this.mModel = item;
 		this.mBoardCode = boardCode;
+		this.mDvachUriBuilder = dvachUriBuilder;
 		
 		SourceWithThumbnailModel urls = getUrls();
 		if(urls != null){
@@ -122,10 +125,10 @@ public class AttachmentInfo {
 		String imageUrl = this.mModel.getImage();
 		String imageThumbnail = this.mModel.getThumbnail();
 		if(!StringUtils.isEmpty(imageUrl)){
-			model.imageUrl = UriUtils.create2chURL(this.mBoardCode, imageUrl).toString();
+			model.imageUrl = this.mDvachUriBuilder.create2chBoardUri(this.mBoardCode, imageUrl).toString();
 		}
 		if(!StringUtils.isEmpty(imageThumbnail)){
-			model.thumbnailUrl = UriUtils.create2chURL(this.mBoardCode, imageThumbnail).toString();
+			model.thumbnailUrl = this.mDvachUriBuilder.create2chBoardUri(this.mBoardCode, imageThumbnail).toString();
 		}
 		// Если выше вызвался любой из двух if, значт прикреплен какой-то файл, а не видео
 		if(model.imageUrl != null || model.thumbnailUrl != null){

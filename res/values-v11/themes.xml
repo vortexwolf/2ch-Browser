@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources> 
+<resources xmlns:android="http://schemas.android.com/apk/res/android"> 
 	<style name="Theme_Light_Switch" parent="@android:style/Theme.Holo.Light">
 	     <item name="iconRefresh">@drawable/ic_actionbar_refresh</item>
 	     <item name="iconSave">@drawable/ic_actionbar_save</item>
@@ -7,6 +7,7 @@
 	     <item name="iconEdit">@drawable/ic_actionbar_edit</item>
 	     <item name="iconBack">@drawable/ic_navigation_previous_item</item>
 	     <item name="iconForward">@drawable/ic_navigation_next_item</item>
+	     <item name="android:actionBarStyle">@style/HoloLight.ActionBar</item>
 	</style>       
 	<style name="Theme_Dark_Switch" parent="@android:style/Theme.Holo">
 	     <item name="iconRefresh">@drawable/ic_actionbar_refresh_dark</item>
@@ -15,5 +16,25 @@
 	     <item name="iconEdit">@drawable/ic_actionbar_edit_dark</item>
 	     <item name="iconBack">@drawable/ic_navigation_previous_item_dark</item>
 	     <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
+	     <item name="android:actionBarStyle">@style/HoloDark.ActionBar</item>
 	</style>
+    
+	<!-- Remove the blue line from the action bar -->
+    <style name="HoloLight.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@null</item>
+        <item name="android:progressBarStyle">@style/HoloLight.ProgressBar</item>
+        <item name="android:progressBarPadding">0dip</item>
+    </style>
+	<style name="HoloDark.ActionBar" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@null</item>
+        <item name="android:progressBarStyle">@style/HoloDark.ProgressBar</item>
+        <item name="android:progressBarPadding">0dip</item>
+    </style>
+    
+    <style name="HoloLight.ProgressBar" parent="@android:style/Widget.Holo.Light.ProgressBar.Horizontal">
+    	<item name="android:progressDrawable">@drawable/progress_horizontal_holo</item>
+    </style>
+    <style name="HoloDark.ProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo</item>
+    </style>
 </resources>

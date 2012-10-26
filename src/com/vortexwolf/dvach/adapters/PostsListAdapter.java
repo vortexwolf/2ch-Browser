@@ -22,6 +22,7 @@ import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.models.presentation.PostsViewModel;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
@@ -38,11 +39,12 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	private final ListView mListView;
 	private final Context mActivityContext;
 	private final PostItemViewBuilder mPostItemViewBuilder;
+	private final DvachUriBuilder mDvachUriBuilder;
 	
 	private boolean mIsBusy = false;
 	private boolean mIsLoadingMore = false;
 		
-	public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView) {
+	public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder) {
         super(context.getApplicationContext(), 0);
         
         this.mBoardName = boardName;
@@ -55,6 +57,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mListView = listView;
         this.mActivityContext = context;
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings);
+        this.mDvachUriBuilder = dvachUriBuilder;
 	}
 	
     @Override
@@ -92,7 +95,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 			}
 		}
 		else {
-			ClickListenersFactory.sDvachUrlSpanClickListener.onClick(v, url);
+			ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder).onClick(v, url);
 		}
 	}
 	
@@ -113,7 +116,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	public void setAdapterData(PostInfo[] posts){
 		this.clear();
 		for(PostInfo pi : posts){
-			this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this));	
+			this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this, this.mDvachUriBuilder));	
 		}
 	}
 	
@@ -127,7 +130,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
 		for(PostInfo pi : posts){
 			if(Integer.valueOf(pi.getNum()) > lastPostNumber) {
-				this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this));
+				this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this, this.mDvachUriBuilder));
 				newPostsCount++;
 			}
 		}

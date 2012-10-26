@@ -8,7 +8,7 @@ import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class Constants {
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	// Нужно не забыть отключить логгирование при выпуске приложения
 	public static final boolean LOGGING = DEBUG;
@@ -19,12 +19,14 @@ public class Constants {
 		
 	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(20);
 	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(10);
-	
-	public static final String DVACH_URL = "http://2ch.hk/";
+
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
     
     public static final String DEFAULT_DOWNLOAD_FOLDER = "/download/2ch Browser/";
+    
+    // Иногда меняется (когда-то был 2ch.so), поэтому добавил в настройки. Если пустое значение - то http://2ch.hk/
+    public static final String DEFAULT_DOMAIN = "2ch.hk";
     
 	// Для http-запросов
     public static final String USER_AGENT_STRING = "2ch browser (Android)";

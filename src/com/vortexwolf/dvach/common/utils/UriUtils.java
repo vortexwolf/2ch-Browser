@@ -6,59 +6,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 import android.net.Uri;
 import android.view.View;
 
 public class UriUtils {
-	
-	private static final Uri dvachHostUri = Uri.parse(Constants.DVACH_URL);
-	public static final String DVACH_HOST = dvachHostUri.getHost();
-		
 	private static final Pattern threadUriPattern = Pattern.compile("/\\w+/res/\\d+\\.html"); // example: /b/res/12345.html
 	private static final Pattern boardUriPattern = Pattern.compile("/\\w+/?(?:\\d+\\.html)?"); // example: /b or /b/1.html
 	private static final Pattern groupsDvachUriPattern = Pattern.compile("^/(\\w+)/?(?:(?:(\\d+).html)|(?:res/(\\d+)\\.html))?$"); // 1: board name; 2: page number; 3: thread number
 	private static final Pattern groupsFileExtensionPattern = Pattern.compile(".*\\.([a-zA-Z0-9]+)$"); // 1: file extension
 	private static final Pattern groupsYoutubeCodePattern = Pattern.compile("\"http://www.youtube.com/v/(.*?)\""); // 1: video code
 	
-	public static boolean isDvachHost(Uri uri){
-		String host = uri.getHost();
-		return host != null && host.endsWith(DVACH_HOST);
-	}
-	
-	public static String create2chURL(String board, int pageNumber) {
-		return create2chURL(board, pageNumber == 0 ? null : pageNumber + ".html").toString();
-	}
-	
-	public static String create2chThreadURL(String board, String threadNumber) {
-		return create2chURL(board, "res/"+threadNumber+".html").toString();
-	}
-	
-	public static String create2chPostURL(String board, String threadNumber, String postNumber) {
-		return create2chThreadURL(board, threadNumber) + "#" + postNumber;
-	}
-	
-	public static Uri create2chURL(String board, String path) {
-		Uri boardUri = appendPath(dvachHostUri, board);
+	public static Uri getUriForDomain(String domain){
+		String url = domain.replaceAll("^(?:http\\://)?(.*?)/*$", "http://$1/");
 		
-		if(!StringUtils.isEmpty(path)){
-			boardUri = appendPath(boardUri, path);
-		}
-		
-		return boardUri;
-	}
-	
-	public static Uri adjust2chRelativeUri(Uri uri){
-		if(uri.isRelative()){
-			return appendPath(dvachHostUri, uri.toString());
-		}
-		
-		return uri;
-	}
-	
-	private static Uri appendPath(Uri baseUri, String path){
-		path = path.replaceAll("^/*(.*)$", "$1");
-		return Uri.withAppendedPath(baseUri, path);
+		return Uri.parse(url);
 	}
 	
 	public static boolean isThreadUri(Uri uri){

@@ -27,13 +27,15 @@ public class ClickListenersFactory implements IClickListenersFactory {
 		}
 	};
 	
-	public static final IURLSpanClickListener sDvachUrlSpanClickListener = new IURLSpanClickListener() {
-		@Override
-		public void onClick(View v, String url) {
-			Uri absoluteUri = UriUtils.adjust2chRelativeUri(Uri.parse(url));
-			BrowserLauncher.launchExternalBrowser(v.getContext(), absoluteUri.toString());
-		}
-	};
+	public static IURLSpanClickListener getDefaultSpanClickListener(final DvachUriBuilder dvachUriBuilder) {
+		return new IURLSpanClickListener() {
+			@Override
+			public void onClick(View v, String url) {
+				Uri absoluteUri = dvachUriBuilder.adjust2chRelativeUri(Uri.parse(url));
+				BrowserLauncher.launchExternalBrowser(v.getContext(), absoluteUri.toString());
+			}
+		};
+	}
 	
 	@Override
 	public OnClickListener getThumbnailOnClickListener(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings) {

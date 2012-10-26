@@ -7,7 +7,6 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
 import com.vortexwolf.dvach.asynctasks.SearchImageTask;
-import com.vortexwolf.dvach.common.BaseListActivity;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
@@ -29,6 +28,7 @@ import com.vortexwolf.dvach.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.dvach.services.BrowserLauncher;
 import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
 import com.vortexwolf.dvach.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -63,6 +63,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	private IPagesSerializationService mSerializationService;
 	private PostItemViewBuilder mPostItemViewBuilder;
 	private HiddenThreadsDataSource mHiddenThreadsDataSource;
+	private DvachUriBuilder mDvachUriBuilder;
 	
 	private DownloadThreadsTask mCurrentDownloadTask = null;
 	private ThreadsListAdapter mAdapter = null;
@@ -100,6 +101,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mSerializationService = this.mApplication.getSerializationService();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings);
         this.mHiddenThreadsDataSource = Factory.getContainer().resolve(HiddenThreadsDataSource.class);
+        this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
     	    	
         // Заголовок страницы
         String pageTitle = mPageNumber != 0 
@@ -108,7 +110,7 @@ public class ThreadsListActivity extends BaseListActivity {
 		this.setTitle(pageTitle);
 		
 		// Сохраняем во вкладках
-		OpenTabModel tabModel = new OpenTabModel(mBoardName, mBoardName, mPageNumber);
+		OpenTabModel tabModel = new OpenTabModel(mBoardName, this.mDvachUriBuilder.create2chBoardUri(mBoardName, mPageNumber));
 		this.mTabModel = this.mApplication.getOpenTabsManager().add(tabModel);
 
         this.resetUI();
@@ -197,7 +199,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	private void setAdapter(){
 		if (mAdapter != null) return;    	
 		
-    	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource);
+    	mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
         this.setListAdapter(mAdapter);
         
 		// добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -250,7 +252,7 @@ public class ThreadsListActivity extends BaseListActivity {
     		this.refreshThreads();
     		break;
     	case R.id.open_browser_menu_id:
-    		BrowserLauncher.launchExternalBrowser(this, UriUtils.create2chURL(this.mBoardName, this.mPageNumber), true);
+    		BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber).toString(), true);
     		break;
     	case R.id.preferences_menu_id:
     		//Start new activity
@@ -353,7 +355,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
-	        	PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.sDvachUrlSpanClickListener);
+	        	PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder), this.mDvachUriBuilder);
 	        	this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
 	        	return true;
 	        }
@@ -388,24 +390,24 @@ public class ThreadsListActivity extends BaseListActivity {
     }
     
     private void navigateToThread(String threadNumber){
-    	navigateToThread(threadNumber, null);
+    	this.navigateToThread(threadNumber, null);
     }
     
     private void navigateToThread(String threadNumber, String threadSubject){
 		Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-		i.setData(Uri.parse(UriUtils.create2chThreadURL(mBoardName, threadNumber)));
+		i.setData(Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(mBoardName, threadNumber)));
 		if(threadSubject != null){
 			i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
 		}
 		
-		startActivity(i);
+		this.startActivity(i);
     }
     
     private void navigateToBoardPageNumber(String boardCode, int pageNumber){
     	Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-		i.setData(Uri.parse(UriUtils.create2chURL(boardCode, pageNumber)));
+		i.setData(this.mDvachUriBuilder.create2chBoardUri(boardCode, pageNumber));
 		
-		startActivity(i);
+		this.startActivity(i);
     }
      
 	private void refreshThreads(){

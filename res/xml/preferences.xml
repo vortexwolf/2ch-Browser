@@ -29,6 +29,13 @@
 			android:summary="@string/pref_name_summary"
 	        android:inputType="text"
 	        android:singleLine="true" />
+	<EditTextPreference
+			android:key="@string/pref_domain_key"
+			android:title="@string/pref_domain"
+			android:hint="@string/pref_domain_hint"
+			android:summary="@string/pref_domain_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
 		
 <PreferenceCategory android:title="@string/pref_category_appearance">
 	<ListPreference

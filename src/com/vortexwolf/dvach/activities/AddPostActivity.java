@@ -9,6 +9,7 @@ import com.vortexwolf.dvach.asynctasks.SendPostTask;
 import com.vortexwolf.dvach.common.*;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
@@ -27,6 +28,7 @@ import com.vortexwolf.dvach.models.presentation.SerializableFileModel;
 import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -96,7 +98,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mJsonReader = this.mApplication.getJsonApiReader();
 		this.mPostSender = this.mApplication.getPostSender();
 		DefaultHttpClient httpClient = MainApplication.getHttpClient();
-		this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient));
+		this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient), Factory.getContainer().resolve(DvachUriBuilder.class));
 		this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
 		this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
 		this.mTracker = this.mApplication.getTracker();
@@ -276,6 +278,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 //		}
 
 		String comment = this.mCommentView.getText().toString();
+		HtmlUtils.trimBr(comment);
 		if(StringUtils.isEmpty(comment) && this.mAttachedFile == null){
 			AppearanceUtils.showToastMessage(this, getString(R.string.warning_write_comment));
 			return;
@@ -466,14 +469,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 					String filePath = null;
 					
 					String[] columns = { MediaStore.Images.Media.DATA };
-		            Cursor cursor = managedQuery(selectedImage, columns, null, null, null);
+		            Cursor cursor = this.getContentResolver().query(selectedImage, columns, null, null, null);
 		            if(cursor != null) {
 			            cursor.moveToFirst();
 	
 			            int columnIndex = cursor.getColumnIndex(columns[0]);
 			            filePath = cursor.getString(columnIndex);
 			            
-			            cursor.close();
+			            if(!cursor.isClosed()){
+			            	cursor.close();
+			            }
 		            }
 		            else {
 		            	filePath = selectedImage.getPath();

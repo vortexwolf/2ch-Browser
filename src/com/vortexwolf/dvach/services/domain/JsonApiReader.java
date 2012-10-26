@@ -28,6 +28,7 @@ import com.vortexwolf.dvach.models.domain.BoardSettings;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 public class JsonApiReader implements IJsonApiReader{
 
@@ -35,22 +36,26 @@ public class JsonApiReader implements IJsonApiReader{
 	private final DefaultHttpClient mHttpClient;
 	private final Resources mResources;
 	private final ObjectMapper mObjectMapper;
+	private final DvachUriBuilder mDvachUriBuilder;
 
-	public JsonApiReader(DefaultHttpClient client, Resources resources, ObjectMapper mapper)
+	public JsonApiReader(DefaultHttpClient client, Resources resources, ObjectMapper mapper, DvachUriBuilder dvachUriBuilder)
 	{
 		this.mHttpClient = client;
 		this.mResources = resources;
 		this.mObjectMapper = mapper;
+		this.mDvachUriBuilder = dvachUriBuilder;
 	}
 	
-	private static String formatThreadsUri(String boardName, int page){
+	private String formatThreadsUri(String boardName, int page){
 		String pageName = page == 0 ? "wakaba" : String.valueOf(page);
 		
-		return Constants.DVACH_URL + boardName + "/" + pageName + ".json";
+		String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, pageName + ".json").toString();
+		
+		return uri;
 	}
 	
-	private static String formatPostsUri(String boardName, String threadId){
-		return Constants.DVACH_URL+boardName+"/res/"+threadId+".json";
+	private String formatPostsUri(String boardName, String threadId){
+		return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/" + threadId + ".json").toString();
 	}
 	
 	@Override

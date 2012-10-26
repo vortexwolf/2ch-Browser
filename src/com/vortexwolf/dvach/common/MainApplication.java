@@ -26,6 +26,7 @@ import com.vortexwolf.dvach.services.domain.DownloadFileService;
 import com.vortexwolf.dvach.services.domain.JsonApiReader;
 import com.vortexwolf.dvach.services.domain.PostSender;
 import com.vortexwolf.dvach.services.presentation.DraftPostsStorage;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.OpenTabsManager;
 import com.vortexwolf.dvach.services.presentation.PagesSerializationService;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -41,13 +42,14 @@ public class MainApplication extends Application {
 		super.onCreate();
 		
 		DefaultHttpClient httpClient = new ExtendedHttpClient();
-		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper());
+		Tracker tracker = new Tracker();
+		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
+		DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings.getDomainUri());
+		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
 		DvachSqlHelper dbHelper = new DvachSqlHelper(this);
 		HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
 		FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
 		HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
-		Tracker tracker = new Tracker();
-		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
 		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
 		HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager));
 		NavigationService navigationService = new NavigationService();
@@ -55,8 +57,9 @@ public class MainApplication extends Application {
 		Container container = Factory.getContainer();
 		container.register(Resources.class, this.getResources());
 		container.register(DefaultHttpClient.class, httpClient);
+		container.register(DvachUriBuilder.class, dvachUriBuilder);
 		container.register(IJsonApiReader.class, jsonApiReader);
-		container.register(IPostSender.class, new PostSender(httpClient, this.getResources()));
+		container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder));
 		container.register(IDraftPostsStorage.class, new DraftPostsStorage());
 		container.register(INavigationService.class, navigationService);
 		container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
@@ -69,7 +72,7 @@ public class MainApplication extends Application {
 		container.register(IBitmapManager.class, new BitmapManager(imageManager));	
 		container.register(HistoryDataSource.class, historyDataSource);	
 		container.register(FavoritesDataSource.class, favoritesDataSource);	
-		container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);	
+		container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
 		
 		historyDataSource.open();
 		favoritesDataSource.open();

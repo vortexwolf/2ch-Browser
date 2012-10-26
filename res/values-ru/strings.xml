@@ -91,7 +91,10 @@
 	<string name="pref_download_path_summary">Измените папку, куда будут сохраняться изображения</string>
     <string name="pref_name">Имя</string>
     <string name="pref_name_summary">Оставьте пустым</string>
-	<string name="pref_name_hint">Аноним</string>
+	<string name="pref_name_hint">Аноним</string>	
+	<string name="pref_domain">Домен</string>
+	<string name="pref_domain_summary">Доменное имя в адресе сайта. Перезагрузите приложение после изменения.</string>
+	<string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
 	<string name="pref_popup_link">Ссылки во всплывающих окнах</string>
