@@ -4,14 +4,14 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.vortexwolf.dvach.interfaces.ICancellable;
+import com.vortexwolf.dvach.interfaces.ICancelled;
 
 public class CancellableInputStream extends FilterInputStream {
 	public static final String TAG = "CancellableInputStream";
 	
-	private final ICancellable mTask;
+	private final ICancelled mTask;
 	
-	public CancellableInputStream(InputStream in, ICancellable task) {
+	public CancellableInputStream(InputStream in, ICancelled task) {
 		super(in);
 		this.mTask = task;
 	}

@@ -351,7 +351,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
+	        	this.mApplication.getSaveFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_VIEW_FULL_POST: {

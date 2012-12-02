@@ -15,6 +15,7 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
@@ -58,6 +59,7 @@ public class PostsListActivity extends BaseListActivity {
 	private Tracker mTracker;
 	private IPagesSerializationService mSerializationService;
 	private DvachUriBuilder mDvachUriBuilder;
+	private FavoritesDataSource mFavoritesDatasource;
 
 	private PostsListAdapter mAdapter = null;
 	private DownloadPostsTask mCurrentDownloadTask = null;
@@ -69,6 +71,8 @@ public class PostsListActivity extends BaseListActivity {
 	private OpenTabModel mTabModel;
 	private String mBoardName;
 	private String mThreadNumber;
+	
+	private Menu mMenu;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,7 @@ public class PostsListActivity extends BaseListActivity {
         this.mSerializationService = this.mApplication.getSerializationService();
         this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
         IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
+        this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
         
         // Заголовок страницы
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT) ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT) : null;
@@ -212,6 +217,10 @@ public class PostsListActivity extends BaseListActivity {
         
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.thread, menu);
+        
+        this.mMenu = menu;
+        this.updateOptionsMenu();
+        
         return true;
     }
     
@@ -241,6 +250,24 @@ public class PostsListActivity extends BaseListActivity {
     		break;
     	case R.id.add_menu_id:
     		this.navigateToAddPostView(null, null);
+    		break;
+    	case R.id.share_menu_id:
+    		Intent i = new Intent(Intent.ACTION_SEND);
+    		i.setType("text/plain");
+    		i.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getTitle());
+    		i.putExtra(Intent.EXTRA_TEXT, this.mTabModel.getUri().toString());
+    		this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
+    		break;
+    	case R.id.add_remove_favorites_menu_id:
+    		String url = this.mTabModel.getUri().toString();
+            if(this.mFavoritesDatasource.hasFavorites(url)){
+            	this.mFavoritesDatasource.removeFromFavorites(url);
+            } else {
+            	this.mFavoritesDatasource.addToFavorites(this.mTabModel.getTitle(), url);
+            }
+            
+            this.updateOptionsMenu();
+            
     		break;
     	case android.R.id.home:
     		this.navigateToThreads(this.mBoardName);
@@ -295,7 +322,7 @@ public class PostsListActivity extends BaseListActivity {
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE:{
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-	        	this.mApplication.getDownloadFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
+	        	this.mApplication.getSaveFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
@@ -314,7 +341,16 @@ public class PostsListActivity extends BaseListActivity {
 		
 		super.onSaveInstanceState(outState);
 	}
-
+    
+    private void updateOptionsMenu(){
+        MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
+        if(this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())){
+        	favoritesItem.setTitle(R.string.menu_remove_favorites);
+        } else {
+        	favoritesItem.setTitle(R.string.menu_add_favorites);
+        }
+    }
+    
 	private void navigateToAddPostView(String postNumber, String postComment){
     	Intent addPostIntent = new Intent(getApplicationContext(), AddPostActivity.class);
 		addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);

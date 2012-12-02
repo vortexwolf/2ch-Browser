@@ -4,48 +4,64 @@ import android.net.Uri;
 
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class DvachUriBuilder {
 	private final Uri mDvachHostUri;
+	private final ApplicationSettings mSettings;
 	
 	public DvachUriBuilder(Uri hostUri) {
 		this.mDvachHostUri = hostUri;
+		this.mSettings = null;
+	}
+	
+	public DvachUriBuilder(ApplicationSettings settings) {
+		this.mSettings = settings;
+		this.mDvachHostUri = null;
 	}
 	
 	public String create2chPostUrl(String board, String threadNumber, String postNumber) {
-		return create2chThreadUrl(board, threadNumber) + "#" + postNumber;
+		return this.create2chThreadUrl(board, threadNumber) + "#" + postNumber;
 	}
 	
 	public String create2chThreadUrl(String board, String threadNumber) {
-		return create2chBoardUri(board, "res/"+threadNumber+".html").toString();
+		return this.create2chBoardUri(board, "res/"+threadNumber+".html").toString();
 	}
 	
 	public Uri create2chBoardUri(String board, int pageNumber) {
-		return create2chBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
+		return this.create2chBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
 	}
 	
 	public Uri create2chBoardUri(String board, String path) {
-		Uri boardUri = appendPath(mDvachHostUri, board);
+		Uri boardUri = this.appendPath(this.getDvachHostUri(), board);
 		
 		if(!StringUtils.isEmpty(path)){
-			boardUri = appendPath(boardUri, path);
+			boardUri = this.appendPath(boardUri, path);
 		}
 		
 		return boardUri;
 	}
 	
 	public Uri create2chUri(String path){
-		Uri uri = appendPath(mDvachHostUri, path);
+		Uri uri = this.appendPath(this.getDvachHostUri(), path);
 		
 		return uri;
 	}
 	
 	public Uri adjust2chRelativeUri(Uri uri){
-		return uri.isRelative() ? appendPath(mDvachHostUri, uri.toString()) : uri;
+		return uri.isRelative() ? this.appendPath(this.getDvachHostUri(), uri.toString()) : uri;
 	}
 	
 	private Uri appendPath(Uri baseUri, String path){
 		path = path.replaceFirst("^/*", "");
 		return Uri.withAppendedPath(baseUri, path);
+	}
+	
+	private Uri getDvachHostUri(){
+		if(this.mSettings != null){
+			return this.mSettings.getDomainUri();
+		}
+		
+		return mDvachHostUri;
 	}
 }

@@ -60,6 +60,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return uri;
 	}
 	
+	public boolean isDownloadInBackground() {
+		return mSettings.getBoolean(mResources.getString(R.string.pref_download_background_key), true);
+	}
+	
 	public boolean isLoadThumbnails() {
 		return mSettings.getBoolean(mResources.getString(R.string.pref_load_thumbnails_key), true);
 	}

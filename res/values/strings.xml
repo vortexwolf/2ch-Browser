@@ -20,6 +20,7 @@
 	<string name="tabs_bookmarks">Bookmarks</string>
 	<string name="tabs_history">History</string>
 	<string name="addpost_politics_prompt">Political preferences</string>
+	<string name="share_via">Share via</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -56,6 +57,9 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_tabs">Tabs</string>
     <string name="menu_clear_history">Clear history</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_add_favorites">Add to bookmarks</string>
+    <string name="menu_remove_favorites">Remove from bookmarks</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -84,11 +88,13 @@
 	<string name="pref_download_path">Downloads folder</string>
 	<string name="pref_download_path_hint">/download/2ch Browser/</string>
 	<string name="pref_download_path_summary">Change a folder where images should be saved</string>
+	<string name="pref_download_background">Download images in background</string>
+	<string name="pref_download_background_summary">The progress dialog will not be displayed and the downloading cannot be cancelled</string>
     <string name="pref_name">Name</string>
     <string name="pref_name_summary">Leave it blank</string>
 	<string name="pref_name_hint">Anonymous</string>
 	<string name="pref_domain">Domain</string>
-	<string name="pref_domain_summary">The domain name of the 2ch website. Reload the app after making changes.</string>
+	<string name="pref_domain_summary">Use any: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
 	<string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
 	<string name="pref_display_post_date">Time of posts</string>
 	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
@@ -133,6 +139,7 @@
 	<string name="error_save_file">An error has occured while saving the file.</string>
 	<string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
 	<string name="error_image_search">The TinEye website doesn\'t work.</string>
+	<string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Enter the confirmation code</string>
@@ -143,7 +150,7 @@
 	<!-- Notifications -->
 	<string name="notification_send_post_success">The post was sent successfully</string>
 	<string name="notification_no_new_posts">No new posts</string>
-	<string name="notification_save_image_success">The file was saved to %1$s</string>
+	<string name="notification_save_image_started">The file will be saved to %1$s</string>
 	<string name="notification_post_not_found">The post isn\'t found</string>
 	<string name="notification_post_copied">Copied to clipboard</string>
 </resources>

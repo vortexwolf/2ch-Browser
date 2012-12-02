@@ -2,7 +2,7 @@ package com.vortexwolf.dvach.asynctasks;
 
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.interfaces.ICancellable;
+import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
@@ -12,7 +12,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.Window;
 
-public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implements IProgressChangeListener, ICancellable {
+public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implements IProgressChangeListener, ICancelled {
 
 	static final String TAG = "DownloadThreadsTask";
 	
@@ -39,7 +39,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 	protected Boolean doInBackground(Void... params) {
 		//Читаем по ссылке json-объект со списком тредов
 		try{
-			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this, this, this.mActivity);
+			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this, this);
 		}
 		catch(JsonApiReaderException e){
 			this.mUserError = e.getMessage();
@@ -95,10 +95,15 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 	}
 
 	@Override
-	public void progressChanged(long oldValue, long newValue) {
+	public void progressChanged(long newValue) {
 		if(this.isCancelled()) return;
 		
 		this.publishProgress(newValue);
+	}
+	
+	@Override
+	public void indeterminateProgress() {
+		this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
 	}
 
 	@Override

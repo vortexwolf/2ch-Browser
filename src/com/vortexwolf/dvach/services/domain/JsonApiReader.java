@@ -2,8 +2,11 @@ package com.vortexwolf.dvach.services.domain;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
@@ -11,17 +14,17 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import android.app.Activity;
 import android.content.res.Resources;
-import android.view.Window;
+import android.content.res.Resources.NotFoundException;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.CancellableInputStream;
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.library.ProgressInputStream;
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.interfaces.ICancellable;
+import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.models.domain.BoardSettings;
@@ -30,193 +33,185 @@ import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
-public class JsonApiReader implements IJsonApiReader{
+public class JsonApiReader implements IJsonApiReader {
 
 	static final String TAG = "JsonApiReader";
 	private final DefaultHttpClient mHttpClient;
 	private final Resources mResources;
 	private final ObjectMapper mObjectMapper;
 	private final DvachUriBuilder mDvachUriBuilder;
+	private final HashMap<String, String> mIfModifiedMap;
 
-	public JsonApiReader(DefaultHttpClient client, Resources resources, ObjectMapper mapper, DvachUriBuilder dvachUriBuilder)
-	{
+	public JsonApiReader(DefaultHttpClient client, Resources resources, ObjectMapper mapper, DvachUriBuilder dvachUriBuilder) {
 		this.mHttpClient = client;
 		this.mResources = resources;
 		this.mObjectMapper = mapper;
 		this.mDvachUriBuilder = dvachUriBuilder;
+		this.mIfModifiedMap = new HashMap<String, String>();
 	}
-	
-	private String formatThreadsUri(String boardName, int page){
+
+	private String formatThreadsUri(String boardName, int page) {
 		String pageName = page == 0 ? "wakaba" : String.valueOf(page);
-		
+
 		String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, pageName + ".json").toString();
-		
+
 		return uri;
 	}
-	
-	private String formatPostsUri(String boardName, String threadId){
+
+	private String formatPostsUri(String boardName, String threadId) {
 		return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/" + threadId + ".json").toString();
 	}
-	
+
 	@Override
-	public ThreadsList readThreadsList(String boardName, int page, IProgressChangeListener listener, ICancellable task, Activity activity) throws JsonApiReaderException{
+	public ThreadsList readThreadsList(String boardName, int page, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
 		String uri = formatThreadsUri(boardName, page);
-		return this.readData(uri, ThreadsList.class, listener, task, activity);
+		
+		return this.readData(uri, ThreadsList.class, listener, task);
 	}
 
 	@Override
-	public PostsList readPostsList(String boardName, String threadNumber, String from, IProgressChangeListener listener, ICancellable task) throws JsonApiReaderException{
+	public PostsList readPostsList(String boardName, String threadNumber, String from, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
 		String uri = formatPostsUri(boardName, threadNumber);
+		
 		return this.readData(uri, PostsList.class, listener, task);
 	}
-	
-	public <T> T readData(String url, Class<T> valueType) throws JsonApiReaderException{
-		return readData(url, valueType, null, null);
+
+	public <T> T readData(String url, Class<T> valueType, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+		return this.readData(url, valueType, listener, task, 0);
 	}
-	
-	public <T> T readData(String url, Class<T> valueType, IProgressChangeListener listener, ICancellable task) throws JsonApiReaderException{
-		return readData(url, valueType, listener, task, null);
-	}
-	
-	public <T> T readData(String url, Class<T> valueType, IProgressChangeListener listener, ICancellable task, Activity activity) throws JsonApiReaderException{
-		return readData(url, valueType, listener, task, activity, 0);
-	}
-	
-	private <T> T readData(String url, Class<T> valueType, IProgressChangeListener listener, ICancellable task, Activity activity, int recLevel) throws JsonApiReaderException {
-//		//Создаем get-request
+
+	private <T> T readData(String url, Class<T> valueType, IProgressChangeListener listener, ICancelled task, int recLevel) throws JsonApiReaderException {
 		HttpGet request = null;
-		try {
-			request = new HttpGet(url);
-			request.setHeader("Accept", "application/json");
-		} 
-		catch (IllegalArgumentException e) {
-			MyLog.e(TAG, e);
-			finishRead(request, null, new JsonApiReaderException(mResources.getString(R.string.error_incorrect_argument), e));
-		}
-		
-		if(checkCancelled(task, request, null)) return null;
-		
-		//Получаем response
 		HttpResponse response = null;
+		T result = null;
 
 		try {
-			response = mHttpClient.execute(request);
+			request = this.createRequest(url);
+
+			if (task != null && task.isCancelled()) return null;
+
+			response = this.executeRequest(request);
+
+			// check the response code
+			StatusLine status = response.getStatusLine();
+			if (status.getStatusCode() == 304) {
+				return null;
+			}
+			if (status.getStatusCode() != 200) {
+				throw new JsonApiReaderException(status.getStatusCode() + " - " + status.getReasonPhrase());
+			}
+
+			if (task != null && task.isCancelled()) return null;
+
+			// read and parse the response
+			InputStream json = this.getInputStream(response, listener, task);
+
+			try {
+				result = this.parseResult(json, valueType);
+			} catch (JsonParseException e) {
+				if (recLevel == 0) {
+					MyLog.v(TAG, "Read json once again");
+					
+					if (listener != null)  listener.indeterminateProgress();
+					result = this.readData(url, valueType, null, task, recLevel + 1);
+				} else {
+					throw new JsonApiReaderException(mResources.getString(R.string.error_json_parse));
+				}
+			}
+
+			// save the last modified date
+			Header header = response.getFirstHeader("Last-Modified");
+			if (header != null) {
+				this.mIfModifiedMap.put(url, header.getValue());
+			}
+
+			return result;
+		} finally {
+			finishRead(request, response);
+		}
+	}
+
+	private HttpGet createRequest(String url) throws JsonApiReaderException {
+		try {
+			HttpGet request = new HttpGet(url);
+			request.setHeader("Accept", "application/json");
+			if (this.mIfModifiedMap.containsKey(url)) {
+				request.setHeader("If-Modified-Since", this.mIfModifiedMap.get(url));
+			}
+
+			return request;
+		} catch (IllegalArgumentException e) {
+			MyLog.e(TAG, e);
+			throw new JsonApiReaderException(mResources.getString(R.string.error_incorrect_argument), e);
+		}
+	}
+
+	private HttpResponse executeRequest(HttpGet request) throws JsonApiReaderException {
+		try {
+			HttpResponse response = this.mHttpClient.execute(request);
+
+			return response;
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_download_data)));
+			throw new JsonApiReaderException(mResources.getString(R.string.error_download_data), e);
 		}
+	}
 
-		StatusLine status = response.getStatusLine();
-		MyLog.v(TAG, status);
-		if(status.getStatusCode() != 200) {
-			finishRead(request, response, new JsonApiReaderException(status.getStatusCode() + " - " + status.getReasonPhrase()));
-		}
-		
-		if(checkCancelled(task, request, response)) return null;
+	private InputStream getInputStream(HttpResponse response, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+		HttpEntity entity = response.getEntity();
+		try {
+			InputStream resultStream = entity.getContent();
 
-		InputStream json = null;
-		try{
-			json = getInputStream(response, listener, task);
-		}
-		catch (Exception e) {
+			if (listener != null) {
+				long contentLength = entity.getContentLength();
+				listener.setContentLength(contentLength);
+
+				ProgressInputStream pin = new ProgressInputStream(resultStream, contentLength);
+				pin.addProgressChangeListener(listener);
+				resultStream = pin;
+			}
+
+			if (task != null) {
+				resultStream = new CancellableInputStream(resultStream, task);
+			}
+
+			return resultStream;
+		} catch (Exception e) {
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_download_data)));
+			throw new JsonApiReaderException(mResources.getString(R.string.error_download_data), e);
 		}
+	}
 
-		//Парсим результат
+	private <T> T parseResult(InputStream json, Class<T> valueType) throws JsonParseException, JsonApiReaderException {
 		T result = null;
 		try {
 			result = this.mObjectMapper.readValue(json, valueType);
-		} 
-		catch (JsonParseException e){
+
+			return result;
+		} catch (JsonParseException e) {
 			MyLog.e(TAG, e);
-			if(recLevel < 1){
-				MyLog.v(TAG, "Read json once again");
-				if(activity != null){
-					activity.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_ON);
-				}
-				return readData(url, valueType, null, task, null, recLevel + 1);
-			}
-			else {
-				finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_json_parse)));
-			}
-		}
-		catch (Exception e) {
-			// Если не удалось преобразовать, значит неверный json-объект
+			throw e;
+		} catch (Exception e) {
 			MyLog.e(TAG, e);
-			finishRead(request, response, new JsonApiReaderException(mResources.getString(R.string.error_json_parse)));
-		}
-
-		finishRead(request, response);
-
-		return result;
-	}
-	
-	private boolean checkCancelled(ICancellable task, HttpGet request, HttpResponse response){
-		if(task != null && task.isCancelled()){
-			finishRead(request, response);
-			MyLog.v(TAG, "task was cancelled");
-			
-	        return true;
-		}
-
-		return false;
-	}
-	
-	/** Освобождает все ресурсы http-запроса и выбрасывает исключения */
-	private void finishRead(HttpGet request, HttpResponse response, JsonApiReaderException exception) throws JsonApiReaderException{
-		finishRead(request, response);
-		
-		if(exception != null){
-			throw exception;
+			throw new JsonApiReaderException(mResources.getString(R.string.error_json_parse));
 		}
 	}
-	
-	/** Освобождает все ресурсы http-запроса */
-	private void finishRead(HttpGet request, HttpResponse response){
-		// Очищяем response перед request, чтобы не было SocketException
-		if(response != null){
+
+	/** Releases all resources of the request and response objects */
+	private void finishRead(HttpGet request, HttpResponse response) {
+		if (response != null) {
 			HttpEntity entity = response.getEntity();
-	        if (entity != null){
-	        	try{ 
-	        		entity.consumeContent();
-	        	}
-	        	catch (Exception e){ 
-	        		MyLog.e(TAG, e); 
-	        	}
-	        }
+			if (entity != null) {
+				try {
+					entity.consumeContent();
+				} catch (Exception e) {
+					MyLog.e(TAG, e);
+				}
+			}
 		}
-		if(request != null){
+
+		if (request != null) {
 			request.abort();
 		}
-	}
-		
-	private InputStream getInputStream(HttpResponse response, IProgressChangeListener listener, ICancellable task) throws IllegalStateException, IOException{
-		
-		HttpEntity entity = response.getEntity();
-		InputStream resultStream = entity.getContent();
-		
-		if (listener != null){
-			long contentLength = -1;
-			// Раньше и этот метод, и entity.getContentLength() возвращали -1. Сейчас вроде все норм.
-			Header contentLengthHeader = response.getFirstHeader("Content-Length");
-			if (contentLengthHeader != null){
-				contentLength = Long.valueOf(contentLengthHeader.getValue());
-			}
-			else {
-				contentLength = entity.getContentLength();
-			}
-			listener.setContentLength(contentLength);
-
-			ProgressInputStream pin = new ProgressInputStream(resultStream, contentLength);
-			pin.addProgressChangeListener(listener);
-			resultStream = pin;
-		}
-		
-		if(task != null) {
-			resultStream = new CancellableInputStream(resultStream, task);
-		}
-		
-		return resultStream;
 	}
 }

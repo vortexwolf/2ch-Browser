@@ -61,10 +61,9 @@ public class ProgressInputStream extends FilterInputStream {
 
     private long updateProgress(long numBytesRead) {
         if (numBytesRead > 0) {
-            long oldTotalNumBytesRead = this.mTotalNumBytesRead;
             this.mTotalNumBytesRead += numBytesRead;
             for(IProgressChangeListener l : this.mListeners){
-            	l.progressChanged(oldTotalNumBytesRead, this.mTotalNumBytesRead);
+            	l.progressChanged(this.mTotalNumBytesRead);
             }
         }
 

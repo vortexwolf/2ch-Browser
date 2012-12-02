@@ -22,6 +22,11 @@
 			android:summary="@string/pref_download_path_summary"
 	        android:inputType="text"
 	        android:singleLine="true" />
+	<CheckBoxPreference
+			android:key="@string/pref_download_background_key"
+			android:defaultValue="true"
+			android:summary="@string/pref_download_background_summary"
+			android:title="@string/pref_download_background" />
 	<EditTextPreference
 			android:key="@string/pref_name_key"
 			android:title="@string/pref_name"

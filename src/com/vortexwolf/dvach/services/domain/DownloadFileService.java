@@ -1,75 +1,119 @@
 package com.vortexwolf.dvach.services.domain;
 
+import java.io.BufferedInputStream;
 import java.io.File;
-import android.content.Context;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.interfaces.IDownloadFileService;
+import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.exceptions.DownloadFileException;
+import com.vortexwolf.dvach.interfaces.ICancelled;
+import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
-public class DownloadFileService implements IDownloadFileService {
-	
-	public static final String TAG = "DownloadFileService";
-	
-	private final Resources mResources;
-	private final ApplicationSettings mSettings;
-	
-	public static boolean sNewClassAvailable;
+public class DownloadFileService {
+	private static final String TAG = "DownloadFileService";
 
-   static {
-	   if (Integer.valueOf(Build.VERSION.SDK) >= 9) {
-           sNewClassAvailable = true;
-       }
-   }
-	
-	public DownloadFileService(Resources resources, ApplicationSettings settings){
+	private final Resources mResources;
+
+	public DownloadFileService(Resources resources) {
 		this.mResources = resources;
-		this.mSettings = settings;
 	}
-	
-	@Override
-	public void downloadFile(Context context, String uri){
-		downloadFile(context, uri, null);
-	}
-	
-	@Override
-	public void downloadFile(Context context, String uri, File cachedFile){
-		File to = this.getSaveFilePath(uri);
-	    if(to.exists()){
-	    	AppearanceUtils.showToastMessage(context, this.mResources.getString(R.string.error_file_exist));
-	    	return;
-	    }
-	    
-	    // В версиях до 2.3 копируем файл из кэша, если возможно
-	    // В версиях начиная с 2.3 Download Manager всегда будет загружать файл заново, т.к. там более удобный интерфейс
-	    Uri from = Uri.parse(uri);
-		
-	    boolean isCached = cachedFile != null && cachedFile.exists();
-	    if(isCached){
-	    	from = Uri.fromFile(cachedFile);
-	    	new DownloadFileTask(context, from, to).execute();
-	    }
-	    else if (sNewClassAvailable) {
-	        DownloadManagerWrapper.downloadFile(context, from, to);
-		} 
-	    else {
-			new DownloadFileTask(context, from, to).execute();
+
+	public void downloadFile(Uri uri, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws DownloadFileException {
+		if (to.exists()) {
+			throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
+		}
+
+		BufferedInputStream input = null;
+		try {
+			File fromFile = new File(uri.getPath());
+
+			if (fromFile.exists()) {
+				progressChangeListener.setContentLength(fromFile.length());
+				input = new BufferedInputStream(new FileInputStream(fromFile));
+			} else {
+				URL url = new URL(uri.toString());
+				URLConnection connection = url.openConnection();
+				connection.connect();
+
+				progressChangeListener.setContentLength(connection.getContentLength());
+				input = new BufferedInputStream(url.openStream());
+			}
+
+			this.SaveStream(input, to, progressChangeListener, task);
+
+		} catch (DownloadFileException e) {
+			throw e;
+		} catch (Exception e) {
+			MyLog.e(TAG, e);
+			throw new DownloadFileException(mResources.getString(R.string.error_save_file));
+		} finally {
+			try {
+				if (input != null) {
+					input.close();
+				}
+			} catch (Exception e) {
+				MyLog.e(TAG, e);
+			}
 		}
 	}
-	
-	private File getSaveFilePath(String uri){
-		Uri img = Uri.parse(uri);
-	    String fileName = img.getLastPathSegment();
-	    
-	    File dir = new File(Environment.getExternalStorageDirectory(), this.mSettings.getDownloadPath());
-	    dir.mkdirs();
-	    File file = new File(dir, fileName);
-	    
-	    return file;
+
+	private void SaveStream(InputStream input, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws Exception, DownloadFileException {
+		OutputStream output = null;
+		byte data[] = new byte[1024];
+		int total = 0, count;
+		boolean wasCancelled = false;
+
+		try {
+			output = new FileOutputStream(to);
+
+			while ((count = input.read(data)) != -1) {
+				if (task != null && task.isCancelled()) {
+					wasCancelled = true;
+					return;
+				}
+
+				total += count;
+				output.write(data, 0, count);
+
+				if (progressChangeListener != null) {
+					progressChangeListener.progressChanged(total);
+				}
+			}
+		} 
+		catch (Exception e){
+			MyLog.e(TAG, e);
+			wasCancelled = true;
+			if(e instanceof FileNotFoundException) {
+				throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
+			}
+			
+			throw e;
+		}
+		finally {
+			try {
+				if (output != null) {
+					output.close();
+				}
+			} catch (Exception e) {
+				MyLog.e(TAG, e);
+			}
+
+			if (wasCancelled) {
+				to.delete();
+			}
+		}
 	}
+
 }

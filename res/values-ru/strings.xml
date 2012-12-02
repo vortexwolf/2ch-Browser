@@ -21,6 +21,7 @@
 	<string name="tabs_bookmarks">Закладки</string>
 	<string name="tabs_history">История</string>
 	<string name="addpost_politics_prompt">Политические предпочтения</string>
+	<string name="share_via">Способ отправки</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -60,7 +61,10 @@
     <string name="menu_save">Сохранить</string>
     <string name="menu_gallery">Галерея</string>
 	<string name="menu_tabs">Вкладки</string>
-	<string name="menu_clear_history">Очистить историю</string>
+	<string name="menu_clear_history">Очистить историю</string>    
+	<string name="menu_share">Поделиться</string>
+    <string name="menu_add_favorites">Добавить в закладки</string>
+    <string name="menu_remove_favorites">Удалить из закладок</string>
         
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -89,11 +93,13 @@
 	<string name="pref_download_path">Папка загрузок</string>
 	<string name="pref_download_path_hint">/download/2ch Browser/</string>
 	<string name="pref_download_path_summary">Измените папку, куда будут сохраняться изображения</string>
+	<string name="pref_download_background">Сохранять изображения в фоне</string>
+	<string name="pref_download_background_summary">Прогресс-диалог не будет отображаться</string>
     <string name="pref_name">Имя</string>
     <string name="pref_name_summary">Оставьте пустым</string>
 	<string name="pref_name_hint">Аноним</string>	
 	<string name="pref_domain">Домен</string>
-	<string name="pref_domain_summary">Доменное имя в адресе сайта. Перезагрузите приложение после изменения.</string>
+	<string name="pref_domain_summary">Любой из списка: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
 	<string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
@@ -138,6 +144,7 @@
 	<string name="error_save_file">Во время сохранения произошла ошибка.</string>
 	<string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>
 	<string name="error_image_search">Поиск в TinEye не работает.</string>
+	<string name="error_download_no_space_sdcard">Не удалось сохранить файл, нет места в памяти устройства.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Введите код подтверждения</string>
@@ -148,7 +155,7 @@
 	<!-- Notifications -->
 	<string name="notification_send_post_success">Сообщение успешно отправлено</string>
 	<string name="notification_no_new_posts">Нет новых сообщений</string>
-	<string name="notification_save_image_success">Файл сохранен в %1$s</string>
+	<string name="notification_save_image_started">Файл будет сохранен в %1$s</string>
 	<string name="notification_post_not_found">Сообщение не найдено</string>
 	<string name="notification_post_copied">Сообщение скопировано</string>
 </resources>

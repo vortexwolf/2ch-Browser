@@ -4,13 +4,13 @@ import android.os.AsyncTask;
 import android.view.Window;
 
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.interfaces.ICancellable;
+import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.models.domain.PostsList;
 
-public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implements IProgressChangeListener, ICancellable {
+public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implements IProgressChangeListener, ICancelled {
 	
 	static final String TAG = "DownloadPostsTask";
 	
@@ -87,7 +87,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 				this.mView.setData(this.mPostsList);
 			}
 		}
-		else if(!success) {
+		else if(!success && this.mUserError != null) {
 			if(this.mIsPartialLoading){
 				this.mView.showUpdateError(this.mUserError);
 			}
@@ -95,6 +95,8 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 				this.mView.showError(this.mUserError);
 			}
 		}
+		
+		// else show "No new posts"
 	}
 
 	private void onFinished(){
@@ -105,11 +107,8 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 			this.mView.hideLoadingScreen();
 		}
 		
-		if (mContentLength == -1){
-			this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_OFF);
-		}
 		//Hide progress anyway
-		this.mView.setWindowProgress(10000);
+		this.mView.setWindowProgress(Window.PROGRESS_END);
 	}
 
 	@Override
@@ -122,10 +121,15 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 	}
 
 	@Override
-	public void progressChanged(long oldValue, long newValue) {
+	public void progressChanged(long newValue) {
 		if(this.isCancelled()) return;
 		
 		publishProgress(newValue);
+	}
+	
+	@Override
+	public void indeterminateProgress() {
+		this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
 	}
 	
 	@Override

@@ -10,7 +10,6 @@ import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
 import com.vortexwolf.dvach.db.HistoryDataSource;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.INavigationService;
@@ -23,6 +22,7 @@ import com.vortexwolf.dvach.services.NavigationService;
 import com.vortexwolf.dvach.services.SerializationService;
 import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.DownloadFileService;
+import com.vortexwolf.dvach.services.domain.SaveFileService;
 import com.vortexwolf.dvach.services.domain.JsonApiReader;
 import com.vortexwolf.dvach.services.domain.PostSender;
 import com.vortexwolf.dvach.services.presentation.DraftPostsStorage;
@@ -44,7 +44,7 @@ public class MainApplication extends Application {
 		DefaultHttpClient httpClient = new ExtendedHttpClient();
 		Tracker tracker = new Tracker();
 		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
-		DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings.getDomainUri());
+		DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
 		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
 		DvachSqlHelper dbHelper = new DvachSqlHelper(this);
 		HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
@@ -53,6 +53,7 @@ public class MainApplication extends Application {
 		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
 		HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager));
 		NavigationService navigationService = new NavigationService();
+		DownloadFileService downloadFileService = new DownloadFileService(this.getResources());
 		
 		Container container = Factory.getContainer();
 		container.register(Resources.class, this.getResources());
@@ -64,7 +65,6 @@ public class MainApplication extends Application {
 		container.register(INavigationService.class, navigationService);
 		container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
 		container.register(ApplicationSettings.class, settings);
-		container.register(IDownloadFileService.class, new DownloadFileService(this.getResources(), settings));
 		container.register(Tracker.class, tracker);
 		container.register(ICacheDirectoryManager.class, cacheManager);
 		container.register(IPagesSerializationService.class,  new PagesSerializationService(cacheManager, new SerializationService()));
@@ -73,6 +73,8 @@ public class MainApplication extends Application {
 		container.register(HistoryDataSource.class, historyDataSource);	
 		container.register(FavoritesDataSource.class, favoritesDataSource);	
 		container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
+		container.register(DownloadFileService.class, downloadFileService);
+		container.register(SaveFileService.class, new SaveFileService(this.getResources(), settings, downloadFileService, cacheManager));
 		
 		historyDataSource.open();
 		favoritesDataSource.open();
@@ -109,8 +111,8 @@ public class MainApplication extends Application {
 		return Factory.getContainer().resolve(IDraftPostsStorage.class);
 	}
 	
-	public IDownloadFileService getDownloadFileService(){
-		return Factory.getContainer().resolve(IDownloadFileService.class);
+	public SaveFileService getSaveFileService(){
+		return Factory.getContainer().resolve(SaveFileService.class);
 	}
 	
 	public Tracker getTracker(){

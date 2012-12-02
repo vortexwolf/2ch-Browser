@@ -65,6 +65,11 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 	}
 	
 	@Override
+	public File getImagesCacheDirectory(){
+		return new File(this.getCurrentCacheDirectory(), "webviewCache");
+	}
+	
+	@Override
 	public void trimCacheIfNeeded(){
 		new Thread(new Runnable(){
 			@Override

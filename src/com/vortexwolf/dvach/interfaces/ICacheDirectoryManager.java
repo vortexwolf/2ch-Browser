@@ -18,4 +18,6 @@ public interface ICacheDirectoryManager {
 
 	public abstract void trimCacheIfNeeded();
 
+	public abstract File getImagesCacheDirectory();
+
 }

@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/open_browser_menu_id" android:title="@string/menu_open_browser" android:icon="@drawable/ic_menu_browser" />
 	<item android:id="@+id/save_menu_id" android:title="@string/menu_save" android:icon="?iconSave" android:showAsAction="ifRoom" />
+	<item android:id="@+id/share_menu_id" android:title="@string/menu_share" android:icon="@drawable/ic_menu_share" />
 </menu>

@@ -4,7 +4,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.interfaces.ICancellable;
+import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
@@ -17,7 +17,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancellable {
+public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
 	private static final String TAG = "DownloadCaptchaTask";
 	
 	private final ICaptchaView mView;

@@ -5,12 +5,14 @@ import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.WebViewFixed;
 import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.interfaces.IDownloadFileService;
 import com.vortexwolf.dvach.services.BrowserLauncher;
 import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.domain.SaveFileService;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,11 +30,15 @@ import android.webkit.WebViewClient;
 public class BrowserActivity extends Activity {
 	public static final String TAG = "BrowserActivity";
 	
+	private enum ViewType { PAGE, LOADING }
+	
     private MainApplication mApplication;
-	private IDownloadFileService mDownloadFileService;
+	private SaveFileService mDownloadFileService;
 	private Tracker mTracker;
 	
-	private WebView mWebview;
+	private WebView mWebView;
+	private View mLoadingView = null;
+	
 	private Uri mUri = null;
 	private String mTitle = null;
 	
@@ -41,23 +47,22 @@ public class BrowserActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		this.requestWindowFeature(Window.FEATURE_PROGRESS);
-		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         
         this.mApplication = (MainApplication) this.getApplication();
-        this.mDownloadFileService = this.mApplication.getDownloadFileService();
+        this.mDownloadFileService = this.mApplication.getSaveFileService();
         this.mTracker = this.mApplication.getTracker();
         
         this.mTracker.trackActivityView(TAG);
         
         this.resetUI();
         
-		WebSettings settings = mWebview.getSettings();
+		WebSettings settings = mWebView.getSettings();
 		settings.setBuiltInZoomControls(true);
 		settings.setUseWideViewPort(true);
 
-		this.mWebview.setInitialScale(100);
+		this.mWebView.setInitialScale(100);
 		
-		this.mWebview.setWebChromeClient(new WebChromeClient() {
+		this.mWebView.setWebChromeClient(new WebChromeClient() {
 			@Override
 			public void onProgressChanged(WebView view, int progress) {
 		    	// Activities and WebViews measure progress with different scales.
@@ -73,48 +78,58 @@ public class BrowserActivity extends Activity {
 		});
 		
 		// in case of a redirect don't open the external browser
-		this.mWebview.setWebViewClient(new WebViewClient() {
+		this.mWebView.setWebViewClient(new WebViewClient() {
 	        @Override
 	        public boolean shouldOverrideUrlLoading(WebView view, String url) {
 	        	view.loadUrl(url);
 	            return true;
 	        }
+
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				BrowserActivity.this.switchToPageView();
+				super.onPageFinished(view, url);
+			}
+
+			@Override
+			public void onPageStarted(WebView view, String url, Bitmap favicon) {
+				BrowserActivity.this.switchToLoadingView();
+				super.onPageStarted(view, url, favicon);
+			}
+	        
 		});
 		
 		this.mUri = getIntent().getData();
 		this.mTitle = this.mUri.toString();
 		this.setTitle(this.mTitle);
-		
-		if (savedInstanceState != null) {
-			this.mWebview.restoreState(savedInstanceState);
-		} else {
-			this.mWebview.loadUrl(this.mUri.toString());
-		}
+
+		this.mWebView.loadUrl(this.mUri.toString());
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		// Must remove the WebView from the view system before destroying.
-		this.mWebview.setVisibility(View.GONE);
-		this.mWebview.destroy();
+		this.mWebView.setVisibility(View.GONE);
+		this.mWebView.destroy();
 	}
 	
 	private void resetUI() {
 		this.setTheme(this.mApplication.getSettings().getTheme());
 		this.setContentView(R.layout.browser);
 		
-		this.mWebview = (WebViewFixed) findViewById(R.id.webview);
+		this.mWebView = (WebViewFixed) findViewById(R.id.webview);
+		this.mLoadingView = this.findViewById(R.id.loadingView);
 		
 		TypedArray a = this.mApplication.getTheme().obtainStyledAttributes(R.styleable.Theme);
 		int background = a.getColor(R.styleable.Theme_activityRootBackground, 0);
-		this.mWebview.setBackgroundColor(background);
+		this.mWebView.setBackgroundColor(background);
 	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_BACK) && this.mWebview.canGoBack()) {
-	    	this.mWebview.goBack();
+	    if ((keyCode == KeyEvent.KEYCODE_BACK) && this.mWebView.canGoBack()) {
+	    	this.mWebView.goBack();
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
@@ -138,22 +153,18 @@ public class BrowserActivity extends Activity {
 	    			BrowserLauncher.launchExternalBrowser(this, this.mUri.toString());
 	    		}
 	    		break;
-	        case R.id.save_menu_id: {
-	            // Пробую сгенерировать ссылку на сохраненный файл так же, как это делает WebView
-	            String hashCode = String.format("%08x", this.mUri.hashCode());
-	            File file = new File(new File(getCacheDir(), "webviewCache"), hashCode);
-	            
-	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString(), file.exists() ? file : null);
+	        case R.id.save_menu_id:
+	        	this.mDownloadFileService.downloadFile(this, this.mUri.toString());
 	        	break;
-	        }
+	    	case R.id.share_menu_id:
+	    		Intent i = new Intent(Intent.ACTION_SEND);
+	    		i.setType("text/plain");
+	    		i.putExtra(Intent.EXTRA_TEXT, this.mUri);
+	    		this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
+	    		break;
     	}
     	
         return true;
-    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-    	this.mWebview.saveState(outState);
     }
 
 	@Override
@@ -161,5 +172,27 @@ public class BrowserActivity extends Activity {
 		return this.getApplicationContext().getCacheDir();
 	}
     
+	private void switchToLoadingView(){
+		this.switchToView(ViewType.LOADING);
+	}
+	
+	private void switchToPageView(){
+		this.switchToView(ViewType.PAGE);
+	}
+	
+	private void switchToView(ViewType vt){
+		if(vt == null) return;
+		
+		switch(vt){
+			case PAGE:
+				this.mWebView.setVisibility(View.VISIBLE);
+				this.mLoadingView.setVisibility(View.GONE);
+				break;
+			case LOADING:
+				this.mWebView.setVisibility(View.GONE);
+				this.mLoadingView.setVisibility(View.VISIBLE);
+				break;
+		}
+	}
     
 }
