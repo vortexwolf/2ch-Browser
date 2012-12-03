@@ -93,8 +93,8 @@
 	<string name="pref_download_path">Папка загрузок</string>
 	<string name="pref_download_path_hint">/download/2ch Browser/</string>
 	<string name="pref_download_path_summary">Измените папку, куда будут сохраняться изображения</string>
-	<string name="pref_download_background">Сохранять изображения в фоне</string>
-	<string name="pref_download_background_summary">Прогресс-диалог не будет отображаться</string>
+	<string name="pref_download_background">Сохранять в фоне</string>
+	<string name="pref_download_background_summary">При сохранении изображений прогресс-диалог не будет отображаться</string>
     <string name="pref_name">Имя</string>
     <string name="pref_name_summary">Оставьте пустым</string>
 	<string name="pref_name_hint">Аноним</string>	
@@ -133,6 +133,7 @@
 	<string name="pref_file_cache_summary">Кэшировать уменьшенные изображения</string>
 	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
 	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
+	<string name="pref_file_cache_clear">Очистить кэш</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>

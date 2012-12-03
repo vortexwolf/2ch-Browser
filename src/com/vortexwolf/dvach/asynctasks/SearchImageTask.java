@@ -1,5 +1,7 @@
 package com.vortexwolf.dvach.asynctasks;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.exceptions.SendPostException;
@@ -16,10 +18,10 @@ public class SearchImageTask extends AsyncTask<Void, Void, String> {
 	private final Context mContext;
 	private final TineyeSearch mSearch;
 	
-	public SearchImageTask(String imageUrl, Context context){
+	public SearchImageTask(String imageUrl, Context context, DefaultHttpClient httpClient){
 		mImageUrl = imageUrl;
 		mContext = context;
-		mSearch = new TineyeSearch(mContext.getResources());
+		mSearch = new TineyeSearch(mContext.getResources(), httpClient);
 	}
 	
 	@Override

@@ -26,10 +26,6 @@ public class NetworkResourceLoader implements INetworkResourceLoader {
 
     private final HttpClient mHttpClient;
 
-    public NetworkResourceLoader(){
-    	this(new ExtendedHttpClient());
-    }
-    
     public NetworkResourceLoader(HttpClient httpClient){
     	mHttpClient = httpClient;
     }
@@ -37,30 +33,24 @@ public class NetworkResourceLoader implements INetworkResourceLoader {
     @Override
 	public Bitmap loadBitmap (Uri uri) {
     	HttpGet request = null;
-		HttpEntity entity = null;
+    	HttpResponse response = null;
 		Bitmap bmp = null;
 		try {
 			MyLog.d(TAG, "Image load started: " + uri);
+			
 			request = new HttpGet(uri.toString());
-			HttpResponse response = this.mHttpClient.execute(request);
-			entity = response.getEntity();
+			response = this.mHttpClient.execute(request);
+			HttpEntity entity = response.getEntity();
 			FlushedInputStream fis = new FlushedInputStream(entity.getContent());
 			bmp = BitmapFactory.decodeStream(fis);
+			
 	        MyLog.d(TAG, "Image downloaded: " + uri);
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
 		} finally {
-			if (entity != null){
-				try {
-					entity.consumeContent();
-				} catch (IOException e) {
-					MyLog.e(TAG, e);
-				}
-			}
-			if(request != null){
-				request.abort();
-			}
+			ExtendedHttpClient.releaseRequestResponse(request, response);
 		}
+		
 		return bmp;
     }
 }

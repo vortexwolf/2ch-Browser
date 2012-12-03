@@ -172,6 +172,8 @@ public class PostItemViewModel {
 			
 			if(iterator.hasNext()){
 				sb.append(", ");
+			} else {
+				sb.append("\n");
 			}
 		}
 		// Разбираю строку на объекты-ссылки и добавляю обработчики событий

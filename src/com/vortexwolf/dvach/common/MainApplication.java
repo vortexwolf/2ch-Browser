@@ -41,9 +41,9 @@ public class MainApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		
-		DefaultHttpClient httpClient = new ExtendedHttpClient();
 		Tracker tracker = new Tracker();
 		ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
+		DefaultHttpClient httpClient = new ExtendedHttpClient();
 		DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
 		JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
 		DvachSqlHelper dbHelper = new DvachSqlHelper(this);
@@ -51,9 +51,9 @@ public class MainApplication extends Application {
 		FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
 		HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
 		CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
-		HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager));
+		HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager), httpClient);
 		NavigationService navigationService = new NavigationService();
-		DownloadFileService downloadFileService = new DownloadFileService(this.getResources());
+		DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpClient);
 		
 		Container container = Factory.getContainer();
 		container.register(Resources.class, this.getResources());

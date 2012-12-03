@@ -96,6 +96,10 @@
 		android:dependency="@string/pref_file_cache_key"
 		android:summary="@string/pref_file_cache_sdcard_summary"
 		android:title="@string/pref_file_cache_sdcard" />
+    <com.vortexwolf.dvach.settings.CacheSizePreference
+			android:key="@string/pref_clear_cache_key"
+			android:dependency="@string/pref_file_cache_key"
+		    android:title="@string/pref_file_cache_clear" />
 </PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/pref_category_autorefresh">

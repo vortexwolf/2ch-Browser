@@ -15,9 +15,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -27,30 +30,44 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 
+import android.content.Context;
+
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ExtendedHttpClient extends DefaultHttpClient {
-
+	private static final String TAG = "ExtendedHttpClient";
+	
+	private static final int SOCKET_OPERATION_TIMEOUT = 15 * 1000;
+	
 	private static final BasicHttpParams sParams;
 	private static final ClientConnectionManager sConnectionManager;
 	
 	static {
+
+		// Client parameters
+		BasicHttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setStaleCheckingEnabled(params, false);
+        HttpConnectionParams.setConnectionTimeout(params, SOCKET_OPERATION_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(params, SOCKET_OPERATION_TIMEOUT);
+        ConnManagerParams.setTimeout(params, SOCKET_OPERATION_TIMEOUT);
+        HttpConnectionParams.setSocketBufferSize(params, 8192);
+
+        HttpProtocolParams.setUserAgent(params, Constants.USER_AGENT_STRING);
+        
 		// HTTPS scheme registry
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 		SSLSocketFactory ssf = SSLSocketFactory.getSocketFactory();
 		ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 		schemeRegistry.register(new Scheme("https", ssf, 443));
-		
-		// Client parameters
-		sParams = new BasicHttpParams();
-        HttpConnectionParams.setStaleCheckingEnabled(sParams, false);
-        ConnManagerParams.setTimeout(sParams, 15 * 1000);
         
         // Multi threaded connection manager
-        sConnectionManager = new ThreadSafeClientConnManager(sParams, schemeRegistry);
+		sParams = params;
+        sConnectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
 		
 	}
 	
@@ -61,24 +78,38 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 		this.addResponseInterceptor(new GzipResponseInterceptor());
 	}
 	
-	@Override
-	public <T> T execute(HttpHost target, HttpRequest request,
-			ResponseHandler<? extends T> responseHandler, HttpContext context)
-			throws IOException, ClientProtocolException {
-		// TODO Auto-generated method stub
-		return super.execute(target, request, responseHandler, context);
+	/** Releases all resources of the request and response objects */
+	public static void releaseRequestResponse(HttpRequestBase request, HttpResponse response){
+		if (response != null) {
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				try {
+					entity.consumeContent();
+				} catch (Exception e) {
+					MyLog.e(TAG, e);
+				}
+			}
+		}
+
+		if (request != null) {
+			request.abort();
+		}
 	}
-
-
+	
+	public static String getLocationHeader(HttpResponse response){
+		Header header = response.getFirstHeader("Location");
+		if(header != null){
+			return header.getValue();
+		}
+		
+		return null;
+	}
 
 	/** Adds default headers */
 	private static class DefaultRequestInterceptor implements HttpRequestInterceptor {
         @Override
 		public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-            request.setHeader("User-Agent", Constants.USER_AGENT_STRING);
-            if (!request.containsHeader("Accept-Encoding")){
-                request.addHeader("Accept-Encoding", "gzip");
-            }
+            request.addHeader("Accept-Encoding", "gzip");
         }
 	}
 	
@@ -87,14 +118,14 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 		@Override
 		public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
             HttpEntity entity = response.getEntity();
-            if (entity != null && entity.getContentEncoding() != null) {
-                HeaderElement[] codecs = entity.getContentEncoding().getElements();
-                for (int i = 0; i < codecs.length; i++) {
-                    if (codecs[i].getName().equalsIgnoreCase("gzip")) {
-                        response.setEntity(new GzipDecompressingEntity(response.getEntity())); 
-                        return;
-                    }
-                }
+            if(entity == null) return;
+            Header header = entity.getContentEncoding();
+            if(header == null) return;
+            String contentEncoding = header.getValue();
+            if (contentEncoding == null) return;
+
+            if (contentEncoding.contains("gzip")) {
+            	response.setEntity(new GzipDecompressingEntity(response.getEntity())); 
             }
         }
 	}

@@ -34,52 +34,34 @@ public class TineyeSearch {
 	private final DefaultHttpClient mHttpClient;
 	private final Resources mResources;
 	
-	public TineyeSearch(Resources resources){
-		this.mHttpClient = new ExtendedHttpClient(); 
+	public TineyeSearch(Resources resources, DefaultHttpClient httpClient){
+		this.mHttpClient = httpClient; 
 		this.mResources = resources;
 	}
 	
 	public String search(String imageUri) throws SendPostException {
 		String searchUri = "http://www.tineye.com/search";
 		
-		HttpResponse response = executeHttpPost(searchUri, imageUri);
-		int statusCode = response.getStatusLine().getStatusCode();
-		
-		// Вернуть ссылку на тред после успешной отправки и редиректа
-		if(statusCode == 302 || statusCode == 303){
-			Header header = response.getFirstHeader("Location");
-			if(header != null){
-				return header.getValue();
-			}
-		}
-		
-		return null;
-	}
-	
-	private HttpResponse executeHttpPost(String uri, String imageUri) throws SendPostException {
-		HttpPost httpPost = new HttpPost(uri);
-		//Редирект-коды я обработаю самостоятельно путем парсинга и возврата заголовка Location
+		HttpPost httpPost = new HttpPost(searchUri);
 		HttpClientParams.setRedirecting(httpPost.getParams(), false);
-		//Настраиваем заголовки
-		httpPost.setHeader(HTTP.USER_AGENT, Constants.USER_AGENT_STRING);
-		httpPost.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-	    httpPost.setHeader("Accept-Language", "ru,ru-ru;q=0.8,en;q=0.5");
-	    httpPost.setHeader("Accept-Encoding", "gzip, deflate");
 
         HttpResponse response = null;
-        try
-        {
+        String location = null;
+        try {
         	List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
         	nameValuePairs.add(new BasicNameValuePair("url", imageUri));
 
 	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	        response = this.mHttpClient.execute(httpPost);  
-	    }	        
-        catch (Exception e) {
+	        
+	        location = ExtendedHttpClient.getLocationHeader(response);
+	    } catch (Exception e) {
         	MyLog.e(TAG, e);
         	throw new SendPostException(mResources.getString(R.string.error_image_search));
+        } finally {
+        	ExtendedHttpClient.releaseRequestResponse(httpPost, response);
         }
-        
-        return response;
+
+		return location;
 	}
 }

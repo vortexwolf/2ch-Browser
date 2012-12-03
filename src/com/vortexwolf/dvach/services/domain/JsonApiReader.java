@@ -127,7 +127,7 @@ public class JsonApiReader implements IJsonApiReader {
 
 			return result;
 		} finally {
-			finishRead(request, response);
+			ExtendedHttpClient.releaseRequestResponse(request, response);
 		}
 	}
 
@@ -194,24 +194,6 @@ public class JsonApiReader implements IJsonApiReader {
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
 			throw new JsonApiReaderException(mResources.getString(R.string.error_json_parse));
-		}
-	}
-
-	/** Releases all resources of the request and response objects */
-	private void finishRead(HttpGet request, HttpResponse response) {
-		if (response != null) {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				try {
-					entity.consumeContent();
-				} catch (Exception e) {
-					MyLog.e(TAG, e);
-				}
-			}
-		}
-
-		if (request != null) {
-			request.abort();
 		}
 	}
 }

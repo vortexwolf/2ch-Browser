@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 
@@ -25,23 +26,21 @@ public class HttpStringReader implements IHttpStringReader {
 	@Override
 	public String fromUri(String uri){
 		HttpGet request = null;
+		HttpResponse response = null;
+		String result = null;
+		
 		try {
 			request = new HttpGet(uri);
-			HttpResponse response = mHttpClient.execute(request);
+			response = mHttpClient.execute(request);
 
-			String result = this.fromResponse(response);
-			
-			return result;
-			
+			result = this.fromResponse(response);
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
 		} finally {
-			if(request != null){
-				request.abort();
-			}
+			ExtendedHttpClient.releaseRequestResponse(request, response);
 		}
 		
-		return null;
+		return result;
 	}
 	
 	@Override
@@ -62,13 +61,7 @@ public class HttpStringReader implements IHttpStringReader {
 		} catch (Exception e) {
 			MyLog.e(TAG, e);
 		} finally {
-			if (entity != null){
-				try {
-					entity.consumeContent();
-				} catch (IOException e) {
-					MyLog.e(TAG, e);
-				}
-			}
+			ExtendedHttpClient.releaseRequestResponse(null, response);
 		}
 		
 		return null;

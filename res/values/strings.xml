@@ -128,6 +128,7 @@
 	<string name="pref_file_cache_summary">Enable to cache thumbnails of images</string>
 	<string name="pref_file_cache_sdcard">Use SD Card</string>
 	<string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
+	<string name="pref_file_cache_clear">Clear cache</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">An error has occured while sending the post.</string>

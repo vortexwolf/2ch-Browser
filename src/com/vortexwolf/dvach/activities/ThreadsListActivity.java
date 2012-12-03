@@ -361,7 +361,7 @@ public class ThreadsListActivity extends BaseListActivity {
 	        }
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
 	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
-	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
+	        	new SearchImageTask(imageUrl, this.getApplicationContext(), this.mApplication.getHttpClient()).execute();
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_HIDE_THREAD: {

@@ -9,6 +9,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 
@@ -70,7 +72,7 @@ public class HttpImageManager{
 
     private final BitmapCache mCache;
     private final BitmapCache mPersistence;
-    private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(); 
+    private final INetworkResourceLoader mNetworkResourceLoader; 
     
     private final Handler mHandler = new Handler();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
@@ -163,14 +165,15 @@ public class HttpImageManager{
     }
     
     
-    public HttpImageManager (BitmapCache cache,  BitmapCache persistence ) {
+    public HttpImageManager (BitmapCache cache,  BitmapCache persistence, DefaultHttpClient httpClient) {
         mCache = cache;
         mPersistence = persistence;
+        mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
     }
     
     
-    public HttpImageManager (BitmapCache persistence) {
-        this(new BasicBitmapCache(), persistence);
+    public HttpImageManager (BitmapCache persistence, DefaultHttpClient httpClient) {
+        this(new BasicBitmapCache(), persistence, httpClient);
     }
     
     public Bitmap loadImage(Uri uri) {

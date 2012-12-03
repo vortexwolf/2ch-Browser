@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.services.domain;
 import java.nio.charset.Charset;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
@@ -37,8 +38,7 @@ public class PostSender implements IPostSender {
 	private final DvachUriBuilder mDvachUriBuilder;
 	
 	public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder){
-		//this.mHttpClient = client;
-		this.mHttpClient = new ExtendedHttpClient(); // похоже, что передаваемые клиент не работает, лучше создать новый
+		this.mHttpClient = client;
 		this.mResources = resources;
 		this.mResponseParser = new PostResponseParser();
 		this.mHttpStringReader = new HttpStringReader(this.mHttpClient);
@@ -58,55 +58,53 @@ public class PostSender implements IPostSender {
 		String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post",  };
 		int statusCode = 502; // Возвращается при неправильном значении task=post, часто меняется, поэтому неизвестно какой будет на данный момент
 		boolean had301 = false;
+		HttpPost httpPost = null;
 		HttpResponse response = null;
+		try {
+			for(int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++){
+				httpPost = new HttpPost(uri);
+				response = executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
+				//Проверяем код ответа
+				statusCode = response.getStatusLine().getStatusCode();
+				
+				if(statusCode == 502) {
+					httpPost.abort();
+				}
+				
+				// TODO: rewrite this error handling
+				if(statusCode == 301 && !had301) {
+					uri = ExtendedHttpClient.getLocationHeader(response);
+					had301 = true;
+					i--;
+				}
+				
+				MyLog.v(TAG, response.getStatusLine());
+	        }
 			
-		for(int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++){
-			HttpPost httpPost = new HttpPost(uri);
-			response = executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
-			//Проверяем код ответа
-			statusCode = response.getStatusLine().getStatusCode();
-			
-			if(statusCode == 502) {
-				httpPost.abort();
+			// Вернуть ссылку на тред после успешной отправки и редиректа
+			if(statusCode == 302 || statusCode == 303){
+				return ExtendedHttpClient.getLocationHeader(response);
 			}
 			
-			// TODO: rewrite this error handling
-			if(statusCode == 301 && !had301) {
-				uri = response.getFirstHeader("Location").getValue();
-				had301 = true;
-				i--;
-			}
-			
-			MyLog.v(TAG, response.getStatusLine());
-        }
-		// Вернуть ссылку на тред после успешной отправки и редиректа
-		if(statusCode == 302 || statusCode == 303){
-			Header header = response.getFirstHeader("Location");
-			if(header != null){
-				return header.getValue();
-			}
+			if(statusCode != 200) {
+		    	throw new SendPostException(statusCode + " - "+response.getStatusLine().getReasonPhrase());
+		    }
+		    
+			//Проверяю 200-response на наличие html-разметки с ошибкой
+		    String responseText = this.mHttpStringReader.fromResponse(response);
+			// Вызываю только для выброса exception
+		    this.mResponseParser.isPostSuccessful(responseText);
+		    
+		    return null;
 		}
-		else if(statusCode != 200) {
-	    	throw new SendPostException(statusCode + " - "+response.getStatusLine().getReasonPhrase());
-	    }
-	    
-		//Проверяю 200-response на наличие html-разметки с ошибкой
-	    String responseText = this.mHttpStringReader.fromResponse(response);
-		// Вызываю только для выброса exception
-	    this.mResponseParser.isPostSuccessful(responseText);
-	    
-	    return null;
+		finally {
+			ExtendedHttpClient.releaseRequestResponse(httpPost, response);
+		}
 	}
 	
 	private HttpResponse executeHttpPost(HttpPost httpPost, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException{
 		//Редирект-коды я обработаю самостоятельно путем парсинга и возврата заголовка Location
 		HttpClientParams.setRedirecting(httpPost.getParams(), false);
-		//Настраиваем заголовки
-		httpPost.setHeader(HTTP.USER_AGENT, Constants.USER_AGENT_STRING);
-		httpPost.setHeader("Accept", "application/json,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-	    httpPost.setHeader("Accept-Language", "ru,ru-ru;q=0.8,en-us;q=0.5,en;q=0.3");
-	    httpPost.setHeader("Accept-Encoding", "gzip, deflate");
-	    httpPost.setHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
 
         HttpResponse response = null;
         try

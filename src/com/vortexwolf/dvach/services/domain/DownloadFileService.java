@@ -11,10 +11,16 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.content.res.Resources;
 import android.net.Uri;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.exceptions.DownloadFileException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
@@ -25,30 +31,34 @@ public class DownloadFileService {
 	private static final String TAG = "DownloadFileService";
 
 	private final Resources mResources;
+	private final DefaultHttpClient mHttpClient;
 
-	public DownloadFileService(Resources resources) {
+	public DownloadFileService(Resources resources, DefaultHttpClient httpClient) {
 		this.mResources = resources;
+		this.mHttpClient = httpClient;
 	}
 
 	public void downloadFile(Uri uri, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws DownloadFileException {
 		if (to.exists()) {
 			throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
 		}
-
+		
+		HttpGet request = null;
+		HttpResponse response = null;
 		BufferedInputStream input = null;
 		try {
 			File fromFile = new File(uri.getPath());
-
+			
 			if (fromFile.exists()) {
 				progressChangeListener.setContentLength(fromFile.length());
 				input = new BufferedInputStream(new FileInputStream(fromFile));
 			} else {
-				URL url = new URL(uri.toString());
-				URLConnection connection = url.openConnection();
-				connection.connect();
-
-				progressChangeListener.setContentLength(connection.getContentLength());
-				input = new BufferedInputStream(url.openStream());
+				request = new HttpGet(uri.toString());
+				response = this.mHttpClient.execute(request);
+				HttpEntity entity = response.getEntity();
+				
+				progressChangeListener.setContentLength(entity.getContentLength());
+				input = new BufferedInputStream(entity.getContent());
 			}
 
 			this.SaveStream(input, to, progressChangeListener, task);
@@ -66,6 +76,8 @@ public class DownloadFileService {
 			} catch (Exception e) {
 				MyLog.e(TAG, e);
 			}
+			
+			ExtendedHttpClient.releaseRequestResponse(request, response);
 		}
 	}
 

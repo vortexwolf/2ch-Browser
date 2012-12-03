@@ -326,8 +326,8 @@ public class PostsListActivity extends BaseListActivity {
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
-	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
-	        	new SearchImageTask(imageUrl, this.getApplicationContext()).execute();
+	        	String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
+	        	new SearchImageTask(imageUrl, this.getApplicationContext(), this.mApplication.getHttpClient()).execute();
 	        	return true;
 	        }
         }
