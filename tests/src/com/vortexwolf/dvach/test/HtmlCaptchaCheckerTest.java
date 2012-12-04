@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.test;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
@@ -20,7 +21,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
 		String responseText = "<style>#captcha_i { display: none };</style>Вам не надо вводить капчу.&nbsp;<a href=\"#\" id=\"capup\" onclick=\"javascript:load('captcha','/test/wakaba.pl?task=captcha&thread=1&dummy=1'); Recaptcha.reload(); return false;\">обновить</a>";
 		
 		IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), mDvachUriBuilder);
-		boolean canSkeep = checker.canSkipCaptcha(null, null);
+		boolean canSkeep = checker.canSkipCaptcha(null);
 		
 		assertTrue(canSkeep);
 	}
@@ -30,7 +31,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
 		String responseText = "<style>#captcha_i { display: inline };</style><div id=\"recaptcha_widget\"><div id=\"recaptcha_data\"><div id=\"recaptcha_image\" onclick=\"javascript:Recaptcha.reload()\"></div></div></div>";
 		
 		IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), mDvachUriBuilder);
-		boolean canSkeep = checker.canSkipCaptcha(null, null);
+		boolean canSkeep = checker.canSkipCaptcha(null);
 		
 		assertFalse(canSkeep);
 	}
@@ -50,6 +51,10 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
 		@Override
 		public String fromResponse(HttpResponse response) {
 			return mResponse;
+		}
+
+		public String fromUri(String uri, Header[] customHeaders) {
+			return null;
 		}
 	}
 }

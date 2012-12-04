@@ -116,7 +116,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	public void setAdapterData(PostInfo[] posts){
 		this.clear();
 		for(PostInfo pi : posts){
-			this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this, this.mDvachUriBuilder));	
+			this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings,this, this.mDvachUriBuilder));	
 		}
 	}
 	
@@ -130,7 +130,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
 		for(PostInfo pi : posts){
 			if(Integer.valueOf(pi.getNum()) > lastPostNumber) {
-				this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this, this.mDvachUriBuilder));
+				this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings, this, this.mDvachUriBuilder));
 				newPostsCount++;
 			}
 		}

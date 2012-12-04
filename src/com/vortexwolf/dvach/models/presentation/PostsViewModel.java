@@ -6,6 +6,7 @@ import android.content.res.Resources.Theme;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostsViewModel {
 
@@ -36,8 +37,8 @@ public class PostsViewModel {
 	 * @param listener Обработчик события нажатия на ссылку в посте
 	 * @return Созданная view model
 	 */
-	public PostItemViewModel createModel(PostInfo item, Theme theme, IURLSpanClickListener listener, DvachUriBuilder uriBuilder){
-		PostItemViewModel viewModel = new PostItemViewModel(mViewModels.size(), item, theme, listener, uriBuilder);
+	public PostItemViewModel createModel(PostInfo item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder){
+		PostItemViewModel viewModel = new PostItemViewModel(mViewModels.size(), item, theme, settings, listener, uriBuilder);
 		this.mLastPostNumber = viewModel.getNumber();
 		
 		ProcessPostItem(viewModel);

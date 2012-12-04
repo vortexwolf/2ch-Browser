@@ -41,7 +41,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 		try{
 			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this, this);
 		}
-		catch(JsonApiReaderException e){
+		catch(Exception e){
 			this.mUserError = e.getMessage();
 		}
 

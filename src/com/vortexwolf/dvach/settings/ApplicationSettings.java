@@ -60,6 +60,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 		return uri;
 	}
 	
+	public boolean isLocalDateTime() {
+		return mSettings.getBoolean(mResources.getString(R.string.pref_convert_post_date_key), false);
+	}
+	
 	public boolean isDownloadInBackground() {
 		return mSettings.getBoolean(mResources.getString(R.string.pref_download_background_key), true);
 	}

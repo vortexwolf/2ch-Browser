@@ -1,8 +1,11 @@
 package com.vortexwolf.dvach.models.presentation;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +25,7 @@ import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.FlowTextHelper;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostItemViewModel {
 
@@ -32,6 +36,7 @@ public class PostItemViewModel {
 	private final Theme mTheme;
 	private final IURLSpanClickListener mUrlListener;
 	private final DvachUriBuilder mDvachUriBuilder;
+	private final ApplicationSettings mSettings;
 
 	private SpannableStringBuilder mSpannedComment = null;
 	private AttachmentInfo mAttachment;
@@ -43,12 +48,13 @@ public class PostItemViewModel {
 	private boolean isFloatImageComment = false;
 
 	
-	public PostItemViewModel(int position, PostInfo model, Theme theme, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
+	public PostItemViewModel(int position, PostInfo model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
 		this.mModel = model;
 		this.mTheme = theme;
 		this.mUrlListener = listener;
 		this.mPosition = position;
 		this.mDvachUriBuilder = dvachUriBuilder;
+		this.mSettings = settings;
 		
 		this.parseReferences();
 	}
@@ -131,7 +137,11 @@ public class PostItemViewModel {
 	
 	public String getPostDate(Context context){
 		if (this.mPostDate == null){
-			Date date = new Date(this.mModel.getTimestamp() * 1000);
+			long realTimeStamp = (this.mModel.getTimestamp() - 3600) * 1000; // the returned value is incorrect, I need to substract 1 hour
+			Date date = this.mSettings.isLocalDateTime()
+						? ThreadPostUtils.getLocalDateFromTimestamp(realTimeStamp)
+						: ThreadPostUtils.getMoscowDateFromTimestamp(realTimeStamp);
+
 			this.mPostDate =  DateFormat.getDateFormat(context).format(date) + ", " + DateFormat.getTimeFormat(context).format(date);
 		}
 

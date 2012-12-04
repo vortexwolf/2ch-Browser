@@ -18,9 +18,10 @@ public class ClickableURLSpan extends ClickableSpan {
     }  
   
     @Override  
-    public void onClick(View widget) {  
-        if(mListener != null)
+    public void onClick(View widget) {
+        if(mListener != null) {
         	mListener.onClick(widget, mURL);  
+        }
     }  
     
     public void setOnClickListener(IURLSpanClickListener listener){
@@ -36,7 +37,7 @@ public class ClickableURLSpan extends ClickableSpan {
     	
     	ClickableURLSpan newSpan = new ClickableURLSpan(url);
     	builder.setSpan(newSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-    	builder.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    	//builder.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     	
     	return newSpan;
     }

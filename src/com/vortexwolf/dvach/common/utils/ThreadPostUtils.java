@@ -1,8 +1,15 @@
 package com.vortexwolf.dvach.common.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -20,6 +27,24 @@ import com.vortexwolf.dvach.settings.ApplicationSettings;
 public class ThreadPostUtils {
 	
 	private static final IClickListenersFactory sThumbnailOnClickListenerFactory = new ClickListenersFactory();
+	
+	public static Date getDateFromTimestamp(long timeInMiliseconds, TimeZone timeZone){
+		long localOffset = TimeZone.getDefault().getOffset(timeInMiliseconds);
+		Date gmtTime = new Date(timeInMiliseconds - localOffset);
+		
+		long timeZoneOffset = timeZone.getOffset(timeInMiliseconds);
+		Date timeZoneTime = new Date(gmtTime.getTime() + timeZoneOffset);
+		
+		return timeZoneTime;
+	}
+	
+	public static Date getMoscowDateFromTimestamp(long timeInMiliseconds){
+		return getDateFromTimestamp(timeInMiliseconds, TimeZone.getTimeZone("GMT+4"));
+	}
+	
+	public static Date getLocalDateFromTimestamp(long timeInMiliseconds){
+		return getDateFromTimestamp(timeInMiliseconds, TimeZone.getDefault());
+	}
 	
 	/** Удаляет ссылки на другие сообщения из поста, если они расположены вначале строки */
 	public static String removeLinksFromComment(String comment){

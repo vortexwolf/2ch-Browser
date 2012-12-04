@@ -79,6 +79,8 @@
     <string name="pref_category_appearance">Appearance</string>
     <string name="pref_category_autorefresh">AutoRefresh</string>
     <string name="pref_category_cache">Cache</string>
+    <string name="pref_category_images">Images</string>
+    <string name="pref_category_datetime">Date &amp; Time</string>
         
     <string name="pref_homepage">Default starting board</string>
     <string name="pref_homepage_summary">Change start page</string>
@@ -94,10 +96,12 @@
     <string name="pref_name_summary">Leave it blank</string>
 	<string name="pref_name_hint">Anonymous</string>
 	<string name="pref_domain">Domain</string>
-	<string name="pref_domain_summary">Use any: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
+	<string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
 	<string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
 	<string name="pref_display_post_date">Time of posts</string>
 	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
+	<string name="pref_convert_post_date">Show local time</string>
+	<string name="pref_convert_post_date_summary">Enable to display your local time instead of Moscow time</string>
 	<string name="pref_display_navigation_bar">Navigation bar</string>
 	<string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
 	<string name="pref_youtube_mobile_links">Video attachments</string>

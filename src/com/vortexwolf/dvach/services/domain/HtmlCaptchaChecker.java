@@ -1,10 +1,9 @@
 package com.vortexwolf.dvach.services.domain;
 
-import android.net.Uri;
-import android.text.Html;
+import org.apache.http.message.BasicHeader;
 
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.utils.StringUtils;
+import android.net.Uri;
+
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
@@ -22,10 +21,15 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 	}
 	
 	@Override
-	public boolean canSkipCaptcha(String boardName, String threadNumber){
+	public boolean canSkipCaptcha(Uri refererUri){
 		
-		Uri uri = this.mDvachUriBuilder.create2chUri("makaba/captcha?code=");
-		String captchaBlock = this.mHttpStringReader.fromUri(uri.toString());
+		Uri uri = this.mDvachUriBuilder.create2chUri("makaba/captcha?usercode=");
+		
+		// Add referer, because it always returns the incorrect value CHECK if not to set it
+		org.apache.http.Header xRequest = new BasicHeader("Referer", refererUri.toString());
+		
+		org.apache.http.Header[] extraHeaders = new org.apache.http.Header[] { xRequest };
+		String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
 		
 		return checkHtmlBlock(captchaBlock);
 	}

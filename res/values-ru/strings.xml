@@ -74,7 +74,7 @@
     <string name="cmenu_download_file">Загрузить файл</string>
     <string name="cmenu_copy_post">Копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
-    <string name="cmenu_view_op_post">Открыть ОП-пост</string>
+    <string name="cmenu_view_op_post">Показать ОП-пост полностью</string>
     <string name="cmenu_add_to_favorites">Добавить в закладки</string>
     <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
     <string name="cmenu_search_image">Поиск изображения в TinEye</string>
@@ -84,6 +84,8 @@
     <string name="pref_category_appearance">Интерфейс</string>
     <string name="pref_category_autorefresh">Автообновление</string>
     <string name="pref_category_cache">Кэширование</string>
+    <string name="pref_category_images">Изображения</string>
+    <string name="pref_category_datetime">Дата и время</string>
     
     <string name="pref_homepage">Форум по умолчанию</string>
     <string name="pref_homepage_summary">Измените стартовую страницу</string>
@@ -99,10 +101,12 @@
     <string name="pref_name_summary">Оставьте пустым</string>
 	<string name="pref_name_hint">Аноним</string>	
 	<string name="pref_domain">Домен</string>
-	<string name="pref_domain_summary">Любой из списка: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
+	<string name="pref_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
 	<string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
 	<string name="pref_display_post_date">Время сообщений</string>
 	<string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
+	<string name="pref_convert_post_date">Локальное время</string>
+	<string name="pref_convert_post_date_summary">Отображать локальное время вместо московского</string>
 	<string name="pref_popup_link">Ссылки во всплывающих окнах</string>
 	<string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
 	<string name="pref_display_navigation_bar">Панель навигации</string>

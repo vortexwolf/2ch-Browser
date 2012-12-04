@@ -49,7 +49,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 		try{
 			this.mPostsList = this.mJsonReader.readPostsList(mBoard, mThreadNumber, mLoadAfterPost, this, this);
 		}
-		catch(JsonApiReaderException e){
+		catch(Exception e){
 			this.mUserError = e.getMessage();
 		}
 		
@@ -87,7 +87,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 				this.mView.setData(this.mPostsList);
 			}
 		}
-		else if(!success && this.mUserError != null) {
+		else if(!success) {
 			if(this.mIsPartialLoading){
 				this.mView.showUpdateError(this.mUserError);
 			}

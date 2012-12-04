@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,13 +25,16 @@ public class HttpStringReader implements IHttpStringReader {
 	}
 	
 	@Override
-	public String fromUri(String uri){
+	public String fromUri(String uri, Header[] customHeaders){
 		HttpGet request = null;
 		HttpResponse response = null;
 		String result = null;
 		
 		try {
 			request = new HttpGet(uri);
+			for(Header h : customHeaders){
+				request.addHeader(h);
+			}
 			response = mHttpClient.execute(request);
 
 			result = this.fromResponse(response);
@@ -41,6 +45,11 @@ public class HttpStringReader implements IHttpStringReader {
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public String fromUri(String uri){
+		return this.fromUri(uri, null);
 	}
 	
 	@Override

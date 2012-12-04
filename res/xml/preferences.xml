@@ -10,6 +10,22 @@
 			android:summary="@string/pref_homepage_summary"
 	        android:inputType="text"
 	        android:singleLine="true" />
+	<EditTextPreference
+			android:key="@string/pref_name_key"
+			android:title="@string/pref_name"
+			android:hint="@string/pref_name_hint"
+			android:summary="@string/pref_name_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
+	<EditTextPreference
+			android:key="@string/pref_domain_key"
+			android:title="@string/pref_domain"
+			android:hint="@string/pref_domain_hint"
+			android:summary="@string/pref_domain_summary"
+	        android:inputType="text"
+	        android:singleLine="true" />
+	
+<PreferenceCategory android:title="@string/pref_category_images">
 	<CheckBoxPreference
 			android:key="@string/pref_load_thumbnails_key"
 			android:defaultValue="true"
@@ -27,21 +43,22 @@
 			android:defaultValue="true"
 			android:summary="@string/pref_download_background_summary"
 			android:title="@string/pref_download_background" />
-	<EditTextPreference
-			android:key="@string/pref_name_key"
-			android:title="@string/pref_name"
-			android:hint="@string/pref_name_hint"
-			android:summary="@string/pref_name_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-	<EditTextPreference
-			android:key="@string/pref_domain_key"
-			android:title="@string/pref_domain"
-			android:hint="@string/pref_domain_hint"
-			android:summary="@string/pref_domain_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-		
+</PreferenceCategory>
+
+<PreferenceCategory android:title="@string/pref_category_datetime">
+   <CheckBoxPreference
+			android:key="@string/pref_display_post_date_key"
+			android:defaultValue="false"
+			android:summary="@string/pref_display_post_date_summary"
+			android:title="@string/pref_display_post_date" />
+   <CheckBoxPreference
+			android:key="@string/pref_convert_post_date_key"
+			android:dependency="@string/pref_display_post_date_key"
+			android:defaultValue="false"
+			android:summary="@string/pref_convert_post_date_summary"
+			android:title="@string/pref_convert_post_date"  />
+</PreferenceCategory>
+
 <PreferenceCategory android:title="@string/pref_category_appearance">
 	<ListPreference
             android:key="@string/pref_text_size_key"
@@ -57,11 +74,6 @@
        		android:entries="@array/pref_theme_choices"
        		android:entryValues="@array/pref_theme_values"
        		android:dialogTitle="@string/pref_theme" />
-   <CheckBoxPreference
-			android:key="@string/pref_display_post_date_key"
-			android:defaultValue="false"
-			android:summary="@string/pref_display_post_date_summary"
-			android:title="@string/pref_display_post_date" />
    <CheckBoxPreference
 			android:key="@string/pref_popup_link_key"
 			android:defaultValue="true"
@@ -93,12 +105,10 @@
     <CheckBoxPreference
 		android:key="@string/pref_file_cache_sdcard_key"
 		android:defaultValue="true"
-		android:dependency="@string/pref_file_cache_key"
 		android:summary="@string/pref_file_cache_sdcard_summary"
 		android:title="@string/pref_file_cache_sdcard" />
     <com.vortexwolf.dvach.settings.CacheSizePreference
 			android:key="@string/pref_clear_cache_key"
-			android:dependency="@string/pref_file_cache_key"
 		    android:title="@string/pref_file_cache_clear" />
 </PreferenceCategory>
 

@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.services;
 
 import com.vortexwolf.dvach.activities.BrowserActivity;
 import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 
 import android.content.Context;
@@ -26,7 +27,12 @@ public class BrowserLauncher {
     		Intent browser = new Intent(Intent.ACTION_VIEW, uri);
     		browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     		browser.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-			context.startActivity(browser);
+    		try {
+    			context.startActivity(browser);
+    		}
+    		catch (Exception e) {
+    			AppearanceUtils.showToastMessage(context, e.getMessage());
+    		}
     	} else {
 	    	Intent browser = new Intent(context, BrowserActivity.class);
 	    	browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

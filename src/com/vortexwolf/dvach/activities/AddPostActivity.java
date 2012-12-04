@@ -69,6 +69,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private CaptchaEntity mCaptcha;
 	private String mBoardName;
 	private String mThreadNumber;
+	private Uri mRefererUri;
 	private CaptchaViewType mCurrentCaptchaView = null;
 	private Bitmap mCaptchaBitmap;
 	
@@ -102,6 +103,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
 		this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
 		this.mTracker = this.mApplication.getTracker();
+		DvachUriBuilder uriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
 
 		//Парсим название борды и номер треда
         Bundle extras = getIntent().getExtras();
@@ -109,6 +111,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     	if (extras != null) {
     		this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
     		this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
+    		this.mRefererUri = this.mThreadNumber == Constants.ADD_THREAD_PARENT
+    						? uriBuilder.create2chBoardUri(this.mBoardName, 0)
+    						: Uri.parse(uriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber));
     	}
     	
 		this.resetUI();
@@ -522,7 +527,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     		mCurrentDownloadCaptchaTask.cancel(true);
     	}
     	
-    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, mBoardName, mThreadNumber, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker, MainApplication.getHttpClient());
+    	mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker, MainApplication.getHttpClient());
     	mCurrentDownloadCaptchaTask.execute();
 	}
 	

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -56,6 +57,7 @@ public class PostItemViewBuilder {
 			vb.postIdView = (TextView) view.findViewById(R.id.post_id);
 			vb.postNameView = (TextView) view.findViewById(R.id.post_name);
 			vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
+			vb.postDateView = (TextView)view.findViewById(R.id.post_item_date_id);
 			vb.commentView = (TextView) view.findViewById(R.id.comment);
 			vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
 			vb.postRepliesView = (TextView)view.findViewById(R.id.post_replies);
@@ -101,9 +103,10 @@ public class PostItemViewBuilder {
 		
 		//Дата поста
 		if(this.mSettings.isDisplayPostItemDate()){
-		    TextView dateView = (TextView)view.findViewById(R.id.post_item_date_id);
-		    dateView.setVisibility(View.VISIBLE);
-			dateView.setText(item.getPostDate(this.mAppContext));
+			vb.postDateView.setVisibility(View.VISIBLE);
+			vb.postDateView.setText(item.getPostDate(this.mAppContext));
+		} else {
+			vb.postDateView.setVisibility(View.GONE);
 		}
 		
 		//Обрабатываем прикрепленный файл
@@ -121,13 +124,13 @@ public class PostItemViewBuilder {
 		}
 		
 		vb.commentView.setText(item.getSpannedComment());
-		vb.commentView.setMovementMethod(LinkMovementMethod.getInstance());
+		vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
 		
 		//Ответы на сообщение
 		if(this.mThreadNumber != null && item.hasReferencesFrom()){
 		    SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.mAppContext.getResources(), this.mBoardName, this.mThreadNumber);
 		    vb.postRepliesView.setText(replies);
-		    vb.postRepliesView.setMovementMethod(LinkMovementMethod.getInstance());
+		    vb.postRepliesView.setMovementMethod(MyLinkMovementMethod.getInstance());
 		    vb.postRepliesView.setVisibility(View.VISIBLE);
 		}
 		else{
@@ -136,7 +139,7 @@ public class PostItemViewBuilder {
 		
 		// Почему-то LinkMovementMethod отменяет контекстное меню. Пустой listener вроде решает проблему
 		view.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
-        
+		
         return view;
     }
 	
@@ -180,6 +183,7 @@ public class PostItemViewBuilder {
     	TextView postIdView;
     	TextView postNameView;
     	TextView postIndexView;
+    	TextView postDateView;
     	TextView commentView;
         TextView attachmentInfoView;
         TextView postRepliesView;

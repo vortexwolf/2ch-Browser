@@ -22,8 +22,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	
 	private final ICaptchaView mView;
 	private final IJsonApiReader mJsonReader;
-	private final String mBoard;
-	private final String mThreadNumberd;
+	private final Uri mRefererUri;
 	private final INetworkResourceLoader mNetworkResourceLoader;
 	private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
 	private final DefaultHttpClient mHttpClient;
@@ -33,11 +32,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	private Bitmap mCaptchaImage;
 	private String mUserError;
 	
-	public DownloadCaptchaTask(ICaptchaView view, String board, String threadNumber, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
+	public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
 		this.mView = view;
 		this.mJsonReader = jsonReader;
-		this.mBoard = board;
-		this.mThreadNumberd = threadNumber;
+		this.mRefererUri = refererUri;
 		this.mNetworkResourceLoader = networkResourceLoader;
 		this.mHtmlCaptchaChecker = htmlCaptchaChecker;
 		this.mHttpClient = httpClient;
@@ -63,7 +61,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 	
 	@Override
 	protected Boolean doInBackground(String... params) {
-		this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mBoard, this.mThreadNumberd);
+		this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
 		if(this.mCanSkip) return true;
 		
 		this.mCaptcha = RecaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient));

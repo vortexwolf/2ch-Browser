@@ -24,6 +24,7 @@ import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.exceptions.SendPostException;
+import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
@@ -33,7 +34,7 @@ public class PostSender implements IPostSender {
 	private static final String TAG = "PostSender";
 	private final DefaultHttpClient mHttpClient;
 	private final Resources mResources;
-	private final HttpStringReader mHttpStringReader;
+	private final IHttpStringReader mHttpStringReader;
 	private final PostResponseParser mResponseParser;
 	private final DvachUriBuilder mDvachUriBuilder;
 	
