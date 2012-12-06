@@ -2,6 +2,11 @@ package com.vortexwolf.dvach.common.utils;
 
 import java.io.File;
 
+import com.vortexwolf.dvach.settings.ApplicationSettings;
+
+import android.net.Uri;
+import android.os.Environment;
+
 public class IoUtils {
 
 	public static long dirSize(File dir) {
@@ -63,6 +68,16 @@ public class IoUtils {
 		double result = Math.round(allSizeMb * 100) / 100d;
 		
 		return result;
+	}
+	
+	public static File getSaveFilePath(Uri uri, ApplicationSettings settings){
+	    String fileName = uri.getLastPathSegment();
+	    
+	    File dir = new File(Environment.getExternalStorageDirectory(), settings.getDownloadPath());
+	    dir.mkdirs();
+	    File file = new File(dir, fileName);
+	    
+	    return file;
 	}
 	
 	public static double convertBytesToMb(long bytes){

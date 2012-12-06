@@ -6,7 +6,6 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 
-import android.app.ActionBar;
 import android.app.ListActivity;
 import android.os.Build;
 import android.os.Bundle;

@@ -54,7 +54,7 @@
    <CheckBoxPreference
 			android:key="@string/pref_convert_post_date_key"
 			android:dependency="@string/pref_display_post_date_key"
-			android:defaultValue="false"
+			android:defaultValue="true"
 			android:summary="@string/pref_convert_post_date_summary"
 			android:title="@string/pref_convert_post_date"  />
 </PreferenceCategory>

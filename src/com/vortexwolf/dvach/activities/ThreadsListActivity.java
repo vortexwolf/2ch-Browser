@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
+import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
 import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.Constants;
@@ -351,7 +352,8 @@ public class ThreadsListActivity extends BaseListActivity {
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-	        	this.mApplication.getSaveFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
+	        	Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
+	        	new DownloadFileTask(this, fileUri).execute();
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
@@ -367,7 +369,8 @@ public class ThreadsListActivity extends BaseListActivity {
 	        case Constants.CONTEXT_MENU_HIDE_THREAD: {
 	        	this.mHiddenThreadsDataSource.addToHiddenThreads(this.mBoardName, info.getNumber());
 	        	info.setHidden(true);
-	        	this.mAdapter.notifyDataSetChanged();
+	        	this.mAdapter.notifyDataSetChanged();	        	
+	        	return true;
 	        }
         }
         

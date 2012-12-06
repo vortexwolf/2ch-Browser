@@ -40,12 +40,13 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 		//Читаем по ссылке json-объект со списком тредов
 		try{
 			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this, this);
+			return true;
 		}
 		catch(Exception e){
 			this.mUserError = e.getMessage();
 		}
 
-    	return this.mThreadsList != null;
+    	return false;
 	}	
 	
 	@Override

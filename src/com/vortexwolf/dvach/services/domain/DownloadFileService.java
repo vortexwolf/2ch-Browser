@@ -83,13 +83,13 @@ public class DownloadFileService {
 
 	private void SaveStream(InputStream input, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws Exception, DownloadFileException {
 		OutputStream output = null;
-		byte data[] = new byte[1024];
+		byte data[] = new byte[8192];
 		int total = 0, count;
 		boolean wasCancelled = false;
 
 		try {
 			output = new FileOutputStream(to);
-
+			
 			while ((count = input.read(data)) != -1) {
 				if (task != null && task.isCancelled()) {
 					wasCancelled = true;

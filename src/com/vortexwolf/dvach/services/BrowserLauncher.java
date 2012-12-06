@@ -19,7 +19,7 @@ public class BrowserLauncher {
     	Uri uri = Uri.parse(url);
 
     	// Some URLs should always be opened externally, if BrowserActivity doesn't support their content.
-    	if (!useExternalBrowser && (UriUtils.isYoutubeUri(uri) || !UriUtils.isImageUri(uri))){
+    	if (!useExternalBrowser && !UriUtils.isImageUri(uri)){
     		useExternalBrowser = true;
     	}
     		

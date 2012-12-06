@@ -2,6 +2,8 @@ package com.vortexwolf.dvach.interfaces;
 
 import java.io.File;
 
+import android.net.Uri;
+
 public interface ICacheDirectoryManager {
 
 	public File getInternalCacheDir();
@@ -19,5 +21,9 @@ public interface ICacheDirectoryManager {
 	public abstract void trimCacheIfNeeded();
 
 	public abstract File getImagesCacheDirectory();
+
+	public abstract File getCachedImageFileForWrite(Uri uri);
+
+	public abstract File getCachedImageFileForRead(Uri uri);
 
 }

@@ -32,9 +32,10 @@ public class HttpStringReader implements IHttpStringReader {
 		
 		try {
 			request = new HttpGet(uri);
-			for(Header h : customHeaders){
-				request.addHeader(h);
+			if(customHeaders != null) {
+				request.setHeaders(customHeaders);
 			}
+			
 			response = mHttpClient.execute(request);
 
 			result = this.fromResponse(response);

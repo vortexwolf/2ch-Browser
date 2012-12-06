@@ -76,6 +76,10 @@ public class PostItemViewModel {
 	}
 	
 	private SpannableStringBuilder createSpannedComment(){
+		if(StringUtils.isEmpty(this.mModel.getComment())){
+			return new SpannableStringBuilder("");
+		}
+		
 		String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
 		SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
         HtmlUtils.replaceUrls(builder, this.mUrlListener, mTheme);
@@ -119,11 +123,7 @@ public class PostItemViewModel {
 		return mAttachment;
 	}
 
-	public SpannableStringBuilder getSpannedComment() {
-		if(StringUtils.isEmpty(this.mModel.getComment())){
-			return new SpannableStringBuilder("");
-		}
-		
+	public SpannableStringBuilder getSpannedComment() {	
 		if(this.mSpannedComment == null){
 			this.mSpannedComment = this.createSpannedComment();
 		}

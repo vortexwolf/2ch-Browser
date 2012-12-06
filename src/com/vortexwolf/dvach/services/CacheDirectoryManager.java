@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.services;
 
 import java.io.File;
 
+import android.net.Uri;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Constants;
@@ -56,17 +57,45 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 	
 	@Override
 	public File getThumbnailsCacheDirectory(){
-		return new File(this.getCurrentCacheDirectory(), "thumbnails");
+		return this.getCacheDirectory("thumbnails");
 	}
 	
 	@Override
 	public File getPagesCacheDirectory(){
-		return new File(this.getCurrentCacheDirectory(), "pages");
+		return this.getCacheDirectory("pages");
 	}
 	
 	@Override
 	public File getImagesCacheDirectory(){
-		return new File(this.getCurrentCacheDirectory(), "webviewCache");
+		return this.getCacheDirectory("images");
+	}
+	
+	private File getCacheDirectory(String subFolder){
+		File file = new File(this.getCurrentCacheDirectory(), subFolder);
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+		
+		return file;
+	}
+	
+	@Override
+	public File getCachedImageFileForWrite(Uri uri){
+	    String fileName = uri.getLastPathSegment();
+	    
+		File cachedFile = new File(this.getImagesCacheDirectory(), fileName);
+		
+		return cachedFile;
+	}
+	
+	@Override
+	public File getCachedImageFileForRead(Uri uri){
+		File cachedFile = getCachedImageFileForWrite(uri);
+		if(!cachedFile.exists()) {
+			cachedFile = IoUtils.getSaveFilePath(uri, this.mSettings);
+		}
+		
+		return cachedFile;
 	}
 	
 	@Override
@@ -79,8 +108,9 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 				
 				if(cacheSize > maxSize){
 					long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
-					IoUtils.deleteDirectory(getReversedCacheDirectory()); //удаляем полностью противоположную кэшу директорию
-					IoUtils.freeSpace(getCurrentCacheDirectory(), deleteAmount); //удаляем лишний объем
+					IoUtils.deleteDirectory(getReversedCacheDirectory()); // remove completly the reversed cache directory
+					deleteAmount -= IoUtils.freeSpace(getImagesCacheDirectory(), deleteAmount); // remove images first
+					IoUtils.freeSpace(getCurrentCacheDirectory(), deleteAmount); // other cache items if needed
 				}
 			}
 		})

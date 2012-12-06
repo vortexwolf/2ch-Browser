@@ -20,22 +20,20 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     
     private boolean mSkipNextClick = false;
 
-    @Override
-    protected boolean handleMovementKey(TextView widget, Spannable buffer, int keyCode,
-            int movementMetaState, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_ENTER:
-                if (KeyEvent.metaStateHasNoModifiers(movementMetaState)) {
-                    if (event.getAction() == KeyEvent.ACTION_DOWN &&
-                            event.getRepeatCount() == 0 && action(CLICK, widget, buffer)) {
-                        return true;
-                    }
-                }
-                break;
-        }
-        return super.handleMovementKey(widget, buffer, keyCode, movementMetaState, event);
-    }
+	@Override
+	public boolean onKeyDown(TextView widget, Spannable buffer, int keyCode, KeyEvent event) {
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_DPAD_CENTER:
+		case KeyEvent.KEYCODE_ENTER:
+			if (event.getRepeatCount() == 0) {
+				if (action(CLICK, widget, buffer)) {
+					return true;
+				}
+			}
+		}
+
+		return super.onKeyDown(widget, buffer, keyCode, event);
+	}
 
     @Override
     protected boolean up(TextView widget, Spannable buffer) {

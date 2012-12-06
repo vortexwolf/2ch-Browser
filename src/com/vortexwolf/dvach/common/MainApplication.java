@@ -22,7 +22,6 @@ import com.vortexwolf.dvach.services.NavigationService;
 import com.vortexwolf.dvach.services.SerializationService;
 import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.DownloadFileService;
-import com.vortexwolf.dvach.services.domain.SaveFileService;
 import com.vortexwolf.dvach.services.domain.JsonApiReader;
 import com.vortexwolf.dvach.services.domain.PostSender;
 import com.vortexwolf.dvach.services.presentation.DraftPostsStorage;
@@ -74,7 +73,6 @@ public class MainApplication extends Application {
 		container.register(FavoritesDataSource.class, favoritesDataSource);	
 		container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
 		container.register(DownloadFileService.class, downloadFileService);
-		container.register(SaveFileService.class, new SaveFileService(this.getResources(), settings, downloadFileService, cacheManager));
 		
 		historyDataSource.open();
 		favoritesDataSource.open();
@@ -109,10 +107,6 @@ public class MainApplication extends Application {
 	
 	public IDraftPostsStorage getDraftPostsStorage(){
 		return Factory.getContainer().resolve(IDraftPostsStorage.class);
-	}
-	
-	public SaveFileService getSaveFileService(){
-		return Factory.getContainer().resolve(SaveFileService.class);
 	}
 	
 	public Tracker getTracker(){

@@ -1,6 +1,8 @@
 package com.vortexwolf.dvach.activities;
 
 
+import java.util.ArrayList;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.BoardsListAdapter;
 import com.vortexwolf.dvach.common.Constants;
@@ -27,85 +29,6 @@ import android.widget.ListView;
 public class PickBoardActivity extends ListActivity {
 
 	public static final String TAG = "PickBoardActivity";
-	
-    public static final IBoardListEntity[] BOARDS = {
-    	new SectionEntity("Разное"),
-    	new BoardEntity("b", "бред"),
-    	new BoardEntity("fag", "фагготрия"),
-    	new BoardEntity("soc", "общение"),
-    	new BoardEntity("r", "просьбы"),
-    	new BoardEntity("int", "international"),
-    	
-    	new SectionEntity("Тематика"),
-    	new BoardEntity("app", "мобильные приложения"),
-    	new BoardEntity("au", "автомобили и транспорт"),
-    	new BoardEntity("bi", "велосипеды"),
-    	new BoardEntity("biz", "бизнес"),
-    	new BoardEntity("bo", "книги"),
-    	new BoardEntity("c", "комиксы и мультфильмы"),
-    	new BoardEntity("di", "столовая"),
-    	new BoardEntity("em", "другие страны и туризм"),
-    	new BoardEntity("ew", "выживание и самооборона"),
-    	new BoardEntity("fa", "мода и стиль"),
-    	new BoardEntity("fiz", "физкультура"),
-    	new BoardEntity("fl", "иностранные языки"),
-    	new BoardEntity("gd", "gamedev"),
-    	new BoardEntity("hi", "история"),
-    	new BoardEntity("hw", "железо"),
-    	new BoardEntity("me", "медицина"),
-    	new BoardEntity("mg", "магия"),
-    	new BoardEntity("mlp", "my little pony"),
-    	new BoardEntity("mo", "мотоциклы"),
-    	new BoardEntity("mu", "музыка"),
-    	new BoardEntity("ne", "животные и природа"),
-    	new BoardEntity("po", "политика и новости"),
-    	new BoardEntity("pr", "программирование"),
-    	new BoardEntity("psy", "психология"),
-    	new BoardEntity("ra", "радиотехника"),
-    	new BoardEntity("re", "религия и философия"),
-    	new BoardEntity("s", "программы"),
-    	new BoardEntity("sf", "научная фантастика"),
-    	new BoardEntity("sci", "наука"),
-    	new BoardEntity("sn", "паранормальные явления"),
-    	new BoardEntity("sp", "спорт"),
-    	new BoardEntity("spc", "космос"),
-    	new BoardEntity("t", "технологии"),
-    	new BoardEntity("tv", "тв и кино"),
-    	new BoardEntity("un", "образование"),
-    	new BoardEntity("wh", "warhammer"),
-    	new BoardEntity("wm", "военная техника"),
-    	new BoardEntity("w", "оружие"),
-    	
-    	new SectionEntity("Творчество"),
-    	new BoardEntity("de", "дизайн"),
-		new BoardEntity("diy", "хобби"),
-		new BoardEntity("f", "flash & gif"),
-		new BoardEntity("mus", "музыканты"),
-		new BoardEntity("o", "мазня"),
-		new BoardEntity("pa", "живопись"),
-		new BoardEntity("p", "фото"),
-		new BoardEntity("wp", "обои и высокое разрешение"),
-        new BoardEntity("td", "трёхмерная графика"),
-        
-    	new SectionEntity("Игры"),
-    	new BoardEntity("bg", "настольные игры"),
-    	new BoardEntity("cg", "консоли"),
-		new BoardEntity("gb", "азартные игры"),
-		new BoardEntity("mc", "minecraft"),
-		new BoardEntity("mmo", "MMO"),
-		new BoardEntity("vg", "видеоигры"),
-		new BoardEntity("wr", "ролевые игры"),
-		new BoardEntity("tes", "the elder scrolls"),
-		
-		new SectionEntity("Японская культура"),
-		new BoardEntity("a", "аниме"),
-		new BoardEntity("aa", "аниме арт"),
-		new BoardEntity("fd", "фэндом"),
-		new BoardEntity("ma", "манга"),
-		new BoardEntity("rm", "rozen maiden"),
-		new BoardEntity("to", "touhou"),
-		new BoardEntity("vn", "визуальные новеллы")
-    };
 
     private MainApplication mApplication;
     private Tracker mTracker;
@@ -123,7 +46,18 @@ public class PickBoardActivity extends ListActivity {
         
         this.resetUI();
         
-        this.mAdapter = new BoardsListAdapter(this, BOARDS);
+        ArrayList<IBoardListEntity> boards = new ArrayList<IBoardListEntity>();
+        String[] entities = this.getResources().getStringArray(R.array.pickboard_boards);
+        for(String entity : entities) {
+        	String[] parts = entity.split(";\\s?");
+        	if(parts.length == 1) {
+        		boards.add(new SectionEntity(parts[0]));
+        	} else if (parts.length == 2) {
+        		boards.add(new BoardEntity(parts[0], parts[1]));
+        	}
+        }
+        
+        this.mAdapter = new BoardsListAdapter(this, boards.toArray(new IBoardListEntity[boards.size()]));
         this.setListAdapter(this.mAdapter);
         
         this.setTitle(this.getString(R.string.pick_board_title));

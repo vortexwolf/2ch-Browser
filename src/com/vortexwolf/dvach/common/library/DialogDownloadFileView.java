@@ -1,5 +1,7 @@
 package com.vortexwolf.dvach.common.library;
 
+import java.io.File;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,13 +10,13 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.interfaces.IProgressView;
+import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 
-public class DialogProgressView implements IProgressView {
+public class DialogDownloadFileView implements IDownloadFileView {
 	private final Context mContext;
 	private final ProgressDialog mProgressDialog;
 	
-	public DialogProgressView(Context context) {
+	public DialogDownloadFileView(Context context) {
 		this.mContext = context;
 		this.mProgressDialog = new ProgressDialog(this.mContext);	
 		this.mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -28,7 +30,7 @@ public class DialogProgressView implements IProgressView {
 			@Override
 			public void onCancel(DialogInterface dialog) {
 				listener.onCancel(dialog);
-				DialogProgressView.this.hide();
+				DialogDownloadFileView.this.hideLoading();
 			}
 		});
 	}
@@ -44,15 +46,31 @@ public class DialogProgressView implements IProgressView {
 	}
 	
 	@Override
-	public void show() {
+	public void showLoading(String message) {
 		int maxValue = this.mProgressDialog.getMax();
 		this.mProgressDialog.setMax(Math.max(maxValue, 0));
 		
 		this.mProgressDialog.show();
+
+		AppearanceUtils.showToastMessage(this.mContext, message);
 	}
 	
 	@Override
-	public void hide() {
+	public void hideLoading() {
 		this.mProgressDialog.dismiss();
+	}
+
+	@Override
+	public void showSuccess(File file) {
+	}
+
+	@Override
+	public void showError(String error) {
+		AppearanceUtils.showToastMessage(this.mContext, error);	
+	}
+
+	@Override
+	public void showFileExists(File file) {
+		this.showError(this.mContext.getString(R.string.error_file_exist));
 	}
 }

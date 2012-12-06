@@ -10,16 +10,19 @@ import java.net.URLConnection;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.library.DialogProgressView;
+import com.vortexwolf.dvach.common.library.BackgroundDownloadFileView;
+import com.vortexwolf.dvach.common.library.DialogDownloadFileView;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.exceptions.DownloadFileException;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.interfaces.ICancellable;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.interfaces.IProgressView;
+import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 import com.vortexwolf.dvach.services.domain.DownloadFileService;
-import com.vortexwolf.dvach.services.domain.SaveFileService;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -35,34 +38,56 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	private final Context mContext;
 	private final Resources mResources;
 	private final Uri mFrom;
-	private final File mFileWriteTo;
-	private final IProgressView mProgressView;
+	private final ApplicationSettings mSettings;
+	private final IDownloadFileView mProgressView;
+	private final ICacheDirectoryManager mCacheDirectoryManager;
 	
+	private File mSaveTo;
 	private String mUserError = null;
 
-	public DownloadFileTask(Context context, Uri from, File to, DownloadFileService downloadFileService, IProgressView progressView) {
-		super();
+	{
+		this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
+		this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);;
+		this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+	}
+	
+	public DownloadFileTask(Context context, Uri from) {
+		this(context, from, null, null);
+	}
+	
+	public DownloadFileTask(Context context, Uri from, IDownloadFileView progressView) {
+		this(context, from, null, progressView);
+	}
+	
+	public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView) {
 		this.mContext = context;
 		this.mResources = context.getResources();
-		this.mDownloadFileService = downloadFileService;
 		this.mFrom = from;
-		this.mFileWriteTo = to;
+		this.mSaveTo = to != null ? to : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
 		
-		this.mProgressView = progressView;
-		if(this.mProgressView != null) {
-			this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					cancel(true);
-				}
-			});
+		if(progressView == null) {
+			this.mProgressView = this.mSettings.isDownloadInBackground()
+								? new BackgroundDownloadFileView(this.mContext)
+								: new DialogDownloadFileView(this.mContext);
+		} else {
+			this.mProgressView = progressView;
 		}
+				
+		this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				cancel(true);
+			}
+		});
 	}
 
 	@Override
 	protected Boolean doInBackground(String... arg0) {
 		try{
-			this.mDownloadFileService.downloadFile(this.mFrom, this.mFileWriteTo, this, this);
+		    Uri from = this.getSaveFromUri();  
+		    
+			this.mDownloadFileService.downloadFile(from, this.mSaveTo, this, this);
+			
 			return true;
 		}
 		catch (DownloadFileException e){
@@ -74,38 +99,46 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 	@Override
 	public void onPreExecute() {
 		//Не показывать диалог совсем, если файл существует
-		if(this.mFileWriteTo.exists()){
+		if(this.mSaveTo.exists()){
 			this.cancel(false);
-			AppearanceUtils.showToastMessage(this.mContext, mResources.getString(R.string.error_file_exist));	
+			this.mProgressView.showFileExists(this.mSaveTo);	
+			
 			return;
 		}
-		
-		AppearanceUtils.showToastMessage(this.mContext, this.mContext.getString(R.string.notification_save_image_started, this.mFileWriteTo.getAbsolutePath()));
-		
-		if(this.mProgressView != null) {
-			this.mProgressView.show();
-		}
+
+		this.mProgressView.showLoading(this.mContext.getString(R.string.notification_save_image_started, this.mSaveTo.getAbsolutePath()));
 	}
 	
 	@Override
 	public void onPostExecute(Boolean success) {
-		if(this.mProgressView != null) {
-			this.mProgressView.hide();
+		this.mProgressView.hideLoading();
+
+		if(success) {
+			this.mProgressView.showSuccess(this.mSaveTo);
+		} else {
+			this.mProgressView.showError(this.mUserError);	
 		}
-		
-		if(success){
-			// ok
-		}
-		else{
-			AppearanceUtils.showToastMessage(this.mContext, this.mUserError);	
-		}
+	}
+	
+	private Uri getSaveFromUri(){
+		Uri from = this.mFrom;
+	
+        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(from);
+	    if(cachedFile.exists()){
+	    	from = Uri.fromFile(cachedFile);
+	    }	
+	    
+	    return from;
+	}
+	
+	@Override
+	public void onProgressUpdate(Long... progress) {
+		this.mProgressView.setProgress(progress[0].intValue());
 	}
 	
 	@Override
 	public void progressChanged(long newValue) {
-		if(this.mProgressView != null) {
-			this.mProgressView.setProgress((int)newValue / 1024);
-		}
+		this.publishProgress(newValue / 1024);
 	}
 	
 	@Override
@@ -115,8 +148,6 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
 	@Override
 	public void setContentLength(long value) {
-		if(this.mProgressView != null) {
-			this.mProgressView.setMax((int)value / 1024);
-		}
+		this.mProgressView.setMax((int)value / 1024);
 	}
 }

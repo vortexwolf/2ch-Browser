@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
+import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
 import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.Constants;
@@ -49,6 +50,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.TextView;
 
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
@@ -322,7 +324,8 @@ public class PostsListActivity extends BaseListActivity {
 	        }
 	        case Constants.CONTEXT_MENU_DOWNLOAD_FILE:{
 	        	AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-	        	this.mApplication.getSaveFileService().downloadFile(this, attachment.getSourceUrl(this.mSettings));
+	        	Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
+	        	new DownloadFileTask(this, fileUri).execute();	        	
 	        	return true;
 	        }
 	        case Constants.CONTEXT_MENU_SEARCH_IMAGE: {

@@ -26,10 +26,10 @@ public class FlowTextHelper {
 	        	sNewClassAvailable = true;
 	        }
 	   }
-
+	   
 	   public static SpannableStringBuilder tryFlowText(SpannableStringBuilder ss, FloatImageModel floatModel){
 		   // There is nothing I can do for older versions, so just return
-		   if(!sNewClassAvailable || ss == null) return ss;
+		   if(!sNewClassAvailable || ss == null || ss.length() == 0) return ss;
 		   
 		   // Get height and width of the image and height of the text line
 	        if(floatModel.getHeight() == 0 || floatModel.getWidth() == 0) return ss;

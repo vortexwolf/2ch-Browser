@@ -61,7 +61,7 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 	}
 	
 	public boolean isLocalDateTime() {
-		return mSettings.getBoolean(mResources.getString(R.string.pref_convert_post_date_key), false);
+		return mSettings.getBoolean(mResources.getString(R.string.pref_convert_post_date_key), true);
 	}
 	
 	public boolean isDownloadInBackground() {
