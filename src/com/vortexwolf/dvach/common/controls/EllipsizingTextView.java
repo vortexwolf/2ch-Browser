@@ -5,6 +5,8 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.text.Layout;
 import android.text.Layout.Alignment;
+import android.text.SpannableStringBuilder;
+import android.text.SpannedString;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.widget.TextView;
@@ -103,14 +105,7 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
             Layout layout = createWorkingLayout(workingText);
             if (layout.getLineCount() > maxLines) {
                 workingText = workingText.subSequence(0, layout.getLineEnd(maxLines - 1));
-                while (createWorkingLayout(workingText + ELLIPSIS).getLineCount() > maxLines) {
-                    int lastSpace = workingText.toString().lastIndexOf(' ');
-                    if (lastSpace == -1) {
-                        break;
-                    }
-                    workingText = workingText.subSequence(0, lastSpace);
-                }
-                workingText = workingText + ELLIPSIS;
+                workingText = new SpannableStringBuilder(workingText).append(ELLIPSIS);
                 ellipsized = true;
             }
         }

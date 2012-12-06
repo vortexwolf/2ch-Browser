@@ -17,8 +17,8 @@ public class Constants {
 	
 	public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg", "jpeg", "png", "gif" }));
 		
-	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(20);
-	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(10);
+	public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
+	public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);
 
 	// Доска по умолчанию
     public static final String DEFAULT_BOARD = "b";
@@ -37,6 +37,8 @@ public class Constants {
     public static final int BUMP_LIMIT = 500;
     
     public static final int OP_POST_POSITION = 0;
+    
+    public static final int YOUTUBE_CODE_LENGTH = 11;
     
     // Вторая буква обязательно на кириллице, вот такой вот прикол
     public static final String ADD_POST_FORM_TASK = "pоst";

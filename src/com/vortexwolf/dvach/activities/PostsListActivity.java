@@ -209,7 +209,7 @@ public class PostsListActivity extends BaseListActivity {
 				this.refreshPosts();
 			}
 		} else {
-			this.refreshPosts();
+			this.refreshPosts(false);
 		}
 	}
 	
@@ -393,6 +393,10 @@ public class PostsListActivity extends BaseListActivity {
 	}
 	
 	private void refreshPosts(){
+		this.refreshPosts(true);
+	}
+	
+	private void refreshPosts(boolean checkModified){
 		//На всякий случай отменю, чтобы не было проблем с обновлениями
 		//Возможно, лучше бы не запускать совсем
 		if(mCurrentDownloadTask != null){
@@ -401,12 +405,12 @@ public class PostsListActivity extends BaseListActivity {
 		//Если адаптер пустой, то значит была ошибка при загрузке, в таком случае запускаю загрузку заново
 		if(!mAdapter.isEmpty()){
 			//Здесь запускаю с индикатором того, что происходит обновление, а не загрузка заново
-			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, mJsonReader, true);
+			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, true, mJsonReader, true);
 			mCurrentDownloadTask.execute(mAdapter.getLastPostNumber());
 		}
 		else
 		{
-			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, mJsonReader, false);
+			mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, checkModified, mJsonReader, false);
     		mCurrentDownloadTask.execute();
 		}
 	}

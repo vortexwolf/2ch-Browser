@@ -21,25 +21,27 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 	private final IListView<ThreadsList> mView;
 	private final String mBoard;
 	private final int mPageNumber;
-	
+	private final boolean mIsCheckModified;
+		
 	private ThreadsList mThreadsList = null;
 	private String mUserError = null;
 	// Progress bar
 	private long mContentLength = 0;
 	
-	public DownloadThreadsTask(Activity activity, IListView<ThreadsList> view, String board, int pageNumber, IJsonApiReader jsonReader) {
+	public DownloadThreadsTask(Activity activity, IListView<ThreadsList> view, String board, int pageNumber, boolean checkModified, IJsonApiReader jsonReader) {
 		this.mActivity = activity;
 		this.mJsonReader = jsonReader;
 		this.mView = view;
 		this.mBoard = board != null ? board : Constants.DEFAULT_BOARD;
 		this.mPageNumber = pageNumber;
+		this.mIsCheckModified = checkModified;
 	}
 	
 	@Override
 	protected Boolean doInBackground(Void... params) {
 		//Читаем по ссылке json-объект со списком тредов
 		try{
-			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this, this);
+			this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this.mIsCheckModified, this, this);
 			return true;
 		}
 		catch(Exception e){

@@ -19,6 +19,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 	private final String mThreadNumber;
 	private final String mBoard;
 	private final boolean mIsPartialLoading;
+	private final boolean mIsCheckModified;
 	
 	private String mLoadAfterPost = null;
 	private PostsList mPostsList = null;
@@ -27,12 +28,13 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 	// Progress bar
 	private long mContentLength = 0;
 	
-	public DownloadPostsTask(IPostsListView view, String board, String threadNumber, IJsonApiReader jsonReader, boolean isPartialLoading) {
+	public DownloadPostsTask(IPostsListView view, String board, String threadNumber, boolean checkModified, IJsonApiReader jsonReader, boolean isPartialLoading) {
 		this.mJsonReader = jsonReader;
 		this.mView = view;
 		this.mThreadNumber = threadNumber;
 		this.mBoard = board;
 		this.mIsPartialLoading = isPartialLoading;
+		this.mIsCheckModified = checkModified;
 	}
 	
 	@Override
@@ -47,7 +49,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 		
 		//Читаем по ссылке json-объект со списком постов
 		try{
-			this.mPostsList = this.mJsonReader.readPostsList(mBoard, mThreadNumber, mLoadAfterPost, this, this);
+			this.mPostsList = this.mJsonReader.readPostsList(mBoard, mThreadNumber, this.mIsCheckModified, this, this);
 			return true;
 		}
 		catch(Exception e){

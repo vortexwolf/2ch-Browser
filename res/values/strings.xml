@@ -21,6 +21,10 @@
 	<string name="tabs_history">History</string>
 	<string name="addpost_politics_prompt">Political preferences</string>
 	<string name="share_via">Share via</string>
+	<string name="attach_youtube_hint">http://youtube.com/watch?v=code or just a code</string>
+	<string name="attach_youtube_title">Add youtube video</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Cancel</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -43,7 +47,8 @@
     <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string> 
     <string name="data_add_thread_title">/%1$s/ - Add new thread</string> 
     <string name="data_add_post_title">/%1$s/%2$s - Add new post</string> 
-    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string> 
+    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string>
+    <string name="data_add_post_video_attachment_name">Video %1$s</string>
     
     <!-- Menus -->
     <string name="menu_pick_board">Pick board</string>
@@ -60,6 +65,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_add_favorites">Add to bookmarks</string>
     <string name="menu_remove_favorites">Remove from bookmarks</string>
+    <string name="menu_attach_youtube">Attach YouTube video</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -145,6 +151,7 @@
 	<string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
 	<string name="error_image_search">The TinEye website doesn\'t work.</string>
 	<string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
+	<string name="error_incorrect_youtube_link">Incorrect format of the link to the video.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Enter the confirmation code</string>

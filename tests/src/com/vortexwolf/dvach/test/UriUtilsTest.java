@@ -127,7 +127,23 @@ public class UriUtilsTest extends InstrumentationTestCase {
 	public void testGetYoutubeCodeTest(){
 		String testHtml = "<a href=\"http://www.youtube.com/v/F4hQ4J4BFOM\"/>";
 		String code = UriUtils.getYouTubeCode(testHtml);
-		
 		assertEquals(code, "F4hQ4J4BFOM");
+		
+		testHtml = "http://youtube.com/watch?v=_-123ZZZzzz";
+		code = UriUtils.getYouTubeCode(testHtml);
+		assertEquals(code, "_-123ZZZzzz");
+		
+		testHtml = "https://www.youtube.com/watch?v=1-123ZZZzzz";
+		code = UriUtils.getYouTubeCode(testHtml);
+		assertEquals(code, "1-123ZZZzzz");
+		
+		testHtml = "http://m.youtube.com/watch?v=123456789zz";
+		code = UriUtils.getYouTubeCode(testHtml);
+		assertEquals(code, "123456789zz");
+		
+		testHtml = "http://m.youtube.com/#/watch?v=123456789xx";
+		code = UriUtils.getYouTubeCode(testHtml);
+		assertEquals(code, "123456789xx");
+		
 	}
 }

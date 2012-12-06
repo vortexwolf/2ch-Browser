@@ -5,6 +5,7 @@ import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.WebViewFixed;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileView;
@@ -192,13 +193,13 @@ public class BrowserActivity extends Activity {
 	
 	private class BrowserDownloadFileView implements IDownloadFileView {
 
-		private int mMaxValue = -1;
+		private double mMaxValue = -1;
 		
 		@Override
 		public void setProgress(int value) {
 			if(mMaxValue > 0) {
-				int progress = value / mMaxValue * 100;
-				BrowserActivity.this.setProgress(progress * 100); // 0 .. 10000
+				double percent = value / mMaxValue;
+				BrowserActivity.this.setProgress((int)(percent * 10000)); // 0 .. 10000
 			}
 			else {
 				BrowserActivity.this.setProgress(Window.PROGRESS_INDETERMINATE_ON);
@@ -207,7 +208,7 @@ public class BrowserActivity extends Activity {
 
 		@Override
 		public void setMax(int value) {
-			this.mMaxValue = value;
+			this.mMaxValue = (double)value;
 		}
 
 		@Override

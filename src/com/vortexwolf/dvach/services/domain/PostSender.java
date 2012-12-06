@@ -118,11 +118,15 @@ public class PostSender implements IPostSender {
             multipartEntity.addPart(fields.getCaptchaKey(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaKey()), utf));
             multipartEntity.addPart(fields.getCaptcha(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaAnswer()), utf));
             multipartEntity.addPart(fields.getComment(), new StringBody(StringUtils.emptyIfNull(entity.getComment()), utf));
+            
             if(entity.isSage()){
             	multipartEntity.addPart(fields.getEmail(), new StringBody(Constants.SAGE_EMAIL, utf));
             }
             if(entity.getAttachment() != null){
             	multipartEntity.addPart(fields.getFile(), new FileBody(entity.getAttachment()));
+            }
+            if(entity.getVideo() != null) {
+                multipartEntity.addPart(fields.getVideo(), new StringBody(entity.getVideo(), utf));
             }
             if(entity.getSubject() != null){
             	multipartEntity.addPart(fields.getSubject(), new StringBody(entity.getSubject(), utf));

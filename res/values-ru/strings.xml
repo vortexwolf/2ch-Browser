@@ -22,6 +22,10 @@
 	<string name="tabs_history">История</string>
 	<string name="addpost_politics_prompt">Политические предпочтения</string>
 	<string name="share_via">Способ отправки</string>
+	<string name="attach_youtube_hint">http://youtube.com/watch?v=code или просто код</string>
+	<string name="attach_youtube_title">Добавить youtube видео</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Отмена</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -47,7 +51,8 @@
 	<string name="data_thread_withsubject_title">/%1$s/ - %2$s</string> 
     <string name="data_add_thread_title">/%1$s/ - Новый тред</string> 
     <string name="data_add_post_title">/%1$s/%2$s - Новое сообщение</string> 
-    <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string> 
+    <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string>
+    <string name="data_add_post_video_attachment_name">Video %1$s</string>
     
     <!-- Menus -->
     <string name="menu_pick_board">Форумы</string>
@@ -65,6 +70,7 @@
 	<string name="menu_share">Поделиться</string>
     <string name="menu_add_favorites">Добавить в закладки</string>
     <string name="menu_remove_favorites">Удалить из закладок</string>
+    <string name="menu_attach_youtube">Прикрепить YouTube видео</string>
         
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -150,6 +156,7 @@
 	<string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>
 	<string name="error_image_search">Поиск в TinEye не работает.</string>
 	<string name="error_download_no_space_sdcard">Не удалось сохранить файл, нет места в памяти устройства.</string>
+	<string name="error_incorrect_youtube_link">Неправильный формат ссылки на видео.</string>
 	
 	<!-- Warnings -->
 	<string name="warning_enter_captcha">Введите код подтверждения</string>

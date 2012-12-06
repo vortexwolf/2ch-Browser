@@ -31,7 +31,10 @@ import com.vortexwolf.dvach.services.domain.HttpStringReader;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -48,6 +51,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,6 +70,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 	private Tracker mTracker;
 	
 	private ImageFileModel mAttachedFile;
+	private String mAttachedVideo;
 	private CaptchaEntity mCaptcha;
 	private String mBoardName;
 	private String mThreadNumber;
@@ -307,7 +312,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		
 		String name = this.mApplication.getSettings().getName();
 		String captchaKey = mCaptcha != null ? mCaptcha.getKey() : null;
-		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name);
+		PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name, this.mAttachedVideo);
 		
 		//Отправляем
 		sendPost(pe);
@@ -452,6 +457,40 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     			i.setType("image/*");
     			startActivityForResult(i, Constants.REQUEST_CODE_GALLERY); 
     			break;
+    		case R.id.menu_attach_youtube_id:
+                // A dialog with a text input
+                final EditText linkTextView = new EditText(this);
+                linkTextView.setHint(this.getString(R.string.attach_youtube_hint));
+                FrameLayout rootLayout = new FrameLayout(this);
+                rootLayout.setPadding(10, 0, 10, 0);
+                rootLayout.addView(linkTextView);
+                
+                final AlertDialog d = new AlertDialog.Builder(this)
+                	.setTitle(this.getString(R.string.attach_youtube_title))
+                    .setView(rootLayout)
+                    .setNegativeButton(this.getString(R.string.cancel), null)
+                    .setPositiveButton(this.getString(R.string.ok), null)
+                    .create();
+                
+            	// don't hide the dialog if there was an error
+                d.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+                        b.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                            	boolean success = AddPostActivity.this.setVideoAttachment(linkTextView.getText().toString());
+                            	if (success) {
+                            		d.dismiss();
+                            	}
+                            }
+                        });
+                    }
+                });
+                
+                d.show();
+    			break;
     	}
     	
     	return true;
@@ -503,21 +542,52 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 		}
 	}
 	
+	private boolean setVideoAttachment(String videoEditText){
+		if(StringUtils.isEmpty(videoEditText)){
+			AppearanceUtils.showToastMessage(this, this.getString(R.string.error_incorrect_youtube_link));
+			return false;
+		}
+		
+		String code = null;
+		if (videoEditText.length() == Constants.YOUTUBE_CODE_LENGTH) {
+			code = videoEditText;
+		}
+		else if (UriUtils.isYoutubeUri(Uri.parse(videoEditText))) {
+			code = UriUtils.getYouTubeCode(videoEditText);
+		}
+		
+		if(code != null){
+			this.mAttachedVideo = UriUtils.formatYoutubeUriFromCode(code);
+			this.mAttachedFile = null;
+			this.displayAttachmentView(this.getString(R.string.data_add_post_video_attachment_name, code), "youtube.com");
+			return true;
+		} else {
+			AppearanceUtils.showToastMessage(this, this.getString(R.string.error_incorrect_youtube_link));
+			return false;
+		}
+	}
+	
 	private void setAttachment(ImageFileModel fileModel){
 		this.mAttachedFile = fileModel;
+		this.mAttachedVideo = null;
 		
+		String infoFormat = this.getResources().getString(R.string.data_add_post_attachment_info);
+		String info = String.format(infoFormat, fileModel.getFileSize(), fileModel.imageWidth, fileModel.imageHeight);
+		this.displayAttachmentView(fileModel.file.getName(), info);
+	}
+	
+	private void displayAttachmentView(String name, String info){
 		this.mAttachmentView.setVisibility(View.VISIBLE);
 		TextView fileNameView = (TextView)findViewById(R.id.addpost_attachment_name);
 		TextView fileSizeView = (TextView)findViewById(R.id.addpost_attachment_size);
 		
-		fileNameView.setText(fileModel.file.getName());
-		
-		String infoFormat = this.getResources().getString(R.string.data_add_post_attachment_info);
-		fileSizeView.setText(String.format(infoFormat, fileModel.getFileSize(), fileModel.imageWidth, fileModel.imageHeight));
+		fileNameView.setText(name);
+		fileSizeView.setText(info);
 	}
 	
 	private void removeAttachment(){
 		this.mAttachedFile = null;
+		this.mAttachedVideo = null;
 		
 		this.mAttachmentView.setVisibility(View.GONE);
 	}

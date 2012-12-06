@@ -63,15 +63,23 @@ public class JsonApiReader implements IJsonApiReader {
 	}
 
 	@Override
-	public ThreadsList readThreadsList(String boardName, int page, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+	public ThreadsList readThreadsList(String boardName, int page, boolean checkModified, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
 		String uri = formatThreadsUri(boardName, page);
+		
+		if(checkModified == false) {
+			this.mIfModifiedMap.remove(uri);
+		}
 		
 		return this.readData(uri, ThreadsList.class, listener, task);
 	}
 
 	@Override
-	public PostsList readPostsList(String boardName, String threadNumber, String from, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+	public PostsList readPostsList(String boardName, String threadNumber, boolean checkModified, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
 		String uri = formatPostsUri(boardName, threadNumber);
+		
+		if(checkModified == false) {
+			this.mIfModifiedMap.remove(uri);
+		}
 		
 		return this.readData(uri, PostsList.class, listener, task);
 	}

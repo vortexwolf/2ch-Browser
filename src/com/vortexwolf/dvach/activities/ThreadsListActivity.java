@@ -214,7 +214,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
         
         if(threads == null){
-        	this.refreshThreads();
+        	this.refreshThreads(false);
         }
         else {
         	this.mAdapter.setAdapterData(threads);
@@ -414,12 +414,16 @@ public class ThreadsListActivity extends BaseListActivity {
     }
      
 	private void refreshThreads(){
+		this.refreshThreads(true);
+	}
+	
+	private void refreshThreads(boolean checkModified){
 		if(this.mCurrentDownloadTask != null){
 			this.mCurrentDownloadTask.cancel(true);
 		}
 		
 		if(this.mBoardName != null){
-			this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mPageNumber, this.mJsonReader);
+			this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mPageNumber, checkModified, this.mJsonReader);
 			this.mCurrentDownloadTask.execute();
 		}
 	}

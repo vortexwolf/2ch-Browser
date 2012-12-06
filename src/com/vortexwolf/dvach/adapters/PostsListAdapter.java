@@ -125,7 +125,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 	 * @param posts Список сообщений (можно и всех, они потом отфильтруются)
 	 */
 	public int updateAdapterData(String from, PostInfo[] posts){
-		Integer lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
+		Integer lastPostNumber;
+		try {
+			lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
+		} catch (NumberFormatException e) {
+			lastPostNumber = 0;
+		}
+		
 		int newPostsCount = 0;
 
 		for(PostInfo pi : posts){

@@ -141,7 +141,7 @@ public class AttachmentInfo {
 		if(!StringUtils.isEmpty(videoCode)){
 			model.isVideo = true;
 			model.videoMobileUrl = "http://m.youtube.com/#/watch?v="+videoCode;
-			model.videoUrl = "http://www.youtube.com/v/"+videoCode;
+			model.videoUrl = UriUtils.formatYoutubeUriFromCode(videoCode);
 			model.thumbnailUrl = "http://img.youtube.com/vi/"+videoCode+"/default.jpg";
 			return model;
 		}

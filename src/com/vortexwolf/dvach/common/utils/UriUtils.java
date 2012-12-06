@@ -16,7 +16,7 @@ public class UriUtils {
 	private static final Pattern boardUriPattern = Pattern.compile("/\\w+/?(?:\\d+\\.html)?"); // example: /b or /b/1.html
 	private static final Pattern groupsDvachUriPattern = Pattern.compile("^/(\\w+)/?(?:(?:(\\d+).html)|(?:res/(\\d+)\\.html))?$"); // 1: board name; 2: page number; 3: thread number
 	private static final Pattern groupsFileExtensionPattern = Pattern.compile(".*\\.([a-zA-Z0-9]+)$"); // 1: file extension
-	private static final Pattern groupsYoutubeCodePattern = Pattern.compile("\"http://www.youtube.com/v/(.*?)\""); // 1: video code
+	private static final Pattern groupsYoutubeCodePattern = Pattern.compile("(?:https?://)?(?:www\\.)?(?:m\\.)?youtube\\.com/(?:(?:v/)|(?:(?:#/)?watch\\?v=))([\\w\\-]{11})"); // 1: video code
 	
 	public static Uri getUriForDomain(String domain){
 		String url = domain.replaceAll("^(?:http\\://)?(.*?)/*$", "http://$1/");
@@ -57,6 +57,13 @@ public class UriUtils {
     	String extension = getGroupValue(uri, groupsFileExtensionPattern, 1);
     	return extension;
     }
+    
+    public static String getYouTubeCode(String text){
+		if(StringUtils.isEmpty(text)) return null;
+		
+		String videoCode = getGroupValue(text, groupsYoutubeCodePattern, 1);
+		return videoCode;
+    }
 	
     public static boolean isYoutubeUri(Uri uri) {
     	if (uri == null) return false;
@@ -64,13 +71,9 @@ public class UriUtils {
     	return host != null && host.endsWith("youtube.com");
     }
     
-	public static String getYouTubeCode(String videoHtml) {
-		if(StringUtils.isEmpty(videoHtml)) return null;
-		
-		String videoCode = getGroupValue(videoHtml, groupsYoutubeCodePattern, 1);
-
-		return videoCode;
-	}
+    public static String formatYoutubeUriFromCode(String code) {
+    	return "http://www.youtube.com/watch?v=" + code;
+    }
 	
 	private static boolean testUriPath(Uri uri, Pattern pattern){
 		if (uri == null) return false;
