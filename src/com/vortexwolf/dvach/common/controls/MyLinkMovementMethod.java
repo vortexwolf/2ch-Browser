@@ -17,23 +17,23 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     private static final int CLICK = 1;
     private static final int UP = 2;
     private static final int DOWN = 3;
-    
+
     private boolean mSkipNextClick = false;
 
-	@Override
-	public boolean onKeyDown(TextView widget, Spannable buffer, int keyCode, KeyEvent event) {
-		switch (keyCode) {
-		case KeyEvent.KEYCODE_DPAD_CENTER:
-		case KeyEvent.KEYCODE_ENTER:
-			if (event.getRepeatCount() == 0) {
-				if (action(CLICK, widget, buffer)) {
-					return true;
-				}
-			}
-		}
+    @Override
+    public boolean onKeyDown(TextView widget, Spannable buffer, int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_ENTER:
+                if (event.getRepeatCount() == 0) {
+                    if (action(CLICK, widget, buffer)) {
+                        return true;
+                    }
+                }
+        }
 
-		return super.onKeyDown(widget, buffer, keyCode, event);
-	}
+        return super.onKeyDown(widget, buffer, keyCode, event);
+    }
 
     @Override
     protected boolean up(TextView widget, Spannable buffer) {
@@ -43,7 +43,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
         return super.up(widget, buffer);
     }
-        
+
     @Override
     protected boolean down(TextView widget, Spannable buffer) {
         if (action(DOWN, widget, buffer)) {
@@ -74,8 +74,8 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     private boolean action(int what, TextView widget, Spannable buffer) {
         Layout layout = widget.getLayout();
 
-        int padding = widget.getTotalPaddingTop() +
-                      widget.getTotalPaddingBottom();
+        int padding = widget.getTotalPaddingTop()
+                + widget.getTotalPaddingBottom();
         int areatop = widget.getScrollY();
         int areabot = areatop + widget.getHeight() - padding;
 
@@ -99,88 +99,83 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
             }
         }
 
-        if (selStart > last)
-            selStart = selEnd = Integer.MAX_VALUE;
-        if (selEnd < first)
-            selStart = selEnd = -1;
+        if (selStart > last) selStart = selEnd = Integer.MAX_VALUE;
+        if (selEnd < first) selStart = selEnd = -1;
 
         switch (what) {
-        case CLICK:
-            if (selStart == selEnd) {
-                return false;
-            }
+            case CLICK:
+                if (selStart == selEnd) {
+                    return false;
+                }
 
-            ClickableSpan[] link = buffer.getSpans(selStart, selEnd, ClickableSpan.class);
+                ClickableSpan[] link = buffer.getSpans(selStart, selEnd, ClickableSpan.class);
 
-            if (link.length != 1)
-                return false;
+                if (link.length != 1) return false;
 
-            link[0].onClick(widget);
-            break;
+                link[0].onClick(widget);
+                break;
 
-        case UP:
-            int beststart, bestend;
+            case UP:
+                int beststart,
+                bestend;
 
-            beststart = -1;
-            bestend = -1;
+                beststart = -1;
+                bestend = -1;
 
-            for (int i = 0; i < candidates.length; i++) {
-                int end = buffer.getSpanEnd(candidates[i]);
+                for (int i = 0; i < candidates.length; i++) {
+                    int end = buffer.getSpanEnd(candidates[i]);
 
-                if (end < selEnd || selStart == selEnd) {
-                    if (end > bestend) {
-                        beststart = buffer.getSpanStart(candidates[i]);
-                        bestend = end;
+                    if (end < selEnd || selStart == selEnd) {
+                        if (end > bestend) {
+                            beststart = buffer.getSpanStart(candidates[i]);
+                            bestend = end;
+                        }
                     }
                 }
-            }
 
-            if (beststart >= 0) {
-                Selection.setSelection(buffer, bestend, beststart);
-                return true;
-            }
+                if (beststart >= 0) {
+                    Selection.setSelection(buffer, bestend, beststart);
+                    return true;
+                }
 
-            break;
+                break;
 
-        case DOWN:
-            beststart = Integer.MAX_VALUE;
-            bestend = Integer.MAX_VALUE;
+            case DOWN:
+                beststart = Integer.MAX_VALUE;
+                bestend = Integer.MAX_VALUE;
 
-            for (int i = 0; i < candidates.length; i++) {
-                int start = buffer.getSpanStart(candidates[i]);
+                for (int i = 0; i < candidates.length; i++) {
+                    int start = buffer.getSpanStart(candidates[i]);
 
-                if (start > selStart || selStart == selEnd) {
-                    if (start < beststart) {
-                        beststart = start;
-                        bestend = buffer.getSpanEnd(candidates[i]);
+                    if (start > selStart || selStart == selEnd) {
+                        if (start < beststart) {
+                            beststart = start;
+                            bestend = buffer.getSpanEnd(candidates[i]);
+                        }
                     }
                 }
-            }
 
-            if (bestend < Integer.MAX_VALUE) {
-                Selection.setSelection(buffer, beststart, bestend);
-                return true;
-            }
+                if (bestend < Integer.MAX_VALUE) {
+                    Selection.setSelection(buffer, beststart, bestend);
+                    return true;
+                }
 
-            break;
+                break;
         }
 
         return false;
     }
 
-    
-    
     @Override
-    public boolean onTouchEvent(TextView widget, Spannable buffer,
-                                MotionEvent event) {
+    public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
         int action = event.getAction();
 
-    	if(mSkipNextClick && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN)) {
-    		mSkipNextClick = false;
-    	}
-    	else if (action == MotionEvent.ACTION_UP ||
-            action == MotionEvent.ACTION_DOWN) {
-        	
+        if (mSkipNextClick
+                && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN)) {
+            mSkipNextClick = false;
+        } else if (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_DOWN) {
+
             int x = (int) event.getX();
             int y = (int) event.getY();
 
@@ -200,9 +195,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
                 if (action == MotionEvent.ACTION_UP) {
                     link[0].onClick(widget);
                 } else if (action == MotionEvent.ACTION_DOWN) {
-                    Selection.setSelection(buffer,
-                                           buffer.getSpanStart(link[0]),
-                                           buffer.getSpanEnd(link[0]));
+                    Selection.setSelection(buffer, buffer.getSpanStart(link[0]), buffer.getSpanEnd(link[0]));
                 }
 
                 return true;
@@ -216,15 +209,15 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
     @Override
     public void initialize(TextView widget, final Spannable text) {
-    	widget.setOnLongClickListener(new TextView.OnLongClickListener() {
-			
-			@Override
-			public boolean onLongClick(View v) {
-				mSkipNextClick = true;
-				Selection.removeSelection(text);
-				return false;
-			}
-		});
+        widget.setOnLongClickListener(new TextView.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                mSkipNextClick = true;
+                Selection.removeSelection(text);
+                return false;
+            }
+        });
         Selection.removeSelection(text);
         text.removeSpan(FROM_BELOW);
     }
@@ -241,8 +234,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     }
 
     public static MyLinkMovementMethod getInstance() {
-        if (sInstance == null)
-            sInstance = new MyLinkMovementMethod();
+        if (sInstance == null) sInstance = new MyLinkMovementMethod();
 
         return sInstance;
     }

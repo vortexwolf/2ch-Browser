@@ -12,46 +12,46 @@ import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
 import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 
 public class OpenTabsManager implements IOpenTabsManager {
-	private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
-	
-	private final HistoryDataSource mDataSource;
-	private final INavigationService mNavigationService;
-	
-	public OpenTabsManager(HistoryDataSource dataSource, INavigationService navigationService){
-		mDataSource = dataSource;
-		mNavigationService = navigationService;
-	}
-	
-	@Override
-	public OpenTabModel add(OpenTabModel newTab){
-		//Не добавляем, если уже добавлено
-		for(OpenTabModel openTab : mTabs){
-			if(openTab.getUri().equals(newTab.getUri())){
-				return openTab;
-			}
-		}
-		
-		mTabs.add(0, newTab);
-		mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
-		
-		return newTab;
-	}
-	
-	@Override
-	public ArrayList<OpenTabModel> getOpenTabs(){
-		return mTabs;
-	}
-	
-	@Override
-	public void remove(OpenTabModel tab){
-		this.mTabs.remove(tab);
-	}
+    private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
 
-	@Override
-	public void navigate(OpenTabModel tab, Activity activity){
-		Bundle extras = new Bundle();
-		extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
-		
-		mNavigationService.navigate(tab.getUri(), activity, extras);
-	}
+    private final HistoryDataSource mDataSource;
+    private final INavigationService mNavigationService;
+
+    public OpenTabsManager(HistoryDataSource dataSource, INavigationService navigationService) {
+        mDataSource = dataSource;
+        mNavigationService = navigationService;
+    }
+
+    @Override
+    public OpenTabModel add(OpenTabModel newTab) {
+        // Не добавляем, если уже добавлено
+        for (OpenTabModel openTab : mTabs) {
+            if (openTab.getUri().equals(newTab.getUri())) {
+                return openTab;
+            }
+        }
+
+        mTabs.add(0, newTab);
+        mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
+
+        return newTab;
+    }
+
+    @Override
+    public ArrayList<OpenTabModel> getOpenTabs() {
+        return mTabs;
+    }
+
+    @Override
+    public void remove(OpenTabModel tab) {
+        this.mTabs.remove(tab);
+    }
+
+    @Override
+    public void navigate(OpenTabModel tab, Activity activity) {
+        Bundle extras = new Bundle();
+        extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
+
+        mNavigationService.navigate(tab.getUri(), activity, extras);
+    }
 }

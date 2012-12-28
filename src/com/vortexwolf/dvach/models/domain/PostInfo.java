@@ -4,109 +4,109 @@ import java.io.Serializable;
 
 public class PostInfo implements IAttachmentEntity, Serializable {
 
-	private static final long serialVersionUID = 8212562227302607027L;
-	
-	protected String num;
-	private String thumbnail;
-	protected String comment;
-	protected String subject;
-	private String video;
-	private String image;
-	private int size;
-	private String name;
-	private int width;
-	private int height;
-	private long timestamp;
+    private static final long serialVersionUID = 8212562227302607027L;
 
-	public String getNum() {
-		return num;
-	}
+    protected String num;
+    private String thumbnail;
+    protected String comment;
+    protected String subject;
+    private String video;
+    private String image;
+    private int size;
+    private String name;
+    private int width;
+    private int height;
+    private long timestamp;
 
-	public void setNum(String num) {
-		this.num = num;
-	}
+    public String getNum() {
+        return num;
+    }
 
-	@Override
-	public String getThumbnail() {
-		return thumbnail;
-	}
+    public void setNum(String num) {
+        this.num = num;
+    }
 
-	public void setThumbnail(String thumbnail) {
-		this.thumbnail = thumbnail;
-	}
+    @Override
+    public String getThumbnail() {
+        return thumbnail;
+    }
 
-	public String getComment() {
-		return comment;
-	}
-	
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	
-	public String getSubject() {
-		return subject;
-	}
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
+    public String getComment() {
+        return comment;
+    }
 
-	@Override
-	public String getVideo() {
-		return video;
-	}
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-	public void setVideo(String video) {
-		this.video = video;
-	}
+    public String getSubject() {
+        return subject;
+    }
 
-	@Override
-	public String getImage() {
-		return image;
-	}
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 
-	public void setImage(String image) {
-		this.image = image;
-	}
+    @Override
+    public String getVideo() {
+        return video;
+    }
 
-	@Override
-	public int getSize() {
-		return size;
-	}
+    public void setVideo(String video) {
+        this.video = video;
+    }
 
-	public void setSize(int size) {
-		this.size = size;
-	}
+    @Override
+    public String getImage() {
+        return image;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setImage(String image) {
+        this.image = image;
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public int getSize() {
+        return size;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setSize(int size) {
+        this.size = size;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setHeight(int height) {
-		this.height = height;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getHeight() {
-		return height;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public long getTimestamp() {
-		return timestamp;
-	}
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 }

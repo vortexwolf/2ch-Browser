@@ -28,104 +28,102 @@ import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class DownloadFileService {
-	private static final String TAG = "DownloadFileService";
+    private static final String TAG = "DownloadFileService";
 
-	private final Resources mResources;
-	private final DefaultHttpClient mHttpClient;
+    private final Resources mResources;
+    private final DefaultHttpClient mHttpClient;
 
-	public DownloadFileService(Resources resources, DefaultHttpClient httpClient) {
-		this.mResources = resources;
-		this.mHttpClient = httpClient;
-	}
+    public DownloadFileService(Resources resources, DefaultHttpClient httpClient) {
+        this.mResources = resources;
+        this.mHttpClient = httpClient;
+    }
 
-	public void downloadFile(Uri uri, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws DownloadFileException {
-		if (to.exists()) {
-			throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
-		}
-		
-		HttpGet request = null;
-		HttpResponse response = null;
-		BufferedInputStream input = null;
-		try {
-			File fromFile = new File(uri.getPath());
-			
-			if (fromFile.exists()) {
-				progressChangeListener.setContentLength(fromFile.length());
-				input = new BufferedInputStream(new FileInputStream(fromFile));
-			} else {
-				request = new HttpGet(uri.toString());
-				response = this.mHttpClient.execute(request);
-				HttpEntity entity = response.getEntity();
-				
-				progressChangeListener.setContentLength(entity.getContentLength());
-				input = new BufferedInputStream(entity.getContent());
-			}
+    public void downloadFile(Uri uri, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws DownloadFileException {
+        if (to.exists()) {
+            throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
+        }
 
-			this.SaveStream(input, to, progressChangeListener, task);
+        HttpGet request = null;
+        HttpResponse response = null;
+        BufferedInputStream input = null;
+        try {
+            File fromFile = new File(uri.getPath());
 
-		} catch (DownloadFileException e) {
-			throw e;
-		} catch (Exception e) {
-			MyLog.e(TAG, e);
-			throw new DownloadFileException(mResources.getString(R.string.error_save_file));
-		} finally {
-			try {
-				if (input != null) {
-					input.close();
-				}
-			} catch (Exception e) {
-				MyLog.e(TAG, e);
-			}
-			
-			ExtendedHttpClient.releaseRequestResponse(request, response);
-		}
-	}
+            if (fromFile.exists()) {
+                progressChangeListener.setContentLength(fromFile.length());
+                input = new BufferedInputStream(new FileInputStream(fromFile));
+            } else {
+                request = new HttpGet(uri.toString());
+                response = this.mHttpClient.execute(request);
+                HttpEntity entity = response.getEntity();
 
-	private void SaveStream(InputStream input, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws Exception, DownloadFileException {
-		OutputStream output = null;
-		byte data[] = new byte[8192];
-		int total = 0, count;
-		boolean wasCancelled = false;
+                progressChangeListener.setContentLength(entity.getContentLength());
+                input = new BufferedInputStream(entity.getContent());
+            }
 
-		try {
-			output = new FileOutputStream(to);
-			
-			while ((count = input.read(data)) != -1) {
-				if (task != null && task.isCancelled()) {
-					wasCancelled = true;
-					return;
-				}
+            this.SaveStream(input, to, progressChangeListener, task);
 
-				total += count;
-				output.write(data, 0, count);
+        } catch (DownloadFileException e) {
+            throw e;
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+            throw new DownloadFileException(mResources.getString(R.string.error_save_file));
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+            }
 
-				if (progressChangeListener != null) {
-					progressChangeListener.progressChanged(total);
-				}
-			}
-		} 
-		catch (Exception e){
-			MyLog.e(TAG, e);
-			wasCancelled = true;
-			if(e instanceof FileNotFoundException) {
-				throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
-			}
-			
-			throw e;
-		}
-		finally {
-			try {
-				if (output != null) {
-					output.close();
-				}
-			} catch (Exception e) {
-				MyLog.e(TAG, e);
-			}
+            ExtendedHttpClient.releaseRequestResponse(request, response);
+        }
+    }
 
-			if (wasCancelled) {
-				to.delete();
-			}
-		}
-	}
+    private void SaveStream(InputStream input, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws Exception, DownloadFileException {
+        OutputStream output = null;
+        byte data[] = new byte[8192];
+        int total = 0, count;
+        boolean wasCancelled = false;
+
+        try {
+            output = new FileOutputStream(to);
+
+            while ((count = input.read(data)) != -1) {
+                if (task != null && task.isCancelled()) {
+                    wasCancelled = true;
+                    return;
+                }
+
+                total += count;
+                output.write(data, 0, count);
+
+                if (progressChangeListener != null) {
+                    progressChangeListener.progressChanged(total);
+                }
+            }
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+            wasCancelled = true;
+            if (e instanceof FileNotFoundException) {
+                throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
+            }
+
+            throw e;
+        } finally {
+            try {
+                if (output != null) {
+                    output.close();
+                }
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+            }
+
+            if (wasCancelled) {
+                to.delete();
+            }
+        }
+    }
 
 }

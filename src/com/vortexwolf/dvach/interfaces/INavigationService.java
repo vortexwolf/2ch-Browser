@@ -6,9 +6,12 @@ import android.os.Bundle;
 
 public interface INavigationService {
 
-	/** Opens the specified uri either inside the application on in the external browser */
-	public abstract void navigate(Uri uri, Context context);
+    /**
+     * Opens the specified uri either inside the application on in the external
+     * browser
+     */
+    public abstract void navigate(Uri uri, Context context);
 
-	public abstract void navigate(Uri uri, Context context, Bundle extras);
+    public abstract void navigate(Uri uri, Context context, Bundle extras);
 
 }

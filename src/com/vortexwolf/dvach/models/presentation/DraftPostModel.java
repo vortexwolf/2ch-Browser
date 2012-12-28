@@ -5,43 +5,43 @@ import android.graphics.Bitmap;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 
 public class DraftPostModel {
-	private String mComment;
-	private ImageFileModel mAttachedFile;
-	private boolean mIsSage;
-	private CaptchaViewType mCaptchaType;
-	private CaptchaEntity mCaptcha;
-	private Bitmap mCaptchaImage;
-	
-	public DraftPostModel(String comment, ImageFileModel attachedFile, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage){
-		this.mComment = comment;
-		this.mAttachedFile = attachedFile;
-		this.mIsSage = isSage;
-		this.mCaptchaType = captchaType;
-		this.mCaptcha = captcha;
-		this.mCaptchaImage = captchaImage;
-	}
+    private String mComment;
+    private ImageFileModel mAttachedFile;
+    private boolean mIsSage;
+    private CaptchaViewType mCaptchaType;
+    private CaptchaEntity mCaptcha;
+    private Bitmap mCaptchaImage;
 
-	public String getComment() {
-		return mComment;
-	}
+    public DraftPostModel(String comment, ImageFileModel attachedFile, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage) {
+        this.mComment = comment;
+        this.mAttachedFile = attachedFile;
+        this.mIsSage = isSage;
+        this.mCaptchaType = captchaType;
+        this.mCaptcha = captcha;
+        this.mCaptchaImage = captchaImage;
+    }
 
-	public ImageFileModel getAttachedFile() {
-		return mAttachedFile;
-	}
+    public String getComment() {
+        return mComment;
+    }
 
-	public boolean isSage() {
-		return mIsSage;
-	}
+    public ImageFileModel getAttachedFile() {
+        return mAttachedFile;
+    }
 
-	public CaptchaViewType getCaptchaType() {
-		return mCaptchaType;
-	}
+    public boolean isSage() {
+        return mIsSage;
+    }
 
-	public CaptchaEntity getCaptcha() {
-		return mCaptcha;
-	}
+    public CaptchaViewType getCaptchaType() {
+        return mCaptchaType;
+    }
 
-	public Bitmap getCaptchaImage() {
-		return mCaptchaImage;
-	}
+    public CaptchaEntity getCaptcha() {
+        return mCaptcha;
+    }
+
+    public Bitmap getCaptchaImage() {
+        return mCaptchaImage;
+    }
 }

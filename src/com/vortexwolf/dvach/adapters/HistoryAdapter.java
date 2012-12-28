@@ -22,56 +22,57 @@ import android.widget.TextView;
 
 public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 
-	private final LayoutInflater mInflater;
-	private final FavoritesDataSource mFavoritesDataSource;
-	
-	public HistoryAdapter(Context context, List<HistoryEntity> objects, FavoritesDataSource favoritesDataSource) {
-		super(context, -1, objects);
-		mInflater = LayoutInflater.from(context);
-		mFavoritesDataSource = favoritesDataSource;
-	}
+    private final LayoutInflater mInflater;
+    private final FavoritesDataSource mFavoritesDataSource;
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-    	final HistoryEntity item = this.getItem(position);
-    	
-    	View view = convertView == null ? mInflater.inflate(R.layout.history_list_item, null) : convertView;
-    	
-    	ViewBag vb = (ViewBag)view.getTag();
-    	if(vb == null){
-    		vb = new ViewBag();
-    		vb.titleView = (TextView)view.findViewById(R.id.title);
-    		vb.urlView = (TextView)view.findViewById(R.id.url);
-    		vb.starView = (CheckBox)view.findViewById(R.id.star);
-    		
-    		view.setTag(vb);
-    	}
-    	
-    	vb.titleView.setText(item.getTitle());
-    	vb.urlView.setText(item.getUrl());
-    	
-    	boolean isInFavorites = mFavoritesDataSource.hasFavorites(item.getUrl());
-    	vb.starView.setOnCheckedChangeListener(null);
-    	vb.starView.setChecked(isInFavorites);
-    	
-    	vb.starView.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if(isChecked){
-					mFavoritesDataSource.addToFavorites(item.getTitle(), item.getUrl());
-				}
-				else {
-					mFavoritesDataSource.removeFromFavorites(item.getUrl());
-				}
-			}
-		});
-    	
-    	return view;
-	}
-	
-	static class ViewBag{
-    	TextView titleView;
-    	TextView urlView;
-    	CheckBox starView;
-	}
+    public HistoryAdapter(Context context, List<HistoryEntity> objects, FavoritesDataSource favoritesDataSource) {
+        super(context, -1, objects);
+        mInflater = LayoutInflater.from(context);
+        mFavoritesDataSource = favoritesDataSource;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        final HistoryEntity item = this.getItem(position);
+
+        View view = convertView == null
+                ? mInflater.inflate(R.layout.history_list_item, null)
+                : convertView;
+
+        ViewBag vb = (ViewBag) view.getTag();
+        if (vb == null) {
+            vb = new ViewBag();
+            vb.titleView = (TextView) view.findViewById(R.id.title);
+            vb.urlView = (TextView) view.findViewById(R.id.url);
+            vb.starView = (CheckBox) view.findViewById(R.id.star);
+
+            view.setTag(vb);
+        }
+
+        vb.titleView.setText(item.getTitle());
+        vb.urlView.setText(item.getUrl());
+
+        boolean isInFavorites = mFavoritesDataSource.hasFavorites(item.getUrl());
+        vb.starView.setOnCheckedChangeListener(null);
+        vb.starView.setChecked(isInFavorites);
+
+        vb.starView.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mFavoritesDataSource.addToFavorites(item.getTitle(), item.getUrl());
+                } else {
+                    mFavoritesDataSource.removeFromFavorites(item.getUrl());
+                }
+            }
+        });
+
+        return view;
+    }
+
+    static class ViewBag {
+        TextView titleView;
+        TextView urlView;
+        CheckBox starView;
+    }
 }

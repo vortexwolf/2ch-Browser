@@ -10,7 +10,7 @@ public class ExtendedImageView extends ImageView {
 
     public ExtendedImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        
+
         this.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
-    }    
+    }
 }

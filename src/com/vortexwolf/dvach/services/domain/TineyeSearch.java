@@ -30,38 +30,38 @@ import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
 
 public class TineyeSearch {
-	private static final String TAG = "TineyeSearch";
-	private final DefaultHttpClient mHttpClient;
-	private final Resources mResources;
-	
-	public TineyeSearch(Resources resources, DefaultHttpClient httpClient){
-		this.mHttpClient = httpClient; 
-		this.mResources = resources;
-	}
-	
-	public String search(String imageUri) throws SendPostException {
-		String searchUri = "http://www.tineye.com/search";
-		
-		HttpPost httpPost = new HttpPost(searchUri);
-		HttpClientParams.setRedirecting(httpPost.getParams(), false);
+    private static final String TAG = "TineyeSearch";
+    private final DefaultHttpClient mHttpClient;
+    private final Resources mResources;
+
+    public TineyeSearch(Resources resources, DefaultHttpClient httpClient) {
+        this.mHttpClient = httpClient;
+        this.mResources = resources;
+    }
+
+    public String search(String imageUri) throws SendPostException {
+        String searchUri = "http://www.tineye.com/search";
+
+        HttpPost httpPost = new HttpPost(searchUri);
+        HttpClientParams.setRedirecting(httpPost.getParams(), false);
 
         HttpResponse response = null;
         String location = null;
         try {
-        	List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
-        	nameValuePairs.add(new BasicNameValuePair("url", imageUri));
+            List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair("url", imageUri));
 
-	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-	        response = this.mHttpClient.execute(httpPost);  
-	        
-	        location = ExtendedHttpClient.getLocationHeader(response);
-	    } catch (Exception e) {
-        	MyLog.e(TAG, e);
-        	throw new SendPostException(mResources.getString(R.string.error_image_search));
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            response = this.mHttpClient.execute(httpPost);
+
+            location = ExtendedHttpClient.getLocationHeader(response);
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+            throw new SendPostException(mResources.getString(R.string.error_image_search));
         } finally {
-        	ExtendedHttpClient.releaseRequestResponse(httpPost, response);
+            ExtendedHttpClient.releaseRequestResponse(httpPost, response);
         }
 
-		return location;
-	}
+        return location;
+    }
 }

@@ -15,7 +15,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-
 /**
  * resource loader using apache HTTP client. support HTTP and HTTPS request.
  * 
@@ -26,31 +25,31 @@ public class NetworkResourceLoader implements INetworkResourceLoader {
 
     private final HttpClient mHttpClient;
 
-    public NetworkResourceLoader(HttpClient httpClient){
-    	mHttpClient = httpClient;
+    public NetworkResourceLoader(HttpClient httpClient) {
+        mHttpClient = httpClient;
     }
 
     @Override
-	public Bitmap loadBitmap (Uri uri) {
-    	HttpGet request = null;
-    	HttpResponse response = null;
-		Bitmap bmp = null;
-		try {
-			MyLog.d(TAG, "Image load started: " + uri);
-			
-			request = new HttpGet(uri.toString());
-			response = this.mHttpClient.execute(request);
-			HttpEntity entity = response.getEntity();
-			FlushedInputStream fis = new FlushedInputStream(entity.getContent());
-			bmp = BitmapFactory.decodeStream(fis);
-			
-	        MyLog.d(TAG, "Image downloaded: " + uri);
-		} catch (Exception e) {
-			MyLog.e(TAG, e);
-		} finally {
-			ExtendedHttpClient.releaseRequestResponse(request, response);
-		}
-		
-		return bmp;
+    public Bitmap loadBitmap(Uri uri) {
+        HttpGet request = null;
+        HttpResponse response = null;
+        Bitmap bmp = null;
+        try {
+            MyLog.d(TAG, "Image load started: " + uri);
+
+            request = new HttpGet(uri.toString());
+            response = this.mHttpClient.execute(request);
+            HttpEntity entity = response.getEntity();
+            FlushedInputStream fis = new FlushedInputStream(entity.getContent());
+            bmp = BitmapFactory.decodeStream(fis);
+
+            MyLog.d(TAG, "Image downloaded: " + uri);
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+        } finally {
+            ExtendedHttpClient.releaseRequestResponse(request, response);
+        }
+
+        return bmp;
     }
 }

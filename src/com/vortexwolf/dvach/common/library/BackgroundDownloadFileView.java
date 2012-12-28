@@ -10,58 +10,57 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 
 public class BackgroundDownloadFileView implements IDownloadFileView {
-	private final Context mContext;
-	private final boolean mShowNotifications;
-	
-	public BackgroundDownloadFileView(Context context) {
-		this(context, true);
-	}
-	
-	public BackgroundDownloadFileView(Context context, boolean showNotifications) {
-		this.mContext = context;
-		this.mShowNotifications = showNotifications;
-	}
-	
-	@Override
-	public void setProgress(int value) {
-	}
+    private final Context mContext;
+    private final boolean mShowNotifications;
 
-	@Override
-	public void setMax(int value) {
-	}
+    public BackgroundDownloadFileView(Context context) {
+        this(context, true);
+    }
 
-	@Override
-	public void showLoading(String message) {
-		if(this.mShowNotifications) {
-			AppearanceUtils.showToastMessage(this.mContext, message);
-		}
-	}
+    public BackgroundDownloadFileView(Context context, boolean showNotifications) {
+        this.mContext = context;
+        this.mShowNotifications = showNotifications;
+    }
 
-	@Override
-	public void hideLoading() {
-	}
+    @Override
+    public void setProgress(int value) {
+    }
 
-	@Override
-	public void setOnCancelListener(OnCancelListener listener) {
-	}
+    @Override
+    public void setMax(int value) {
+    }
 
-	@Override
-	public void showSuccess(File file) {
-	}
+    @Override
+    public void showLoading(String message) {
+        if (this.mShowNotifications) {
+            AppearanceUtils.showToastMessage(this.mContext, message);
+        }
+    }
 
-	@Override
-	public void showError(String error) {
-		if(this.mShowNotifications) {
-			AppearanceUtils.showToastMessage(this.mContext, error);	
-		}
-	}
+    @Override
+    public void hideLoading() {
+    }
 
-	@Override
-	public void showFileExists(File file) {
-		if(this.mShowNotifications) {
-			this.showError(this.mContext.getString(R.string.error_file_exist));
-		}
-	}
-		
+    @Override
+    public void setOnCancelListener(OnCancelListener listener) {
+    }
+
+    @Override
+    public void showSuccess(File file) {
+    }
+
+    @Override
+    public void showError(String error) {
+        if (this.mShowNotifications) {
+            AppearanceUtils.showToastMessage(this.mContext, error);
+        }
+    }
+
+    @Override
+    public void showFileExists(File file) {
+        if (this.mShowNotifications) {
+            this.showError(this.mContext.getString(R.string.error_file_exist));
+        }
+    }
 
 }

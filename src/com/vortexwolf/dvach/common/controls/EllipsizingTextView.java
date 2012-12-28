@@ -42,11 +42,11 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
         super(context, attrs, defStyle);
         this.updateMaxLinesFromAttributes(context, attrs);
     }
-    
-    private void updateMaxLinesFromAttributes(Context context, AttributeSet attrs){
-    	TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.maxLines }); 
-    	int maxLines = a.getInt(0, this.maxLines);
-    	setMaxLines(maxLines); 
+
+    private void updateMaxLinesFromAttributes(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.maxLines });
+        int maxLines = a.getInt(0, this.maxLines);
+        setMaxLines(maxLines);
     }
 
     public void setEllipsizeListener(EllipsizeListener listener) {
@@ -100,7 +100,7 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
         int maxLines = this.getMaxLines();
         CharSequence workingText = fullText;
         boolean ellipsized = false;
-        
+
         if (maxLines != -1) {
             Layout layout = createWorkingLayout(workingText);
             if (layout.getLineCount() > maxLines) {
@@ -119,13 +119,14 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
         }
         isStale = false;
         isEllipsized = ellipsized;
-        if(ellipsizeListener != null){
-        	ellipsizeListener.ellipsizeStateChanged(this, ellipsized);
+        if (ellipsizeListener != null) {
+            ellipsizeListener.ellipsizeStateChanged(this, ellipsized);
         }
     }
-    
+
     private Layout createWorkingLayout(CharSequence workingText) {
-        return new StaticLayout(workingText, getPaint(), getWidth() - getPaddingLeft() - getPaddingRight(), Alignment.ALIGN_NORMAL, lineSpacingMultiplier, lineAdditionalVerticalPadding, false);
+        return new StaticLayout(workingText, getPaint(), getWidth()
+                - getPaddingLeft() - getPaddingRight(), Alignment.ALIGN_NORMAL, lineSpacingMultiplier, lineAdditionalVerticalPadding, false);
     }
 
     @Override
@@ -133,4 +134,3 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
         // Ellipsize settings are not respected
     }
 }
-

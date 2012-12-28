@@ -1,6 +1,5 @@
 package com.vortexwolf.dvach.activities;
 
-
 import java.util.ArrayList;
 
 import com.vortexwolf.dvach.R;
@@ -28,93 +27,93 @@ import android.widget.ListView;
 
 public class PickBoardActivity extends ListActivity {
 
-	public static final String TAG = "PickBoardActivity";
+    public static final String TAG = "PickBoardActivity";
 
     private MainApplication mApplication;
     private Tracker mTracker;
     private BoardsListAdapter mAdapter = null;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
         this.mApplication = (MainApplication) this.getApplication();
         this.mTracker = this.mApplication.getTracker();
-        
+
         this.mTracker.clearBoardVar();
         this.mTracker.trackActivityView(TAG);
-        
+
         this.resetUI();
-        
+
         ArrayList<IBoardListEntity> boards = new ArrayList<IBoardListEntity>();
         String[] entities = this.getResources().getStringArray(R.array.pickboard_boards);
-        for(String entity : entities) {
-        	String[] parts = entity.split(";\\s?");
-        	if(parts.length == 1) {
-        		boards.add(new SectionEntity(parts[0]));
-        	} else if (parts.length == 2) {
-        		boards.add(new BoardEntity(parts[0], parts[1]));
-        	}
+        for (String entity : entities) {
+            String[] parts = entity.split(";\\s?");
+            if (parts.length == 1) {
+                boards.add(new SectionEntity(parts[0]));
+            } else if (parts.length == 2) {
+                boards.add(new BoardEntity(parts[0], parts[1]));
+            }
         }
-        
+
         this.mAdapter = new BoardsListAdapter(this, boards.toArray(new IBoardListEntity[boards.size()]));
         this.setListAdapter(this.mAdapter);
-        
+
         this.setTitle(this.getString(R.string.pick_board_title));
     }
 
-    private void resetUI()
-    {
-    	this.setTheme(this.mApplication.getSettings().getTheme());
-    	this.setContentView(R.layout.pick_board_view);
-        
-        final Button pickBoardButton = (Button)findViewById(R.id.pick_board_button);
-        final EditText pickBoardInput = (EditText)findViewById(R.id.pick_board_input);
-        
+    private void resetUI() {
+        this.setTheme(this.mApplication.getSettings().getTheme());
+        this.setContentView(R.layout.pick_board_view);
+
+        final Button pickBoardButton = (Button) findViewById(R.id.pick_board_button);
+        final EditText pickBoardInput = (EditText) findViewById(R.id.pick_board_input);
+
         pickBoardButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String enteredBoard = pickBoardInput.getText().toString().trim();
-				returnBoard(enteredBoard);
-			}
-		});
-        
+            @Override
+            public void onClick(View v) {
+                String enteredBoard = pickBoardInput.getText().toString().trim();
+                returnBoard(enteredBoard);
+            }
+        });
+
         pickBoardInput.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-		        	String enteredBoard = pickBoardInput.getText().toString().trim();
-					returnBoard(enteredBoard);
-		        	return true;
-		        }
-		        return false;
-		    }
-		});
-        
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String enteredBoard = pickBoardInput.getText().toString().trim();
+                    returnBoard(enteredBoard);
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
-    
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-    	BoardEntity item = (BoardEntity)this.mAdapter.getItem(position);
+        BoardEntity item = (BoardEntity) this.mAdapter.getItem(position);
         returnBoard(item.getCode());
     }
-    
-    private void returnBoard(String boardCode) {
-    	if(StringUtils.isEmpty(boardCode)){
-			AppearanceUtils.showToastMessage(this, getString(R.string.warning_enter_board));
-			return;
-    	}
-    	
-    	// remove the slash if it was entered
-    	if(boardCode.charAt(0) == '/'){
-    		boardCode = boardCode.substring(1);
-    	}
-    	boardCode = boardCode.toLowerCase();
 
-       	Intent intent = new Intent();
-       	intent.putExtra(Constants.EXTRA_SELECTED_BOARD, boardCode);
-       	setResult(RESULT_OK, intent);
-       	finish();	
+    private void returnBoard(String boardCode) {
+        if (StringUtils.isEmpty(boardCode)) {
+            AppearanceUtils.showToastMessage(this, getString(R.string.warning_enter_board));
+            return;
+        }
+
+        // remove the slash if it was entered
+        if (boardCode.charAt(0) == '/') {
+            boardCode = boardCode.substring(1);
+        }
+        boardCode = boardCode.toLowerCase();
+
+        Intent intent = new Intent();
+        intent.putExtra(Constants.EXTRA_SELECTED_BOARD, boardCode);
+        setResult(RESULT_OK, intent);
+        finish();
     }
-    
+
 }

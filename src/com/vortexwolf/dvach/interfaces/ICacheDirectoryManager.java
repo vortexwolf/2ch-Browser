@@ -6,24 +6,24 @@ import android.net.Uri;
 
 public interface ICacheDirectoryManager {
 
-	public File getInternalCacheDir();
+    public File getInternalCacheDir();
 
-	public File getExternalCacheDir();
+    public File getExternalCacheDir();
 
-	public File getCurrentCacheDirectory();
+    public File getCurrentCacheDirectory();
 
-	public abstract File getPagesCacheDirectory();
+    public abstract File getPagesCacheDirectory();
 
-	public abstract File getThumbnailsCacheDirectory();
+    public abstract File getThumbnailsCacheDirectory();
 
-	public abstract boolean isCacheEnabled();
+    public abstract boolean isCacheEnabled();
 
-	public abstract void trimCacheIfNeeded();
+    public abstract void trimCacheIfNeeded();
 
-	public abstract File getImagesCacheDirectory();
+    public abstract File getImagesCacheDirectory();
 
-	public abstract File getCachedImageFileForWrite(Uri uri);
+    public abstract File getCachedImageFileForWrite(Uri uri);
 
-	public abstract File getCachedImageFileForRead(Uri uri);
+    public abstract File getCachedImageFileForRead(Uri uri);
 
 }

@@ -6,6 +6,7 @@ import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,164 +32,162 @@ import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostItemViewBuilder {
-	private final LayoutInflater mInflater;
-	private final IBitmapManager mBitmapManager;
-	private final String mBoardName;
-	private final String mThreadNumber;
-	private final Context mAppContext;
-	private final ApplicationSettings mSettings;
-	
-	public PostItemViewBuilder(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
-		this.mAppContext = context.getApplicationContext();
-		this.mInflater = LayoutInflater.from(context);
-		this.mBitmapManager = bitmapManager;
-		this.mBoardName = boardName;
-		this.mThreadNumber = threadNumber;
-		this.mSettings = settings;
-	}
+    private final LayoutInflater mInflater;
+    private final IBitmapManager mBitmapManager;
+    private final String mBoardName;
+    private final String mThreadNumber;
+    private final Context mAppContext;
+    private final ApplicationSettings mSettings;
 
-	public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
-    	View view = convertView == null ? mInflater.inflate(R.layout.posts_list_item, null) : convertView;
+    public PostItemViewBuilder(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
+        this.mAppContext = context.getApplicationContext();
+        this.mInflater = LayoutInflater.from(context);
+        this.mBitmapManager = bitmapManager;
+        this.mBoardName = boardName;
+        this.mThreadNumber = threadNumber;
+        this.mSettings = settings;
+    }
 
-        //Get inner controls
-		ViewBag vb = (ViewBag)view.getTag();
-		if(vb == null){
-			vb = new ViewBag();
-			vb.postIdView = (TextView) view.findViewById(R.id.post_id);
-			vb.postNameView = (TextView) view.findViewById(R.id.post_name);
-			vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
-			vb.postDateView = (TextView)view.findViewById(R.id.post_item_date_id);
-			vb.commentView = (TextView) view.findViewById(R.id.comment);
-			vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
-			vb.postRepliesView = (TextView)view.findViewById(R.id.post_replies);
-			vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
-			vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
-			vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
-		    view.setTag(vb);
-		}
-		
-		if(FlowTextHelper.sNewClassAvailable){
-		    if(item.hasAttachment()){
-		    	FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
-		    }
-		    else {
-		    	FlowTextHelper.setDefaultLayoutPosition(vb.fullThumbnailView, vb.commentView);
-		    }
-		}
-		
-		//Apply info from the data item
-		//Номер поста
-		String postNumber = item.getNumber();
-		vb.postIdView.setText(postNumber);
-		
-		//Номер по порядку
-		int postIndex = item.getPosition() + 1;
-		vb.postIndexView.setText(String.valueOf(postIndex));
-		if(postIndex >= ThreadPostUtils.getBumpLimitNumber(this.mBoardName)){
-			vb.postIndexView.setTextColor(Color.parseColor("#C41E3A"));
-		}
-		else {
-			vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
-		}
-		
-		//Имя
-		String name = item.getName();
-		if(mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")){
-			vb.postNameView.setText(Html.fromHtml(name, HtmlUtils.sImageGetter, null));
-			vb.postNameView.setVisibility(View.VISIBLE);
-		}
-		else {
-			vb.postNameView.setVisibility(View.GONE);
-		}
-		
-		//Дата поста
-		if(this.mSettings.isDisplayPostItemDate()){
-			vb.postDateView.setVisibility(View.VISIBLE);
-			vb.postDateView.setText(item.getPostDate(this.mAppContext));
-		} else {
-			vb.postDateView.setVisibility(View.GONE);
-		}
-		
-		//Обрабатываем прикрепленный файл
-		AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-		ThreadPostUtils.handleAttachmentImage(isBusy, attachment, 
-				vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-				this.mBitmapManager, this.mSettings, this.mAppContext);
-		ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView);
-		
-		//Комментарий (обновляем после файла)
-		if(item.canMakeCommentFloat()){
-			WindowManager wm = ((WindowManager)this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
-			FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), wm.getDefaultDisplay(), this.mAppContext.getResources());
-			item.makeCommentFloat(floatModel);
-		}
-		
-		vb.commentView.setText(item.getSpannedComment());
-		vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
-		
-		//Ответы на сообщение
-		if(this.mThreadNumber != null && item.hasReferencesFrom()){
-		    SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.mAppContext.getResources(), this.mBoardName, this.mThreadNumber);
-		    vb.postRepliesView.setText(replies);
-		    vb.postRepliesView.setMovementMethod(MyLinkMovementMethod.getInstance());
-		    vb.postRepliesView.setVisibility(View.VISIBLE);
-		}
-		else{
-			vb.postRepliesView.setVisibility(View.GONE);
-		}
-		
-		// Почему-то LinkMovementMethod отменяет контекстное меню. Пустой listener вроде решает проблему
-		view.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
-		
-        return view;
-    }
-	
-    public void displayPopupDialog(final PostItemViewModel item, Context activityContext, Theme theme){
-		View view = this.getView(item, null, false);
-		
-		//убираем фон в виде рамки с закругленными краями и ставим обычный
-		int backColor = theme.obtainStyledAttributes(R.styleable.Theme).getColor(R.styleable.Theme_activityRootBackground, android.R.color.transparent);
-		view.setBackgroundColor(backColor);
-		
-		//Перемещаем текст в ScrollView
-		ScrollView scrollView = (ScrollView)view.findViewById(R.id.post_item_scroll);
-		RelativeLayout contentLayout = (RelativeLayout)view.findViewById(R.id.post_item_content_layout);
-		
-		((ViewGroup)contentLayout.getParent()).removeView(contentLayout);
-		scrollView.addView(contentLayout);
-		scrollView.setVisibility(View.VISIBLE);
-		
-		//Отображаем созданное view в диалоге
-		Dialog currentDialog = new Dialog(activityContext);
-		currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		currentDialog.setCanceledOnTouchOutside(true);
-		currentDialog.setContentView(view);
-		currentDialog.show();
-    }
-	
-	public void displayThumbnail(final View v, final PostItemViewModel item){
-        if(item != null){
-            ViewBag vb = (ViewBag)v.getTag();
-            AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-            
-            if(vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)){
-	            ThreadPostUtils.handleAttachmentImage(false, attachment, 
-	            		vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, 
-	            		this.mBitmapManager, this.mSettings, this.mAppContext);
+    public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
+        View view = convertView == null
+                ? mInflater.inflate(R.layout.posts_list_item, null)
+                : convertView;
+
+        // Get inner controls
+        ViewBag vb = (ViewBag) view.getTag();
+        if (vb == null) {
+            vb = new ViewBag();
+            vb.postIdView = (TextView) view.findViewById(R.id.post_id);
+            vb.postNameView = (TextView) view.findViewById(R.id.post_name);
+            vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
+            vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
+            vb.commentView = (TextView) view.findViewById(R.id.comment);
+            vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
+            vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
+            vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
+            vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
+            vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
+            view.setTag(vb);
+        }
+
+        if (FlowTextHelper.sNewClassAvailable) {
+            if (item.hasAttachment()) {
+                FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
+            } else {
+                FlowTextHelper.setDefaultLayoutPosition(vb.fullThumbnailView, vb.commentView);
             }
         }
-	}
-    
-    private static class ViewBag{
-    	TextView postIdView;
-    	TextView postNameView;
-    	TextView postIndexView;
-    	TextView postDateView;
-    	TextView commentView;
+
+        // Apply info from the data item
+        // Номер поста
+        String postNumber = item.getNumber();
+        vb.postIdView.setText(postNumber);
+
+        // Номер по порядку
+        int postIndex = item.getPosition() + 1;
+        vb.postIndexView.setText(String.valueOf(postIndex));
+        if (postIndex >= ThreadPostUtils.getBumpLimitNumber(this.mBoardName)) {
+            vb.postIndexView.setTextColor(Color.parseColor("#C41E3A"));
+        } else {
+            vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
+        }
+
+        // Имя
+        String name = item.getName();
+        if (mSettings.isDisplayNames()
+                && !StringUtils.isEmptyOrWhiteSpace(name)
+                && !name.equals("Аноним")) {
+            vb.postNameView.setText(Html.fromHtml(name, HtmlUtils.sImageGetter, null));
+            vb.postNameView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postNameView.setVisibility(View.GONE);
+        }
+
+        // Дата поста
+        if (this.mSettings.isDisplayPostItemDate()) {
+            vb.postDateView.setVisibility(View.VISIBLE);
+            vb.postDateView.setText(item.getPostDate(this.mAppContext));
+        } else {
+            vb.postDateView.setVisibility(View.GONE);
+        }
+
+        // Обрабатываем прикрепленный файл
+        AttachmentInfo attachment = item.getAttachment(this.mBoardName);
+        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+        ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView);
+
+        // Комментарий (обновляем после файла)
+        if (item.canMakeCommentFloat()) {
+            WindowManager wm = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
+            FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), wm.getDefaultDisplay(), this.mAppContext.getResources());
+            item.makeCommentFloat(floatModel);
+        }
+
+        vb.commentView.setText(item.getSpannedComment());
+        vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
+
+        // Ответы на сообщение
+        if (this.mThreadNumber != null && item.hasReferencesFrom()) {
+            SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.mAppContext.getResources(), this.mBoardName, this.mThreadNumber);
+            vb.postRepliesView.setText(replies);
+            vb.postRepliesView.setMovementMethod(MyLinkMovementMethod.getInstance());
+            vb.postRepliesView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postRepliesView.setVisibility(View.GONE);
+        }
+
+        // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой
+        // listener вроде решает проблему
+        view.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
+
+        return view;
+    }
+
+    public void displayPopupDialog(final PostItemViewModel item, Context activityContext, Theme theme) {
+        View view = this.getView(item, null, false);
+
+        // убираем фон в виде рамки с закругленными краями и ставим обычный
+        int backColor = theme.obtainStyledAttributes(R.styleable.Theme).getColor(R.styleable.Theme_activityRootBackground, android.R.color.transparent);
+        view.setBackgroundColor(backColor);
+
+        // Перемещаем текст в ScrollView
+        ScrollView scrollView = (ScrollView) view.findViewById(R.id.post_item_scroll);
+        RelativeLayout contentLayout = (RelativeLayout) view.findViewById(R.id.post_item_content_layout);
+
+        ((ViewGroup) contentLayout.getParent()).removeView(contentLayout);
+        scrollView.addView(contentLayout);
+        scrollView.setVisibility(View.VISIBLE);
+
+        // Отображаем созданное view в диалоге
+        Dialog currentDialog = new Dialog(activityContext);
+        currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        currentDialog.setCanceledOnTouchOutside(true);
+        currentDialog.setContentView(view);
+        currentDialog.show();
+    }
+
+    public void displayThumbnail(final View v, final PostItemViewModel item) {
+        if (item != null) {
+            ViewBag vb = (ViewBag) v.getTag();
+            AttachmentInfo attachment = item.getAttachment(this.mBoardName);
+
+            if (vb != null
+                    && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)) {
+                ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+            }
+        }
+    }
+
+    private static class ViewBag {
+        TextView postIdView;
+        TextView postNameView;
+        TextView postIndexView;
+        TextView postDateView;
+        TextView commentView;
         TextView attachmentInfoView;
         TextView postRepliesView;
         View fullThumbnailView;
         ImageView imageView;
         ProgressBar indeterminateProgressBar;
-	}
+    }
 }

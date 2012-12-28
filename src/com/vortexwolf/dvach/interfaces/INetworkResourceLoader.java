@@ -5,6 +5,6 @@ import android.net.Uri;
 
 public interface INetworkResourceLoader {
 
-	public Bitmap loadBitmap(Uri uri);
+    public Bitmap loadBitmap(Uri uri);
 
 }

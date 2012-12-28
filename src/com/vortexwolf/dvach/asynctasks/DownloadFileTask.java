@@ -33,121 +33,123 @@ import android.os.AsyncTask;
 import android.view.Window;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancelled, IProgressChangeListener {
-	public static final String TAG = "DownloadFileTask";
-	private final DownloadFileService mDownloadFileService;
-	private final Context mContext;
-	private final Resources mResources;
-	private final Uri mFrom;
-	private final ApplicationSettings mSettings;
-	private final IDownloadFileView mProgressView;
-	private final ICacheDirectoryManager mCacheDirectoryManager;
-	
-	private File mSaveTo;
-	private String mUserError = null;
+    public static final String TAG = "DownloadFileTask";
+    private final DownloadFileService mDownloadFileService;
+    private final Context mContext;
+    private final Resources mResources;
+    private final Uri mFrom;
+    private final ApplicationSettings mSettings;
+    private final IDownloadFileView mProgressView;
+    private final ICacheDirectoryManager mCacheDirectoryManager;
 
-	{
-		this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
-		this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);;
-		this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
-	}
-	
-	public DownloadFileTask(Context context, Uri from) {
-		this(context, from, null, null);
-	}
-	
-	public DownloadFileTask(Context context, Uri from, IDownloadFileView progressView) {
-		this(context, from, null, progressView);
-	}
-	
-	public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView) {
-		this.mContext = context;
-		this.mResources = context.getResources();
-		this.mFrom = from;
-		this.mSaveTo = to != null ? to : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
-		
-		if(progressView == null) {
-			this.mProgressView = this.mSettings.isDownloadInBackground()
-								? new BackgroundDownloadFileView(this.mContext)
-								: new DialogDownloadFileView(this.mContext);
-		} else {
-			this.mProgressView = progressView;
-		}
-				
-		this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				cancel(true);
-			}
-		});
-	}
+    private File mSaveTo;
+    private String mUserError = null;
 
-	@Override
-	protected Boolean doInBackground(String... arg0) {
-		try{
-		    Uri from = this.getSaveFromUri();  
-		    
-			this.mDownloadFileService.downloadFile(from, this.mSaveTo, this, this);
-			
-			return true;
-		}
-		catch (DownloadFileException e){
-			this.mUserError = e.getMessage();
-			return false;
-		}
-	}
-	
-	@Override
-	public void onPreExecute() {
-		//Не показывать диалог совсем, если файл существует
-		if(this.mSaveTo.exists()){
-			this.cancel(false);
-			this.mProgressView.showFileExists(this.mSaveTo);	
-			
-			return;
-		}
+    {
+        this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
+        this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
+        ;
+        this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+    }
 
-		this.mProgressView.showLoading(this.mContext.getString(R.string.notification_save_image_started, this.mSaveTo.getAbsolutePath()));
-	}
-	
-	@Override
-	public void onPostExecute(Boolean success) {
-		this.mProgressView.hideLoading();
+    public DownloadFileTask(Context context, Uri from) {
+        this(context, from, null, null);
+    }
 
-		if(success) {
-			this.mProgressView.showSuccess(this.mSaveTo);
-		} else {
-			this.mProgressView.showError(this.mUserError);	
-		}
-	}
-	
-	private Uri getSaveFromUri(){
-		Uri from = this.mFrom;
-	
+    public DownloadFileTask(Context context, Uri from, IDownloadFileView progressView) {
+        this(context, from, null, progressView);
+    }
+
+    public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView) {
+        this.mContext = context;
+        this.mResources = context.getResources();
+        this.mFrom = from;
+        this.mSaveTo = to != null
+                ? to
+                : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
+
+        if (progressView == null) {
+            this.mProgressView = this.mSettings.isDownloadInBackground()
+                    ? new BackgroundDownloadFileView(this.mContext)
+                    : new DialogDownloadFileView(this.mContext);
+        } else {
+            this.mProgressView = progressView;
+        }
+
+        this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                cancel(true);
+            }
+        });
+    }
+
+    @Override
+    protected Boolean doInBackground(String... arg0) {
+        try {
+            Uri from = this.getSaveFromUri();
+
+            this.mDownloadFileService.downloadFile(from, this.mSaveTo, this, this);
+
+            return true;
+        } catch (DownloadFileException e) {
+            this.mUserError = e.getMessage();
+            return false;
+        }
+    }
+
+    @Override
+    public void onPreExecute() {
+        // Не показывать диалог совсем, если файл существует
+        if (this.mSaveTo.exists()) {
+            this.cancel(false);
+            this.mProgressView.showFileExists(this.mSaveTo);
+
+            return;
+        }
+
+        this.mProgressView.showLoading(this.mContext.getString(R.string.notification_save_image_started, this.mSaveTo.getAbsolutePath()));
+    }
+
+    @Override
+    public void onPostExecute(Boolean success) {
+        this.mProgressView.hideLoading();
+
+        if (success) {
+            this.mProgressView.showSuccess(this.mSaveTo);
+        } else {
+            this.mProgressView.showError(this.mUserError);
+        }
+    }
+
+    private Uri getSaveFromUri() {
+        Uri from = this.mFrom;
+
         File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(from);
-	    if(cachedFile.exists()){
-	    	from = Uri.fromFile(cachedFile);
-	    }	
-	    
-	    return from;
-	}
-	
-	@Override
-	public void onProgressUpdate(Long... progress) {
-		this.mProgressView.setProgress(progress[0].intValue());
-	}
-	
-	@Override
-	public void progressChanged(long newValue) {
-		this.publishProgress(newValue / 1024);
-	}
-	
-	@Override
-	public void indeterminateProgress() {
-		// nothing
-	}
+        if (cachedFile.exists()) {
+            from = Uri.fromFile(cachedFile);
+        }
 
-	@Override
-	public void setContentLength(long value) {
-		this.mProgressView.setMax((int)value / 1024);
-	}
+        return from;
+    }
+
+    @Override
+    public void onProgressUpdate(Long... progress) {
+        this.mProgressView.setProgress(progress[0].intValue());
+    }
+
+    @Override
+    public void progressChanged(long newValue) {
+        this.publishProgress(newValue / 1024);
+    }
+
+    @Override
+    public void indeterminateProgress() {
+        // nothing
+    }
+
+    @Override
+    public void setContentLength(long value) {
+        this.mProgressView.setMax((int) value / 1024);
+    }
 }
