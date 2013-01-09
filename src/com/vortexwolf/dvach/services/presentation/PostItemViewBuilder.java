@@ -70,12 +70,10 @@ public class PostItemViewBuilder {
             view.setTag(vb);
         }
 
-        if (FlowTextHelper.sNewClassAvailable) {
-            if (item.hasAttachment()) {
-                FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
-            } else {
-                FlowTextHelper.setDefaultLayoutPosition(vb.fullThumbnailView, vb.commentView);
-            }
+        if (item.canMakeCommentFloat() || item.isCommentFloat()) {
+            FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
+        } else {
+            FlowTextHelper.setDefaultLayoutPosition(vb.fullThumbnailView, vb.commentView);
         }
 
         // Apply info from the data item

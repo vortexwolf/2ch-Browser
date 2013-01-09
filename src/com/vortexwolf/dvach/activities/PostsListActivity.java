@@ -350,6 +350,8 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void updateOptionsMenu() {
+        if(this.mMenu == null) return;
+        
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
         if (this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);

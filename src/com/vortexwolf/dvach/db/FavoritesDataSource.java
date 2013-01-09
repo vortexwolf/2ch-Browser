@@ -46,8 +46,7 @@ public class FavoritesDataSource {
     public List<FavoritesEntity> getAllFavorites() {
         List<FavoritesEntity> favorites = new ArrayList<FavoritesEntity>();
 
-        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID
-                + " desc");
+        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID + " desc");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             FavoritesEntity he = createFavoritesEntity(cursor);

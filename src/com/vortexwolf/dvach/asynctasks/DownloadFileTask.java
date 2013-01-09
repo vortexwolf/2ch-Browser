@@ -13,6 +13,7 @@ import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.library.BackgroundDownloadFileView;
 import com.vortexwolf.dvach.common.library.DialogDownloadFileView;
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.library.SingleMediaScanner;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.exceptions.DownloadFileException;
@@ -41,7 +42,8 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private final ApplicationSettings mSettings;
     private final IDownloadFileView mProgressView;
     private final ICacheDirectoryManager mCacheDirectoryManager;
-
+    private final boolean mUpdateGallery;
+    
     private File mSaveTo;
     private String mUserError = null;
 
@@ -53,21 +55,18 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     }
 
     public DownloadFileTask(Context context, Uri from) {
-        this(context, from, null, null);
+        this(context, from, null, null, true);
     }
 
-    public DownloadFileTask(Context context, Uri from, IDownloadFileView progressView) {
-        this(context, from, null, progressView);
-    }
-
-    public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView) {
+    public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView, boolean updateGallery) {
         this.mContext = context;
         this.mResources = context.getResources();
         this.mFrom = from;
         this.mSaveTo = to != null
                 ? to
                 : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
-
+        this.mUpdateGallery = updateGallery;
+        
         if (progressView == null) {
             this.mProgressView = this.mSettings.isDownloadInBackground()
                     ? new BackgroundDownloadFileView(this.mContext)
@@ -116,6 +115,9 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mProgressView.hideLoading();
 
         if (success) {
+            if (this.mUpdateGallery){ 
+                new SingleMediaScanner(this.mContext, this.mSaveTo);
+            }
             this.mProgressView.showSuccess(this.mSaveTo);
         } else {
             this.mProgressView.showError(this.mUserError);

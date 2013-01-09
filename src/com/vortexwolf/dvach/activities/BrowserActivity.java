@@ -53,6 +53,9 @@ public class BrowserActivity extends Activity {
     private Uri mUri = null;
     private String mTitle = null;
     private OnCancelListener mCurrentCancelListener;
+    
+    private Menu mMenu;
+    private boolean mImageLoaded = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +86,7 @@ public class BrowserActivity extends Activity {
         } else {
             // download image and cache it
             File writeCachedFile = this.mCacheDirectoryManager.getCachedImageFileForWrite(this.mUri);
-            new DownloadFileTask(this, this.mUri, writeCachedFile, new BrowserDownloadFileView()).execute();
+            new DownloadFileTask(this, this.mUri, writeCachedFile, new BrowserDownloadFileView(), false).execute();
         }
 
         this.mTracker.trackActivityView(TAG);
@@ -122,6 +125,10 @@ public class BrowserActivity extends Activity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.browser, menu);
+        
+        this.mMenu = menu;
+        this.updateOptionsMenu();
+        
         return true;
     }
 
@@ -130,17 +137,15 @@ public class BrowserActivity extends Activity {
 
         switch (item.getItemId()) {
             case R.id.open_browser_menu_id:
-                if (this.mUri != null) {
-                    BrowserLauncher.launchExternalBrowser(this, this.mUri.toString());
-                }
+                BrowserLauncher.launchExternalBrowser(this, this.mUri.toString());
                 break;
             case R.id.save_menu_id:
                 new DownloadFileTask(this, this.mUri).execute();
                 break;
             case R.id.share_menu_id:
                 Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_TEXT, this.mUri);
+                i.setType("image/jpeg");
+                i.putExtra(Intent.EXTRA_STREAM, this.mUri);
                 this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
                 break;
         }
@@ -155,6 +160,19 @@ public class BrowserActivity extends Activity {
 
     private void setImage(File file) {
         this.mWebView.loadUrl(Uri.fromFile(file).toString());
+        
+        this.mImageLoaded = true;
+        this.updateOptionsMenu();
+    }
+    
+    private void updateOptionsMenu() {
+        if(this.mMenu == null) return;
+        
+        MenuItem saveMenuItem = this.mMenu.findItem(R.id.save_menu_id);
+        MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
+        
+        saveMenuItem.setVisible(this.mImageLoaded);
+        shareMenuItem.setVisible(this.mImageLoaded);
     }
 
     private void switchToLoadingView() {
@@ -204,9 +222,7 @@ public class BrowserActivity extends Activity {
         public void setProgress(int value) {
             if (mMaxValue > 0) {
                 double percent = value / mMaxValue;
-                BrowserActivity.this.setProgress((int) (percent * 10000)); // 0
-                                                                           // ..
-                                                                           // 10000
+                BrowserActivity.this.setProgress((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
             } else {
                 BrowserActivity.this.setProgress(Window.PROGRESS_INDETERMINATE_ON);
             }

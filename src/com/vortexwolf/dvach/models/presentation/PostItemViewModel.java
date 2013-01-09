@@ -210,7 +210,10 @@ public class PostItemViewModel {
      * изображение
      */
     public boolean canMakeCommentFloat() {
-        return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment
-                && this.hasAttachment();
+        return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment && this.hasAttachment();
+    }
+    
+    public boolean isCommentFloat() {
+        return this.isFloatImageComment;
     }
 }

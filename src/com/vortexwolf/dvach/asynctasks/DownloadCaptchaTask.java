@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.asynctasks;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
@@ -59,7 +60,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
+        // check captcha only for new posts, not for new threads
+        if (UriUtils.isThreadUri(this.mRefererUri)) {
+            this.mCanSkip = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
+        }
         if (this.mCanSkip) return true;
 
         this.mCaptcha = RecaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient));
