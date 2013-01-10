@@ -121,8 +121,6 @@ public class BrowserActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.browser, menu);
         

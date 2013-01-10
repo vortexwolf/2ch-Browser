@@ -2,14 +2,23 @@ package com.vortexwolf.dvach.activities;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 
+import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TabHost;
 
 public class TabsHistoryBookmarksActivity extends TabActivity {
+    private Menu mSoftwareMenu;
+    private boolean mIsSoftwareMenu;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,5 +42,51 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
         intent = new Intent(this, HistoryActivity.class);
         intent.putExtras(extras);
         tabHost.addTab(tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tabs_history), res.getDrawable(R.drawable.browser_history_tab)).setContent(intent));
+        
+        // devices without hardware menu button work differently with tabs, so I add extra code so that the menu is updated properly
+        this.mIsSoftwareMenu = !CompatibilityUtils.hasHardwareMenu(this.getApplicationContext());
+        
+        if (this.mIsSoftwareMenu) {
+            tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+                @Override
+                public void onTabChanged(String arg0) {
+                    updateMenu(mSoftwareMenu);
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.history, menu);
+        
+        this.updateMenu(menu);
+        if (this.mIsSoftwareMenu) {
+            this.mSoftwareMenu = menu;
+        }
+
+        return true;
+    }
+
+    private void updateMenu(Menu menu) {
+        MenuItem clearHistory = menu.findItem(R.id.menu_clear_history_id);
+        Activity currentActivity = this.getCurrentActivity();
+        
+        // the clear history menu item is visible only for the history tab
+        if (currentActivity instanceof HistoryActivity) {
+            clearHistory.setVisible(true);
+        } else {
+            clearHistory.setVisible(false);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (this.mIsSoftwareMenu) {
+            return this.getCurrentActivity().onOptionsItemSelected(item);
+        }
+        
+        return super.onOptionsItemSelected(item);
     }
 }

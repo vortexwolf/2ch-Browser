@@ -441,8 +441,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.addpost, menu);
         return true;
