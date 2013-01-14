@@ -13,7 +13,7 @@
     	<FrameLayout android:layout_width="0dip" android:layout_height="wrap_content" android:layout_weight="1">            
         	<ImageView android:id="@+id/addpost_captcha_image"
 	        		android:layout_width="fill_parent"
-	        		android:layout_height="72dip"
+	        		android:layout_height="wrap_content"
 	        		android:adjustViewBounds="true"
 	        		android:scaleType="fitCenter"
 	                />
