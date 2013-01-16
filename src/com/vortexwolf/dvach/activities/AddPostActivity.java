@@ -606,29 +606,22 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         String startTag = "[" + code + "]";
         String endTag = "[/" + code + "]";
 
-        int selectionStart = mCommentView.getSelectionStart();
-        int selectionEnd = mCommentView.getSelectionEnd();
+        int selectionStart = Math.max(0, mCommentView.getSelectionStart());
+        int selectionEnd =  Math.min(text.length(), mCommentView.getSelectionEnd());
         String selectedText = text.substring(selectionStart, selectionEnd);
 
         // Проверяем текст на краях выделенной области, на случай если уже была
         // добавлена разметка
-        String textBeforeSelection = text.substring(Math.max(0, selectionStart
-                - startTag.length()), selectionStart);
-        String textAfterSelection = text.substring(selectionEnd, Math.min(text.length(), selectionEnd
-                + endTag.length()));
+        String textBeforeSelection = text.substring(Math.max(0, selectionStart - startTag.length()), selectionStart);
+        String textAfterSelection = text.substring(selectionEnd, Math.min(text.length(), selectionEnd + endTag.length()));
 
         // Удаляем теги форматирования если есть, добавляем если нет
-        if (textBeforeSelection.equalsIgnoreCase(startTag)
-                && textAfterSelection.equalsIgnoreCase(endTag)) {
-            editable.replace(selectionStart - startTag.length(), selectionEnd
-                    + endTag.length(), selectedText);
-            mCommentView.setSelection(selectionStart - startTag.length(), selectionEnd
-                    - startTag.length());
+        if (textBeforeSelection.equalsIgnoreCase(startTag) && textAfterSelection.equalsIgnoreCase(endTag)) {
+            editable.replace(selectionStart - startTag.length(), selectionEnd + endTag.length(), selectedText);
+            mCommentView.setSelection(selectionStart - startTag.length(), selectionEnd - startTag.length());
         } else {
-            editable.replace(selectionStart, selectionEnd, startTag
-                    + selectedText + endTag);
-            mCommentView.setSelection(selectionStart + startTag.length(), selectionEnd
-                    + startTag.length());
+            editable.replace(selectionStart, selectionEnd, startTag + selectedText + endTag);
+            mCommentView.setSelection(selectionStart + startTag.length(), selectionEnd + startTag.length());
         }
     }
 

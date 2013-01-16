@@ -15,6 +15,7 @@ import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
 import com.vortexwolf.dvach.services.domain.RecaptchaService;
 import com.vortexwolf.dvach.services.domain.SolvemediaCaptchaService;
+import com.vortexwolf.dvach.services.domain.YandexCaptchaService;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -62,19 +63,15 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        String captchaKey = null;
-        // check captcha only for new posts, not for new threads
-        if (UriUtils.isThreadUri(this.mRefererUri)) {
-            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
-            this.mCanSkip = result.canSkip;
-            captchaKey = result.captchaKey;
-        }
-        if (this.mCanSkip) return true;
+        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
+        this.mCanSkip = result.canSkip;
+        String captchaKey = result.captchaKey;
+            
+        if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) return true;
 
-        this.mCaptcha = SolvemediaCaptchaService.loadCaptcha(new HttpStringReader(this.mHttpClient), captchaKey);
-        if (this.mCaptcha == null) return false;
-
-        if (this.isCancelled()) return false;
+        this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
+        
+        if (this.mCaptcha == null || this.isCancelled()) return false;
 
         this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
 

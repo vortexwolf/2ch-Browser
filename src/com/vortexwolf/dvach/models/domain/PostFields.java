@@ -109,8 +109,8 @@ public class PostFields {
     @JsonIgnore
     public static PostFields getDefault() {
         PostFields defPF = new PostFields();
-        defPF.setCaptcha("adcopy_response");
-        defPF.setCaptchaKey("adcopy_challenge");
+        defPF.setCaptcha("captcha_value");
+        defPF.setCaptchaKey("captcha");
         defPF.setComment("shampoo");
         defPF.setEmail("nabiki");
         defPF.setFile("file");
