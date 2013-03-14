@@ -2,8 +2,6 @@ package com.vortexwolf.dvach.services.domain;
 
 import java.nio.charset.Charset;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
@@ -12,17 +10,14 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HTTP;
 
 import android.content.res.Resources;
-import android.net.Uri;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
-import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.exceptions.SendPostException;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.interfaces.IPostSender;
@@ -49,9 +44,8 @@ public class PostSender implements IPostSender {
     @Override
     public String sendPost(String boardName, String threadNumber, PostFields fields, PostEntity entity) throws SendPostException {
 
-        if (boardName == null || threadNumber == null || fields == null
-                || entity == null) {
-            throw new SendPostException(mResources.getString(R.string.error_incorrect_argument));
+        if (boardName == null || threadNumber == null || fields == null || entity == null) {
+            throw new SendPostException(this.mResources.getString(R.string.error_incorrect_argument));
         }
 
         String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, "/wakaba.pl").toString();
@@ -66,10 +60,9 @@ public class PostSender implements IPostSender {
         HttpPost httpPost = null;
         HttpResponse response = null;
         try {
-            for (int i = 0; i < possibleTasks.length
-                    && (statusCode == 502 || statusCode == 301); i++) {
+            for (int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++) {
                 httpPost = new HttpPost(uri);
-                response = executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
+                response = this.executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
                 // Проверяем код ответа
                 statusCode = response.getStatusLine().getStatusCode();
 
@@ -93,8 +86,7 @@ public class PostSender implements IPostSender {
             }
 
             if (statusCode != 200) {
-                throw new SendPostException(statusCode + " - "
-                        + response.getStatusLine().getReasonPhrase());
+                throw new SendPostException(statusCode + " - " + response.getStatusLine().getReasonPhrase());
             }
 
             // Проверяю 200-response на наличие html-разметки с ошибкой
@@ -148,7 +140,7 @@ public class PostSender implements IPostSender {
             response = this.mHttpClient.execute(httpPost);
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new SendPostException(mResources.getString(R.string.error_send_post));
+            throw new SendPostException(this.mResources.getString(R.string.error_send_post));
         }
 
         return response;

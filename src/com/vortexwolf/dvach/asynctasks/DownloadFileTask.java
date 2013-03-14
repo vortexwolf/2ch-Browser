@@ -1,37 +1,26 @@
 package com.vortexwolf.dvach.asynctasks;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.library.BackgroundDownloadFileView;
-import com.vortexwolf.dvach.common.library.DialogDownloadFileView;
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.library.SingleMediaScanner;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.exceptions.DownloadFileException;
-import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.dvach.interfaces.ICancellable;
-import com.vortexwolf.dvach.interfaces.ICancelled;
-import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.interfaces.IDownloadFileView;
-import com.vortexwolf.dvach.services.domain.DownloadFileService;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.view.Window;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.library.BackgroundDownloadFileView;
+import com.vortexwolf.dvach.common.library.DialogDownloadFileView;
+import com.vortexwolf.dvach.common.library.SingleMediaScanner;
+import com.vortexwolf.dvach.common.utils.IoUtils;
+import com.vortexwolf.dvach.exceptions.DownloadFileException;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.dvach.interfaces.ICancelled;
+import com.vortexwolf.dvach.interfaces.IDownloadFileView;
+import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
+import com.vortexwolf.dvach.services.domain.DownloadFileService;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancelled, IProgressChangeListener {
     public static final String TAG = "DownloadFileTask";
@@ -43,7 +32,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private final IDownloadFileView mProgressView;
     private final ICacheDirectoryManager mCacheDirectoryManager;
     private final boolean mUpdateGallery;
-    
+
     private File mSaveTo;
     private String mUserError = null;
 
@@ -62,11 +51,9 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mContext = context;
         this.mResources = context.getResources();
         this.mFrom = from;
-        this.mSaveTo = to != null
-                ? to
-                : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
+        this.mSaveTo = to != null ? to : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
         this.mUpdateGallery = updateGallery;
-        
+
         if (progressView == null) {
             this.mProgressView = this.mSettings.isDownloadInBackground()
                     ? new BackgroundDownloadFileView(this.mContext)
@@ -78,7 +65,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                cancel(true);
+                DownloadFileTask.this.cancel(true);
             }
         });
     }
@@ -115,7 +102,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mProgressView.hideLoading();
 
         if (success) {
-            if (this.mUpdateGallery){ 
+            if (this.mUpdateGallery) {
                 new SingleMediaScanner(this.mContext, this.mSaveTo);
             }
             this.mProgressView.showSuccess(this.mSaveTo);

@@ -2,10 +2,6 @@ package com.vortexwolf.dvach.adapters;
 
 import java.util.ArrayList;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.models.presentation.OpenTabModel;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
+import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 
 public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
     private final LayoutInflater mInflater;
@@ -29,9 +29,7 @@ public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
 
         final OpenTabModel item = this.getItem(position);
 
-        View view = convertView == null
-                ? mInflater.inflate(R.layout.tabs_list_item, null)
-                : convertView;
+        View view = convertView == null ? this.mInflater.inflate(R.layout.tabs_list_item, null) : convertView;
 
         this.fillItemView(view, item);
 

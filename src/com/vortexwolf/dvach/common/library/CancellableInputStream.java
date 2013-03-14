@@ -35,7 +35,7 @@ public class CancellableInputStream extends FilterInputStream {
     }
 
     private boolean checkCancelled() {
-        if (mTask != null && mTask.isCancelled()) {
+        if (this.mTask != null && this.mTask.isCancelled()) {
             MyLog.v(TAG, "stream reading was cancelled");
             try {
                 this.close();

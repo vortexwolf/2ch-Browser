@@ -1,8 +1,8 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker.CaptchaResult;
-
 import android.net.Uri;
+
+import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker.CaptchaResult;
 
 public interface IHtmlCaptchaChecker {
 

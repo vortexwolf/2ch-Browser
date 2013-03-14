@@ -18,28 +18,28 @@ public class OpenTabsManager implements IOpenTabsManager {
     private final INavigationService mNavigationService;
 
     public OpenTabsManager(HistoryDataSource dataSource, INavigationService navigationService) {
-        mDataSource = dataSource;
-        mNavigationService = navigationService;
+        this.mDataSource = dataSource;
+        this.mNavigationService = navigationService;
     }
 
     @Override
     public OpenTabModel add(OpenTabModel newTab) {
         // Не добавляем, если уже добавлено
-        for (OpenTabModel openTab : mTabs) {
+        for (OpenTabModel openTab : this.mTabs) {
             if (openTab.getUri().equals(newTab.getUri())) {
                 return openTab;
             }
         }
 
-        mTabs.add(0, newTab);
-        mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
+        this.mTabs.add(0, newTab);
+        this.mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
 
         return newTab;
     }
 
     @Override
     public ArrayList<OpenTabModel> getOpenTabs() {
-        return mTabs;
+        return this.mTabs;
     }
 
     @Override
@@ -52,6 +52,6 @@ public class OpenTabsManager implements IOpenTabsManager {
         Bundle extras = new Bundle();
         extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
 
-        mNavigationService.navigate(tab.getUri(), activity, extras);
+        this.mNavigationService.navigate(tab.getUri(), activity, extras);
     }
 }

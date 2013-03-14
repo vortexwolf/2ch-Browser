@@ -10,14 +10,14 @@ import java.util.concurrent.Executors;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
-
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.widget.ImageView;
+
+import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 
 /**
  * HttpImageManager uses 3-level caching to download and store network images.
@@ -96,21 +96,22 @@ public class HttpImageManager {
         }
 
         public LoadRequest(Uri uri, ImageView v, OnLoadResponseListener l) {
-            if (uri == null)
+            if (uri == null) {
                 throw new NullPointerException("uri must not be null");
+            }
 
-            mUri = uri;
-            mHashedUri = computeHashedName(uri.toString());
-            mImageView = v;
-            mListener = l;
+            this.mUri = uri;
+            this.mHashedUri = this.computeHashedName(uri.toString());
+            this.mImageView = v;
+            this.mListener = l;
         }
 
         public ImageView getImageView() {
-            return mImageView;
+            return this.mImageView;
         }
 
         public Uri getUri() {
-            return mUri;
+            return this.mUri;
         }
 
         public String getHashedUri() {
@@ -119,13 +120,14 @@ public class HttpImageManager {
 
         @Override
         public int hashCode() {
-            return mUri.hashCode();
+            return this.mUri.hashCode();
         }
 
         @Override
         public boolean equals(Object b) {
-            if (b instanceof LoadRequest)
-                return mUri.equals(((LoadRequest) b).getUri());
+            if (b instanceof LoadRequest) {
+                return this.mUri.equals(((LoadRequest) b).getUri());
+            }
 
             return false;
         }
@@ -157,9 +159,9 @@ public class HttpImageManager {
     }
 
     public HttpImageManager(BitmapCache cache, BitmapCache persistence, DefaultHttpClient httpClient) {
-        mCache = cache;
-        mPersistence = persistence;
-        mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
+        this.mCache = cache;
+        this.mPersistence = persistence;
+        this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
     }
 
     public HttpImageManager(BitmapCache persistence, DefaultHttpClient httpClient) {
@@ -167,14 +169,14 @@ public class HttpImageManager {
     }
 
     public Bitmap loadImage(Uri uri) {
-        return loadImage(new LoadRequest(uri));
+        return this.loadImage(new LoadRequest(uri));
     }
 
     public boolean isCached(String uriString) {
         LoadRequest r = new LoadRequest(Uri.parse(uriString));
         String key = r.getHashedUri();
 
-        return mCache.exists(key);
+        return this.mCache.exists(key);
     }
 
     /**
@@ -184,9 +186,9 @@ public class HttpImageManager {
      * @return
      */
     public Bitmap loadImage(LoadRequest r) {
-        if (r == null || r.getUri() == null
-                || TextUtils.isEmpty(r.getUri().toString()))
+        if (r == null || r.getUri() == null || TextUtils.isEmpty(r.getUri().toString())) {
             throw new IllegalArgumentException("null or empty request");
+        }
 
         ImageView v = r.getImageView();
         if (v != null) {
@@ -198,11 +200,13 @@ public class HttpImageManager {
 
         String key = r.getHashedUri();
 
-        Bitmap cachedBitmap = mCache.loadData(key);
+        Bitmap cachedBitmap = this.mCache.loadData(key);
         if (cachedBitmap == null) {
             // not ready yet, try to retrieve it asynchronously.
-            if (r.mListener != null) r.mListener.beforeLoad(r);
-            mExecutor.submit(newRequestCall(r));
+            if (r.mListener != null) {
+                r.mListener.beforeLoad(r);
+            }
+            this.mExecutor.submit(this.newRequestCall(r));
             return null;
         }
 
@@ -215,17 +219,17 @@ public class HttpImageManager {
             @Override
             public LoadRequest call() {
 
-                synchronized (mActiveRequests) {
+                synchronized (HttpImageManager.this.mActiveRequests) {
                     // If there's been already request pending for the same URL,
                     // we just wait until it is handled.
-                    while (mActiveRequests.contains(request)) {
+                    while (HttpImageManager.this.mActiveRequests.contains(request)) {
                         try {
-                            mActiveRequests.wait();
+                            HttpImageManager.this.mActiveRequests.wait();
                         } catch (InterruptedException e) {
                         }
                     }
 
-                    mActiveRequests.add(request);
+                    HttpImageManager.this.mActiveRequests.add(request);
                 }
 
                 Bitmap data = null;
@@ -234,30 +238,30 @@ public class HttpImageManager {
                     String key = request.getHashedUri();
 
                     // first we lookup memory cache
-                    data = mCache.loadData(key);
+                    data = HttpImageManager.this.mCache.loadData(key);
                     if (data == null) {
                         // then check the persistent storage
-                        data = mPersistence.isEnabled()
-                                ? mPersistence.loadData(key)
+                        data = HttpImageManager.this.mPersistence.isEnabled()
+                                ? HttpImageManager.this.mPersistence.loadData(key)
                                 : null;
                         if (data != null) {
                             // MyLog.d(TAG, "found in persistent: " +
                             // request.getUri().toString());
                             // load it into memory
-                            mCache.storeData(key, data);
+                            HttpImageManager.this.mCache.storeData(key, data);
                         } else {
                             // we go to network
-                            data = mNetworkResourceLoader.loadBitmap(request.getUri());
+                            data = HttpImageManager.this.mNetworkResourceLoader.loadBitmap(request.getUri());
                             if (data == null) {
                                 throw new RuntimeException("data from remote can't be decoded to bitmap");
                             }
 
                             // load it into memory
-                            mCache.storeData(key, data);
+                            HttpImageManager.this.mCache.storeData(key, data);
 
                             // persist it
-                            if (mPersistence.isEnabled()) {
-                                mPersistence.storeData(key, data);
+                            if (HttpImageManager.this.mPersistence.isEnabled()) {
+                                HttpImageManager.this.mPersistence.storeData(key, data);
                             }
                         }
                     }
@@ -267,7 +271,7 @@ public class HttpImageManager {
                         final ImageView iv = request.getImageView();
 
                         if (iv != null) {
-                            mHandler.post(new Runnable() {
+                            HttpImageManager.this.mHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (iv.getTag() == request.getUri()) {
@@ -277,30 +281,32 @@ public class HttpImageManager {
                             });
                         }
 
-                        mHandler.post(new Runnable() {
+                        HttpImageManager.this.mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (request.mListener != null)
+                                if (request.mListener != null) {
                                     request.mListener.onLoadResponse(request, theData);
+                                }
                             }
                         });
                     }
 
                 } catch (final Throwable e) {
-                    mHandler.post(new Runnable() {
+                    HttpImageManager.this.mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (request.mListener != null)
+                            if (request.mListener != null) {
                                 request.mListener.onLoadError(request, e);
+                            }
                         }
                     });
                     MyLog.e(TAG, e);
                 } finally {
-                    synchronized (mActiveRequests) {
-                        mActiveRequests.remove(request);
-                        mActiveRequests.notifyAll(); // wake up pending requests
-                                                     // who's querying the same
-                                                     // URL.
+                    synchronized (HttpImageManager.this.mActiveRequests) {
+                        HttpImageManager.this.mActiveRequests.remove(request);
+                        HttpImageManager.this.mActiveRequests.notifyAll(); // wake up pending requests
+                        // who's querying the same
+                        // URL.
                     }
                 }
 

@@ -1,16 +1,13 @@
 package com.vortexwolf.dvach.services;
 
-import com.vortexwolf.dvach.activities.BrowserActivity;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.common.utils.UriUtils;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.Browser;
+
+import com.vortexwolf.dvach.activities.BrowserActivity;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 
 public class BrowserLauncher {
 

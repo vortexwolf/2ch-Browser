@@ -14,7 +14,7 @@ public class BoardSettings {
     private PostFields postFields;
 
     public int getQueryInterval() {
-        return queryInterval;
+        return this.queryInterval;
     }
 
     public void setQueryInterval(int queryInterval) {
@@ -22,7 +22,7 @@ public class BoardSettings {
     }
 
     public int getQueryLimit() {
-        return queryLimit;
+        return this.queryLimit;
     }
 
     public void setQueryLimit(int queryLimit) {
@@ -30,7 +30,7 @@ public class BoardSettings {
     }
 
     public int getBanTime() {
-        return banTime;
+        return this.banTime;
     }
 
     public void setBanTime(int banTime) {
@@ -38,7 +38,7 @@ public class BoardSettings {
     }
 
     public PostFields getPostFields() {
-        return postFields;
+        return this.postFields;
     }
 
     public void setPostFields(PostFields postFields) {

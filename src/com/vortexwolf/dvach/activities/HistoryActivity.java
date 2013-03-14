@@ -2,31 +2,27 @@ package com.vortexwolf.dvach.activities;
 
 import java.util.List;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.adapters.HistoryAdapter;
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.db.FavoritesDataSource;
-import com.vortexwolf.dvach.db.HistoryDataSource;
-import com.vortexwolf.dvach.db.HistoryEntity;
-import com.vortexwolf.dvach.interfaces.INavigationService;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.adapters.HistoryAdapter;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.db.HistoryDataSource;
+import com.vortexwolf.dvach.db.HistoryEntity;
+import com.vortexwolf.dvach.interfaces.INavigationService;
 
 public class HistoryActivity extends BaseListActivity {
 
@@ -63,18 +59,18 @@ public class HistoryActivity extends BaseListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        HistoryEntity item = mAdapter.getItem(position);
+        HistoryEntity item = this.mAdapter.getItem(position);
 
-        mNavigationService.navigate(Uri.parse(item.getUrl()), this);
+        this.mNavigationService.navigate(Uri.parse(item.getUrl()), this);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear_history_id:
-                mDatasource.deleteAllHistory();
-                mAdapter.clear();
-                mAdapter.notifyDataSetChanged();
+                this.mDatasource.deleteAllHistory();
+                this.mAdapter.clear();
+                this.mAdapter.notifyDataSetChanged();
                 break;
         }
 
@@ -91,11 +87,11 @@ public class HistoryActivity extends BaseListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        HistoryEntity model = mAdapter.getItem(menuInfo.position);
+        HistoryEntity model = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(model.getUrl());
 
                 AppearanceUtils.showToastMessage(this, model.getUrl());
@@ -110,16 +106,16 @@ public class HistoryActivity extends BaseListActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            List<HistoryEntity> historyItems = mDatasource.getAllHistory();
+            List<HistoryEntity> historyItems = HistoryActivity.this.mDatasource.getAllHistory();
 
-            mAdapter = new HistoryAdapter(HistoryActivity.this, historyItems, mFavoritesDatasource);
+            HistoryActivity.this.mAdapter = new HistoryAdapter(HistoryActivity.this, historyItems, HistoryActivity.this.mFavoritesDatasource);
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            HistoryActivity.this.setListAdapter(mAdapter);
+            HistoryActivity.this.setListAdapter(HistoryActivity.this.mAdapter);
             HistoryActivity.this.switchToListView();
         }
 

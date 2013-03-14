@@ -5,7 +5,7 @@ public class CaptchaEntity {
     private String key;
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     public void setUrl(String url) {
@@ -13,7 +13,7 @@ public class CaptchaEntity {
     }
 
     public String getKey() {
-        return key;
+        return this.key;
     }
 
     public void setKey(String key) {

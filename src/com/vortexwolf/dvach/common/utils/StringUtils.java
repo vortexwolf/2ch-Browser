@@ -3,8 +3,9 @@ package com.vortexwolf.dvach.common.utils;
 public class StringUtils {
 
     public static String cutIfLonger(String str, int maxLength) {
-        if (str.length() > maxLength)
+        if (str.length() > maxLength) {
             return str.substring(0, maxLength) + "...";
+        }
         return str;
     }
 

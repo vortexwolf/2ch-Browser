@@ -17,11 +17,11 @@ public class SerializationService {
     private final ExecutorService mExecutor;
 
     public SerializationService() {
-        mExecutor = Executors.newFixedThreadPool(1);
+        this.mExecutor = Executors.newFixedThreadPool(1);
     }
 
     public void serializeObject(final File file, final Object obj) {
-        mExecutor.execute(new Runnable() {
+        this.mExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {

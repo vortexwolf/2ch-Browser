@@ -10,7 +10,7 @@ public class BoardEntity implements IBoardListEntity {
     }
 
     public String getCode() {
-        return code;
+        return this.code;
     }
 
     public void setCode(String code) {
@@ -18,7 +18,7 @@ public class BoardEntity implements IBoardListEntity {
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title) {

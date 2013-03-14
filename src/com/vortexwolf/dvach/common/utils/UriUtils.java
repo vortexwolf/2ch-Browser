@@ -1,15 +1,11 @@
 package com.vortexwolf.dvach.common.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
-
 import android.net.Uri;
-import android.view.View;
+
+import com.vortexwolf.dvach.common.Constants;
 
 public class UriUtils {
     private static final Pattern threadUriPattern = Pattern.compile("/\\w+/res/\\d+\\.html"); // example:
@@ -75,14 +71,18 @@ public class UriUtils {
     }
 
     public static String getYouTubeCode(String text) {
-        if (StringUtils.isEmpty(text)) return null;
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
 
         String videoCode = getGroupValue(text, groupsYoutubeCodePattern, 1);
         return videoCode;
     }
 
     public static boolean isYoutubeUri(Uri uri) {
-        if (uri == null) return false;
+        if (uri == null) {
+            return false;
+        }
         String host = uri.getHost();
         return host != null && host.endsWith("youtube.com");
     }
@@ -92,7 +92,9 @@ public class UriUtils {
     }
 
     private static boolean testUriPath(Uri uri, Pattern pattern) {
-        if (uri == null) return false;
+        if (uri == null) {
+            return false;
+        }
         String path = uri.getPath();
 
         Matcher m = pattern.matcher(path);
@@ -102,14 +104,18 @@ public class UriUtils {
     }
 
     private static String getGroupValue(Uri uri, Pattern pattern, int groupIndex) {
-        if (uri == null) return null;
+        if (uri == null) {
+            return null;
+        }
         String path = uri.getPath();
 
         return getGroupValue(path, pattern, groupIndex);
     }
 
     private static String getGroupValue(String str, Pattern pattern, int groupIndex) {
-        if (str == null) return null;
+        if (str == null) {
+            return null;
+        }
 
         Matcher m = pattern.matcher(str);
         if (m.find() && m.groupCount() > 0) {

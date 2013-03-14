@@ -7,11 +7,11 @@ import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 
 public class SolvemediaCaptchaService {
-    
+
     public static final String DEFAULT_KEY = "oIzJ06xKCH-H6PKr8OLVMa26G06kK3qh";
     public static final String CHALLENGE_URI = "http://api.solvemedia.com/papi/_challenge.js?k=";
     public static final String IMAGE_URI = "http://api.solvemedia.com/papi/media?c=";
-    
+
     private static final Pattern sChallengeIdPattern = Pattern.compile("\"chid\"\\s*:\\s*\"(.+)\",");
 
     public static CaptchaEntity loadCaptcha(IHttpStringReader httpStringReader, String key) {

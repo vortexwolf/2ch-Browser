@@ -2,7 +2,6 @@ package com.vortexwolf.dvach.services.presentation;
 
 import android.net.Uri;
 
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
@@ -29,9 +28,7 @@ public class DvachUriBuilder {
     }
 
     public Uri create2chBoardUri(String board, int pageNumber) {
-        return this.create2chBoardUri(board, pageNumber == 0
-                ? null
-                : pageNumber + ".html");
+        return this.create2chBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
     }
 
     public Uri create2chBoardUri(String board, String path) {
@@ -51,9 +48,7 @@ public class DvachUriBuilder {
     }
 
     public Uri adjust2chRelativeUri(Uri uri) {
-        return uri.isRelative()
-                ? this.appendPath(this.getDvachHostUri(), uri.toString())
-                : uri;
+        return uri.isRelative() ? this.appendPath(this.getDvachHostUri(), uri.toString()) : uri;
     }
 
     private Uri appendPath(Uri baseUri, String path) {
@@ -66,6 +61,6 @@ public class DvachUriBuilder {
             return this.mSettings.getDomainUri();
         }
 
-        return mDvachHostUri;
+        return this.mDvachHostUri;
     }
 }

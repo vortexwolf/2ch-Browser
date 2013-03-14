@@ -5,22 +5,15 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -33,10 +26,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 
-import android.content.Context;
-
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ExtendedHttpClient extends DefaultHttpClient {
     private static final String TAG = "ExtendedHttpClient";
@@ -118,11 +108,17 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         @Override
         public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
             HttpEntity entity = response.getEntity();
-            if (entity == null) return;
+            if (entity == null) {
+                return;
+            }
             Header header = entity.getContentEncoding();
-            if (header == null) return;
+            if (header == null) {
+                return;
+            }
             String contentEncoding = header.getValue();
-            if (contentEncoding == null) return;
+            if (contentEncoding == null) {
+                return;
+            }
 
             if (contentEncoding.contains("gzip")) {
                 response.setEntity(new GzipDecompressingEntity(response.getEntity()));
@@ -138,7 +134,7 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         @Override
         public InputStream getContent() throws IOException, IllegalStateException {
             // the wrapped entity's getContent() decides about repeatability
-            InputStream wrappedin = wrappedEntity.getContent();
+            InputStream wrappedin = this.wrappedEntity.getContent();
             return new GZIPInputStream(wrappedin);
         }
 

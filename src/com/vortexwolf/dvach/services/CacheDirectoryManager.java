@@ -24,30 +24,27 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         this.mInternalCacheDir = internalCacheDir;
         this.mSettings = settings;
         this.mTracker = tracker;
-        this.mExternalCacheDir = getExternalCachePath();
+        this.mExternalCacheDir = this.getExternalCachePath();
     }
 
     @Override
     public File getInternalCacheDir() {
-        return mInternalCacheDir;
+        return this.mInternalCacheDir;
     }
 
     @Override
     public File getExternalCacheDir() {
-        return mExternalCacheDir;
+        return this.mExternalCacheDir;
     }
 
     @Override
     public File getCurrentCacheDirectory() {
         File currentDirectory;
 
-        if (mExternalCacheDir != null
-                && mSettings.isFileCacheEnabled()
-                && mSettings.isFileCacheSdCard()
-                && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            currentDirectory = mExternalCacheDir;
+        if (this.mExternalCacheDir != null && this.mSettings.isFileCacheEnabled() && this.mSettings.isFileCacheSdCard() && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            currentDirectory = this.mExternalCacheDir;
         } else {
-            currentDirectory = mInternalCacheDir;
+            currentDirectory = this.mInternalCacheDir;
         }
 
         if (!currentDirectory.exists()) {
@@ -92,7 +89,7 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 
     @Override
     public File getCachedImageFileForRead(Uri uri) {
-        File cachedFile = getCachedImageFileForWrite(uri);
+        File cachedFile = this.getCachedImageFileForWrite(uri);
         if (!cachedFile.exists()) {
             cachedFile = IoUtils.getSaveFilePath(uri, this.mSettings);
         }
@@ -105,26 +102,25 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                long cacheSize = IoUtils.dirSize(getCurrentCacheDirectory());
+                long cacheSize = IoUtils.dirSize(CacheDirectoryManager.this.getCurrentCacheDirectory());
                 long maxSize = Constants.FILE_CACHE_THRESHOLD;
 
                 if (cacheSize > maxSize) {
-                    long deleteAmount = (cacheSize - maxSize)
-                            + Constants.FILE_CACHE_TRIM_AMOUNT;
-                    IoUtils.deleteDirectory(getReversedCacheDirectory()); // remove
-                                                                          // completly
-                                                                          // the
-                                                                          // reversed
-                                                                          // cache
-                                                                          // directory
-                    deleteAmount -= IoUtils.freeSpace(getImagesCacheDirectory(), deleteAmount); // remove
-                                                                                                // images
-                                                                                                // first
-                    IoUtils.freeSpace(getCurrentCacheDirectory(), deleteAmount); // other
-                                                                                 // cache
-                                                                                 // items
-                                                                                 // if
-                                                                                 // needed
+                    long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
+                    IoUtils.deleteDirectory(CacheDirectoryManager.this.getReversedCacheDirectory()); // remove
+                    // completly
+                    // the
+                    // reversed
+                    // cache
+                    // directory
+                    deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount); // remove
+                    // images
+                    // first
+                    IoUtils.freeSpace(CacheDirectoryManager.this.getCurrentCacheDirectory(), deleteAmount); // other
+                    // cache
+                    // items
+                    // if
+                    // needed
                 }
             }
         }).start();
@@ -132,13 +128,13 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 
     @Override
     public boolean isCacheEnabled() {
-        return mSettings.isFileCacheEnabled();
+        return this.mSettings.isFileCacheEnabled();
     }
 
     private File getReversedCacheDirectory() {
-        return getCurrentCacheDirectory().equals(mExternalCacheDir)
-                ? mInternalCacheDir
-                : mExternalCacheDir;
+        return this.getCurrentCacheDirectory().equals(this.mExternalCacheDir)
+                ? this.mInternalCacheDir
+                : this.mExternalCacheDir;
     }
 
     private File getExternalCachePath() {
@@ -148,12 +144,7 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
             // storage
             File externalStorageDir = Environment.getExternalStorageDirectory();
             // {SD_PATH}/Android/data/com.vortexwolf.dvach/cache
-            File extStorageAppCachePath = new File(externalStorageDir, "Android"
-                    + File.separator
-                    + "data"
-                    + File.separator
-                    + mPackageName
-                    + File.separator + "cache");
+            File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + this.mPackageName + File.separator + "cache");
 
             return extStorageAppCachePath;
         }

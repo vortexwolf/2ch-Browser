@@ -17,7 +17,7 @@ public class SerializableFileModel extends ImageFileModel implements Parcelable 
     }
 
     public SerializableFileModel(Parcel in) {
-        readFromParcel(in);
+        this.readFromParcel(in);
     }
 
     @Override
@@ -28,19 +28,19 @@ public class SerializableFileModel extends ImageFileModel implements Parcelable 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
-        dest.writeString(file.getAbsolutePath());
+        dest.writeString(this.file.getAbsolutePath());
         // dest.writeParcelable(bitmap, flags);
 
-        dest.writeInt(imageHeight);
-        dest.writeInt(imageWidth);
+        dest.writeInt(this.imageHeight);
+        dest.writeInt(this.imageWidth);
     }
 
     private void readFromParcel(Parcel in) {
-        file = new File(in.readString());
+        this.file = new File(in.readString());
         // bitmap = in.readParcelable(Bitmap.class.getClassLoader());
 
-        imageHeight = in.readInt();
-        imageWidth = in.readInt();
+        this.imageHeight = in.readInt();
+        this.imageWidth = in.readInt();
     }
 
     public static final Parcelable.Creator<SerializableFileModel> CREATOR = new Parcelable.Creator<SerializableFileModel>() {

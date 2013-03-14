@@ -1,15 +1,15 @@
 package com.vortexwolf.dvach.adapters;
 
-import com.vortexwolf.dvach.models.presentation.BoardEntity;
-import com.vortexwolf.dvach.models.presentation.IBoardListEntity;
-import com.vortexwolf.dvach.models.presentation.SectionEntity;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.models.presentation.BoardEntity;
+import com.vortexwolf.dvach.models.presentation.IBoardListEntity;
+import com.vortexwolf.dvach.models.presentation.SectionEntity;
 
 public class BoardsListAdapter extends BaseAdapter {
     private static final int ITEM_VIEW_TYPE_BOARD = 0;
@@ -45,9 +45,7 @@ public class BoardsListAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return this.getItem(position).isSection()
-                ? ITEM_VIEW_TYPE_SEPARATOR
-                : ITEM_VIEW_TYPE_BOARD;
+        return this.getItem(position).isSection() ? ITEM_VIEW_TYPE_SEPARATOR : ITEM_VIEW_TYPE_BOARD;
     }
 
     @Override
@@ -61,7 +59,7 @@ public class BoardsListAdapter extends BaseAdapter {
         final IBoardListEntity item = this.getItem(position);
 
         if (convertView == null) {
-            convertView = mInflater.inflate(item.isSection()
+            convertView = this.mInflater.inflate(item.isSection()
                     ? com.vortexwolf.dvach.R.layout.pick_board_section
                     : android.R.layout.simple_list_item_1, null);
         }

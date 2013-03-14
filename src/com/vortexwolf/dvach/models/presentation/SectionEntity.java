@@ -8,7 +8,7 @@ public class SectionEntity implements IBoardListEntity {
     }
 
     public String getTitle() {
-        return mTitle;
+        return this.mTitle;
     }
 
     @Override

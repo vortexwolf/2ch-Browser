@@ -6,12 +6,9 @@ import android.graphics.Canvas;
 import android.text.Layout;
 import android.text.Layout.Alignment;
 import android.text.SpannableStringBuilder;
-import android.text.SpannedString;
+import android.text.StaticLayout;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
-import android.widget.TextView;
-import android.widget.TextView.BufferType;
-import android.text.StaticLayout;
 
 public class EllipsizingTextView extends JellyBeanSpanFixTextView {
     private static final String ELLIPSIS = "...";
@@ -46,29 +43,29 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
     private void updateMaxLinesFromAttributes(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.maxLines });
         int maxLines = a.getInt(0, this.maxLines);
-        setMaxLines(maxLines);
+        this.setMaxLines(maxLines);
     }
 
     public void setEllipsizeListener(EllipsizeListener listener) {
         if (listener == null) {
             throw new NullPointerException();
         }
-        ellipsizeListener = listener;
+        this.ellipsizeListener = listener;
     }
 
     public boolean isEllipsized() {
-        return isEllipsized;
+        return this.isEllipsized;
     }
 
     @Override
     public void setMaxLines(int maxLines) {
         super.setMaxLines(maxLines);
         this.maxLines = maxLines;
-        isStale = true;
+        this.isStale = true;
     }
 
     public int getMaxLines() {
-        return maxLines;
+        return this.maxLines;
     }
 
     @Override
@@ -81,52 +78,51 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
     @Override
     protected void onTextChanged(CharSequence text, int start, int before, int after) {
         super.onTextChanged(text, start, before, after);
-        if (!programmaticChange) {
-            fullText = text;
-            isStale = true;
+        if (!this.programmaticChange) {
+            this.fullText = text;
+            this.isStale = true;
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (isStale) {
+        if (this.isStale) {
             super.setEllipsize(null);
-            resetText();
+            this.resetText();
         }
         super.onDraw(canvas);
     }
 
     private void resetText() {
         int maxLines = this.getMaxLines();
-        CharSequence workingText = fullText;
+        CharSequence workingText = this.fullText;
         boolean ellipsized = false;
 
         if (maxLines != -1) {
-            Layout layout = createWorkingLayout(workingText);
+            Layout layout = this.createWorkingLayout(workingText);
             if (layout.getLineCount() > maxLines) {
                 workingText = workingText.subSequence(0, layout.getLineEnd(maxLines - 1));
                 workingText = new SpannableStringBuilder(workingText).append(ELLIPSIS);
                 ellipsized = true;
             }
         }
-        if (!workingText.equals(getText())) {
-            programmaticChange = true;
+        if (!workingText.equals(this.getText())) {
+            this.programmaticChange = true;
             try {
-                setText(workingText);
+                this.setText(workingText);
             } finally {
-                programmaticChange = false;
+                this.programmaticChange = false;
             }
         }
-        isStale = false;
-        isEllipsized = ellipsized;
-        if (ellipsizeListener != null) {
-            ellipsizeListener.ellipsizeStateChanged(this, ellipsized);
+        this.isStale = false;
+        this.isEllipsized = ellipsized;
+        if (this.ellipsizeListener != null) {
+            this.ellipsizeListener.ellipsizeStateChanged(this, ellipsized);
         }
     }
 
     private Layout createWorkingLayout(CharSequence workingText) {
-        return new StaticLayout(workingText, getPaint(), getWidth()
-                - getPaddingLeft() - getPaddingRight(), Alignment.ALIGN_NORMAL, lineSpacingMultiplier, lineAdditionalVerticalPadding, false);
+        return new StaticLayout(workingText, this.getPaint(), this.getWidth() - this.getPaddingLeft() - this.getPaddingRight(), Alignment.ALIGN_NORMAL, this.lineSpacingMultiplier, this.lineAdditionalVerticalPadding, false);
     }
 
     @Override

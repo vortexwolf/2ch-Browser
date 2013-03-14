@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +17,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
@@ -49,9 +46,7 @@ public class PostItemViewBuilder {
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
-        View view = convertView == null
-                ? mInflater.inflate(R.layout.posts_list_item, null)
-                : convertView;
+        View view = convertView == null ? this.mInflater.inflate(R.layout.posts_list_item, null) : convertView;
 
         // Get inner controls
         ViewBag vb = (ViewBag) view.getTag();
@@ -92,9 +87,7 @@ public class PostItemViewBuilder {
 
         // Имя
         String name = item.getName();
-        if (mSettings.isDisplayNames()
-                && !StringUtils.isEmptyOrWhiteSpace(name)
-                && !name.equals("Аноним")) {
+        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")) {
             vb.postNameView.setText(Html.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
@@ -169,8 +162,7 @@ public class PostItemViewBuilder {
             ViewBag vb = (ViewBag) v.getTag();
             AttachmentInfo attachment = item.getAttachment(this.mBoardName);
 
-            if (vb != null
-                    && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)) {
+            if (vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
                 ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
             }
         }

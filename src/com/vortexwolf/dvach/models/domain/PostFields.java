@@ -19,7 +19,7 @@ public class PostFields {
     private String comment;
 
     public String getCaptchaKey() {
-        return captchaKey;
+        return this.captchaKey;
     }
 
     public void setCaptchaKey(String captchaKey) {
@@ -27,7 +27,7 @@ public class PostFields {
     }
 
     public String getVideo() {
-        return video;
+        return this.video;
     }
 
     public void setVideo(String video) {
@@ -35,7 +35,7 @@ public class PostFields {
     }
 
     public String getSubject() {
-        return subject;
+        return this.subject;
     }
 
     public void setSubject(String subject) {
@@ -43,7 +43,7 @@ public class PostFields {
     }
 
     public String getFile() {
-        return file;
+        return this.file;
     }
 
     public void setFile(String file) {
@@ -51,7 +51,7 @@ public class PostFields {
     }
 
     public String getNoFile() {
-        return noFile;
+        return this.noFile;
     }
 
     public void setNoFile(String noFile) {
@@ -59,7 +59,7 @@ public class PostFields {
     }
 
     public String getSubmit() {
-        return submit;
+        return this.submit;
     }
 
     public void setSubmit(String submit) {
@@ -67,7 +67,7 @@ public class PostFields {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -75,7 +75,7 @@ public class PostFields {
     }
 
     public String getTask() {
-        return task;
+        return this.task;
     }
 
     public void setTask(String task) {
@@ -83,7 +83,7 @@ public class PostFields {
     }
 
     public String getCaptcha() {
-        return captcha;
+        return this.captcha;
     }
 
     public void setCaptcha(String captcha) {
@@ -91,7 +91,7 @@ public class PostFields {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
@@ -99,7 +99,7 @@ public class PostFields {
     }
 
     public String getComment() {
-        return comment;
+        return this.comment;
     }
 
     public void setComment(String comment) {

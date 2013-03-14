@@ -1,12 +1,10 @@
 package com.vortexwolf.dvach.services.domain;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
@@ -15,10 +13,8 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 
 import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.CancellableInputStream;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
@@ -27,8 +23,6 @@ import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.models.domain.BoardSettings;
-import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
@@ -53,20 +47,18 @@ public class JsonApiReader implements IJsonApiReader {
     private String formatThreadsUri(String boardName, int page) {
         String pageName = page == 0 ? "wakaba" : String.valueOf(page);
 
-        String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, pageName
-                + ".json").toString();
+        String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, pageName + ".json").toString();
 
         return uri;
     }
 
     private String formatPostsUri(String boardName, String threadId) {
-        return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/"
-                + threadId + ".json").toString();
+        return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/" + threadId + ".json").toString();
     }
 
     @Override
     public ThreadsList readThreadsList(String boardName, int page, boolean checkModified, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
-        String uri = formatThreadsUri(boardName, page);
+        String uri = this.formatThreadsUri(boardName, page);
 
         if (checkModified == false) {
             this.mIfModifiedMap.remove(uri);
@@ -77,7 +69,7 @@ public class JsonApiReader implements IJsonApiReader {
 
     @Override
     public PostsList readPostsList(String boardName, String threadNumber, boolean checkModified, IProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
-        String uri = formatPostsUri(boardName, threadNumber);
+        String uri = this.formatPostsUri(boardName, threadNumber);
 
         if (checkModified == false) {
             this.mIfModifiedMap.remove(uri);
@@ -98,7 +90,9 @@ public class JsonApiReader implements IJsonApiReader {
         try {
             request = this.createRequest(url);
 
-            if (task != null && task.isCancelled()) return null;
+            if (task != null && task.isCancelled()) {
+                return null;
+            }
 
             response = this.executeRequest(request);
 
@@ -108,11 +102,12 @@ public class JsonApiReader implements IJsonApiReader {
                 return null;
             }
             if (status.getStatusCode() != 200) {
-                throw new JsonApiReaderException(status.getStatusCode() + " - "
-                        + status.getReasonPhrase());
+                throw new JsonApiReaderException(status.getStatusCode() + " - " + status.getReasonPhrase());
             }
 
-            if (task != null && task.isCancelled()) return null;
+            if (task != null && task.isCancelled()) {
+                return null;
+            }
 
             // read and parse the response
             InputStream json = this.getInputStream(response, listener, task);
@@ -123,10 +118,12 @@ public class JsonApiReader implements IJsonApiReader {
                 if (recLevel == 0) {
                     MyLog.v(TAG, "Read json once again");
 
-                    if (listener != null) listener.indeterminateProgress();
+                    if (listener != null) {
+                        listener.indeterminateProgress();
+                    }
                     result = this.readData(url, valueType, null, task, recLevel + 1);
                 } else {
-                    throw new JsonApiReaderException(mResources.getString(R.string.error_json_parse));
+                    throw new JsonApiReaderException(this.mResources.getString(R.string.error_json_parse));
                 }
             }
 
@@ -153,7 +150,7 @@ public class JsonApiReader implements IJsonApiReader {
             return request;
         } catch (IllegalArgumentException e) {
             MyLog.e(TAG, e);
-            throw new JsonApiReaderException(mResources.getString(R.string.error_incorrect_argument), e);
+            throw new JsonApiReaderException(this.mResources.getString(R.string.error_incorrect_argument), e);
         }
     }
 
@@ -164,7 +161,7 @@ public class JsonApiReader implements IJsonApiReader {
             return response;
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new JsonApiReaderException(mResources.getString(R.string.error_download_data), e);
+            throw new JsonApiReaderException(this.mResources.getString(R.string.error_download_data), e);
         }
     }
 
@@ -189,7 +186,7 @@ public class JsonApiReader implements IJsonApiReader {
             return resultStream;
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new JsonApiReaderException(mResources.getString(R.string.error_download_data), e);
+            throw new JsonApiReaderException(this.mResources.getString(R.string.error_download_data), e);
         }
     }
 
@@ -204,7 +201,7 @@ public class JsonApiReader implements IJsonApiReader {
             throw e;
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new JsonApiReaderException(mResources.getString(R.string.error_json_parse));
+            throw new JsonApiReaderException(this.mResources.getString(R.string.error_json_parse));
         }
     }
 }

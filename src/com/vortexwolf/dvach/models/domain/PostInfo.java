@@ -19,7 +19,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     private long timestamp;
 
     public String getNum() {
-        return num;
+        return this.num;
     }
 
     public void setNum(String num) {
@@ -28,7 +28,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
 
     @Override
     public String getThumbnail() {
-        return thumbnail;
+        return this.thumbnail;
     }
 
     public void setThumbnail(String thumbnail) {
@@ -36,7 +36,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public String getComment() {
-        return comment;
+        return this.comment;
     }
 
     public void setComment(String comment) {
@@ -44,7 +44,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public String getSubject() {
-        return subject;
+        return this.subject;
     }
 
     public void setSubject(String subject) {
@@ -53,7 +53,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
 
     @Override
     public String getVideo() {
-        return video;
+        return this.video;
     }
 
     public void setVideo(String video) {
@@ -62,7 +62,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
 
     @Override
     public String getImage() {
-        return image;
+        return this.image;
     }
 
     public void setImage(String image) {
@@ -71,7 +71,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
 
     @Override
     public int getSize() {
-        return size;
+        return this.size;
     }
 
     public void setSize(int size) {
@@ -83,7 +83,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setWidth(int width) {
@@ -91,7 +91,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public int getWidth() {
-        return width;
+        return this.width;
     }
 
     public void setHeight(int height) {
@@ -99,7 +99,7 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public int getHeight() {
-        return height;
+        return this.height;
     }
 
     public void setTimestamp(long timestamp) {
@@ -107,6 +107,6 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public long getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 }

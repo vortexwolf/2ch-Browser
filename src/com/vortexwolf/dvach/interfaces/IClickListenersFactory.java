@@ -1,10 +1,10 @@
 package com.vortexwolf.dvach.interfaces;
 
-import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
 import android.content.Context;
 import android.view.View.OnClickListener;
+
+import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public interface IClickListenersFactory {
 

@@ -1,11 +1,8 @@
 package com.vortexwolf.dvach.models.presentation;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,12 +12,12 @@ import android.content.res.Resources.Theme;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
-import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
@@ -68,8 +65,8 @@ public class PostItemViewModel {
 
         Matcher m = sReplyLinkFullPattern.matcher(comment);
         while (m.find()) {
-            if (m.groupCount() > 0 && !refersTo.contains(m.group(1))) {
-                refersTo.add(m.group(1));
+            if (m.groupCount() > 0 && !this.refersTo.contains(m.group(1))) {
+                this.refersTo.add(m.group(1));
             }
         }
     }
@@ -81,7 +78,7 @@ public class PostItemViewModel {
 
         String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
         SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
-        HtmlUtils.replaceUrls(builder, this.mUrlListener, mTheme);
+        HtmlUtils.replaceUrls(builder, this.mUrlListener, this.mTheme);
 
         return builder;
     }
@@ -95,19 +92,19 @@ public class PostItemViewModel {
     }
 
     public void addReferenceFrom(String postNumber) {
-        referencesFrom.add(postNumber);
+        this.referencesFrom.add(postNumber);
     }
 
     public int getPosition() {
-        return mPosition;
+        return this.mPosition;
     }
 
     public String getNumber() {
-        return mModel.getNum();
+        return this.mModel.getNum();
     }
 
     public String getName() {
-        return mModel.getName();
+        return this.mModel.getName();
     }
 
     public boolean hasAttachment() {
@@ -119,7 +116,7 @@ public class PostItemViewModel {
             this.mAttachment = new AttachmentInfo(this.mModel, boardCode, this.mDvachUriBuilder);
         }
 
-        return mAttachment;
+        return this.mAttachment;
     }
 
     public SpannableStringBuilder getSpannedComment() {
@@ -127,11 +124,11 @@ public class PostItemViewModel {
             this.mSpannedComment = this.createSpannedComment();
         }
 
-        return mSpannedComment;
+        return this.mSpannedComment;
     }
 
     public ArrayList<String> getRefersTo() {
-        return refersTo;
+        return this.refersTo;
     }
 
     public String getPostDate(Context context) {
@@ -151,8 +148,7 @@ public class PostItemViewModel {
                     ? ThreadPostUtils.getLocalDateFromTimestamp(realTimeStamp)
                     : ThreadPostUtils.getMoscowDateFromTimestamp(realTimeStamp);
 
-            this.mPostDate = DateFormat.getDateFormat(context).format(date)
-                    + ", " + DateFormat.getTimeFormat(context).format(date);
+            this.mPostDate = DateFormat.getDateFormat(context).format(date) + ", " + DateFormat.getTimeFormat(context).format(date);
         }
 
         return this.mPostDate;
@@ -164,13 +160,15 @@ public class PostItemViewModel {
 
     public SpannableStringBuilder getReferencesFromAsSpannableString(Resources res, String boardName, String threadNumber) {
         String firstWord = res.getString(R.string.postitem_replies);
-        SpannableStringBuilder builder = createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
+        SpannableStringBuilder builder = this.createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
 
         return builder;
     }
 
     private SpannableStringBuilder createReferencesString(String firstWord, ArrayList<String> references, String boardName, String threadNumber) {
-        if (references.isEmpty()) return null;
+        if (references.isEmpty()) {
+            return null;
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(firstWord);
@@ -200,7 +198,7 @@ public class PostItemViewModel {
         // Разбираю строку на объекты-ссылки и добавляю обработчики событий
         String joinedLinks = sb.toString();
         SpannableStringBuilder builder = (SpannableStringBuilder) Html.fromHtml(joinedLinks);
-        HtmlUtils.replaceUrls(builder, this.mUrlListener, mTheme);
+        HtmlUtils.replaceUrls(builder, this.mUrlListener, this.mTheme);
 
         return builder;
     }
@@ -212,7 +210,7 @@ public class PostItemViewModel {
     public boolean canMakeCommentFloat() {
         return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment && this.hasAttachment();
     }
-    
+
     public boolean isCommentFloat() {
         return this.isFloatImageComment;
     }

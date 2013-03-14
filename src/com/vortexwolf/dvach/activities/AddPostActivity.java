@@ -1,12 +1,41 @@
 package com.vortexwolf.dvach.activities;
 
 import java.io.File;
+
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.httpimage.NetworkResourceLoader;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore.MediaColumns;
+import android.text.Editable;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.dvach.asynctasks.SendPostTask;
-import com.vortexwolf.dvach.common.*;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
@@ -29,34 +58,6 @@ import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.httpimage.NetworkResourceLoader;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.text.Editable;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
@@ -101,7 +102,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mApplication = (MainApplication) getApplication();
+        this.mApplication = (MainApplication) this.getApplication();
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mPostSender = this.mApplication.getPostSender();
         DefaultHttpClient httpClient = MainApplication.getHttpClient();
@@ -112,7 +113,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         DvachUriBuilder uriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
 
         // Парсим название борды и номер треда
-        Bundle extras = getIntent().getExtras();
+        Bundle extras = this.getIntent().getExtras();
 
         if (extras != null) {
             this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
@@ -172,13 +173,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         if (Constants.ADD_THREAD_PARENT.equals(this.mThreadNumber)) {
-            this.setTitle(String.format(getString(R.string.data_add_thread_title), mBoardName));
+            this.setTitle(String.format(this.getString(R.string.data_add_thread_title), this.mBoardName));
             this.mSubjectView.setVisibility(View.VISIBLE);
         } else {
-            this.setTitle(String.format(getString(R.string.data_add_post_title), mBoardName, mThreadNumber));
+            this.setTitle(String.format(this.getString(R.string.data_add_post_title), this.mBoardName, this.mThreadNumber));
         }
 
-        this.mTracker.setBoardVar(mBoardName);
+        this.mTracker.setBoardVar(this.mBoardName);
         this.mTracker.trackActivityView(TAG);
     }
 
@@ -200,13 +201,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.setTheme(this.mApplication.getSettings().getTheme());
         this.setContentView(R.layout.add_post_view);
 
-        this.mCaptchaImageView = (ImageView) findViewById(R.id.addpost_captcha_image);
-        this.mCaptchaLoadingView = findViewById(R.id.addpost_captcha_loading);
-        this.mCaptchaSkipView = findViewById(R.id.addpost_captcha_skip_text);
+        this.mCaptchaImageView = (ImageView) this.findViewById(R.id.addpost_captcha_image);
+        this.mCaptchaLoadingView = this.findViewById(R.id.addpost_captcha_loading);
+        this.mCaptchaSkipView = this.findViewById(R.id.addpost_captcha_skip_text);
         this.mCaptchaAnswerView = (EditText) this.findViewById(R.id.addpost_captcha_input);
-        this.mCommentView = (EditText) findViewById(R.id.addpost_comment_input);
+        this.mCommentView = (EditText) this.findViewById(R.id.addpost_comment_input);
         this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
-        this.mAttachmentView = findViewById(R.id.addpost_attachment_view);
+        this.mAttachmentView = this.findViewById(R.id.addpost_attachment_view);
         this.mSendButton = (Button) this.findViewById(R.id.addpost_send_button);
         this.mSubjectView = (EditText) this.findViewById(R.id.addpost_subject);
         this.mPoliticsView = (Spinner) this.findViewById(R.id.addpost_politics);
@@ -214,8 +215,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         final ImageButton refreshCaptchaButton = (ImageButton) this.findViewById(R.id.addpost_refresh_button);
         final LinearLayout textFormatView = (LinearLayout) this.findViewById(R.id.addpost_textformat_view);
 
-        if (ThreadPostUtils.isPoliticsBoard(mBoardName)) {
-            mPoliticsView.setVisibility(View.VISIBLE);
+        if (ThreadPostUtils.isPoliticsBoard(this.mBoardName)) {
+            this.mPoliticsView.setVisibility(View.VISIBLE);
         }
 
         View.OnClickListener formatButtonListener = new View.OnClickListener() {
@@ -223,22 +224,22 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.addpost_textformat_b:
-                        formatSelectedText("b");
+                        AddPostActivity.this.formatSelectedText("b");
                         break;
                     case R.id.addpost_textformat_i:
-                        formatSelectedText("i");
+                        AddPostActivity.this.formatSelectedText("i");
                         break;
                     case R.id.addpost_textformat_s:
-                        formatSelectedText("s");
+                        AddPostActivity.this.formatSelectedText("s");
                         break;
                     case R.id.addpost_textformat_spoiler:
-                        formatSelectedText("spoiler");
+                        AddPostActivity.this.formatSelectedText("spoiler");
                         break;
                     case R.id.addpost_textformat_u:
-                        formatSelectedText("u");
+                        AddPostActivity.this.formatSelectedText("u");
                         break;
                     case R.id.addpost_textformat_quote:
-                        formatQuote();
+                        AddPostActivity.this.formatQuote();
                         break;
                 }
             }
@@ -252,7 +253,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         // Обрабатываем нажатие на кнопку "Отправить"
-        mSendButton.setOnClickListener(new View.OnClickListener() {
+        this.mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AddPostActivity.this.onSend();
@@ -288,36 +289,33 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         String comment = this.mCommentView.getText().toString();
         HtmlUtils.trimBr(comment);
         if (StringUtils.isEmpty(comment) && this.mAttachedFile == null) {
-            AppearanceUtils.showToastMessage(this, getString(R.string.warning_write_comment));
+            AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_write_comment));
             return;
         }
 
         boolean isSage = this.mSageCheckBox.isChecked();
 
-        File attachment = this.mAttachedFile != null
-                ? this.mAttachedFile.file
-                : null;
-        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT)
-                && attachment == null) {
-            AppearanceUtils.showToastMessage(this, getString(R.string.warning_attach_file_new_thread));
+        File attachment = this.mAttachedFile != null ? this.mAttachedFile.file : null;
+        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && attachment == null) {
+            AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }
 
         String subject = StringUtils.nullIfEmpty(this.mSubjectView.getText().toString());
 
         String politics = null;
-        if (ThreadPostUtils.isPoliticsBoard(mBoardName)) {
-            int itemIndex = mPoliticsView.getSelectedItemPosition();
+        if (ThreadPostUtils.isPoliticsBoard(this.mBoardName)) {
+            int itemIndex = this.mPoliticsView.getSelectedItemPosition();
             politics = Math.max(itemIndex - 1, -1) + ""; // the list starts from
                                                          // -1
         }
 
         String name = this.mApplication.getSettings().getName();
-        String captchaKey = mCaptcha != null ? mCaptcha.getKey() : null;
+        String captchaKey = this.mCaptcha != null ? this.mCaptcha.getKey() : null;
         PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name, this.mAttachedVideo);
 
         // Отправляем
-        sendPost(pe);
+        this.sendPost(pe);
     }
 
     private void sendPost(PostEntity pe) {
@@ -326,13 +324,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mCurrentPostSendTask.cancel(true);
         }
 
-        this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, mBoardName, mThreadNumber, pe);
+        this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardName, this.mThreadNumber, pe);
         this.mCurrentPostSendTask.execute();
     }
 
     @Override
     public void showSuccess(String redirectedPage) {
-        AppearanceUtils.showToastMessage(this, getString(R.string.notification_send_post_success));
+        AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_send_post_success));
         // return back to the list of posts
         String redirectedThreadNumber = null;
         if (redirectedPage != null) {
@@ -345,14 +343,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         Intent intent = new Intent();
         intent.putExtra(Constants.EXTRA_REDIRECTED_THREAD_NUMBER, redirectedThreadNumber);
         this.setResult(RESULT_OK, intent);
-        finish();
+        this.finish();
     }
 
     @Override
     public void showError(String error) {
-        error = error != null
-                ? error
-                : this.getString(R.string.error_send_post);
+        error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
 
         if (error.startsWith("Ошибка: Неверный код подтверждения.")) {
@@ -363,30 +359,30 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     @Override
     public void showPostLoading() {
-        mSendButton.setEnabled(false);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setMessage(getString(R.string.loading));
-        mProgressDialog.setCancelable(true);
-        mProgressDialog.setCanceledOnTouchOutside(false);
-        mProgressDialog.show();
+        this.mSendButton.setEnabled(false);
+        this.mProgressDialog = new ProgressDialog(this);
+        this.mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        this.mProgressDialog.setMessage(this.getString(R.string.loading));
+        this.mProgressDialog.setCancelable(true);
+        this.mProgressDialog.setCanceledOnTouchOutside(false);
+        this.mProgressDialog.show();
     }
 
     @Override
     public void hidePostLoading() {
-        mSendButton.setEnabled(true);
-        mProgressDialog.dismiss();
-        mCurrentPostSendTask = null;
+        this.mSendButton.setEnabled(true);
+        this.mProgressDialog.dismiss();
+        this.mCurrentPostSendTask = null;
     }
 
     @Override
     public void showCaptchaLoading() {
-        switchToCaptchaView(CaptchaViewType.LOADING);
+        this.switchToCaptchaView(CaptchaViewType.LOADING);
     }
 
     @Override
     public void skipCaptcha() {
-        switchToCaptchaView(CaptchaViewType.SKIP);
+        this.switchToCaptchaView(CaptchaViewType.SKIP);
     }
 
     @Override
@@ -400,7 +396,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaBitmap = captchaImage;
         this.mCaptchaImageView.setImageBitmap(captchaImage);
 
-        switchToCaptchaView(CaptchaViewType.IMAGE);
+        this.switchToCaptchaView(CaptchaViewType.IMAGE);
     }
 
     @Override
@@ -408,32 +404,32 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaImageView.setImageResource(android.R.color.transparent);
         AppearanceUtils.showToastMessage(this, errorMessage);
 
-        switchToCaptchaView(CaptchaViewType.ERROR);
+        this.switchToCaptchaView(CaptchaViewType.ERROR);
     }
 
     private void switchToCaptchaView(CaptchaViewType vt) {
         this.mCurrentCaptchaView = vt;
         switch (vt) {
             case LOADING:
-                mCaptchaImageView.setVisibility(View.GONE);
-                mCaptchaImageView.setImageResource(android.R.color.transparent);
-                mCaptchaLoadingView.setVisibility(View.VISIBLE);
-                mCaptchaSkipView.setVisibility(View.GONE);
+                this.mCaptchaImageView.setVisibility(View.GONE);
+                this.mCaptchaImageView.setImageResource(android.R.color.transparent);
+                this.mCaptchaLoadingView.setVisibility(View.VISIBLE);
+                this.mCaptchaSkipView.setVisibility(View.GONE);
                 break;
             case ERROR:
             case IMAGE:
                 this.mCurrentDownloadCaptchaTask = null;
-                mCaptchaAnswerView.setVisibility(View.VISIBLE);
-                mCaptchaImageView.setVisibility(View.VISIBLE);
-                mCaptchaLoadingView.setVisibility(View.GONE);
-                mCaptchaSkipView.setVisibility(View.GONE);
+                this.mCaptchaAnswerView.setVisibility(View.VISIBLE);
+                this.mCaptchaImageView.setVisibility(View.VISIBLE);
+                this.mCaptchaLoadingView.setVisibility(View.GONE);
+                this.mCaptchaSkipView.setVisibility(View.GONE);
                 break;
             case SKIP:
                 this.mCurrentDownloadCaptchaTask = null;
-                mCaptchaAnswerView.setVisibility(View.GONE);
-                mCaptchaImageView.setVisibility(View.GONE);
-                mCaptchaLoadingView.setVisibility(View.GONE);
-                mCaptchaSkipView.setVisibility(View.VISIBLE);
+                this.mCaptchaAnswerView.setVisibility(View.GONE);
+                this.mCaptchaImageView.setVisibility(View.GONE);
+                this.mCaptchaLoadingView.setVisibility(View.GONE);
+                this.mCaptchaSkipView.setVisibility(View.VISIBLE);
                 break;
         }
 
@@ -441,7 +437,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.addpost, menu);
         return true;
     }
@@ -454,12 +450,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 intent.putExtra(FilesListActivity.EXTRA_CURRENT_FILE, this.mAttachedFile != null
                         ? this.mAttachedFile.file.getAbsolutePath()
                         : null);
-                startActivityForResult(intent, Constants.REQUEST_CODE_FILE_LIST_ACTIVITY);
+                this.startActivityForResult(intent, Constants.REQUEST_CODE_FILE_LIST_ACTIVITY);
                 break;
             case R.id.menu_gallery_id:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
-                startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
+                this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
             case R.id.menu_attach_youtube_id:
                 // A dialog with a text input
@@ -475,7 +471,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 d.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
-                        Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button b = d.getButton(DialogInterface.BUTTON_POSITIVE);
                         b.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -501,8 +497,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             switch (requestCode) {
                 case Constants.REQUEST_CODE_FILE_LIST_ACTIVITY:
 
-                    SerializableFileModel fileModel = data.getParcelableExtra(getPackageName()
-                            + Constants.EXTRA_SELECTED_FILE);
+                    SerializableFileModel fileModel = data.getParcelableExtra(this.getPackageName() + Constants.EXTRA_SELECTED_FILE);
 
                     this.setAttachment(fileModel);
 
@@ -512,7 +507,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     Uri selectedImage = data.getData();
                     String filePath = null;
 
-                    String[] columns = { MediaStore.Images.Media.DATA };
+                    String[] columns = { MediaColumns.DATA };
                     Cursor cursor = this.getContentResolver().query(selectedImage, columns, null, null, null);
                     if (cursor != null) {
                         cursor.moveToFirst();
@@ -576,8 +571,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private void displayAttachmentView(String name, String info) {
         this.mAttachmentView.setVisibility(View.VISIBLE);
-        TextView fileNameView = (TextView) findViewById(R.id.addpost_attachment_name);
-        TextView fileSizeView = (TextView) findViewById(R.id.addpost_attachment_size);
+        TextView fileNameView = (TextView) this.findViewById(R.id.addpost_attachment_name);
+        TextView fileSizeView = (TextView) this.findViewById(R.id.addpost_attachment_size);
 
         fileNameView.setText(name);
         fileSizeView.setText(info);
@@ -591,23 +586,23 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptcha() {
-        if (mCurrentDownloadCaptchaTask != null) {
-            mCurrentDownloadCaptchaTask.cancel(true);
+        if (this.mCurrentDownloadCaptchaTask != null) {
+            this.mCurrentDownloadCaptchaTask.cancel(true);
         }
 
-        mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, mJsonReader, mNetworkResourceLoader, mHtmlCaptchaChecker, MainApplication.getHttpClient());
-        mCurrentDownloadCaptchaTask.execute();
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mNetworkResourceLoader, this.mHtmlCaptchaChecker, MainApplication.getHttpClient());
+        this.mCurrentDownloadCaptchaTask.execute();
     }
 
     private void formatSelectedText(String code) {
-        Editable editable = mCommentView.getEditableText();
+        Editable editable = this.mCommentView.getEditableText();
         String text = editable.toString();
 
         String startTag = "[" + code + "]";
         String endTag = "[/" + code + "]";
 
-        int selectionStart = Math.max(0, mCommentView.getSelectionStart());
-        int selectionEnd =  Math.min(text.length(), mCommentView.getSelectionEnd());
+        int selectionStart = Math.max(0, this.mCommentView.getSelectionStart());
+        int selectionEnd = Math.min(text.length(), this.mCommentView.getSelectionEnd());
         String selectedText = text.substring(selectionStart, selectionEnd);
 
         // Проверяем текст на краях выделенной области, на случай если уже была
@@ -618,19 +613,19 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         // Удаляем теги форматирования если есть, добавляем если нет
         if (textBeforeSelection.equalsIgnoreCase(startTag) && textAfterSelection.equalsIgnoreCase(endTag)) {
             editable.replace(selectionStart - startTag.length(), selectionEnd + endTag.length(), selectedText);
-            mCommentView.setSelection(selectionStart - startTag.length(), selectionEnd - startTag.length());
+            this.mCommentView.setSelection(selectionStart - startTag.length(), selectionEnd - startTag.length());
         } else {
             editable.replace(selectionStart, selectionEnd, startTag + selectedText + endTag);
-            mCommentView.setSelection(selectionStart + startTag.length(), selectionEnd + startTag.length());
+            this.mCommentView.setSelection(selectionStart + startTag.length(), selectionEnd + startTag.length());
         }
     }
 
     private void formatQuote() {
-        Editable editable = mCommentView.getEditableText();
+        Editable editable = this.mCommentView.getEditableText();
         String text = editable.toString();
 
-        int selectionStart = mCommentView.getSelectionStart();
-        int selectionEnd = mCommentView.getSelectionEnd();
+        int selectionStart = this.mCommentView.getSelectionStart();
+        int selectionEnd = this.mCommentView.getSelectionEnd();
         String selectedText = text.substring(selectionStart, selectionEnd);
         String oneSymbolBefore = text.substring(Math.max(selectionStart - 1, 0), selectionStart);
 
@@ -639,17 +634,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             int diff = selectedText.length() - unQuotedText.length();
 
             editable.replace(selectionStart, selectionEnd, unQuotedText);
-            mCommentView.setSelection(selectionStart, selectionEnd - diff);
+            this.mCommentView.setSelection(selectionStart, selectionEnd - diff);
         } else {
-            String firstSymbol = oneSymbolBefore.length() == 0
-                    || oneSymbolBefore.equals("\n") ? "" : "\n";
-            String quotedText = firstSymbol + ">"
-                    + selectedText.replaceAll("(\n+)", "$1>");
+            String firstSymbol = oneSymbolBefore.length() == 0 || oneSymbolBefore.equals("\n") ? "" : "\n";
+            String quotedText = firstSymbol + ">" + selectedText.replaceAll("(\n+)", "$1>");
             int diff = quotedText.length() - selectedText.length();
 
             editable.replace(selectionStart, selectionEnd, quotedText);
-            mCommentView.setSelection(selectionStart + firstSymbol.length(), selectionEnd
-                    + diff);
+            this.mCommentView.setSelection(selectionStart + firstSymbol.length(), selectionEnd + diff);
         }
     }
 }

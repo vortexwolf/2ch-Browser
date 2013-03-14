@@ -3,9 +3,9 @@ package com.vortexwolf.dvach.services;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-
 import android.app.Activity;
+
+import com.vortexwolf.dvach.common.library.MyLog;
 
 public class TimerService {
 
@@ -32,9 +32,9 @@ public class TimerService {
         this.mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                mActivity.runOnUiThread(mTask);
+                TimerService.this.mActivity.runOnUiThread(TimerService.this.mTask);
             }
-        }, mInterval * 1000, mInterval * 1000);
+        }, this.mInterval * 1000, this.mInterval * 1000);
     }
 
     public void stop() {

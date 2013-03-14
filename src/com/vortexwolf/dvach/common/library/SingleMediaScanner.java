@@ -11,18 +11,18 @@ public class SingleMediaScanner implements MediaScannerConnection.MediaScannerCo
     private File mFile;
 
     public SingleMediaScanner(Context context, File f) {
-        mFile = f;
-        mMs = new MediaScannerConnection(context, this);
-        mMs.connect();
+        this.mFile = f;
+        this.mMs = new MediaScannerConnection(context, this);
+        this.mMs.connect();
     }
-    
+
     @Override
     public void onMediaScannerConnected() {
-        mMs.scanFile(mFile.getAbsolutePath(), null);
+        this.mMs.scanFile(this.mFile.getAbsolutePath(), null);
     }
-    
+
     @Override
     public void onScanCompleted(String path, Uri uri) {
-        mMs.disconnect();
+        this.mMs.disconnect();
     }
 }

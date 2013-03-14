@@ -18,11 +18,9 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     @Override
     public int getLeadingMargin(boolean first) {
         if (first) {
-            /*
-             * Данный отступ будет применен к количеству строк возвращаемых
-             * getLeadingMarginLineCount()
-             */
-            return margin;
+            /* Данный отступ будет применен к количеству строк возвращаемых
+             * getLeadingMarginLineCount() */
+            return this.margin;
         } else {
             // Отступ для всех остальных строк
             return 0;
@@ -33,13 +31,11 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top, int baseline, int bottom, CharSequence text, int start, int end, boolean first, Layout layout) {
     }
 
-    /*
-     * Возвращает количество строк, к которым должен быть применен отступ
+    /* Возвращает количество строк, к которым должен быть применен отступ
      * возвращаемый методом getLeadingMargin(true) Замечание. Отступ применяется
-     * только к N строкам одного параграфа.
-     */
+     * только к N строкам одного параграфа. */
     @Override
     public int getLeadingMarginLineCount() {
-        return lines;
+        return this.lines;
     }
 }

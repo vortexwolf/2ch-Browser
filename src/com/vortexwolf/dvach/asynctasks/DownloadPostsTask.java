@@ -3,7 +3,6 @@ package com.vortexwolf.dvach.asynctasks;
 import android.os.AsyncTask;
 import android.view.Window;
 
-import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IPostsListView;
@@ -48,7 +47,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 
         // Читаем по ссылке json-объект со списком постов
         try {
-            this.mPostsList = this.mJsonReader.readPostsList(mBoard, mThreadNumber, this.mIsCheckModified, this, this);
+            this.mPostsList = this.mJsonReader.readPostsList(this.mBoard, this.mThreadNumber, this.mIsCheckModified, this, this);
             return true;
         } catch (Exception e) {
             this.mUserError = e.getMessage();
@@ -65,7 +64,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
             this.mView.showLoadingScreen();
         }
 
-        if (mContentLength == -1) {
+        if (this.mContentLength == -1) {
             this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
         } else {
             this.mView.setWindowProgress(0);
@@ -109,18 +108,19 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     @Override
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
-        if (mContentLength > 0) {
-            int relativeProgress = progress[0].intValue() * 9999
-                    / (int) mContentLength;
+        if (this.mContentLength > 0) {
+            int relativeProgress = progress[0].intValue() * 9999 / (int) this.mContentLength;
             this.mView.setWindowProgress(relativeProgress);
         }
     }
 
     @Override
     public void progressChanged(long newValue) {
-        if (this.isCancelled()) return;
+        if (this.isCancelled()) {
+            return;
+        }
 
-        publishProgress(newValue);
+        this.publishProgress(newValue);
     }
 
     @Override

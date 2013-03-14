@@ -1,11 +1,10 @@
 package com.vortexwolf.dvach.common.controls;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-
 import android.text.Layout;
 import android.text.NoCopySpan;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.Spanned;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
@@ -26,7 +25,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
                 if (event.getRepeatCount() == 0) {
-                    if (action(CLICK, widget, buffer)) {
+                    if (this.action(CLICK, widget, buffer)) {
                         return true;
                     }
                 }
@@ -37,7 +36,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
     @Override
     protected boolean up(TextView widget, Spannable buffer) {
-        if (action(UP, widget, buffer)) {
+        if (this.action(UP, widget, buffer)) {
             return true;
         }
 
@@ -46,7 +45,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
     @Override
     protected boolean down(TextView widget, Spannable buffer) {
-        if (action(DOWN, widget, buffer)) {
+        if (this.action(DOWN, widget, buffer)) {
             return true;
         }
 
@@ -55,7 +54,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
     @Override
     protected boolean left(TextView widget, Spannable buffer) {
-        if (action(UP, widget, buffer)) {
+        if (this.action(UP, widget, buffer)) {
             return true;
         }
 
@@ -64,7 +63,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
     @Override
     protected boolean right(TextView widget, Spannable buffer) {
-        if (action(DOWN, widget, buffer)) {
+        if (this.action(DOWN, widget, buffer)) {
             return true;
         }
 
@@ -74,8 +73,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     private boolean action(int what, TextView widget, Spannable buffer) {
         Layout layout = widget.getLayout();
 
-        int padding = widget.getTotalPaddingTop()
-                + widget.getTotalPaddingBottom();
+        int padding = widget.getTotalPaddingTop() + widget.getTotalPaddingBottom();
         int areatop = widget.getScrollY();
         int areabot = areatop + widget.getHeight() - padding;
 
@@ -99,8 +97,12 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
             }
         }
 
-        if (selStart > last) selStart = selEnd = Integer.MAX_VALUE;
-        if (selEnd < first) selStart = selEnd = -1;
+        if (selStart > last) {
+            selStart = selEnd = Integer.MAX_VALUE;
+        }
+        if (selEnd < first) {
+            selStart = selEnd = -1;
+        }
 
         switch (what) {
             case CLICK:
@@ -110,7 +112,9 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
                 ClickableSpan[] link = buffer.getSpans(selStart, selEnd, ClickableSpan.class);
 
-                if (link.length != 1) return false;
+                if (link.length != 1) {
+                    return false;
+                }
 
                 link[0].onClick(widget);
                 break;
@@ -170,11 +174,9 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
         int action = event.getAction();
 
-        if (mSkipNextClick
-                && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN)) {
-            mSkipNextClick = false;
-        } else if (action == MotionEvent.ACTION_UP
-                || action == MotionEvent.ACTION_DOWN) {
+        if (this.mSkipNextClick && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN)) {
+            this.mSkipNextClick = false;
+        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
 
             int x = (int) event.getX();
             int y = (int) event.getY();
@@ -213,7 +215,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
             @Override
             public boolean onLongClick(View v) {
-                mSkipNextClick = true;
+                MyLinkMovementMethod.this.mSkipNextClick = true;
                 Selection.removeSelection(text);
                 return false;
             }
@@ -227,14 +229,16 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
         Selection.removeSelection(text);
 
         if ((dir & View.FOCUS_BACKWARD) != 0) {
-            text.setSpan(FROM_BELOW, 0, 0, Spannable.SPAN_POINT_POINT);
+            text.setSpan(FROM_BELOW, 0, 0, Spanned.SPAN_POINT_POINT);
         } else {
             text.removeSpan(FROM_BELOW);
         }
     }
 
     public static MyLinkMovementMethod getInstance() {
-        if (sInstance == null) sInstance = new MyLinkMovementMethod();
+        if (sInstance == null) {
+            sInstance = new MyLinkMovementMethod();
+        }
 
         return sInstance;
     }

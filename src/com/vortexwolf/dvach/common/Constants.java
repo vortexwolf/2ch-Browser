@@ -13,12 +13,10 @@ public class Constants {
     // Нужно не забыть отключить логгирование при выпуске приложения
     public static final boolean LOGGING = DEBUG;
 
-    public static final String ANALYTICS_KEY = DEBUG
-            ? "UA-28782346-1"
-            : "UA-28782631-1";
+    public static final String ANALYTICS_KEY = DEBUG ? "UA-28782346-1" : "UA-28782631-1";
 
-    public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] {
-            "jpg", "jpeg", "png", "gif" }));
+    public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
+            "jpeg", "png", "gif" }));
 
     public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
     public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);

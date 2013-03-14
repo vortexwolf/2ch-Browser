@@ -2,9 +2,11 @@ package com.vortexwolf.dvach.asynctasks;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.vortexwolf.dvach.common.library.MyLog;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
+
 import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
@@ -12,14 +14,7 @@ import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
-import com.vortexwolf.dvach.services.domain.HttpStringReader;
-import com.vortexwolf.dvach.services.domain.RecaptchaService;
-import com.vortexwolf.dvach.services.domain.SolvemediaCaptchaService;
 import com.vortexwolf.dvach.services.domain.YandexCaptchaService;
-
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
     private static final String TAG = "DownloadCaptchaTask";
@@ -54,8 +49,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     public void onPostExecute(Boolean success) {
         if (this.mCanSkip) {
             this.mView.skipCaptcha();
-        } else if (success && mCaptcha != null) {
-            this.mView.showCaptcha(mCaptcha, mCaptchaImage);
+        } else if (success && this.mCaptcha != null) {
+            this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
         } else {
             this.mView.showCaptchaError(this.mUserError);
         }
@@ -66,12 +61,16 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
         this.mCanSkip = result.canSkip;
         String captchaKey = result.captchaKey;
-            
-        if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) return true;
+
+        if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) {
+            return true;
+        }
 
         this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
-        
-        if (this.mCaptcha == null || this.isCancelled()) return false;
+
+        if (this.mCaptcha == null || this.isCancelled()) {
+            return false;
+        }
 
         this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
 

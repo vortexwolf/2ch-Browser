@@ -38,7 +38,7 @@ public class AttachmentInfo {
         this.mBoardCode = boardCode;
         this.mDvachUriBuilder = dvachUriBuilder;
 
-        SourceWithThumbnailModel urls = getUrls();
+        SourceWithThumbnailModel urls = this.getUrls();
         if (urls != null) {
             this.mIsEmpty = false;
             this.mIsVideo = urls.isVideo;
@@ -64,29 +64,26 @@ public class AttachmentInfo {
         if (this.mIsEmpty) {
             return null;
         } else if (this.mIsVideo) {
-            return settings.isYoutubeMobileLinks()
-                    ? this.mVideoMobileUrl
-                    : this.mVideoUrl;
+            return settings.isYoutubeMobileLinks() ? this.mVideoMobileUrl : this.mVideoUrl;
         } else {
             return this.mImageUrl;
         }
     }
 
     public String getSourceExtension() {
-        return mSourceExtension;
+        return this.mSourceExtension;
     }
 
     public boolean isFile() {
-        return !StringUtils.isEmpty(mSourceExtension);
+        return !StringUtils.isEmpty(this.mSourceExtension);
     }
 
     public boolean isImage() {
-        return !StringUtils.isEmpty(mSourceExtension)
-                && Constants.IMAGE_EXTENSIONS.contains(mSourceExtension);
+        return !StringUtils.isEmpty(this.mSourceExtension) && Constants.IMAGE_EXTENSIONS.contains(this.mSourceExtension);
     }
 
     public String getThumbnailUrl() {
-        return mThumbnailUrl;
+        return this.mThumbnailUrl;
     }
 
     public int getDefaultThumbnail() {
@@ -96,7 +93,7 @@ public class AttachmentInfo {
     }
 
     public boolean isEmpty() {
-        return mIsEmpty;
+        return this.mIsEmpty;
     }
 
     public int getSize() {
@@ -142,11 +139,9 @@ public class AttachmentInfo {
         String videoCode = UriUtils.getYouTubeCode(videoHtml);
         if (!StringUtils.isEmpty(videoCode)) {
             model.isVideo = true;
-            model.videoMobileUrl = "http://m.youtube.com/#/watch?v="
-                    + videoCode;
+            model.videoMobileUrl = "http://m.youtube.com/#/watch?v=" + videoCode;
             model.videoUrl = UriUtils.formatYoutubeUriFromCode(videoCode);
-            model.thumbnailUrl = "http://img.youtube.com/vi/" + videoCode
-                    + "/default.jpg";
+            model.thumbnailUrl = "http://img.youtube.com/vi/" + videoCode + "/default.jpg";
             return model;
         }
 

@@ -5,11 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,7 +22,6 @@ import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.exceptions.DownloadFileException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class DownloadFileService {
     private static final String TAG = "DownloadFileService";
@@ -40,7 +36,7 @@ public class DownloadFileService {
 
     public void downloadFile(Uri uri, File to, IProgressChangeListener progressChangeListener, ICancelled task) throws DownloadFileException {
         if (to.exists()) {
-            throw new DownloadFileException(mResources.getString(R.string.error_file_exist));
+            throw new DownloadFileException(this.mResources.getString(R.string.error_file_exist));
         }
 
         HttpGet request = null;
@@ -67,7 +63,7 @@ public class DownloadFileService {
             throw e;
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new DownloadFileException(mResources.getString(R.string.error_save_file));
+            throw new DownloadFileException(this.mResources.getString(R.string.error_save_file));
         } finally {
             try {
                 if (input != null) {

@@ -10,7 +10,7 @@ public class Tracker {
     private final GoogleAnalyticsTracker mTracker;
 
     public Tracker() {
-        mTracker = GoogleAnalyticsTracker.getInstance();
+        this.mTracker = GoogleAnalyticsTracker.getInstance();
     }
 
     public void startSession(Context context) {
@@ -27,34 +27,34 @@ public class Tracker {
 
     // tracking methods
     public void trackActivityView(String pagePath) {
-        mTracker.trackPageView(pagePath);
+        this.mTracker.trackPageView(pagePath);
     }
 
     public void trackEvent(String category, String action) {
-        mTracker.trackEvent(category, action, "", 0);
+        this.mTracker.trackEvent(category, action, "", 0);
     }
 
     public void trackEvent(String category, String action, String label) {
-        mTracker.trackEvent(category, action, label, 0);
+        this.mTracker.trackEvent(category, action, label, 0);
     }
 
     public void trackEvent(String category, String action, int value) {
-        mTracker.trackEvent(category, action, "", value);
+        this.mTracker.trackEvent(category, action, "", value);
     }
 
     public void trackEvent(String category, String action, String label, int value) {
-        mTracker.trackEvent(category, action, label, value);
+        this.mTracker.trackEvent(category, action, label, value);
     }
 
     public void setBoardVar(String boardName) {
-        mTracker.setCustomVar(1, "Board Name", boardName);
+        this.mTracker.setCustomVar(1, "Board Name", boardName);
     }
 
     public void clearBoardVar() {
-        mTracker.setCustomVar(1, "Board Name", "");
+        this.mTracker.setCustomVar(1, "Board Name", "");
     }
 
     public void setPageNumberVar(int pageNumber) {
-        mTracker.setCustomVar(2, "Page Number", String.valueOf(pageNumber));
+        this.mTracker.setCustomVar(2, "Page Number", String.valueOf(pageNumber));
     }
 }

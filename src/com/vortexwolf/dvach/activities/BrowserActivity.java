@@ -1,38 +1,31 @@
 package com.vortexwolf.dvach.activities;
 
 import java.io.File;
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.controls.WebViewFixed;
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.dvach.interfaces.IDownloadFileView;
-import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.services.Tracker;
 
 import android.app.Activity;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
+import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.controls.WebViewFixed;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.dvach.interfaces.IDownloadFileView;
+import com.vortexwolf.dvach.services.BrowserLauncher;
+import com.vortexwolf.dvach.services.Tracker;
 
 public class BrowserActivity extends Activity {
     public static final String TAG = "BrowserActivity";
@@ -53,7 +46,7 @@ public class BrowserActivity extends Activity {
     private Uri mUri = null;
     private String mTitle = null;
     private OnCancelListener mCurrentCancelListener;
-    
+
     private Menu mMenu;
     private boolean mImageLoaded = false;
 
@@ -70,7 +63,7 @@ public class BrowserActivity extends Activity {
         this.resetUI();
 
         this.mWebView.setInitialScale(100);
-        WebSettings settings = mWebView.getSettings();
+        WebSettings settings = this.mWebView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -96,7 +89,7 @@ public class BrowserActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         if (this.mCurrentCancelListener != null) {
-            mCurrentCancelListener.onCancel(null);
+            this.mCurrentCancelListener.onCancel(null);
         }
 
         // Must remove the WebView from the view system before destroying.
@@ -121,12 +114,12 @@ public class BrowserActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.browser, menu);
-        
+
         this.mMenu = menu;
         this.updateOptionsMenu();
-        
+
         return true;
     }
 
@@ -158,17 +151,19 @@ public class BrowserActivity extends Activity {
 
     private void setImage(File file) {
         this.mWebView.loadUrl(Uri.fromFile(file).toString());
-        
+
         this.mImageLoaded = true;
         this.updateOptionsMenu();
     }
-    
+
     private void updateOptionsMenu() {
-        if(this.mMenu == null) return;
-        
+        if (this.mMenu == null) {
+            return;
+        }
+
         MenuItem saveMenuItem = this.mMenu.findItem(R.id.save_menu_id);
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
-        
+
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
     }
@@ -185,13 +180,13 @@ public class BrowserActivity extends Activity {
         this.switchToView(ViewType.ERROR);
 
         TextView errorTextView = (TextView) this.mErrorView.findViewById(R.id.error_text);
-        errorTextView.setText(message != null
-                ? message
-                : this.getString(R.string.error_unknown));
+        errorTextView.setText(message != null ? message : this.getString(R.string.error_unknown));
     }
 
     private void switchToView(ViewType vt) {
-        if (vt == null) return;
+        if (vt == null) {
+            return;
+        }
 
         switch (vt) {
             case PAGE:
@@ -218,8 +213,8 @@ public class BrowserActivity extends Activity {
 
         @Override
         public void setProgress(int value) {
-            if (mMaxValue > 0) {
-                double percent = value / mMaxValue;
+            if (this.mMaxValue > 0) {
+                double percent = value / this.mMaxValue;
                 BrowserActivity.this.setProgress((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
             } else {
                 BrowserActivity.this.setProgress(Window.PROGRESS_INDETERMINATE_ON);
@@ -228,7 +223,7 @@ public class BrowserActivity extends Activity {
 
         @Override
         public void setMax(int value) {
-            this.mMaxValue = (double) value;
+            this.mMaxValue = value;
         }
 
         @Override

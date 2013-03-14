@@ -1,6 +1,7 @@
 package com.vortexwolf.dvach.models.presentation;
 
 import java.util.HashMap;
+
 import android.content.res.Resources.Theme;
 
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
@@ -16,7 +17,7 @@ public class PostsViewModel {
     // Обновляет ссылки у других постов и добавляет модель в список
     private void ProcessPostItem(PostItemViewModel viewModel) {
         for (String refPostNumber : viewModel.getRefersTo()) {
-            PostItemViewModel refModel = mViewModels.get(refPostNumber);
+            PostItemViewModel refModel = this.mViewModels.get(refPostNumber);
             if (refModel != null) {
                 refModel.addReferenceFrom(viewModel.getNumber());
             }
@@ -26,7 +27,7 @@ public class PostsViewModel {
     }
 
     public PostItemViewModel getModel(String postNumber) {
-        return mViewModels.get(postNumber);
+        return this.mViewModels.get(postNumber);
     }
 
     /**
@@ -41,10 +42,10 @@ public class PostsViewModel {
      * @return Созданная view model
      */
     public PostItemViewModel createModel(PostInfo item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
-        PostItemViewModel viewModel = new PostItemViewModel(mViewModels.size(), item, theme, settings, listener, uriBuilder);
+        PostItemViewModel viewModel = new PostItemViewModel(this.mViewModels.size(), item, theme, settings, listener, uriBuilder);
         this.mLastPostNumber = viewModel.getNumber();
 
-        ProcessPostItem(viewModel);
+        this.ProcessPostItem(viewModel);
 
         return viewModel;
     }
@@ -53,6 +54,6 @@ public class PostsViewModel {
      * Возвращает номер последнего сообщения в треде
      */
     public String getLastPostNumber() {
-        return mLastPostNumber;
+        return this.mLastPostNumber;
     }
 }

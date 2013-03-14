@@ -1,13 +1,11 @@
 package com.vortexwolf.dvach.asynctasks;
 
-import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
+import android.os.AsyncTask;
+
 import com.vortexwolf.dvach.interfaces.IPostSendView;
 import com.vortexwolf.dvach.interfaces.IPostSender;
-import com.vortexwolf.dvach.models.domain.BoardSettings;
 import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
-
-import android.os.AsyncTask;
 
 public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 
@@ -33,7 +31,7 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected Boolean doInBackground(Void... args) {
         try {
-            this.mRedirectedPage = this.mPostSender.sendPost(mBoardName, mThreadNumber, getPostFields(), mEntity);
+            this.mRedirectedPage = this.mPostSender.sendPost(this.mBoardName, this.mThreadNumber, this.getPostFields(), this.mEntity);
             return true;
         } catch (Exception e) {
             this.mUserError = e.getMessage();

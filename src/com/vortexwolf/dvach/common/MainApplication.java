@@ -1,7 +1,14 @@
 package com.vortexwolf.dvach.common;
 
 import java.io.File;
+
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.app.Application;
+import android.content.res.Resources;
+import android.httpimage.FileSystemPersistence;
+import android.httpimage.HttpImageManager;
+
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.ExtendedObjectMapper;
 import com.vortexwolf.dvach.db.DvachSqlHelper;
@@ -14,8 +21,8 @@ import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.INavigationService;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
+import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.services.BitmapManager;
 import com.vortexwolf.dvach.services.CacheDirectoryManager;
 import com.vortexwolf.dvach.services.NavigationService;
@@ -29,10 +36,6 @@ import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.OpenTabsManager;
 import com.vortexwolf.dvach.services.presentation.PagesSerializationService;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
-import android.app.Application;
-import android.content.res.Resources;
-import android.httpimage.FileSystemPersistence;
-import android.httpimage.HttpImageManager;
 
 public class MainApplication extends Application {
 

@@ -8,7 +8,7 @@ public class ThreadsList {
     private ThreadInfo[] threads;
 
     public ThreadInfo[] getThreads() {
-        return threads;
+        return this.threads;
     }
 
     public void setThreads(ThreadInfo[] threads) {

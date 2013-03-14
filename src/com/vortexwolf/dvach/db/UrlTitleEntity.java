@@ -10,7 +10,7 @@ public class UrlTitleEntity {
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public void setTitle(String title) {
@@ -18,7 +18,7 @@ public class UrlTitleEntity {
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     public void setUrl(String url) {
@@ -26,11 +26,11 @@ public class UrlTitleEntity {
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     @Override
     public String toString() {
-        return id + " " + title;
+        return this.id + " " + this.title;
     }
 }

@@ -10,9 +10,10 @@ public class PostsList {
 
     @JsonIgnore
     public PostInfo[] getThread() {
-        PostInfo[] newThread = new PostInfo[thread.length];
-        for (int i = 0; i < thread.length; i++)
-            newThread[i] = thread[i][0];
+        PostInfo[] newThread = new PostInfo[this.thread.length];
+        for (int i = 0; i < this.thread.length; i++) {
+            newThread[i] = this.thread[i][0];
+        }
         return newThread;
     }
 }

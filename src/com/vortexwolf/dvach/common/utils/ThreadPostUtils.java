@@ -1,15 +1,11 @@
 package com.vortexwolf.dvach.common.utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -58,8 +54,7 @@ public class ThreadPostUtils {
 
     /** Проверяет, прикреплен ли к посту какой-либо файл */
     public static boolean hasAttachment(IAttachmentEntity item) {
-        return !StringUtils.isEmpty(item.getImage())
-                || !StringUtils.isEmpty(item.getVideo());
+        return !StringUtils.isEmpty(item.getImage()) || !StringUtils.isEmpty(item.getVideo());
     }
 
     public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings) {
@@ -127,8 +122,7 @@ public class ThreadPostUtils {
             // открывает файл в полном размере
             if (thumbnailUrl != null) {
                 // Ничего не загружаем, если так установлено в настройках
-                if (settings.isLoadThumbnails() == false
-                        && !bitmapManager.isCached(thumbnailUrl)) {
+                if (settings.isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)) {
                     imageView.setImageResource(R.drawable.empty_image);
                 } else {
                     imageView.setTag(Uri.parse(thumbnailUrl));
@@ -156,8 +150,7 @@ public class ThreadPostUtils {
         }
 
         String thumbnailUrl = attachment.getThumbnailUrl();
-        return thumbnailUrl == null || !settings.isLoadThumbnails()
-                || bitmapManager.isCached(thumbnailUrl);
+        return thumbnailUrl == null || !settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl);
     }
 
     public static void handleAttachmentDescription(AttachmentInfo attachment, Resources res, TextView attachmentInfoView) {

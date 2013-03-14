@@ -2,12 +2,6 @@ package com.vortexwolf.dvach.adapters;
 
 import java.util.List;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.adapters.ThreadsListAdapter.ViewBag;
-import com.vortexwolf.dvach.common.controls.EllipsizingTextView;
-import com.vortexwolf.dvach.db.FavoritesDataSource;
-import com.vortexwolf.dvach.db.HistoryEntity;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.db.HistoryEntity;
 
 public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 
@@ -27,17 +23,15 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 
     public HistoryAdapter(Context context, List<HistoryEntity> objects, FavoritesDataSource favoritesDataSource) {
         super(context, -1, objects);
-        mInflater = LayoutInflater.from(context);
-        mFavoritesDataSource = favoritesDataSource;
+        this.mInflater = LayoutInflater.from(context);
+        this.mFavoritesDataSource = favoritesDataSource;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final HistoryEntity item = this.getItem(position);
 
-        View view = convertView == null
-                ? mInflater.inflate(R.layout.history_list_item, null)
-                : convertView;
+        View view = convertView == null ? this.mInflater.inflate(R.layout.history_list_item, null) : convertView;
 
         ViewBag vb = (ViewBag) view.getTag();
         if (vb == null) {
@@ -52,7 +46,7 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
         vb.titleView.setText(item.getTitle());
         vb.urlView.setText(item.getUrl());
 
-        boolean isInFavorites = mFavoritesDataSource.hasFavorites(item.getUrl());
+        boolean isInFavorites = this.mFavoritesDataSource.hasFavorites(item.getUrl());
         vb.starView.setOnCheckedChangeListener(null);
         vb.starView.setChecked(isInFavorites);
 
@@ -60,9 +54,9 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    mFavoritesDataSource.addToFavorites(item.getTitle(), item.getUrl());
+                    HistoryAdapter.this.mFavoritesDataSource.addToFavorites(item.getTitle(), item.getUrl());
                 } else {
-                    mFavoritesDataSource.removeFromFavorites(item.getUrl());
+                    HistoryAdapter.this.mFavoritesDataSource.removeFromFavorites(item.getUrl());
                 }
             }
         });

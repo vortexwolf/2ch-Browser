@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.vortexwolf.dvach.common.library.MyLog;
 
 public class ImageFileModel {
 
@@ -40,27 +40,24 @@ public class ImageFileModel {
     }
 
     public int getFileSize() {
-        return (int) Math.round(file.length() / 1024.0);
+        return (int) Math.round(this.file.length() / 1024.0);
     }
 
     public Bitmap getBitmap() {
-        if (mBitmap == null) {
+        if (this.mBitmap == null) {
             int scale = 1;
-            if (this.imageHeight > IMAGE_MAX_SIZE
-                    || this.imageWidth > IMAGE_MAX_SIZE) {
-                scale = (int) Math.pow(2, (int) Math.round(Math.log(IMAGE_MAX_SIZE
-                        / (double) Math.max(this.imageHeight, this.imageWidth))
-                        / Math.log(0.5)));
+            if (this.imageHeight > IMAGE_MAX_SIZE || this.imageWidth > IMAGE_MAX_SIZE) {
+                scale = (int) Math.pow(2, (int) Math.round(Math.log(IMAGE_MAX_SIZE / (double) Math.max(this.imageHeight, this.imageWidth)) / Math.log(0.5)));
             }
 
             // Decode with inSampleSize
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inSampleSize = scale;
 
-            mBitmap = this.readBitmapFromFile(o);
+            this.mBitmap = this.readBitmapFromFile(o);
         }
 
-        return mBitmap;
+        return this.mBitmap;
     }
 
     private Bitmap readBitmapFromFile(BitmapFactory.Options o) {

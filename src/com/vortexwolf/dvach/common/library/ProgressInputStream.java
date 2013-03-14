@@ -24,39 +24,39 @@ public class ProgressInputStream extends FilterInputStream {
     }
 
     public long getMaxNumBytes() {
-        return mMaxNumBytes;
+        return this.mMaxNumBytes;
     }
 
     public long getTotalNumBytesRead() {
-        return mTotalNumBytesRead;
+        return this.mTotalNumBytesRead;
     }
 
     public void addProgressChangeListener(IProgressChangeListener l) {
-        mListeners.add(l);
+        this.mListeners.add(l);
     }
 
     public void removeProgressChangeListener(IProgressChangeListener l) {
-        mListeners.remove(l);
+        this.mListeners.remove(l);
     }
 
     @Override
     public int read() throws IOException {
-        return (int) updateProgress(super.read());
+        return (int) this.updateProgress(super.read());
     }
 
     @Override
     public int read(byte[] b) throws IOException {
-        return (int) updateProgress(super.read(b));
+        return (int) this.updateProgress(super.read(b));
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        return (int) updateProgress(super.read(b, off, len));
+        return (int) this.updateProgress(super.read(b, off, len));
     }
 
     @Override
     public long skip(long n) throws IOException {
-        return updateProgress(super.skip(n));
+        return this.updateProgress(super.skip(n));
     }
 
     private long updateProgress(long numBytesRead) {

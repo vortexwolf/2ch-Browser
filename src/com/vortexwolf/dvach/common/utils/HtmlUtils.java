@@ -5,19 +5,9 @@ import java.util.regex.Pattern;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
-import com.vortexwolf.dvach.common.library.Html;
-import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
-import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
-import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
-import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
-
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,6 +17,16 @@ import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
+import com.vortexwolf.dvach.common.library.Html;
+import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
+import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
+import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 public class HtmlUtils {
     private static final Pattern styleColorPattern = Pattern.compile(".*?color: rgb\\((\\d+), (\\d+), (\\d+)\\);.*");
@@ -81,7 +81,9 @@ public class HtmlUtils {
     }
 
     public static String fixHtmlTags(String htmlText) {
-        if (htmlText == null) return null;
+        if (htmlText == null) {
+            return null;
+        }
 
         String result = htmlText;
         // Убираем абзацы
@@ -94,7 +96,9 @@ public class HtmlUtils {
     }
 
     public static String trimBr(String htmlText) {
-        if (htmlText == null) return null;
+        if (htmlText == null) {
+            return null;
+        }
 
         String result = htmlText;
         if (htmlText.startsWith("<br />") || htmlText.endsWith("<br />")) {
@@ -105,7 +109,9 @@ public class HtmlUtils {
     }
 
     public static Integer getIntFontColor(String htmlText) {
-        if (htmlText == null) return null;
+        if (htmlText == null) {
+            return null;
+        }
 
         Matcher m = styleColorPattern.matcher(htmlText);
         while (m.find() && m.groupCount() == 3) {

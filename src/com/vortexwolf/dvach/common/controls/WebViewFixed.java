@@ -1,10 +1,10 @@
 package com.vortexwolf.dvach.common.controls;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
+
+import com.vortexwolf.dvach.common.library.MyLog;
 
 /**
  * Fixes the onWindowFocusChanged bug, by catching NullPointerException.

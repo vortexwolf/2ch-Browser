@@ -18,8 +18,7 @@ public class DraftPostsStorage implements IDraftPostsStorage {
 
     @Override
     public DraftPostModel getDraft(String boardName, String threadNumber) {
-        if (this.mBoardName.equals(boardName)
-                && this.mThreadNumber.equals(threadNumber)) {
+        if (this.mBoardName.equals(boardName) && this.mThreadNumber.equals(threadNumber)) {
             return this.mDraft;
         }
 
@@ -28,8 +27,7 @@ public class DraftPostsStorage implements IDraftPostsStorage {
 
     @Override
     public void clearDraft(String boardName, String threadNumber) {
-        if (this.mBoardName.equals(boardName)
-                && this.mThreadNumber.equals(threadNumber)) {
+        if (this.mBoardName.equals(boardName) && this.mThreadNumber.equals(threadNumber)) {
             this.mBoardName = "";
             this.mThreadNumber = "";
             this.mDraft = null;

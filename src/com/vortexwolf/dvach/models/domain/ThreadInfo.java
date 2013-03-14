@@ -15,14 +15,14 @@ public class ThreadInfo implements Serializable {
     private PostInfo[][] posts;
 
     public int getReplyCount() {
-        return replyCount;
+        return this.replyCount;
     }
 
     public int getImageCount() {
-        return imageCount;
+        return this.imageCount;
     }
 
     public PostInfo[] getPosts() {
-        return posts[0];
+        return this.posts[0];
     }
 }

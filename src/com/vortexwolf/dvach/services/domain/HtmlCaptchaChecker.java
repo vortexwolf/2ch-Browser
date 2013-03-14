@@ -6,7 +6,6 @@ import android.net.Uri;
 
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
-import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker.CaptchaResult;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
 public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
@@ -29,13 +28,13 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         org.apache.http.Header[] extraHeaders = new org.apache.http.Header[] { xRequest };
         String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
 
-        return checkHtmlBlock(captchaBlock);
+        return this.checkHtmlBlock(captchaBlock);
     }
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
         CaptchaResult result = new CaptchaResult();
         result.canSkip = false;
-        
+
         if (captchaBlock != null && captchaBlock.startsWith("OK")) {
             result.canSkip = true;
         } else if (captchaBlock != null) {
@@ -44,8 +43,8 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 
         return result;
     }
-    
-    public class CaptchaResult {        
+
+    public class CaptchaResult {
         public boolean canSkip;
         public String captchaKey;
     }

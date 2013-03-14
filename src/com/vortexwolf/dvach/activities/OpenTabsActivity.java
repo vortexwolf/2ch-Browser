@@ -1,28 +1,27 @@
 package com.vortexwolf.dvach.activities;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.adapters.OpenTabsAdapter;
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.Factory;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.db.FavoritesDataSource;
-import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.models.presentation.OpenTabModel;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
 import android.app.ListActivity;
 import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.adapters.OpenTabsAdapter;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
+import com.vortexwolf.dvach.models.presentation.OpenTabModel;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class OpenTabsActivity extends ListActivity {
 
@@ -48,12 +47,12 @@ public class OpenTabsActivity extends ListActivity {
 
         this.resetUI();
 
-        this.mAdapter = new OpenTabsAdapter(this, mTabsManager.getOpenTabs(), mTabsManager);
+        this.mAdapter = new OpenTabsAdapter(this, this.mTabsManager.getOpenTabs(), this.mTabsManager);
         this.getListView().setAdapter(this.mAdapter);
     }
 
     private void resetUI() {
-        this.setTheme(mApplicationSettings.getTheme());
+        this.setTheme(this.mApplicationSettings.getTheme());
         TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
         this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
 
@@ -75,11 +74,11 @@ public class OpenTabsActivity extends ListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        OpenTabModel item = mAdapter.getItem(info.position);
+        OpenTabModel item = this.mAdapter.getItem(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
 
-        if (!mFavoritesDatasource.hasFavorites(item.getUri().toString())) {
+        if (!this.mFavoritesDatasource.hasFavorites(item.getUri().toString())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
@@ -89,22 +88,22 @@ public class OpenTabsActivity extends ListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        OpenTabModel model = mAdapter.getItem(menuInfo.position);
+        OpenTabModel model = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(model.getUri().toString());
 
                 AppearanceUtils.showToastMessage(this, model.getUri().toString());
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
-                mFavoritesDatasource.addToFavorites(model.getTitle(), model.getUri().toString());
+                this.mFavoritesDatasource.addToFavorites(model.getTitle(), model.getUri().toString());
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                mFavoritesDatasource.removeFromFavorites(model.getUri().toString());
+                this.mFavoritesDatasource.removeFromFavorites(model.getUri().toString());
                 return true;
             }
         }

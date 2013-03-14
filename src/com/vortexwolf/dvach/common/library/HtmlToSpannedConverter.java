@@ -38,8 +38,7 @@ import com.vortexwolf.dvach.common.utils.XmlUtils;
 
 public class HtmlToSpannedConverter implements ContentHandler {
 
-    private static final float[] HEADER_SIZES = { 1.5f, 1.4f, 1.3f, 1.2f, 1.1f,
-            1f, };
+    private static final float[] HEADER_SIZES = { 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f, };
 
     private String mSource;
     private XMLReader mReader;
@@ -49,18 +48,18 @@ public class HtmlToSpannedConverter implements ContentHandler {
     private Stack<Attributes> mUnknownTagsAttributes = new Stack<Attributes>();
 
     public HtmlToSpannedConverter(String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler, Parser parser) {
-        mSource = source;
-        mSpannableStringBuilder = new SpannableStringBuilder();
-        mImageGetter = imageGetter;
-        mTagHandler = tagHandler;
-        mReader = parser;
+        this.mSource = source;
+        this.mSpannableStringBuilder = new SpannableStringBuilder();
+        this.mImageGetter = imageGetter;
+        this.mTagHandler = tagHandler;
+        this.mReader = parser;
     }
 
     public Spanned convert() {
 
-        mReader.setContentHandler(this);
+        this.mReader.setContentHandler(this);
         try {
-            mReader.parse(new InputSource(new StringReader(mSource)));
+            this.mReader.parse(new InputSource(new StringReader(this.mSource)));
         } catch (IOException e) {
             // We are reading from a string. There should not be IO problems.
             throw new RuntimeException(e);
@@ -70,27 +69,26 @@ public class HtmlToSpannedConverter implements ContentHandler {
         }
 
         // Fix flags and range for paragraph-type markup.
-        Object[] obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
+        Object[] obj = this.mSpannableStringBuilder.getSpans(0, this.mSpannableStringBuilder.length(), ParagraphStyle.class);
         for (int i = 0; i < obj.length; i++) {
-            int start = mSpannableStringBuilder.getSpanStart(obj[i]);
-            int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
+            int start = this.mSpannableStringBuilder.getSpanStart(obj[i]);
+            int end = this.mSpannableStringBuilder.getSpanEnd(obj[i]);
 
             // If the last line of the range is blank, back off by one.
             if (end - 2 >= 0) {
-                if (mSpannableStringBuilder.charAt(end - 1) == '\n'
-                        && mSpannableStringBuilder.charAt(end - 2) == '\n') {
+                if (this.mSpannableStringBuilder.charAt(end - 1) == '\n' && this.mSpannableStringBuilder.charAt(end - 2) == '\n') {
                     end--;
                 }
             }
 
             if (end == start) {
-                mSpannableStringBuilder.removeSpan(obj[i]);
+                this.mSpannableStringBuilder.removeSpan(obj[i]);
             } else {
-                mSpannableStringBuilder.setSpan(obj[i], start, end, Spanned.SPAN_PARAGRAPH);
+                this.mSpannableStringBuilder.setSpan(obj[i], start, end, Spanned.SPAN_PARAGRAPH);
             }
         }
 
-        return mSpannableStringBuilder;
+        return this.mSpannableStringBuilder;
     }
 
     private void handleStartTag(String tag, Attributes attributes) {
@@ -100,100 +98,96 @@ public class HtmlToSpannedConverter implements ContentHandler {
             // so we can safely emite the linebreaks when we handle the close
             // tag.
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(mSpannableStringBuilder);
+            handleP(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(mSpannableStringBuilder);
+            handleP(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("strong")) {
-            start(mSpannableStringBuilder, new Bold());
+            start(this.mSpannableStringBuilder, new Bold());
         } else if (tag.equalsIgnoreCase("b")) {
-            start(mSpannableStringBuilder, new Bold());
+            start(this.mSpannableStringBuilder, new Bold());
         } else if (tag.equalsIgnoreCase("em")) {
-            start(mSpannableStringBuilder, new Italic());
+            start(this.mSpannableStringBuilder, new Italic());
         } else if (tag.equalsIgnoreCase("cite")) {
-            start(mSpannableStringBuilder, new Italic());
+            start(this.mSpannableStringBuilder, new Italic());
         } else if (tag.equalsIgnoreCase("dfn")) {
-            start(mSpannableStringBuilder, new Italic());
+            start(this.mSpannableStringBuilder, new Italic());
         } else if (tag.equalsIgnoreCase("i")) {
-            start(mSpannableStringBuilder, new Italic());
+            start(this.mSpannableStringBuilder, new Italic());
         } else if (tag.equalsIgnoreCase("big")) {
-            start(mSpannableStringBuilder, new Big());
+            start(this.mSpannableStringBuilder, new Big());
         } else if (tag.equalsIgnoreCase("small")) {
-            start(mSpannableStringBuilder, new Small());
+            start(this.mSpannableStringBuilder, new Small());
         } else if (tag.equalsIgnoreCase("font")) {
-            startFont(mSpannableStringBuilder, attributes);
+            startFont(this.mSpannableStringBuilder, attributes);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(mSpannableStringBuilder);
-            start(mSpannableStringBuilder, new Blockquote());
+            handleP(this.mSpannableStringBuilder);
+            start(this.mSpannableStringBuilder, new Blockquote());
         } else if (tag.equalsIgnoreCase("tt")) {
-            start(mSpannableStringBuilder, new Monospace());
+            start(this.mSpannableStringBuilder, new Monospace());
         } else if (tag.equalsIgnoreCase("a")) {
-            startA(mSpannableStringBuilder, attributes);
+            startA(this.mSpannableStringBuilder, attributes);
         } else if (tag.equalsIgnoreCase("u")) {
-            start(mSpannableStringBuilder, new Underline());
+            start(this.mSpannableStringBuilder, new Underline());
         } else if (tag.equalsIgnoreCase("sup")) {
-            start(mSpannableStringBuilder, new Super());
+            start(this.mSpannableStringBuilder, new Super());
         } else if (tag.equalsIgnoreCase("sub")) {
-            start(mSpannableStringBuilder, new Sub());
-        } else if (tag.length() == 2
-                && Character.toLowerCase(tag.charAt(0)) == 'h'
-                && tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(mSpannableStringBuilder);
-            start(mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
+            start(this.mSpannableStringBuilder, new Sub());
+        } else if (tag.length() == 2 && Character.toLowerCase(tag.charAt(0)) == 'h' && tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+            handleP(this.mSpannableStringBuilder);
+            start(this.mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
         } else if (tag.equalsIgnoreCase("img")) {
-            startImg(mSpannableStringBuilder, attributes, mImageGetter);
-        } else if (mTagHandler != null) {
-            mUnknownTagsAttributes.push(attributes);
-            mTagHandler.handleTag(true, tag, mSpannableStringBuilder, attributes);
+            startImg(this.mSpannableStringBuilder, attributes, this.mImageGetter);
+        } else if (this.mTagHandler != null) {
+            this.mUnknownTagsAttributes.push(attributes);
+            this.mTagHandler.handleTag(true, tag, this.mSpannableStringBuilder, attributes);
         }
     }
 
     private void handleEndTag(String tag) {
         if (tag.equalsIgnoreCase("br")) {
-            handleBr(mSpannableStringBuilder);
+            handleBr(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(mSpannableStringBuilder);
+            handleP(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(mSpannableStringBuilder);
+            handleP(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("strong")) {
-            end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+            end(this.mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
         } else if (tag.equalsIgnoreCase("b")) {
-            end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+            end(this.mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
         } else if (tag.equalsIgnoreCase("em")) {
-            end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            end(this.mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
         } else if (tag.equalsIgnoreCase("cite")) {
-            end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            end(this.mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
         } else if (tag.equalsIgnoreCase("dfn")) {
-            end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            end(this.mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
         } else if (tag.equalsIgnoreCase("i")) {
-            end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            end(this.mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
         } else if (tag.equalsIgnoreCase("big")) {
-            end(mSpannableStringBuilder, Big.class, new RelativeSizeSpan(1.25f));
+            end(this.mSpannableStringBuilder, Big.class, new RelativeSizeSpan(1.25f));
         } else if (tag.equalsIgnoreCase("small")) {
-            end(mSpannableStringBuilder, Small.class, new RelativeSizeSpan(0.8f));
+            end(this.mSpannableStringBuilder, Small.class, new RelativeSizeSpan(0.8f));
         } else if (tag.equalsIgnoreCase("font")) {
-            endFont(mSpannableStringBuilder);
+            endFont(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(mSpannableStringBuilder);
-            end(mSpannableStringBuilder, Blockquote.class, new QuoteSpan());
+            handleP(this.mSpannableStringBuilder);
+            end(this.mSpannableStringBuilder, Blockquote.class, new QuoteSpan());
         } else if (tag.equalsIgnoreCase("tt")) {
-            end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
+            end(this.mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
         } else if (tag.equalsIgnoreCase("a")) {
-            endA(mSpannableStringBuilder);
+            endA(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("u")) {
-            end(mSpannableStringBuilder, Underline.class, new UnderlineSpan());
+            end(this.mSpannableStringBuilder, Underline.class, new UnderlineSpan());
         } else if (tag.equalsIgnoreCase("sup")) {
-            end(mSpannableStringBuilder, Super.class, new SuperscriptSpan());
+            end(this.mSpannableStringBuilder, Super.class, new SuperscriptSpan());
         } else if (tag.equalsIgnoreCase("sub")) {
-            end(mSpannableStringBuilder, Sub.class, new SubscriptSpan());
-        } else if (tag.length() == 2
-                && Character.toLowerCase(tag.charAt(0)) == 'h'
-                && tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(mSpannableStringBuilder);
-            endHeader(mSpannableStringBuilder);
+            end(this.mSpannableStringBuilder, Sub.class, new SubscriptSpan());
+        } else if (tag.length() == 2 && Character.toLowerCase(tag.charAt(0)) == 'h' && tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+            handleP(this.mSpannableStringBuilder);
+            endHeader(this.mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("img")) {
             return;
-        } else if (mTagHandler != null) {
-            mTagHandler.handleTag(false, tag, mSpannableStringBuilder, mUnknownTagsAttributes.pop());
+        } else if (this.mTagHandler != null) {
+            this.mTagHandler.handleTag(false, tag, this.mSpannableStringBuilder, this.mUnknownTagsAttributes.pop());
         }
     }
 
@@ -219,10 +213,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     public static <T> T getLast(Spanned text, Class<T> kind) {
-        /*
-         * This knows that the last returned object from getSpans() will be the
-         * most recently added.
-         */
+        /* This knows that the last returned object from getSpans() will be the
+         * most recently added. */
         T[] objs = text.getSpans(0, text.length(), kind);
 
         if (objs.length == 0) {
@@ -379,42 +371,34 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        handleStartTag(localName, attributes);
+        this.handleStartTag(localName, attributes);
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        handleEndTag(localName);
+        this.handleEndTag(localName);
     }
 
     @Override
     public void characters(char ch[], int start, int length) throws SAXException {
         StringBuilder sb = new StringBuilder();
 
-        /*
-         * Ignore whitespace that immediately follows other whitespace; newlines
-         * count as spaces.
-         */
+        /* Ignore whitespace that immediately follows other whitespace; newlines
+         * count as spaces. */
 
         for (int i = 0; i < length; i++) {
             char c = ch[i + start];
 
-            /*
-             * if (c == ' ' || c == '\n') { char pred; int len = sb.length();
-             * 
-             * if (len == 0) { len = mSpannableStringBuilder.length();
-             * 
-             * if (len == 0) { pred = '\n'; } else { pred =
+            /* if (c == ' ' || c == '\n') { char pred; int len = sb.length(); if
+             * (len == 0) { len = mSpannableStringBuilder.length(); if (len ==
+             * 0) { pred = '\n'; } else { pred =
              * mSpannableStringBuilder.charAt(len - 1); } } else { pred =
-             * sb.charAt(len - 1); }
-             * 
-             * if (pred != ' ' && pred != '\n') { sb.append(' '); } } else {
-             * sb.append(c); }
-             */
+             * sb.charAt(len - 1); } if (pred != ' ' && pred != '\n') {
+             * sb.append(' '); } } else { sb.append(c); } */
             sb.append(c);
         }
 
-        mSpannableStringBuilder.append(sb);
+        this.mSpannableStringBuilder.append(sb);
     }
 
     @Override
@@ -461,8 +445,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
         public String mFace;
 
         public Font(String color, String face) {
-            mColor = color;
-            mFace = face;
+            this.mColor = color;
+            this.mFace = face;
         }
     }
 
@@ -470,7 +454,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         public String mHref;
 
         public Href(String href) {
-            mHref = href;
+            this.mHref = href;
         }
     }
 
@@ -478,7 +462,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         private int mLevel;
 
         public Header(int level) {
-            mLevel = level;
+            this.mLevel = level;
         }
     }
 

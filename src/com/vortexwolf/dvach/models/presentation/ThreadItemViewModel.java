@@ -1,12 +1,10 @@
 package com.vortexwolf.dvach.models.presentation;
 
 import android.content.res.Resources.Theme;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
-import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.models.domain.ThreadInfo;
@@ -41,7 +39,7 @@ public class ThreadItemViewModel {
             this.mSpannedComment = (SpannableStringBuilder) spanned;
         }
 
-        return mSpannedComment;
+        return this.mSpannedComment;
     }
 
     public String getSubject() {
@@ -57,7 +55,7 @@ public class ThreadItemViewModel {
             this.mAttachment = new AttachmentInfo(this.mOpPost, boardCode, this.mDvachUriBuilder);
         }
 
-        return mAttachment;
+        return this.mAttachment;
     }
 
     public PostInfo getOpPost() {
@@ -69,11 +67,11 @@ public class ThreadItemViewModel {
     }
 
     public int getReplyCount() {
-        return mReplyCount;
+        return this.mReplyCount;
     }
 
     public int getImageCount() {
-        return mImageCount;
+        return this.mImageCount;
     }
 
     public void setEllipsized(boolean ellipsized) {
@@ -81,11 +79,11 @@ public class ThreadItemViewModel {
     }
 
     public boolean isEllipsized() {
-        return mEllipsized;
+        return this.mEllipsized;
     }
 
     public boolean isHidden() {
-        return mHidden;
+        return this.mHidden;
     }
 
     public void setHidden(boolean hidden) {

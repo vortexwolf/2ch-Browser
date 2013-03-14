@@ -30,7 +30,7 @@ public class PostEntity {
     }
 
     public String getCaptchaKey() {
-        return mCaptchaKey;
+        return this.mCaptchaKey;
     }
 
     public void setCaptchaAnswer(String captchaAnswer) {
@@ -38,7 +38,7 @@ public class PostEntity {
     }
 
     public String getCaptchaAnswer() {
-        return mCaptchaAnswer;
+        return this.mCaptchaAnswer;
     }
 
     public void setComment(String comment) {
@@ -46,7 +46,7 @@ public class PostEntity {
     }
 
     public String getComment() {
-        return mComment;
+        return this.mComment;
     }
 
     public void setSage(boolean isSage) {
@@ -54,7 +54,7 @@ public class PostEntity {
     }
 
     public boolean isSage() {
-        return mIsSage;
+        return this.mIsSage;
     }
 
     public void setAttachment(File attachment) {
@@ -62,7 +62,7 @@ public class PostEntity {
     }
 
     public File getAttachment() {
-        return mAttachment;
+        return this.mAttachment;
     }
 
     public void setSubject(String subject) {
@@ -70,11 +70,11 @@ public class PostEntity {
     }
 
     public String getSubject() {
-        return mSubject;
+        return this.mSubject;
     }
 
     public String getPolitics() {
-        return mPolitics;
+        return this.mPolitics;
     }
 
     public void setPolitics(String politics) {
@@ -82,7 +82,7 @@ public class PostEntity {
     }
 
     public String getName() {
-        return mName;
+        return this.mName;
     }
 
     public void setName(String name) {
@@ -90,7 +90,7 @@ public class PostEntity {
     }
 
     public String getVideo() {
-        return mVideo;
+        return this.mVideo;
     }
 
     public void setVideo(String video) {

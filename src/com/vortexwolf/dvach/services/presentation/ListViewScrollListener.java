@@ -1,10 +1,10 @@
 package com.vortexwolf.dvach.services.presentation;
 
-import com.vortexwolf.dvach.interfaces.IBusyAdapter;
-
 import android.widget.AbsListView;
-import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ListView;
+
+import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 
 public class ListViewScrollListener implements ListView.OnScrollListener {
 
@@ -22,13 +22,13 @@ public class ListViewScrollListener implements ListView.OnScrollListener {
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         switch (scrollState) {
             case OnScrollListener.SCROLL_STATE_IDLE:
-                mBusyAdapter.setBusy(false, view);
+                this.mBusyAdapter.setBusy(false, view);
                 break;
             case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-                mBusyAdapter.setBusy(true, view);
+                this.mBusyAdapter.setBusy(true, view);
                 break;
             case OnScrollListener.SCROLL_STATE_FLING:
-                mBusyAdapter.setBusy(true, view);
+                this.mBusyAdapter.setBusy(true, view);
                 break;
         }
     }

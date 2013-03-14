@@ -3,8 +3,6 @@ package com.vortexwolf.dvach.services.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 

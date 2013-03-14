@@ -3,10 +3,6 @@ package com.vortexwolf.dvach.common.library;
 import java.util.HashMap;
 
 import org.xml.sax.Attributes;
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.library.Html.TagHandler;
-import com.vortexwolf.dvach.common.utils.HtmlUtils;
-import com.vortexwolf.dvach.common.utils.StringUtils;
 
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
@@ -19,6 +15,11 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.library.Html.TagHandler;
+import com.vortexwolf.dvach.common.utils.HtmlUtils;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 
 public class UnknownTagsHandler implements TagHandler {
 
@@ -41,9 +42,9 @@ public class UnknownTagsHandler implements TagHandler {
     public void handleTag(boolean opening, String tag, SpannableStringBuilder output, Attributes attributes) {
         if (tag == "span") {
             if (opening) {
-                startSpan(output, attributes);
+                this.startSpan(output, attributes);
             } else {
-                endSpan(output);
+                this.endSpan(output);
             }
         } else if (tag == "code") {
             if (opening) {
@@ -77,11 +78,11 @@ public class UnknownTagsHandler implements TagHandler {
         if (span.mSpanType != null) {
             switch (span.mSpanType) {
                 case QUOTE:
-                    text.setSpan(new ForegroundColorSpan(mPostQuoteForeground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new ForegroundColorSpan(this.mPostQuoteForeground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 case SPOILER:
-                    text.setSpan(new ForegroundColorSpan(mSpoilerForeground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    text.setSpan(new BackgroundColorSpan(mSpoilerBackground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new ForegroundColorSpan(this.mSpoilerForeground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    text.setSpan(new BackgroundColorSpan(this.mSpoilerBackground), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     break;
                 case STRIKE:
                     text.setSpan(new StrikethroughSpan(), where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -116,7 +117,7 @@ public class UnknownTagsHandler implements TagHandler {
         }
 
         public Span(SpanType spanType) {
-            mSpanType = spanType;
+            this.mSpanType = spanType;
         }
 
         public static Span fromAttributes(final Attributes attributes) {
@@ -145,7 +146,7 @@ public class UnknownTagsHandler implements TagHandler {
         public ColorSpan(int color) {
             super(SpanType.COLOR);
 
-            mColor = color;
+            this.mColor = color;
         }
     }
 }

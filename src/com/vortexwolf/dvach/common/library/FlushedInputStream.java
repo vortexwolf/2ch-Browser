@@ -18,9 +18,9 @@ public class FlushedInputStream extends FilterInputStream {
     public long skip(long n) throws IOException {
         long totalBytesSkipped = 0L;
         while (totalBytesSkipped < n) {
-            long bytesSkipped = in.skip(n - totalBytesSkipped);
+            long bytesSkipped = this.in.skip(n - totalBytesSkipped);
             if (bytesSkipped == 0L) {
-                int ibyte = read();
+                int ibyte = this.read();
                 if (ibyte < 0) {
                     break; // we reached EOF
                 } else {

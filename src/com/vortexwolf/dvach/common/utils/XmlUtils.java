@@ -2,7 +2,9 @@ package com.vortexwolf.dvach.common.utils;
 
 public class XmlUtils {
     public static final int convertValueToInt(CharSequence charSeq, int defaultValue) {
-        if (null == charSeq) return defaultValue;
+        if (null == charSeq) {
+            return defaultValue;
+        }
 
         String nm = charSeq.toString();
 
@@ -22,7 +24,9 @@ public class XmlUtils {
 
         if ('0' == nm.charAt(index)) {
             // Quick check for a zero by itself
-            if (index == (len - 1)) return 0;
+            if (index == (len - 1)) {
+                return 0;
+            }
 
             char c = nm.charAt(index + 1);
 

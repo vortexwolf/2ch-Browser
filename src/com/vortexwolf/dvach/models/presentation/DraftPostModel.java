@@ -22,26 +22,26 @@ public class DraftPostModel {
     }
 
     public String getComment() {
-        return mComment;
+        return this.mComment;
     }
 
     public ImageFileModel getAttachedFile() {
-        return mAttachedFile;
+        return this.mAttachedFile;
     }
 
     public boolean isSage() {
-        return mIsSage;
+        return this.mIsSage;
     }
 
     public CaptchaViewType getCaptchaType() {
-        return mCaptchaType;
+        return this.mCaptchaType;
     }
 
     public CaptchaEntity getCaptcha() {
-        return mCaptcha;
+        return this.mCaptcha;
     }
 
     public Bitmap getCaptchaImage() {
-        return mCaptchaImage;
+        return this.mCaptchaImage;
     }
 }

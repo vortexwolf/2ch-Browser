@@ -1,7 +1,5 @@
 package com.vortexwolf.dvach.common.controls;
 
-import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
-
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
@@ -9,23 +7,25 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
 import android.view.View;
 
+import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+
 public class ClickableURLSpan extends ClickableSpan {
     private final String mURL;
     private IURLSpanClickListener mListener;
 
     public ClickableURLSpan(String url) {
-        mURL = url;
+        this.mURL = url;
     }
 
     @Override
     public void onClick(View widget) {
-        if (mListener != null) {
-            mListener.onClick(widget, mURL);
+        if (this.mListener != null) {
+            this.mListener.onClick(widget, this.mURL);
         }
     }
 
     public void setOnClickListener(IURLSpanClickListener listener) {
-        mListener = listener;
+        this.mListener = listener;
     }
 
     public static ClickableURLSpan replaceURLSpan(SpannableStringBuilder builder, URLSpan span, int color) {

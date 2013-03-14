@@ -1,7 +1,19 @@
 package com.vortexwolf.dvach.activities;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.text.ClipboardManager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
@@ -19,8 +31,8 @@ import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
+import com.vortexwolf.dvach.interfaces.IPostsListView;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
@@ -34,23 +46,6 @@ import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.ClipboardManager;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView;
-import android.widget.TextView;
 
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
@@ -103,8 +98,8 @@ public class PostsListActivity extends BaseListActivity {
                 ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT)
                 : null;
         String pageTitle = pageSubject != null
-                ? String.format(getString(R.string.data_thread_withsubject_title), mBoardName, pageSubject)
-                : String.format(getString(R.string.data_thread_title), mBoardName, mThreadNumber);
+                ? String.format(this.getString(R.string.data_thread_withsubject_title), this.mBoardName, pageSubject)
+                : String.format(this.getString(R.string.data_thread_title), this.mBoardName, this.mThreadNumber);
 
         this.setTitle(pageTitle);
 
@@ -130,7 +125,7 @@ public class PostsListActivity extends BaseListActivity {
         this.mAutoRefreshTimer = new TimerService(this.mSettings.isAutoRefresh(), this.mSettings.getAutoRefreshInterval(), refreshTask, this);
         this.mAutoRefreshTimer.start();
 
-        this.mTracker.setBoardVar(mBoardName);
+        this.mTracker.setBoardVar(this.mBoardName);
         this.mTracker.trackActivityView(TAG);
     }
 
@@ -161,8 +156,7 @@ public class PostsListActivity extends BaseListActivity {
             return;
         }
 
-        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate
-                || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails) {
+        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails) {
             this.mAdapter.notifyDataSetChanged();
         }
 
@@ -185,10 +179,12 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void setAdapter() {
-        if (mAdapter != null) return;
+        if (this.mAdapter != null) {
+            return;
+        }
 
-        mAdapter = new PostsListAdapter(this, mBoardName, mThreadNumber, this.mApplication.getBitmapManager(), mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder);
-        this.setListAdapter(mAdapter);
+        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder);
+        this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
         if (Integer.valueOf(Build.VERSION.SDK) > 7) {
@@ -217,7 +213,7 @@ public class PostsListActivity extends BaseListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.thread, menu);
 
         this.mMenu = menu;
@@ -230,25 +226,25 @@ public class PostsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(getApplicationContext(), TabsHistoryBookmarksActivity.class);
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
                 openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
-                startActivity(openTabsIntent);
+                this.startActivity(openTabsIntent);
                 break;
             case R.id.refresh_menu_id:
                 this.refreshPosts();
                 break;
             case R.id.pick_board_menu_id:
                 // Start new activity
-                Intent pickBoardIntent = new Intent(getApplicationContext(), PickBoardActivity.class);
-                startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
+                Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
+                this.startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
                 break;
             case R.id.open_browser_menu_id:
                 BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber), true);
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
-                Intent preferencesIntent = new Intent(getApplicationContext(), ApplicationPreferencesActivity.class);
-                startActivity(preferencesIntent);
+                Intent preferencesIntent = new Intent(this.getApplicationContext(), ApplicationPreferencesActivity.class);
+                this.startActivity(preferencesIntent);
                 break;
             case R.id.add_menu_id:
                 this.navigateToAddPostView(null, null);
@@ -284,7 +280,7 @@ public class PostsListActivity extends BaseListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        PostItemViewModel item = mAdapter.getItem(info.position);
+        PostItemViewModel item = this.mAdapter.getItem(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST, 0, this.getString(R.string.cmenu_reply_post));
         if (!StringUtils.isEmpty(item.getSpannedComment().toString())) {
@@ -293,12 +289,10 @@ public class PostsListActivity extends BaseListActivity {
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
         }
-        if (item.hasAttachment()
-                && item.getAttachment(this.mBoardName).isFile()) {
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(R.string.cmenu_download_file));
         }
-        if (item.hasAttachment()
-                && item.getAttachment(this.mBoardName).isImage()) {
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 4, this.getString(R.string.cmenu_search_image));
         }
     }
@@ -306,19 +300,19 @@ public class PostsListActivity extends BaseListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        PostItemViewModel info = mAdapter.getItem(menuInfo.position);
+        PostItemViewModel info = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_REPLY_POST: {
-                navigateToAddPostView(info.getNumber(), null);
+                this.navigateToAddPostView(info.getNumber(), null);
                 return true;
             }
             case Constants.CONTEXT_MENU_REPLY_POST_QUOTE: {
-                navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
+                this.navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
                 return true;
             }
             case Constants.CONTEXT_MENU_COPY_TEXT: {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(info.getSpannedComment().toString());
 
                 AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
@@ -332,7 +326,7 @@ public class PostsListActivity extends BaseListActivity {
             }
             case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
                 String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
-                new SearchImageTask(imageUrl, this.getApplicationContext(), this.mApplication.getHttpClient()).execute();
+                new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
                 return true;
             }
         }
@@ -348,8 +342,10 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void updateOptionsMenu() {
-        if(this.mMenu == null) return;
-        
+        if (this.mMenu == null) {
+            return;
+        }
+
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
         if (this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);
@@ -359,7 +355,7 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void navigateToAddPostView(String postNumber, String postComment) {
-        Intent addPostIntent = new Intent(getApplicationContext(), AddPostActivity.class);
+        Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, this.mThreadNumber);
 
@@ -370,7 +366,7 @@ public class PostsListActivity extends BaseListActivity {
             addPostIntent.putExtra(Constants.EXTRA_POST_COMMENT, postComment);
         }
 
-        startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+        this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
 
     private void navigateToThreads(String boardName) {
@@ -403,19 +399,19 @@ public class PostsListActivity extends BaseListActivity {
     private void refreshPosts(boolean checkModified) {
         // На всякий случай отменю, чтобы не было проблем с обновлениями
         // Возможно, лучше бы не запускать совсем
-        if (mCurrentDownloadTask != null) {
+        if (this.mCurrentDownloadTask != null) {
             this.mCurrentDownloadTask.cancel(true);
         }
         // Если адаптер пустой, то значит была ошибка при загрузке, в таком
         // случае запускаю загрузку заново
-        if (!mAdapter.isEmpty()) {
+        if (!this.mAdapter.isEmpty()) {
             // Здесь запускаю с индикатором того, что происходит обновление, а
             // не загрузка заново
-            mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, true, mJsonReader, true);
-            mCurrentDownloadTask.execute(mAdapter.getLastPostNumber());
+            this.mCurrentDownloadTask = new DownloadPostsTask(this.mPostsReaderListener, this.mBoardName, this.mThreadNumber, true, this.mJsonReader, true);
+            this.mCurrentDownloadTask.execute(this.mAdapter.getLastPostNumber());
         } else {
-            mCurrentDownloadTask = new DownloadPostsTask(mPostsReaderListener, mBoardName, mThreadNumber, checkModified, mJsonReader, false);
-            mCurrentDownloadTask.execute();
+            this.mCurrentDownloadTask = new DownloadPostsTask(this.mPostsReaderListener, this.mBoardName, this.mThreadNumber, checkModified, this.mJsonReader, false);
+            this.mCurrentDownloadTask.execute();
         }
     }
 
@@ -436,8 +432,8 @@ public class PostsListActivity extends BaseListActivity {
             MyLog.d(TAG, "setData was called");
             if (postsList != null) {
                 PostInfo[] posts = postsList.getThread();
-                mSerializationService.serializePosts(mThreadNumber, posts);
-                mAdapter.setAdapterData(posts);
+                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
+                PostsListActivity.this.mAdapter.setAdapterData(posts);
             } else {
                 MyLog.e(TAG, "posts = null");
             }
@@ -457,18 +453,18 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         public void hideLoadingScreen() {
             PostsListActivity.this.switchToListView();
-            mCurrentDownloadTask = null;
+            PostsListActivity.this.mCurrentDownloadTask = null;
         }
 
         @Override
         public void updateData(String from, PostsList list) {
             PostInfo[] posts = list.getThread();
 
-            int addedCount = mAdapter.updateAdapterData(from, posts);
+            int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
                 // Нужно удостовериться, что элементы из posts не менялись после
                 // добавления в адаптер, чтобы сериализация прошла правильно
-                mSerializationService.serializePosts(mThreadNumber, posts);
+                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             }
         }
@@ -480,13 +476,13 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void showUpdateLoading() {
-            mAdapter.setLoadingMore(true);
+            PostsListActivity.this.mAdapter.setLoadingMore(true);
         }
 
         @Override
         public void hideUpdateLoading() {
-            mAdapter.setLoadingMore(false);
-            mCurrentDownloadTask = null;
+            PostsListActivity.this.mAdapter.setLoadingMore(false);
+            PostsListActivity.this.mCurrentDownloadTask = null;
         }
     }
 }

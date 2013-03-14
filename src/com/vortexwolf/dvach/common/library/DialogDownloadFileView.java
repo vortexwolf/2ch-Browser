@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.interfaces.ICancellable;
-import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 
 public class DialogDownloadFileView implements IDownloadFileView {

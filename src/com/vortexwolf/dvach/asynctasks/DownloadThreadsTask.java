@@ -1,16 +1,15 @@
 package com.vortexwolf.dvach.asynctasks;
 
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.view.Window;
+
 import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
-
-import android.app.Activity;
-import android.os.AsyncTask;
-import android.view.Window;
 
 public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implements IProgressChangeListener, ICancelled {
 
@@ -55,7 +54,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         // Отображаем экран загрузки и запускаем прогресс бар
         this.mView.showLoadingScreen();
 
-        if (mContentLength == -1) {
+        if (this.mContentLength == -1) {
             this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
         } else {
             this.mView.setWindowProgress(0);
@@ -78,7 +77,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     private void onFinished() {
         this.mView.hideLoadingScreen();
 
-        if (mContentLength == -1) {
+        if (this.mContentLength == -1) {
             this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_OFF);
         }
         // Hide progress anyway
@@ -88,16 +87,17 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     @Override
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
-        if (mContentLength > 0) {
-            int relativeProgress = progress[0].intValue() * 9999
-                    / (int) mContentLength;
+        if (this.mContentLength > 0) {
+            int relativeProgress = progress[0].intValue() * 9999 / (int) this.mContentLength;
             this.mView.setWindowProgress(relativeProgress);
         }
     }
 
     @Override
     public void progressChanged(long newValue) {
-        if (this.isCancelled()) return;
+        if (this.isCancelled()) {
+            return;
+        }
 
         this.publishProgress(newValue);
     }

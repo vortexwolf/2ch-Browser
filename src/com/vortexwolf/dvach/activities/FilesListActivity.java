@@ -7,16 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.Constants;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.models.presentation.ImageFileModel;
-import com.vortexwolf.dvach.models.presentation.SerializableFileModel;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -26,11 +16,19 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.MainApplication;
+import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.models.presentation.ImageFileModel;
+import com.vortexwolf.dvach.models.presentation.SerializableFileModel;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class FilesListActivity extends ListActivity {
     public static final String TAG = "FilePickerActivity";
@@ -70,37 +68,36 @@ public class FilesListActivity extends ListActivity {
         this.setTheme(settings.getTheme());
         this.setContentView(R.layout.files_list_view);
 
-        mDirectory = new File(SDCARD_DIRECTORY);
-        mFiles = new ArrayList<ImageFileModel>();
-        mAdapter = new FilePickerListAdapter(this, mFiles);
-        setListAdapter(mAdapter);
+        this.mDirectory = new File(SDCARD_DIRECTORY);
+        this.mFiles = new ArrayList<ImageFileModel>();
+        this.mAdapter = new FilePickerListAdapter(this, this.mFiles);
+        this.setListAdapter(this.mAdapter);
 
         // image file extensions
-        acceptedFileExtensions = Constants.IMAGE_EXTENSIONS.toArray(new String[Constants.IMAGE_EXTENSIONS.size()]);
+        this.acceptedFileExtensions = Constants.IMAGE_EXTENSIONS.toArray(new String[Constants.IMAGE_EXTENSIONS.size()]);
 
         // Get intent extras
         String currentFilePath = null;
-        if (getIntent().hasExtra(FilesListActivity.EXTRA_CURRENT_FILE)
-                && (currentFilePath = getIntent().getStringExtra(EXTRA_CURRENT_FILE)) != null) {
-            mCurrentFile = new File(currentFilePath);
-            mDirectory = mCurrentFile.getParentFile();
-        } else if (getIntent().hasExtra(EXTRA_FILE_PATH)) {
-            String filePath = getIntent().getStringExtra(EXTRA_FILE_PATH);
-            mDirectory = new File(filePath);
+        if (this.getIntent().hasExtra(FilesListActivity.EXTRA_CURRENT_FILE) && (currentFilePath = this.getIntent().getStringExtra(EXTRA_CURRENT_FILE)) != null) {
+            this.mCurrentFile = new File(currentFilePath);
+            this.mDirectory = this.mCurrentFile.getParentFile();
+        } else if (this.getIntent().hasExtra(EXTRA_FILE_PATH)) {
+            String filePath = this.getIntent().getStringExtra(EXTRA_FILE_PATH);
+            this.mDirectory = new File(filePath);
         }
 
-        if (getIntent().hasExtra(EXTRA_SHOW_HIDDEN_FILES)) {
-            mShowHiddenFiles = getIntent().getBooleanExtra(EXTRA_SHOW_HIDDEN_FILES, false);
+        if (this.getIntent().hasExtra(EXTRA_SHOW_HIDDEN_FILES)) {
+            this.mShowHiddenFiles = this.getIntent().getBooleanExtra(EXTRA_SHOW_HIDDEN_FILES, false);
         }
-        if (getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
-            ArrayList<String> collection = getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
-            acceptedFileExtensions = collection.toArray(new String[collection.size()]);
+        if (this.getIntent().hasExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS)) {
+            ArrayList<String> collection = this.getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
+            this.acceptedFileExtensions = collection.toArray(new String[collection.size()]);
         }
     }
 
     @Override
     protected void onResume() {
-        refreshFilesList();
+        this.refreshFilesList();
         super.onResume();
     }
 
@@ -117,31 +114,31 @@ public class FilesListActivity extends ListActivity {
      */
     protected void refreshFilesList() {
         // Clear the files ArrayList
-        mFiles.clear();
+        this.mFiles.clear();
 
         // Set the extension file filter
-        ExtensionFilenameFilter filter = new ExtensionFilenameFilter(acceptedFileExtensions);
+        ExtensionFilenameFilter filter = new ExtensionFilenameFilter(this.acceptedFileExtensions);
 
         // Get the files in the directory
-        File[] files = mDirectory.listFiles(filter);
+        File[] files = this.mDirectory.listFiles(filter);
         if (files != null && files.length > 0) {
             for (File f : files) {
-                if (f.isHidden() && !mShowHiddenFiles) {
+                if (f.isHidden() && !this.mShowHiddenFiles) {
                     // Don't add the file
                     continue;
                 }
 
                 // Add the file the ArrayAdapter
-                mFiles.add(new ImageFileModel(f));
+                this.mFiles.add(new ImageFileModel(f));
             }
 
-            Collections.sort(mFiles, new FileComparator());
+            Collections.sort(this.mFiles, new FileComparator());
         }
 
         if (this.mCurrentFile != null && !this.mCurrentFileSelected) {
             int position = -1;
-            for (int i = 0; i < mFiles.size(); i++) {
-                if (mFiles.get(i).file.getAbsolutePath().equals(this.mCurrentFile.getAbsolutePath())) {
+            for (int i = 0; i < this.mFiles.size(); i++) {
+                if (this.mFiles.get(i).file.getAbsolutePath().equals(this.mCurrentFile.getAbsolutePath())) {
                     position = i;
                     break;
                 }
@@ -151,8 +148,8 @@ public class FilesListActivity extends ListActivity {
             this.mCurrentFileSelected = true;
         }
 
-        this.setTitle(mDirectory.getAbsolutePath());
-        mAdapter.notifyDataSetChanged();
+        this.setTitle(this.mDirectory.getAbsolutePath());
+        this.mAdapter.notifyDataSetChanged();
 
     }
 
@@ -160,11 +157,10 @@ public class FilesListActivity extends ListActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mDirectory.getParentFile() != null
-                    && !mDirectory.getPath().endsWith(SDCARD_DIRECTORY)) {
+            if (this.mDirectory.getParentFile() != null && !this.mDirectory.getPath().endsWith(SDCARD_DIRECTORY)) {
                 // Go to parent directory
-                mDirectory = mDirectory.getParentFile();
-                refreshFilesList();
+                this.mDirectory = this.mDirectory.getParentFile();
+                this.refreshFilesList();
                 return true;
             }
         }
@@ -179,14 +175,14 @@ public class FilesListActivity extends ListActivity {
         if (newFile.file.isFile()) {
             // Set result
             Intent extra = new Intent();
-            extra.putExtra(getPackageName() + Constants.EXTRA_SELECTED_FILE, new SerializableFileModel(newFile));
-            setResult(RESULT_OK, extra);
+            extra.putExtra(this.getPackageName() + Constants.EXTRA_SELECTED_FILE, new SerializableFileModel(newFile));
+            this.setResult(RESULT_OK, extra);
             // Finish the activity
-            finish();
+            this.finish();
         } else {
-            mDirectory = newFile.file;
+            this.mDirectory = newFile.file;
             // Update the files list
-            refreshFilesList();
+            this.refreshFilesList();
         }
 
         super.onListItemClick(l, v, position, id);
@@ -199,7 +195,7 @@ public class FilesListActivity extends ListActivity {
 
         public FilePickerListAdapter(Context context, List<ImageFileModel> objects) {
             super(context, 0, objects);
-            mObjects = objects;
+            this.mObjects = objects;
             this.mInflater = LayoutInflater.from(context);
         }
 
@@ -214,7 +210,7 @@ public class FilesListActivity extends ListActivity {
                 view = convertView;
             }
 
-            ImageFileModel object = mObjects.get(position);
+            ImageFileModel object = this.mObjects.get(position);
 
             ImageView frame = (ImageView) view.findViewById(R.id.filelist_thumb_frame);
             ImageView imageView = (ImageView) view.findViewById(R.id.filelist_icon);
@@ -235,8 +231,7 @@ public class FilesListActivity extends ListActivity {
                 if (bitmapModel.getBitmap() != null) {
                     imageView.setImageBitmap(bitmapModel.getBitmap());
                     frame.setVisibility(View.VISIBLE);
-                    statusText += ", " + bitmapModel.imageWidth + "x"
-                            + bitmapModel.imageHeight;
+                    statusText += ", " + bitmapModel.imageWidth + "x" + bitmapModel.imageHeight;
                 } else {
                     MyLog.v(TAG, "Bitmap is null");
                     imageView.setImageResource(android.R.color.transparent);
@@ -283,7 +278,7 @@ public class FilesListActivity extends ListActivity {
 
         public ExtensionFilenameFilter(String[] extensions) {
             super();
-            mExtensions = extensions;
+            this.mExtensions = extensions;
         }
 
         @Override
@@ -292,9 +287,9 @@ public class FilesListActivity extends ListActivity {
                 // Accept all directory names
                 return true;
             }
-            if (mExtensions != null && mExtensions.length > 0) {
-                for (int i = 0; i < mExtensions.length; i++) {
-                    if (filename.endsWith(mExtensions[i])) {
+            if (this.mExtensions != null && this.mExtensions.length > 0) {
+                for (int i = 0; i < this.mExtensions.length; i++) {
+                    if (filename.endsWith(this.mExtensions[i])) {
                         // The filename ends with the extension
                         return true;
                     }

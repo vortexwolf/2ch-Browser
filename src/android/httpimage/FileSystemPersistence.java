@@ -7,12 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 /**
  * File system implementation of persistent storage for downloaded images.
@@ -27,27 +27,27 @@ public class FileSystemPersistence implements BitmapCache {
     private final File mBaseDir;
 
     public FileSystemPersistence(ICacheDirectoryManager cacheManager) {
-        mCacheManager = cacheManager;
+        this.mCacheManager = cacheManager;
 
-        mBaseDir = cacheManager.getThumbnailsCacheDirectory();
-        if (!mBaseDir.exists()) {
-            mBaseDir.mkdirs();
+        this.mBaseDir = cacheManager.getThumbnailsCacheDirectory();
+        if (!this.mBaseDir.exists()) {
+            this.mBaseDir.mkdirs();
         }
     }
 
     @Override
     public boolean isEnabled() {
-        return mCacheManager.isCacheEnabled();
+        return this.mCacheManager.isCacheEnabled();
     }
 
     @Override
     public void clear() {
-        IoUtils.deleteDirectory(mBaseDir);
+        IoUtils.deleteDirectory(this.mBaseDir);
     }
 
     @Override
     public boolean exists(String key) {
-        File file = new File(mBaseDir, key);
+        File file = new File(this.mBaseDir, key);
         return file.exists();
     }
 
@@ -58,14 +58,14 @@ public class FileSystemPersistence implements BitmapCache {
 
     @Override
     public Bitmap loadData(String key) {
-        if (!mCacheManager.isCacheEnabled() || !exists(key)) {
+        if (!this.mCacheManager.isCacheEnabled() || !this.exists(key)) {
             return null;
         }
 
         // load the bitmap as-is (no scaling, no crop)
         Bitmap bitmap = null;
 
-        File file = new File(mBaseDir, key);
+        File file = new File(this.mBaseDir, key);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
@@ -94,14 +94,14 @@ public class FileSystemPersistence implements BitmapCache {
 
     @Override
     public void storeData(String key, Bitmap data) {
-        if (!mCacheManager.isCacheEnabled()) {
+        if (!this.mCacheManager.isCacheEnabled()) {
             return;
         }
 
         OutputStream outputStream = null;
 
         try {
-            File file = new File(mBaseDir, key);
+            File file = new File(this.mBaseDir, key);
 
             outputStream = new FileOutputStream(file);
             if (!data.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
@@ -109,7 +109,7 @@ public class FileSystemPersistence implements BitmapCache {
             }
         } catch (FileNotFoundException e) {
             // No space left
-            mCacheManager.trimCacheIfNeeded();
+            this.mCacheManager.trimCacheIfNeeded();
             MyLog.e(TAG, e);
         } finally {
             if (outputStream != null) {

@@ -9,7 +9,9 @@ public class Base64 {
     static final byte[] encode(byte abyte0[]) {
         byte abyte1[] = new byte[abyte0.length];
         System.arraycopy(abyte0, 0, abyte1, 0, abyte0.length);
-        if (abyte1.length == 0) return abyte1;
+        if (abyte1.length == 0) {
+            return abyte1;
+        }
         byte abyte2[] = new byte[((abyte1.length - 1) / 3 + 1) * 4];
         int k1 = 0;
         int l1;
@@ -56,15 +58,19 @@ public class Base64 {
     static final byte[] decode(byte abyte0[]) {
         byte abyte1[] = new byte[abyte0.length];
         System.arraycopy(abyte0, 0, abyte1, 0, abyte0.length);
-        if (abyte1.length == 0) return abyte1;
+        if (abyte1.length == 0) {
+            return abyte1;
+        }
         int i;
-        for (i = abyte1.length; abyte1[i - 1] == 61; i--)
+        for (i = abyte1.length; abyte1[i - 1] == 61; i--) {
             ;
+        }
         byte abyte2[] = new byte[i - abyte1.length / 4];
         for (int j = 0; j < abyte1.length; j++) {
             abyte1[j] = ascii[abyte1[j]];
-            if (abyte1[j] == -1 && j < i)
+            if (abyte1[j] == -1 && j < i) {
                 throw new IllegalArgumentException((new StringBuilder()).append("Invalid character in base 64 encoding at index ").append(j).toString());
+            }
         }
 
         try {
@@ -77,10 +83,12 @@ public class Base64 {
                 k += 4;
             }
 
-            if (l < abyte2.length)
+            if (l < abyte2.length) {
                 abyte2[l] = (byte) (abyte1[k] << 2 & 0xff | abyte1[k + 1] >>> 4 & 3);
-            if (++l < abyte2.length)
+            }
+            if (++l < abyte2.length) {
                 abyte2[l] = (byte) (abyte1[k + 1] << 4 & 0xff | abyte1[k + 2] >>> 2 & 0xf);
+            }
         } catch (ArrayIndexOutOfBoundsException arrayindexoutofboundsexception) {
             throw new IllegalArgumentException("Invalid base 64 encoded input");
         }
@@ -99,18 +107,17 @@ public class Base64 {
         return new String(encode(abyte0));
     }
 
-    private static byte base64[] = { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-            75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97,
-            98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
-            112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50,
-            51, 52, 53, 54, 55, 56, 57, 43, 47 };
+    private static byte base64[] = { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
+            85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+            114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47 };
     static byte ascii[];
 
     static {
         ascii = new byte[255];
         Arrays.fill(ascii, (byte) -1);
-        for (int i = 0; i < base64.length; i++)
+        for (int i = 0; i < base64.length; i++) {
             ascii[base64[i]] = (byte) i;
+        }
 
     }
 }

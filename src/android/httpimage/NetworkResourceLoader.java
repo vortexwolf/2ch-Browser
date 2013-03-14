@@ -1,19 +1,18 @@
 package android.httpimage;
 
-import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.FlushedInputStream;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 
 /**
  * resource loader using apache HTTP client. support HTTP and HTTPS request.
@@ -26,7 +25,7 @@ public class NetworkResourceLoader implements INetworkResourceLoader {
     private final HttpClient mHttpClient;
 
     public NetworkResourceLoader(HttpClient httpClient) {
-        mHttpClient = httpClient;
+        this.mHttpClient = httpClient;
     }
 
     @Override

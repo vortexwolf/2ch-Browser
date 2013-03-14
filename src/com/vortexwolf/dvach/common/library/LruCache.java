@@ -15,9 +15,10 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
 
     @Override
     protected boolean removeEldestEntry(Map.Entry<K, V> paramEntry) {
-        if (size() <= MAX_CAPACITY)
+        if (this.size() <= MAX_CAPACITY) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 }

@@ -1,7 +1,22 @@
 package com.vortexwolf.dvach.activities;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
@@ -36,24 +51,6 @@ import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 import com.vortexwolf.dvach.settings.SettingsEntity;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TextView;
-
 public class ThreadsListActivity extends BaseListActivity {
     private static final String TAG = "ThreadsListActivity";
 
@@ -87,12 +84,12 @@ public class ThreadsListActivity extends BaseListActivity {
         // Парсим код доски и номер страницы
         Uri data = this.getIntent().getData();
         if (data != null) {
-            mBoardName = UriUtils.getBoardName(data);
-            mPageNumber = UriUtils.getBoardPageNumber(data);
+            this.mBoardName = UriUtils.getBoardName(data);
+            this.mPageNumber = UriUtils.getBoardPageNumber(data);
         }
 
-        if (StringUtils.isEmpty(mBoardName)) {
-            mBoardName = this.mApplication.getSettings().getHomepage();
+        if (StringUtils.isEmpty(this.mBoardName)) {
+            this.mBoardName = this.mApplication.getSettings().getHomepage();
         }
 
         this.mJsonReader = this.mApplication.getJsonApiReader();
@@ -105,21 +102,21 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
 
         // Заголовок страницы
-        String pageTitle = mPageNumber != 0
-                ? String.format(getString(R.string.data_board_title_with_page), mBoardName, mPageNumber)
-                : String.format(getString(R.string.data_board_title), mBoardName);
+        String pageTitle = this.mPageNumber != 0
+                ? String.format(this.getString(R.string.data_board_title_with_page), this.mBoardName, this.mPageNumber)
+                : String.format(this.getString(R.string.data_board_title), this.mBoardName);
         this.setTitle(pageTitle);
 
         // Сохраняем во вкладках
-        OpenTabModel tabModel = new OpenTabModel(mBoardName, this.mDvachUriBuilder.create2chBoardUri(mBoardName, mPageNumber));
+        OpenTabModel tabModel = new OpenTabModel(this.mBoardName, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber));
         this.mTabModel = this.mApplication.getOpenTabsManager().add(tabModel);
 
         this.resetUI();
 
         this.setAdapter();
 
-        this.mTracker.setBoardVar(mBoardName);
-        this.mTracker.setPageNumberVar(mPageNumber);
+        this.mTracker.setBoardVar(this.mBoardName);
+        this.mTracker.setPageNumberVar(this.mPageNumber);
         this.mTracker.trackActivityView(TAG);
     }
 
@@ -142,9 +139,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         if (this.mCurrentSettings.isDisplayNavigationBar != newSettings.isDisplayNavigationBar) {
-            this.mNavigationBar.setVisibility(newSettings.isDisplayNavigationBar
-                    ? View.VISIBLE
-                    : View.GONE);
+            this.mNavigationBar.setVisibility(newSettings.isDisplayNavigationBar ? View.VISIBLE : View.GONE);
         }
 
         if (this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails) {
@@ -169,9 +164,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
         // Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
-        this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar()
-                ? View.VISIBLE
-                : View.GONE);
+        this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar() ? View.VISIBLE : View.GONE);
 
         TextView pageNumberView = (TextView) this.findViewById(R.id.threads_page_number);
         pageNumberView.setText(String.valueOf(this.mPageNumber));
@@ -187,23 +180,25 @@ public class ThreadsListActivity extends BaseListActivity {
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThreadsListActivity.this.navigateToBoardPageNumber(mBoardName, mPageNumber - 1);
+                ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber - 1);
             }
         });
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThreadsListActivity.this.navigateToBoardPageNumber(mBoardName, mPageNumber + 1);
+                ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber + 1);
             }
         });
     }
 
     private void setAdapter() {
-        if (mAdapter != null) return;
+        if (this.mAdapter != null) {
+            return;
+        }
 
-        mAdapter = new ThreadsListAdapter(this, mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
-        this.setListAdapter(mAdapter);
+        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
+        this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
         if (Integer.valueOf(Build.VERSION.SDK) > 7) {
@@ -229,7 +224,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.board, menu);
         return true;
     }
@@ -238,15 +233,15 @@ public class ThreadsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(getApplicationContext(), TabsHistoryBookmarksActivity.class);
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
                 openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
-                startActivity(openTabsIntent);
+                this.startActivity(openTabsIntent);
                 break;
             case R.id.pick_board_menu_id:
             case android.R.id.home:
                 // Start new activity
-                Intent pickBoardIntent = new Intent(getApplicationContext(), PickBoardActivity.class);
-                startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
+                Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
+                this.startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
                 break;
             case R.id.refresh_menu_id:
                 this.refreshThreads();
@@ -256,8 +251,8 @@ public class ThreadsListActivity extends BaseListActivity {
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
-                Intent preferencesIntent = new Intent(getApplicationContext(), ApplicationPreferencesActivity.class);
-                startActivity(preferencesIntent);
+                Intent preferencesIntent = new Intent(this.getApplicationContext(), ApplicationPreferencesActivity.class);
+                this.startActivity(preferencesIntent);
                 break;
             case R.id.add_menu_id:
                 this.navigateToAddThreadView();
@@ -275,8 +270,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 case Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY:
                     String boardCode = intent.getExtras().getString(Constants.EXTRA_SELECTED_BOARD);
                     // Открываем новую борду, если не совпадает с открытой
-                    if (!StringUtils.isEmpty(boardCode)
-                            && !mBoardName.equals(boardCode)) {
+                    if (!StringUtils.isEmpty(boardCode) && !this.mBoardName.equals(boardCode)) {
                         this.navigateToBoardPageNumber(boardCode, 0);
                     }
                     break;
@@ -296,7 +290,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ThreadItemViewModel info = mAdapter.getItem(position);
+        ThreadItemViewModel info = this.mAdapter.getItem(position);
 
         if (info.isHidden()) {
             this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mBoardName, info.getNumber());
@@ -315,12 +309,11 @@ public class ThreadsListActivity extends BaseListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        ThreadItemViewModel item = mAdapter.getItem(info.position);
+        ThreadItemViewModel item = this.mAdapter.getItem(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_ANSWER, 0, this.getString(R.string.cmenu_answer_without_reading));
 
-        if (item.hasAttachment()
-                && item.getAttachment(this.mBoardName).isFile()) {
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(R.string.cmenu_download_file));
         }
 
@@ -328,8 +321,7 @@ public class ThreadsListActivity extends BaseListActivity {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
         }
 
-        if (item.hasAttachment()
-                && item.getAttachment(this.mBoardName).isImage()) {
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 3, this.getString(R.string.cmenu_search_image));
         }
 
@@ -341,14 +333,14 @@ public class ThreadsListActivity extends BaseListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        ThreadItemViewModel info = mAdapter.getItem(menuInfo.position);
+        ThreadItemViewModel info = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_ANSWER: {
-                Intent addPostIntent = new Intent(getApplicationContext(), AddPostActivity.class);
+                Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
                 addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
                 addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, info.getNumber());
-                startActivity(addPostIntent);
+                this.startActivity(addPostIntent);
                 return true;
             }
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
@@ -364,7 +356,7 @@ public class ThreadsListActivity extends BaseListActivity {
             }
             case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
                 String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
-                new SearchImageTask(imageUrl, this.getApplicationContext(), this.mApplication.getHttpClient()).execute();
+                new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
@@ -390,7 +382,7 @@ public class ThreadsListActivity extends BaseListActivity {
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, Constants.ADD_THREAD_PARENT);
 
-        startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+        this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
 
     private void navigateToThread(String threadNumber) {
@@ -399,7 +391,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToThread(String threadNumber, String threadSubject) {
         Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-        i.setData(Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(mBoardName, threadNumber)));
+        i.setData(Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, threadNumber)));
         if (threadSubject != null) {
             i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
         }
@@ -445,8 +437,8 @@ public class ThreadsListActivity extends BaseListActivity {
         public void setData(ThreadsList threadsList) {
             if (threadsList != null) {
                 ThreadInfo[] threads = threadsList.getThreads();
-                mSerializationService.serializeThreads(mBoardName, mPageNumber, threads);
-                mAdapter.setAdapterData(threads);
+                ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
+                ThreadsListActivity.this.mAdapter.setAdapterData(threads);
             } else {
                 MyLog.e(TAG, "threads = null");
             }
@@ -466,7 +458,7 @@ public class ThreadsListActivity extends BaseListActivity {
         @Override
         public void hideLoadingScreen() {
             ThreadsListActivity.this.switchToListView();
-            mCurrentDownloadTask = null;
+            ThreadsListActivity.this.mCurrentDownloadTask = null;
         }
     }
 }

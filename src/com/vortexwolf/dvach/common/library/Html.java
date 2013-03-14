@@ -5,7 +5,8 @@ import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 
 import android.graphics.drawable.Drawable;
-import android.text.*;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 
 /**
  * This class processes HTML strings into displayable styled text. Not all HTML

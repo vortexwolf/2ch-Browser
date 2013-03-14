@@ -1,5 +1,16 @@
 package com.vortexwolf.dvach.adapters;
 
+import android.content.Context;
+import android.content.res.Resources.Theme;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -12,18 +23,6 @@ import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
-
-import android.content.Context;
-import android.content.res.Resources.Theme;
-import android.text.Spanned;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
@@ -59,9 +58,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
     @Override
     public int getItemViewType(int position) {
-        return this.getItem(position).isHidden()
-                ? ITEM_VIEW_TYPE_HIDDEN_THREAD
-                : ITEM_VIEW_TYPE_THREAD;
+        return this.getItem(position).isHidden() ? ITEM_VIEW_TYPE_HIDDEN_THREAD : ITEM_VIEW_TYPE_THREAD;
     }
 
     @Override
@@ -71,15 +68,11 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         ThreadItemViewModel item = this.getItem(position);
 
         if (!item.isHidden()) {
-            view = convertView != null
-                    ? convertView
-                    : mInflater.inflate(R.layout.threads_list_item, null);
+            view = convertView != null ? convertView : this.mInflater.inflate(R.layout.threads_list_item, null);
 
             this.fillItemView(view, item);
         } else {
-            view = convertView != null
-                    ? convertView
-                    : mInflater.inflate(R.layout.threads_list_hidden_item, null);
+            view = convertView != null ? convertView : this.mInflater.inflate(R.layout.threads_list_hidden_item, null);
 
             this.fillHiddenThreadView(view, item);
         }
@@ -144,7 +137,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(mIsBusy, attachment, vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
+        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
         ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
     }
 
@@ -181,7 +174,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
                 ViewBag vb = (ViewBag) v.getTag();
 
                 AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
-                if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, mSettings, mBitmapManager)) {
+                if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
                     ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
                 }
             }

@@ -18,10 +18,10 @@ public class PostResponseParser {
             return true;
         }
 
-        Matcher centerMatcher = mCenterPattern.matcher(response);
+        Matcher centerMatcher = this.mCenterPattern.matcher(response);
         while (centerMatcher.find() && centerMatcher.groupCount() > 0) {
 
-            Matcher m = mErrorPattern.matcher(centerMatcher.group(1));
+            Matcher m = this.mErrorPattern.matcher(centerMatcher.group(1));
             if (m.find() && m.groupCount() > 0) {
                 String htmlText = m.group(1);
                 String text = Html.fromHtml(htmlText).toString().replaceAll("\n", "");

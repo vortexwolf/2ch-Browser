@@ -3,14 +3,14 @@ package com.vortexwolf.dvach.common.controls;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vortexwolf.dvach.common.Constants;
-
 import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.vortexwolf.dvach.common.Constants;
 
 /**
  * <p>
@@ -71,7 +71,7 @@ public class JellyBeanSpanFixTextView extends TextView {
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         } catch (IndexOutOfBoundsException e) {
-            fixOnMeasure(widthMeasureSpec, heightMeasureSpec);
+            this.fixOnMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
 
@@ -80,15 +80,15 @@ public class JellyBeanSpanFixTextView extends TextView {
      * needed.
      */
     private void fixOnMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        CharSequence text = getText();
+        CharSequence text = this.getText();
         if (text instanceof Spanned) {
             SpannableStringBuilder builder = new SpannableStringBuilder(text);
-            fixSpannedWithSpaces(builder, widthMeasureSpec, heightMeasureSpec);
+            this.fixSpannedWithSpaces(builder, widthMeasureSpec, heightMeasureSpec);
         } else {
             if (Constants.DEBUG) {
                 Log.d(TAG, "The text isn't a Spanned");
             }
-            fallbackToString(widthMeasureSpec, heightMeasureSpec);
+            this.fallbackToString(widthMeasureSpec, heightMeasureSpec);
         }
     }
 
@@ -99,12 +99,12 @@ public class JellyBeanSpanFixTextView extends TextView {
     private void fixSpannedWithSpaces(SpannableStringBuilder builder, int widthMeasureSpec, int heightMeasureSpec) {
         long startFix = System.currentTimeMillis();
 
-        FixingResult result = addSpacesAroundSpansUntilFixed(builder, widthMeasureSpec, heightMeasureSpec);
+        FixingResult result = this.addSpacesAroundSpansUntilFixed(builder, widthMeasureSpec, heightMeasureSpec);
 
         if (result.fixed) {
-            removeUnneededSpaces(widthMeasureSpec, heightMeasureSpec, builder, result);
+            this.removeUnneededSpaces(widthMeasureSpec, heightMeasureSpec, builder, result);
         } else {
-            fallbackToString(widthMeasureSpec, heightMeasureSpec);
+            this.fallbackToString(widthMeasureSpec, heightMeasureSpec);
         }
 
         if (Constants.DEBUG) {
@@ -121,19 +121,19 @@ public class JellyBeanSpanFixTextView extends TextView {
 
         for (Object span : spans) {
             int spanStart = builder.getSpanStart(span);
-            if (isNotSpace(builder, spanStart - 1)) {
+            if (this.isNotSpace(builder, spanStart - 1)) {
                 builder.insert(spanStart, " ");
                 spansWithSpacesBefore.add(span);
             }
 
             int spanEnd = builder.getSpanEnd(span);
-            if (isNotSpace(builder, spanEnd)) {
+            if (this.isNotSpace(builder, spanEnd)) {
                 builder.insert(spanEnd, " ");
                 spansWithSpacesAfter.add(span);
             }
 
             try {
-                setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
+                this.setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
                 return FixingResult.fixed(spansWithSpacesBefore, spansWithSpacesAfter);
             } catch (IndexOutOfBoundsException notFixed) {
             }
@@ -149,7 +149,7 @@ public class JellyBeanSpanFixTextView extends TextView {
     }
 
     private void setTextAndMeasure(CharSequence text, int widthMeasureSpec, int heightMeasureSpec) {
-        setText(text);
+        this.setText(text);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -159,7 +159,7 @@ public class JellyBeanSpanFixTextView extends TextView {
             int spanEnd = builder.getSpanEnd(span);
             builder.delete(spanEnd, spanEnd + 1);
             try {
-                setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
+                this.setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
             } catch (IndexOutOfBoundsException ignored) {
                 builder.insert(spanEnd, " ");
             }
@@ -170,7 +170,7 @@ public class JellyBeanSpanFixTextView extends TextView {
             int spanStart = builder.getSpanStart(span);
             builder.delete(spanStart - 1, spanStart);
             try {
-                setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
+                this.setTextAndMeasure(builder, widthMeasureSpec, heightMeasureSpec);
                 needReset = false;
             } catch (IndexOutOfBoundsException ignored) {
                 needReset = true;
@@ -180,7 +180,7 @@ public class JellyBeanSpanFixTextView extends TextView {
         }
 
         if (needReset) {
-            setText(builder);
+            this.setText(builder);
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
@@ -189,8 +189,8 @@ public class JellyBeanSpanFixTextView extends TextView {
         if (Constants.DEBUG) {
             Log.d(TAG, "Fallback to unspanned text");
         }
-        String fallbackText = getText().toString();
-        setTextAndMeasure(fallbackText, widthMeasureSpec, heightMeasureSpec);
+        String fallbackText = this.getText().toString();
+        this.setTextAndMeasure(fallbackText, widthMeasureSpec, heightMeasureSpec);
     }
 
 }

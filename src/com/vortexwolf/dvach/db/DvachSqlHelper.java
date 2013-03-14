@@ -1,12 +1,10 @@
 package com.vortexwolf.dvach.db;
 
-import java.io.File;
-
-import com.vortexwolf.dvach.services.SqlCreateTableScriptBuilder;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.vortexwolf.dvach.services.SqlCreateTableScriptBuilder;
 
 public class DvachSqlHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "dvach.db";

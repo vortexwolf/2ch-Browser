@@ -7,10 +7,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -60,9 +60,9 @@ public class FavoritesActivity extends BaseListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        FavoritesEntity item = mAdapter.getItem(position);
+        FavoritesEntity item = this.mAdapter.getItem(position);
 
-        mNavigationService.navigate(Uri.parse(item.getUrl()), this);
+        this.mNavigationService.navigate(Uri.parse(item.getUrl()), this);
     }
 
     @Override
@@ -76,19 +76,19 @@ public class FavoritesActivity extends BaseListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        FavoritesEntity model = mAdapter.getItem(menuInfo.position);
+        FavoritesEntity model = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(model.getUrl());
 
                 AppearanceUtils.showToastMessage(this, model.getUrl());
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                mDatasource.removeFromFavorites(model.getUrl());
-                mAdapter.remove(model);
+                this.mDatasource.removeFromFavorites(model.getUrl());
+                this.mAdapter.remove(model);
                 return true;
             }
         }
@@ -100,16 +100,16 @@ public class FavoritesActivity extends BaseListActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            List<FavoritesEntity> favorites = mDatasource.getAllFavorites();
+            List<FavoritesEntity> favorites = FavoritesActivity.this.mDatasource.getAllFavorites();
 
-            mAdapter = new FavoritesAdapter(FavoritesActivity.this, favorites);
+            FavoritesActivity.this.mAdapter = new FavoritesAdapter(FavoritesActivity.this, favorites);
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            FavoritesActivity.this.setListAdapter(mAdapter);
+            FavoritesActivity.this.setListAdapter(FavoritesActivity.this.mAdapter);
             FavoritesActivity.this.switchToListView();
         }
 

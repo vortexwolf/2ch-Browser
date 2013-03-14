@@ -9,11 +9,11 @@ public class SqlCreateTableScriptBuilder {
     private final ArrayList<String> mColumns = new ArrayList<String>();
 
     public SqlCreateTableScriptBuilder(String tableName) {
-        mTableName = tableName;
+        this.mTableName = tableName;
     }
 
     public SqlCreateTableScriptBuilder addPrimaryKey(String columnName) {
-        mPrimaryKey = columnName;
+        this.mPrimaryKey = columnName;
 
         return this;
     }
@@ -27,23 +27,22 @@ public class SqlCreateTableScriptBuilder {
     }
 
     public SqlCreateTableScriptBuilder addColumn(String columnName, String columnType, boolean nullable) {
-        String columnString = columnName + " " + columnType + " "
-                + (nullable ? "null" : "not null");
+        String columnString = columnName + " " + columnType + " " + (nullable ? "null" : "not null");
 
-        mColumns.add(columnString);
+        this.mColumns.add(columnString);
 
         return this;
     }
 
     public String toSql() {
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("create table " + mTableName + "(");
-        sqlBuilder.append(mPrimaryKey + " integer primary key autoincrement, ");
-        for (int i = 0; i < mColumns.size(); i++) {
-            String columnString = mColumns.get(i);
+        sqlBuilder.append("create table " + this.mTableName + "(");
+        sqlBuilder.append(this.mPrimaryKey + " integer primary key autoincrement, ");
+        for (int i = 0; i < this.mColumns.size(); i++) {
+            String columnString = this.mColumns.get(i);
             sqlBuilder.append(columnString);
 
-            if (i != mColumns.size() - 1) {
+            if (i != this.mColumns.size() - 1) {
                 sqlBuilder.append(", ");
             }
         }

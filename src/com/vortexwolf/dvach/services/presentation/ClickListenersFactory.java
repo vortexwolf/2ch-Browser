@@ -1,19 +1,18 @@
 package com.vortexwolf.dvach.services.presentation;
 
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
-import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
-import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
-import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
-
 import android.content.Context;
 import android.net.Uri;
 import android.os.Debug;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
+import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
+import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
+import com.vortexwolf.dvach.services.BrowserLauncher;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ClickListenersFactory implements IClickListenersFactory {
 
@@ -42,7 +41,7 @@ public class ClickListenersFactory implements IClickListenersFactory {
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                raiseThumbnailClick(attachment, context, settings);
+                ClickListenersFactory.this.raiseThumbnailClick(attachment, context, settings);
             }
         };
     }
@@ -52,13 +51,10 @@ public class ClickListenersFactory implements IClickListenersFactory {
         int imageSize = attachment.getSize();
         String url = attachment.getSourceUrl(settings);
 
-        long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024
-                + imageSize + sHeapPad;
+        long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
         if (allocatedSize > sMaxVmHeap) {
-            long freeSize = Math.max(0, imageSize
-                    - (allocatedSize - sMaxVmHeap));
-            AppearanceUtils.showToastMessage(context, "Image is " + imageSize
-                    + "Kb. Available Memory is " + freeSize + "Kb");
+            long freeSize = Math.max(0, imageSize - (allocatedSize - sMaxVmHeap));
+            AppearanceUtils.showToastMessage(context, "Image is " + imageSize + "Kb. Available Memory is " + freeSize + "Kb");
             return;
         }
 

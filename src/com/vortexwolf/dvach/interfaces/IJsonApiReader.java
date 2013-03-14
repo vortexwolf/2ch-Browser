@@ -1,8 +1,6 @@
 package com.vortexwolf.dvach.interfaces;
 
 import com.vortexwolf.dvach.exceptions.JsonApiReaderException;
-import com.vortexwolf.dvach.models.domain.BoardSettings;
-import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
 

@@ -10,6 +10,7 @@ import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
@@ -62,8 +63,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (isStatusView(position)) {
-            return mInflater.inflate(R.layout.loading, null);
+        if (this.isStatusView(position)) {
+            return this.mInflater.inflate(R.layout.loading, null);
         }
 
         View view = this.mPostItemViewBuilder.getView(this.getItem(position), convertView, this.mIsBusy);
@@ -79,12 +80,10 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
         // Если ссылка указывает на этот тред - перескакиваем на нужный пост,
         // иначе открываем в браузере
-        if (mThreadNumber.equals(pageName)) {
+        if (this.mThreadNumber.equals(pageName)) {
             String postNumber = uri.getFragment();
             // Переходим на тот пост, куда указывает ссылка
-            int position = postNumber != null
-                    ? findPostByNumber(postNumber)
-                    : Constants.OP_POST_POSITION;
+            int position = postNumber != null ? this.findPostByNumber(postNumber) : Constants.OP_POST_POSITION;
             if (position == -1) {
                 AppearanceUtils.showToastMessage(this.getContext(), this.getContext().getString(R.string.notification_post_not_found));
                 return;
@@ -132,9 +131,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     public int updateAdapterData(String from, PostInfo[] posts) {
         Integer lastPostNumber;
         try {
-            lastPostNumber = !StringUtils.isEmpty(from)
-                    ? Integer.valueOf(from)
-                    : 0;
+            lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
         } catch (NumberFormatException e) {
             lastPostNumber = 0;
         }
@@ -173,22 +170,22 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     }
 
     public void setLoadingMore(boolean isLoadingMore) {
-        mIsLoadingMore = isLoadingMore;
+        this.mIsLoadingMore = isLoadingMore;
         this.notifyDataSetChanged();
     }
 
     private final boolean hasStatusView() {
-        return mIsLoadingMore && super.getCount() > 0;
+        return this.mIsLoadingMore && super.getCount() > 0;
     }
 
     private final boolean isStatusView(int position) {
-        return hasStatusView() && position == getCount() - 1;
+        return this.hasStatusView() && position == this.getCount() - 1;
     }
 
     @Override
     public int getCount() {
         int i = super.getCount();
-        if (hasStatusView()) {
+        if (this.hasStatusView()) {
             i++;
         }
         return i;
@@ -196,25 +193,21 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
     @Override
     public PostItemViewModel getItem(int position) {
-        return isStatusView(position) ? null : super.getItem(position);
+        return this.isStatusView(position) ? null : super.getItem(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return isStatusView(position)
-                ? Long.MIN_VALUE
-                : super.getItemId(position);
+        return this.isStatusView(position) ? Long.MIN_VALUE : super.getItemId(position);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return isStatusView(position)
-                ? Adapter.IGNORE_ITEM_VIEW_TYPE
-                : super.getItemViewType(position);
+        return this.isStatusView(position) ? Adapter.IGNORE_ITEM_VIEW_TYPE : super.getItemViewType(position);
     }
 
     @Override
     public boolean isEnabled(int position) {
-        return !isStatusView(position);
+        return !this.isStatusView(position);
     }
 }

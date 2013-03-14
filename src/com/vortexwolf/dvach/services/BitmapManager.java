@@ -1,13 +1,14 @@
 package com.vortexwolf.dvach.services;
 
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import android.graphics.Bitmap;
 import android.httpimage.HttpImageManager;
 import android.httpimage.HttpImageManager.LoadRequest;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
+import com.vortexwolf.dvach.interfaces.IBitmapManager;
 
 public class BitmapManager implements IBitmapManager {
     private final HttpImageManager mImageManager;
@@ -18,7 +19,7 @@ public class BitmapManager implements IBitmapManager {
 
     @Override
     public boolean isCached(String uriString) {
-        return mImageManager.isCached(uriString);
+        return this.mImageManager.isCached(uriString);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class BitmapManager implements IBitmapManager {
         });
 
         // Запрос
-        Bitmap b = mImageManager.loadImage(r);
+        Bitmap b = this.mImageManager.loadImage(r);
         // Если удалось взять из кэша, отображаем сразу
         if (b != null) {
             imageView.setImageBitmap(b);

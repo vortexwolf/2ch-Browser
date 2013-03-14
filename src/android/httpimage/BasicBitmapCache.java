@@ -1,7 +1,8 @@
 package android.httpimage;
 
-import com.vortexwolf.dvach.common.library.LruCache;
 import android.graphics.Bitmap;
+
+import com.vortexwolf.dvach.common.library.LruCache;
 
 public class BasicBitmapCache implements BitmapCache {
 
@@ -13,22 +14,22 @@ public class BasicBitmapCache implements BitmapCache {
 
     @Override
     public synchronized boolean exists(String key) {
-        return mMap.containsKey(key);
+        return this.mMap.containsKey(key);
     }
 
     @Override
     public synchronized void invalidate(String key) {
-        mMap.remove(key);
+        this.mMap.remove(key);
     }
 
     @Override
     public synchronized void clear() {
-        mMap.clear();
+        this.mMap.clear();
     }
 
     @Override
     public synchronized Bitmap loadData(String key) {
-        Bitmap res = mMap.get(key);
+        Bitmap res = this.mMap.get(key);
 
         return res;
     }
@@ -39,7 +40,7 @@ public class BasicBitmapCache implements BitmapCache {
             return;
         }
 
-        mMap.put(key, data);
+        this.mMap.put(key, data);
     }
 
     @Override

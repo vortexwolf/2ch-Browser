@@ -1,13 +1,9 @@
 package com.vortexwolf.dvach.services.domain;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -38,7 +34,7 @@ public class HttpStringReader implements IHttpStringReader {
                 request.setHeaders(customHeaders);
             }
 
-            response = mHttpClient.execute(request);
+            response = this.mHttpClient.execute(request);
 
             result = this.fromResponse(response);
         } catch (Exception e) {
@@ -62,11 +58,11 @@ public class HttpStringReader implements IHttpStringReader {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte data[] = new byte[8192];
             int count;
-            
+
             while ((count = stream.read(data)) != -1) {
                 output.write(data, 0, count);
             }
-            
+
             String result = output.toString(Constants.UTF8_CHARSET.name());
             return result;
         } catch (Exception e) {
