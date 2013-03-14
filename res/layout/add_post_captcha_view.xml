@@ -49,6 +49,7 @@
       android:layout_height="wrap_content"
       android:hint="@string/addpost_captcha_hint"
       android:inputType="number"
+      android:imeOptions="flagNoExtractUi|flagNoFullscreen"
       android:singleLine="true" />
 
 </LinearLayout>

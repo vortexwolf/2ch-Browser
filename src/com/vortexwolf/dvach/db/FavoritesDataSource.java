@@ -3,10 +3,13 @@ package com.vortexwolf.dvach.db;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vortexwolf.dvach.common.utils.UriUtils;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 public class FavoritesDataSource {
     private static final String TABLE = DvachSqlHelper.TABLE_FAVORITES;
@@ -57,6 +60,19 @@ public class FavoritesDataSource {
         cursor.close();
 
         return favorites;
+    }
+    
+    public List<FavoritesEntity> getFavoriteBoards() {
+    	List<FavoritesEntity> favorites = this.getAllFavorites();
+    	List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
+    	
+    	for (FavoritesEntity f : favorites) {
+    		if (UriUtils.isBoardUri(Uri.parse(f.getUrl()))){
+    			boardFavorites.add(f);
+    		}
+    	}
+    	
+    	return boardFavorites;
     }
 
     public boolean hasFavorites(String url) {

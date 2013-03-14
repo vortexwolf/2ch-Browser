@@ -112,6 +112,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public boolean isDisplayNames() {
         return mSettings.getBoolean(mResources.getString(R.string.pref_display_name_key), false);
     }
+    
+    public boolean isDisplayAllBoards() {
+    	return mSettings.getBoolean(mResources.getString(R.string.pref_display_all_boards_key), false);
+    }
 
     public int getTheme() {
         final String defaultTextSizeValue = mResources.getString(R.string.pref_text_size_default_value);

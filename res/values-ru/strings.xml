@@ -25,7 +25,8 @@
 	<string name="attach_youtube_hint">http://youtube.com/watch?v=code или просто код</string>
 	<string name="attach_youtube_title">Добавить youtube видео</string>
 	<string name="ok">OK</string>
-	<string name="cancel">Отмена</string>
+	<string name="cancel">Отмена</string>  
+	<string name="favorites">Избранное</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -144,7 +145,9 @@
 	<string name="pref_file_cache_sdcard">Использовать SD карту</string>
 	<string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
 	<string name="pref_file_cache_clear">Очистить кэш</string>
-	
+    <string name="pref_display_all_boards">Все форумы</string>
+    <string name="pref_display_all_boards_summary">Отображать все форумы в списке</string>
+    
 	<!-- Errors -->
 	<string name="error_send_post">При отправке сообщения произошла ошибка.</string>
 	<string name="error_download_data">Невозможно открыть страницу.</string>

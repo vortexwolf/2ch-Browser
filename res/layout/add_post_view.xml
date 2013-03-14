@@ -62,11 +62,12 @@
 	            		android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
 						>
-			    <ImageButton android:id="@+id/addpost_textformat_b" android:src="@drawable/bold" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_i" android:src="@drawable/italic" style="@style/TextFormatButton" />
+
+			    <ImageButton android:id="@+id/addpost_textformat_b" style="@style/TextFormatButton" android:src="@drawable/bold" />
+			    <ImageButton android:id="@+id/addpost_textformat_i" style="@style/TextFormatButton" android:src="@drawable/italic" />
 			    <ImageButton android:id="@+id/addpost_textformat_u" android:src="@drawable/underline" style="@style/TextFormatButton" />
 			    <ImageButton android:id="@+id/addpost_textformat_s" android:src="@drawable/strike" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_spoiler" android:src="@drawable/spoiler" style="@style/TextFormatButton" />
+			    <ImageButton android:id="@+id/addpost_textformat_spoiler" android:src="@drawable/spoiler" style="@style/TextFormatButtonLong" />
 			    <ImageButton android:id="@+id/addpost_textformat_quote" android:src="@drawable/quote1" style="@style/TextFormatButton" />
 		</LinearLayout>
 		

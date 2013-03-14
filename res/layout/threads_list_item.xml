@@ -8,8 +8,9 @@
     <LinearLayout android:id="@+id/thumbnail_view"
     			  android:layout_width="wrap_content"
 				  android:layout_height="wrap_content"
+				  android:layout_marginRight="3dip"
 				  android:orientation="vertical"
-				  android:layout_alignParentRight="true">
+				  android:layout_alignParentLeft="true">
 				  
 	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
 		    <com.vortexwolf.dvach.common.controls.ExtendedImageView
@@ -41,10 +42,9 @@
 	<!-- Top row -->
 
     <TextView android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/thumbnail_view"
+        android:layout_toRightOf="@id/thumbnail_view"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginBottom="1dip"
         android:textColor="?threadTitleForeground"
@@ -52,11 +52,10 @@
     />
 
      <com.vortexwolf.dvach.common.controls.EllipsizingTextView android:id="@+id/comment"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
     	android:layout_below="@id/title"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/thumbnail_view"
+        android:layout_toRightOf="@id/thumbnail_view"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginBottom="1dip"
         android:maxLines="@integer/opPostMaxLines"
@@ -67,8 +66,9 @@
        <TextView android:id="@+id/repliesNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/comment"
-        android:layout_alignParentLeft="true"
+        android:layout_below="@id/comment"        
+        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_alignWithParentIfMissing="true"
         android:textColor="?itemInfoForeground"
         android:textAppearance="?android:attr/textAppearanceSmall"
     />

@@ -109,7 +109,7 @@ public class PostFields {
     @JsonIgnore
     public static PostFields getDefault() {
         PostFields defPF = new PostFields();
-        defPF.setCaptcha("captcha_value");
+        defPF.setCaptcha("captcha_value_id_06");
         defPF.setCaptchaKey("captcha");
         defPF.setComment("shampoo");
         defPF.setEmail("nabiki");

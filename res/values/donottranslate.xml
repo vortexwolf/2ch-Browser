@@ -26,6 +26,7 @@
 	<string name="pref_download_background_key">pref_download_background_key</string>
 	<string name="pref_clear_cache_key">pref_clear_cache_key</string>
 	<string name="pref_convert_post_date_key">pref_convert_post_date_key</string>
+	<string name="pref_display_all_boards_key">pref_display_all_boards_key</string>
 	
 	<string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>
@@ -79,19 +80,23 @@
 		<item>c; комиксы и мультфильмы</item>
 		<item>di; столовая</item>
 		<item>em; другие страны и туризм</item>
-		<item>ew; выживание и самооборона</item>
+		<item>ew; конец света</item>
 		<item>fa; мода и стиль</item>
 		<item>fiz; физкультура</item>
 		<item>fl; иностранные языки</item>
+		<item>ftb; футбол</item>
 		<item>gd; gamedev</item>
+		<item>hh; хип-хоп культура</item>
 		<item>hi; история</item>
 		<item>hw; железо</item>
 		<item>me; медицина</item>
 		<item>mg; магия</item>
 		<item>mlp; my little pony</item>
+		<item>mov; фильмы</item>
 		<item>mo; мотоциклы</item>
 		<item>mu; музыка</item>
 		<item>ne; животные и природа</item>
+		<item>pvc; коллекционные фигурки</item>
 		<item>po; политика и новости</item>
 		<item>pr; программирование</item>
 		<item>psy; психология</item>
@@ -103,8 +108,9 @@
 		<item>sn; паранормальные явления</item>
 		<item>sp; спорт</item>
 		<item>spc; космос</item>
-		<item>t; технологии</item>
-		<item>tv; тв и кино</item>
+		<item>t; техника</item>
+		<item>tr; транспорт и авиация</item>
+		<item>tv; тв</item>
 		<item>un; образование</item>
 		<item>wh; warhammer</item>
 		<item>wm; военная техника</item>
@@ -113,7 +119,9 @@
 		<item>Творчество</item>
 		<item>de; дизайн</item>
 		<item>diy; хобби</item>
+		<item>dom; домострой</item>
 		<item>f; flash &amp; gif</item>
+		<item>izd; издательство</item>
 		<item>mus; музыканты</item>
 		<item>o; мазня</item>
 		<item>pa; живопись</item>
@@ -141,4 +149,32 @@
 		<item>to; touhou</item>
 		<item>vn; визуальные новеллы</item>
 	</string-array>
+	
+	<string-array name="pickboard_boards_hidden">
+        <item>Взрослым</item>
+        <item>fg; трапы</item>
+        <item>fur; фурри</item>
+        <item>g; девушки</item>
+        <item>ga; геи</item>
+        <item>h; хентай</item>
+        <item>fag; fags</item>
+        <item>ho; прочий хентай</item>
+        <item>hc; hardcore</item>
+        <item>e; extreme pron</item>
+        <item>fet; фетиш</item>
+        <item>sex; секс и отношения</item>
+        
+        <item>Пробное</item>
+        <item>gif; анимированные GIF</item>
+        <item>br; барахолка</item>
+        <item>wrk; работа и карьера</item>
+        <item>fs; фэнтези</item>
+        
+        <item>Скрытые</item>
+        <item>rf; убежище</item>
+        <item>i; вторжения</item>
+        <item>dev; девчатник</item>
+        <item>mlp34; прон с mlp</item>
+        <item>asylum; asylum</item>
+    </string-array>
 </resources>

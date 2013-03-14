@@ -25,6 +25,7 @@
 	<string name="attach_youtube_title">Add youtube video</string>
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
+	<string name="favorites">Favorites</string>
 	
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -139,6 +140,8 @@
 	<string name="pref_file_cache_sdcard">Use SD Card</string>
 	<string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
 	<string name="pref_file_cache_clear">Clear cache</string>
+	<string name="pref_display_all_boards">Show all boards</string>
+	<string name="pref_display_all_boards_summary">Enable to show all boards in the boards list</string>
 	
 	<!-- Errors -->
 	<string name="error_send_post">An error has occured while sending the post.</string>

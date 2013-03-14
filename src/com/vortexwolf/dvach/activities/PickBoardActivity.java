@@ -1,20 +1,27 @@
 package com.vortexwolf.dvach.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.BoardsListAdapter;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.db.FavoritesEntity;
 import com.vortexwolf.dvach.models.presentation.BoardEntity;
 import com.vortexwolf.dvach.models.presentation.IBoardListEntity;
 import com.vortexwolf.dvach.models.presentation.SectionEntity;
 import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,6 +38,8 @@ public class PickBoardActivity extends ListActivity {
 
     private MainApplication mApplication;
     private Tracker mTracker;
+    private FavoritesDataSource mFavoritesDataSource;
+    private ApplicationSettings mSettings;
     private BoardsListAdapter mAdapter = null;
 
     @Override
@@ -39,14 +48,47 @@ public class PickBoardActivity extends ListActivity {
 
         this.mApplication = (MainApplication) this.getApplication();
         this.mTracker = this.mApplication.getTracker();
+        this.mSettings = this.mApplication.getSettings();
+        this.mFavoritesDataSource = Factory.getContainer().resolve(FavoritesDataSource.class);
 
         this.mTracker.clearBoardVar();
         this.mTracker.trackActivityView(TAG);
 
         this.resetUI();
 
+        ArrayList<IBoardListEntity> boards = this.createBoardList();
+
+        this.mAdapter = new BoardsListAdapter(this, boards.toArray(new IBoardListEntity[boards.size()]));
+        this.setListAdapter(this.mAdapter);
+
+        this.setTitle(this.getString(R.string.pick_board_title));
+    }
+    
+    private ArrayList<IBoardListEntity> createBoardList(){
         ArrayList<IBoardListEntity> boards = new ArrayList<IBoardListEntity>();
-        String[] entities = this.getResources().getStringArray(R.array.pickboard_boards);
+
+        // favorite boards
+        List<FavoritesEntity> favoriteBoards = this.mFavoritesDataSource.getFavoriteBoards();
+        if (favoriteBoards.size() > 0) {
+        	boards.add(new SectionEntity(this.getString(R.string.favorites)));
+        	
+        	for(FavoritesEntity f : favoriteBoards) {
+        		String boardName = UriUtils.getBoardName(Uri.parse(f.getUrl()));
+        		boards.add(new BoardEntity(boardName, boardName));
+        	}
+        }
+        
+        // default boards
+        this.addBoardsToTheList(R.array.pickboard_boards, boards);
+        if (this.mSettings.isDisplayAllBoards()) {
+        	this.addBoardsToTheList(R.array.pickboard_boards_hidden, boards);
+        }
+        
+        return boards;
+    }
+    
+    private void addBoardsToTheList(int arrayId, ArrayList<IBoardListEntity> boards){
+        String[] entities = this.getResources().getStringArray(arrayId);
         for (String entity : entities) {
             String[] parts = entity.split(";\\s?");
             if (parts.length == 1) {
@@ -55,11 +97,6 @@ public class PickBoardActivity extends ListActivity {
                 boards.add(new BoardEntity(parts[0], parts[1]));
             }
         }
-
-        this.mAdapter = new BoardsListAdapter(this, boards.toArray(new IBoardListEntity[boards.size()]));
-        this.setListAdapter(this.mAdapter);
-
-        this.setTitle(this.getString(R.string.pick_board_title));
     }
 
     private void resetUI() {

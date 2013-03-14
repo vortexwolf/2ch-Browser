@@ -94,6 +94,11 @@
 			android:defaultValue="true"
 			android:summary="@string/pref_display_name_summary"
 			android:title="@string/pref_display_name" />
+    <CheckBoxPreference
+            android:key="@string/pref_display_all_boards_key"
+            android:defaultValue="false"
+            android:summary="@string/pref_display_all_boards_summary"
+            android:title="@string/pref_display_all_boards" />
   </PreferenceCategory>
 
 <PreferenceCategory android:title="@string/pref_category_cache">
