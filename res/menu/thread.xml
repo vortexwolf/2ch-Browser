@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/add_menu_id" android:title="@string/menu_add_post" android:icon="?iconEdit" android:showAsAction="ifRoom"/>
-   	<item android:id="@+id/refresh_menu_id" android:title="@string/menu_refresh" android:icon="?iconRefresh" android:showAsAction="ifRoom" android:alphabeticShortcut="r" />
-    <item android:id="@+id/tabs_menu_id" android:title="@string/menu_tabs" android:icon="@drawable/ic_menu_windows" />
-    <item android:id="@+id/pick_board_menu_id" android:title="@string/menu_pick_board" android:icon="@drawable/ic_menu_flash" />
-	<item android:id="@+id/open_browser_menu_id" android:title="@string/menu_open_browser" android:icon="@drawable/ic_menu_browser"/>
-	<item android:id="@+id/add_remove_favorites_menu_id" android:title="@string/menu_add_favorites"/>
-	<item android:id="@+id/share_menu_id" android:title="@string/menu_share" android:icon="@drawable/ic_menu_share"/>
-	<item android:id="@+id/preferences_menu_id" android:title="@string/menu_preferences" android:icon="@drawable/ic_menu_preferences" android:alphabeticShortcut="p"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/add_menu_id"
+        android:icon="?iconEdit"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_add_post"/>
+    <item
+        android:id="@+id/refresh_menu_id"
+        android:alphabeticShortcut="r"
+        android:icon="?iconRefresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/tabs_menu_id"
+        android:icon="@drawable/ic_menu_windows"
+        android:title="@string/menu_tabs"/>
+    <item
+        android:id="@+id/pick_board_menu_id"
+        android:icon="@drawable/ic_menu_flash"
+        android:title="@string/menu_pick_board"/>
+    <item
+        android:id="@+id/open_browser_menu_id"
+        android:icon="@drawable/ic_menu_browser"
+        android:title="@string/menu_open_browser"/>
+    <item
+        android:id="@+id/add_remove_favorites_menu_id"
+        android:title="@string/menu_add_favorites"/>
+    <item
+        android:id="@+id/share_menu_id"
+        android:icon="@drawable/ic_menu_share"
+        android:title="@string/menu_share"/>
+    <item
+        android:id="@+id/preferences_menu_id"
+        android:alphabeticShortcut="p"
+        android:icon="@drawable/ic_menu_preferences"
+        android:title="@string/menu_preferences"/>
+
 </menu>

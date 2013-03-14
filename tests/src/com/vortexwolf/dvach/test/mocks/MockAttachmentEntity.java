@@ -2,37 +2,36 @@ package com.vortexwolf.dvach.test.mocks;
 
 import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
 
-public class MockAttachmentEntity implements IAttachmentEntity
-{
-	private String mImage;
-	private String mThumbnail;
-	private String mVideo;
-	private int mSize;
+public class MockAttachmentEntity implements IAttachmentEntity {
+    private String mImage;
+    private String mThumbnail;
+    private String mVideo;
+    private int mSize;
 
-	public MockAttachmentEntity(String image, String thumbnail, int size, String video){
-		this.mImage = image;
-		this.mThumbnail = thumbnail;
-		this.mVideo = video;
-		this.mSize = size;
-	}
-	
-	@Override
-	public String getImage() {
-		return mImage;
-	}
+    public MockAttachmentEntity(String image, String thumbnail, int size, String video) {
+        this.mImage = image;
+        this.mThumbnail = thumbnail;
+        this.mVideo = video;
+        this.mSize = size;
+    }
 
-	@Override
-	public String getVideo() {
-		return mVideo;
-	}
+    @Override
+    public String getImage() {
+        return this.mImage;
+    }
 
-	@Override
-	public int getSize() {
-		return mSize;
-	}
+    @Override
+    public String getVideo() {
+        return this.mVideo;
+    }
 
-	@Override
-	public String getThumbnail() {
-		return mThumbnail;
-	}
+    @Override
+    public int getSize() {
+        return this.mSize;
+    }
+
+    @Override
+    public String getThumbnail() {
+        return this.mThumbnail;
+    }
 }

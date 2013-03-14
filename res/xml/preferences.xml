@@ -1,139 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach">
-  
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach" >
+
     <EditTextPreference
-			android:key="@string/pref_homepage_key"
-			android:title="@string/pref_homepage"
-			android:hint="@string/pref_homepage_hint"
-			android:summary="@string/pref_homepage_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-	<EditTextPreference
-			android:key="@string/pref_name_key"
-			android:title="@string/pref_name"
-			android:hint="@string/pref_name_hint"
-			android:summary="@string/pref_name_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-	<EditTextPreference
-			android:key="@string/pref_domain_key"
-			android:title="@string/pref_domain"
-			android:hint="@string/pref_domain_hint"
-			android:summary="@string/pref_domain_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-	
-<PreferenceCategory android:title="@string/pref_category_images">
-	<CheckBoxPreference
-			android:key="@string/pref_load_thumbnails_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_load_thumbnails_summary"
-			android:title="@string/pref_load_thumbnails" />
-	<EditTextPreference
-			android:key="@string/pref_download_path_key"
-			android:title="@string/pref_download_path"
-			android:hint="@string/pref_download_path_hint"
-			android:summary="@string/pref_download_path_summary"
-	        android:inputType="text"
-	        android:singleLine="true" />
-	<CheckBoxPreference
-			android:key="@string/pref_download_background_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_download_background_summary"
-			android:title="@string/pref_download_background" />
-</PreferenceCategory>
+        android:hint="@string/pref_homepage_hint"
+        android:inputType="text"
+        android:key="@string/pref_homepage_key"
+        android:singleLine="true"
+        android:summary="@string/pref_homepage_summary"
+        android:title="@string/pref_homepage" />
+    <EditTextPreference
+        android:hint="@string/pref_name_hint"
+        android:inputType="text"
+        android:key="@string/pref_name_key"
+        android:singleLine="true"
+        android:summary="@string/pref_name_summary"
+        android:title="@string/pref_name" />
+    <EditTextPreference
+        android:hint="@string/pref_domain_hint"
+        android:inputType="text"
+        android:key="@string/pref_domain_key"
+        android:singleLine="true"
+        android:summary="@string/pref_domain_summary"
+        android:title="@string/pref_domain" />
 
-<PreferenceCategory android:title="@string/pref_category_datetime">
-   <CheckBoxPreference
-			android:key="@string/pref_display_post_date_key"
-			android:defaultValue="false"
-			android:summary="@string/pref_display_post_date_summary"
-			android:title="@string/pref_display_post_date" />
-   <CheckBoxPreference
-			android:key="@string/pref_convert_post_date_key"
-			android:dependency="@string/pref_display_post_date_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_convert_post_date_summary"
-			android:title="@string/pref_convert_post_date"  />
-</PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_images" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_load_thumbnails_key"
+            android:summary="@string/pref_load_thumbnails_summary"
+            android:title="@string/pref_load_thumbnails" />
 
-<PreferenceCategory android:title="@string/pref_category_appearance">
-	<ListPreference
-            android:key="@string/pref_text_size_key"
-            android:title="@string/pref_text_size"
+        <EditTextPreference
+            android:hint="@string/pref_download_path_hint"
+            android:inputType="text"
+            android:key="@string/pref_download_path_key"
+            android:singleLine="true"
+            android:summary="@string/pref_download_path_summary"
+            android:title="@string/pref_download_path" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_download_background_key"
+            android:summary="@string/pref_download_background_summary"
+            android:title="@string/pref_download_background" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_datetime" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_display_post_date_key"
+            android:summary="@string/pref_display_post_date_summary"
+            android:title="@string/pref_display_post_date" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="@string/pref_display_post_date_key"
+            android:key="@string/pref_convert_post_date_key"
+            android:summary="@string/pref_convert_post_date_summary"
+            android:title="@string/pref_convert_post_date" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_appearance" >
+        <ListPreference
             android:defaultValue="@string/pref_text_size_default_value"
+            android:dialogTitle="@string/pref_text_size"
             android:entries="@array/pref_text_size_choices"
             android:entryValues="@array/pref_text_size_values"
-            android:dialogTitle="@string/pref_text_size" />
-    <ListPreference
-       		android:key="@string/pref_theme_key"
-       		android:title="@string/pref_theme"
-       		android:defaultValue="@string/pref_theme_default_value"
-       		android:entries="@array/pref_theme_choices"
-       		android:entryValues="@array/pref_theme_values"
-       		android:dialogTitle="@string/pref_theme" />
-   <CheckBoxPreference
-			android:key="@string/pref_popup_link_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_popup_link_summary"
-			android:title="@string/pref_popup_link" />
-    <CheckBoxPreference
-			android:key="@string/pref_display_navigation_bar_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_display_navigation_bar_summary"
-			android:title="@string/pref_display_navigation_bar" />
-    <CheckBoxPreference
-			android:key="@string/pref_youtube_mobile_links_key"
-			android:defaultValue="false"
-			android:summary="@string/pref_youtube_mobile_links_summary"
-			android:title="@string/pref_youtube_mobile_links" />
-    <CheckBoxPreference
-			android:key="@string/pref_display_name_key"
-			android:defaultValue="true"
-			android:summary="@string/pref_display_name_summary"
-			android:title="@string/pref_display_name" />
-    <CheckBoxPreference
-            android:key="@string/pref_display_all_boards_key"
+            android:key="@string/pref_text_size_key"
+            android:title="@string/pref_text_size" />
+        <ListPreference
+            android:defaultValue="@string/pref_theme_default_value"
+            android:dialogTitle="@string/pref_theme"
+            android:entries="@array/pref_theme_choices"
+            android:entryValues="@array/pref_theme_values"
+            android:key="@string/pref_theme_key"
+            android:title="@string/pref_theme" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_popup_link_key"
+            android:summary="@string/pref_popup_link_summary"
+            android:title="@string/pref_popup_link" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_display_navigation_bar_key"
+            android:summary="@string/pref_display_navigation_bar_summary"
+            android:title="@string/pref_display_navigation_bar" />
+        <CheckBoxPreference
             android:defaultValue="false"
+            android:key="@string/pref_youtube_mobile_links_key"
+            android:summary="@string/pref_youtube_mobile_links_summary"
+            android:title="@string/pref_youtube_mobile_links" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_display_name_key"
+            android:summary="@string/pref_display_name_summary"
+            android:title="@string/pref_display_name" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_display_all_boards_key"
             android:summary="@string/pref_display_all_boards_summary"
             android:title="@string/pref_display_all_boards" />
-  </PreferenceCategory>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_cache" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_file_cache_key"
+            android:summary="@string/pref_file_cache_summary"
+            android:title="@string/pref_file_cache" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/pref_file_cache_sdcard_key"
+            android:summary="@string/pref_file_cache_sdcard_summary"
+            android:title="@string/pref_file_cache_sdcard" />
 
-<PreferenceCategory android:title="@string/pref_category_cache">
-    <CheckBoxPreference
-		android:key="@string/pref_file_cache_key"
-		android:defaultValue="true"
-		android:summary="@string/pref_file_cache_summary"
-		android:title="@string/pref_file_cache" />
-    <CheckBoxPreference
-		android:key="@string/pref_file_cache_sdcard_key"
-		android:defaultValue="true"
-		android:summary="@string/pref_file_cache_sdcard_summary"
-		android:title="@string/pref_file_cache_sdcard" />
-    <com.vortexwolf.dvach.settings.CacheSizePreference
-			android:key="@string/pref_clear_cache_key"
-		    android:title="@string/pref_file_cache_clear" />
-</PreferenceCategory>
+        <com.vortexwolf.dvach.settings.CacheSizePreference
+            android:key="@string/pref_clear_cache_key"
+            android:title="@string/pref_file_cache_clear" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_autorefresh" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_auto_refresh_key"
+            android:summary="@string/pref_auto_refresh_summary"
+            android:title="@string/pref_auto_refresh" />
 
-	<PreferenceCategory android:title="@string/pref_category_autorefresh">
-		 <CheckBoxPreference 
-		     android:key="@string/pref_auto_refresh_key" 
-		     android:title="@string/pref_auto_refresh" 
-		     android:defaultValue="false" 
-		     android:summary="@string/pref_auto_refresh_summary" />
-		 
-		 <com.vortexwolf.dvach.settings.SeekBarPreference
-				android:key="@string/pref_auto_refresh_interval_key"
-				android:dependency="@string/pref_auto_refresh_key"
-			    android:title="@string/pref_auto_refresh_interval"
-			    android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"
-			    android:summary="@string/pref_auto_refresh_interval_summary"
-			    android:defaultValue="60"
-			    local:valueFormat="@string/pref_auto_refresh_interval_summary"
-			    local:minValue="30"
-			    local:maxValue="150"
-			    local:step="10" />
-	</PreferenceCategory>
+        <com.vortexwolf.dvach.settings.SeekBarPreference
+            android:defaultValue="60"
+            android:dependency="@string/pref_auto_refresh_key"
+            android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"
+            android:key="@string/pref_auto_refresh_interval_key"
+            android:summary="@string/pref_auto_refresh_interval_summary"
+            android:title="@string/pref_auto_refresh_interval"
+            local:maxValue="150"
+            local:minValue="30"
+            local:step="10"
+            local:valueFormat="@string/pref_auto_refresh_interval_summary" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

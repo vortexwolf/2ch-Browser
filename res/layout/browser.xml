@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:id="@+id/browser_view" xmlns:android="http://schemas.android.com/apk/res/android" android:background="?activityRootBackground" android:layout_width="fill_parent" android:layout_height="fill_parent">
-    <com.vortexwolf.dvach.common.controls.WebViewFixed android:id="@+id/webview" android:layout_width="fill_parent" android:layout_height="fill_parent" />
-    <include android:layout_gravity="center" android:id="@+id/loadingView" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/loading" />
-   	<include android:layout_gravity="center" android:id="@+id/error" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/error" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/browser_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?activityRootBackground" >
+
+    <com.vortexwolf.dvach.common.controls.WebViewFixed
+        android:id="@+id/webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <include
+        android:id="@+id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        layout="@layout/loading"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        layout="@layout/error"
+        android:visibility="gone" />
+
 </FrameLayout>

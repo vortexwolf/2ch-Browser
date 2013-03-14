@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="?activityRootBackground" xmlns:android="http://schemas.android.com/apk/res/android">
-	<ListView android:id="@android:id/list"
-	     android:layout_width="fill_parent" 
-	     android:layout_height="fill_parent" 
-	     android:scrollingCache="false" 
-	     android:dividerHeight="1.0px" 
-	     android:fastScrollEnabled="true" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?activityRootBackground" >
 
-	<TextView android:id="@android:id/empty" 
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 
-	    android:textAppearance="?android:attr/textAppearanceLarge"
-	    android:text="@string/fileslist_nofiles"
-	    android:layout_gravity="center" />
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:dividerHeight="1.0px"
+        android:fastScrollEnabled="true"
+        android:scrollingCache="false" />
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/fileslist_nofiles"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 </FrameLayout>

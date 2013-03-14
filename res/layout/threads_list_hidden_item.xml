@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:paddingBottom="10dip"
     android:paddingLeft="5dip"
     android:paddingRight="5dip"
-    android:paddingTop="10dip"
-    android:paddingBottom="10dip">
-	<TextView 
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:text="Скрытый тред" />
-	
-	<TextView android:id="@+id/thread_number"
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 
-	    android:layout_marginLeft="5dip"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:textColor="?urlLinkForeground" 
-	    android:textStyle="bold"
-	    android:text="№123456" />
+    android:paddingTop="10dip" >
 
-	<TextView android:id="@+id/thread_description"
-	    android:layout_width="0dp"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
-	    android:layout_marginLeft="5dip"
-	    android:textStyle="italic"
-	    android:singleLine="true"
-	    android:ellipsize="end"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:text="Длинное название треда Длинное название треда Длинное название треда"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Скрытый тред"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/thread_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:text="№123456"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?urlLinkForeground"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/thread_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dip"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Длинное название треда Длинное название треда Длинное название треда"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="italic" />
 
 </LinearLayout>

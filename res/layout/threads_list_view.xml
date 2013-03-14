@@ -1,44 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent" 
-	android:layout_height="fill_parent"
-	android:orientation="vertical"
-	android:background="?activityRootBackground"
-	>
-	<FrameLayout 
-		android:layout_width="fill_parent" 
-		android:layout_height="0dip"
-		android:layout_weight="1">
-			<ListView android:id="@android:id/list" android:fastScrollEnabled="true" android:layout_width="fill_parent" android:layout_height="fill_parent" />
-		    <include android:layout_gravity="center" android:id="@+id/loadingView" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/loading" />
-	    	<include android:layout_gravity="center" android:id="@+id/error" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" layout="@layout/error" />
-	</FrameLayout>
-	
-	<RelativeLayout android:id="@+id/threads_navigation_bar"
-		android:layout_width="fill_parent"
-		android:layout_height="@dimen/navigation_button_size"
-		>
-		   	<ImageButton android:id="@+id/threads_prev_page"
-		   		android:layout_width="@dimen/navigation_button_size"
-		   		android:layout_height="@dimen/navigation_button_size"
-		   		android:layout_alignParentLeft="true"
-		   		android:src="?iconBack"
-		   		android:background="@null"
-		   		/>
-		   	<TextView android:id="@+id/threads_page_number"
-		   		android:layout_width="wrap_content"
-		   		android:layout_height="wrap_content"
-		   		android:layout_centerInParent="true"
-		   		android:textAppearance="?android:attr/textAppearanceLarge"
-		   	    />
-		   	<ImageButton android:id="@+id/threads_next_page"
-		   		android:layout_width="@dimen/navigation_button_size"
-		   		android:layout_height="@dimen/navigation_button_size"
-		   		android:layout_alignParentRight="true"
-		   		android:src="?iconForward"
-		   		android:background="@null"
-		   		/>
-	</RelativeLayout>
-</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?activityRootBackground"
+    android:orientation="vertical" >
 
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" >
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fastScrollEnabled="true" />
+
+        <include
+            android:id="@+id/loadingView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/loading"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/error"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/threads_navigation_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/navigation_button_size" >
+
+        <ImageButton
+            android:id="@+id/threads_prev_page"
+            android:layout_width="@dimen/navigation_button_size"
+            android:layout_height="@dimen/navigation_button_size"
+            android:layout_alignParentLeft="true"
+            android:background="@null"
+            android:src="?iconBack" />
+
+        <TextView
+            android:id="@+id/threads_page_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageButton
+            android:id="@+id/threads_next_page"
+            android:layout_width="@dimen/navigation_button_size"
+            android:layout_height="@dimen/navigation_button_size"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:src="?iconForward" />
+    </RelativeLayout>
+
+</LinearLayout>

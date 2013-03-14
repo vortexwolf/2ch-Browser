@@ -1,129 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:background="?postItemBackground"
-     android:minHeight="?android:attr/listPreferredItemHeight"
-     android:orientation="vertical"
-     android:padding="4dip" >
-				  
-<!-- Top row -->
-
-<RelativeLayout
-    android:id="@+id/post_top_row"
-    android:layout_width="fill_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dip">
-	
-	<TextView android:id="@+id/post_index"
-   		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"
-		android:layout_marginRight="4dip"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:textStyle="bold"
-		android:textColor="#4F7942"
-		android:text="666" /> 
-       
-	<TextView android:id="@+id/post_id"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_toRightOf="@id/post_index"
-	    android:layout_alignBaseline="@id/post_index"
-	    android:layout_marginRight="4dip"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:textColor="?postNumberForeground"
-	    android:text="testtesttest" />
-	   	
-	<TextView
-	    android:id="@+id/post_item_date_id"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentRight="true"
-	    android:layout_alignBaseline="@id/post_index"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:singleLine="true"
-	    android:text="25.05.2012 23:59:59"/>
-	
-	<TextView android:id="@+id/post_name"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_toRightOf="@id/post_id"
-	    android:layout_toLeftOf="@id/post_item_date_id"
-	    android:layout_alignBaseline="@id/post_index"
-	    android:textAppearance="?android:attr/textAppearanceMedium"
-	    android:layout_marginRight="4dip"
-	    android:singleLine="true"
-	    android:ellipsize="end"
-	    android:text="anon anonanonanonanon"
-		/>
-</RelativeLayout>
+    android:background="?postItemBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="vertical"
+    android:padding="4dip" >
 
-<!-- Content  -->
-<ScrollView android:id="@+id/post_item_scroll" android:visibility="gone" 
-android:layout_width="fill_parent" android:layout_height="0dip" android:layout_weight="1.0" android:fillViewport="true" />
+    <!-- Top row -->
 
-<RelativeLayout android:id="@+id/post_item_content_layout" android:layout_width="fill_parent" android:layout_height="wrap_content">
-
-    <LinearLayout android:id="@+id/thumbnail_view"
-    			  android:layout_width="wrap_content"
-				  android:layout_height="wrap_content"
-				  android:orientation="vertical"
-				  android:layout_alignParentLeft="true"
-				  android:layout_marginRight="5dip">
-				  
-	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
-		    <com.vortexwolf.dvach.common.controls.ExtendedImageView
-		    	android:id="@+id/thumbnail"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent"
-		        android:adjustViewBounds="true"
-		        android:layout_gravity="center"
-		        android:scaleType="centerInside"
-	    	/>
-	    	
-	    	<ProgressBar
-	    	    android:id="@+id/indeterminate_progress"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent"
-	    	    android:layout_gravity="center"
-	    	    android:indeterminate="true"
-	    	    android:visibility="gone" 
-	    	/>        
-    	</FrameLayout>
-   	
-   		<TextView android:id="@+id/attachment_info"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:textColor="?itemInfoForeground"
-	        android:textAppearance="?android:attr/textAppearanceSmall"
-	    />
-    </LinearLayout>
-    
-     <com.vortexwolf.dvach.common.controls.JellyBeanSpanFixTextView
-        android:id="@+id/comment"
+    <RelativeLayout
+        android:id="@+id/post_top_row"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/thumbnail_view"
-        android:layout_alignWithParentIfMissing="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        local:postQuoteForeground="?postQuoteForeground"
-        local:spoilerForeground="?spoilerForeground"
-        local:spoilerBackground="?spoilerBackground"
-        local:urlLinkForeground="?urlLinkForeground"
-        />
-</RelativeLayout>
+        android:layout_marginBottom="1dip" >
 
-<!-- Bottom row -->
-<TextView 
-		android:id="@+id/post_replies"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:layout_marginTop="5dip"
-		android:textStyle="italic"
-		android:textColor="?android:textColorPrimary" /> 
+        <TextView
+            android:id="@+id/post_index"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="4dip"
+            android:text="666"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#4F7942"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/post_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toRightOf="@id/post_index"
+            android:text="testtesttest"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?postNumberForeground" />
+
+        <TextView
+            android:id="@+id/post_item_date_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_alignParentRight="true"
+            android:singleLine="true"
+            android:text="25.05.2012 23:59:59"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/post_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toLeftOf="@id/post_item_date_id"
+            android:layout_toRightOf="@id/post_id"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="anon anonanonanonanon"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
+
+    <!-- Content -->
+
+    <ScrollView
+        android:id="@+id/post_item_scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1.0"
+        android:fillViewport="true"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/post_item_content_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:id="@+id/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dip"
+            android:orientation="vertical" >
+
+            <FrameLayout
+                android:layout_width="@dimen/thumbnail_size"
+                android:layout_height="@dimen/thumbnail_size" >
+
+                <com.vortexwolf.dvach.common.controls.ExtendedImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside" />
+
+                <ProgressBar
+                    android:id="@+id/indeterminate_progress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/attachment_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?itemInfoForeground" />
+        </LinearLayout>
+
+        <com.vortexwolf.dvach.common.controls.JellyBeanSpanFixTextView
+            android:id="@+id/comment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_toRightOf="@id/thumbnail_view"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            local:postQuoteForeground="?postQuoteForeground"
+            local:spoilerBackground="?spoilerBackground"
+            local:spoilerForeground="?spoilerForeground"
+            local:urlLinkForeground="?urlLinkForeground" />
+    </RelativeLayout>
+
+    <!-- Bottom row -->
+
+    <TextView
+        android:id="@+id/post_replies"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:textColorPrimary"
+        android:textStyle="italic" />
+
 </LinearLayout>
