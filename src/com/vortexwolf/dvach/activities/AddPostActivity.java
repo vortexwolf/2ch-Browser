@@ -58,6 +58,8 @@ import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
+import com.vortexwolf.dvach.services.presentation.EditTextDialog;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
@@ -105,8 +107,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mApplication = (MainApplication) this.getApplication();
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mPostSender = this.mApplication.getPostSender();
+        ApplicationSettings settings = this.mApplication.getSettings();
         DefaultHttpClient httpClient = MainApplication.getHttpClient();
-        this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient), Factory.getContainer().resolve(DvachUriBuilder.class));
+        this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient), Factory.getContainer().resolve(DvachUriBuilder.class), settings);
         this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
         this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
         this.mTracker = this.mApplication.getTracker();
@@ -142,7 +145,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
             if (draft.getCaptchaType() == CaptchaViewType.SKIP) {
                 this.skipCaptcha();
-            } else if (draft.getCaptchaType() == CaptchaViewType.IMAGE) {
+            } else if (draft.getCaptchaType() == CaptchaViewType.IMAGE && draft.getCaptchaImage() != null && draft.getCaptchaImage().isRecycled() == false) {
                 this.showCaptcha(draft.getCaptcha(), draft.getCaptchaImage());
             }
         }
@@ -278,17 +281,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private void onSend() {
         // Собираем все заполненные поля
         String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
-        // if(this.mCurrentCaptchaView == CaptchaViewType.LOADING ||
-        // (this.mCurrentCaptchaView == CaptchaViewType.IMAGE &&
-        // StringUtils.isEmpty(captchaAnswer))){
-        // AppearanceUtils.showToastMessage(this,
-        // getString(R.string.warning_enter_captcha));
-        // return;
-        // }
 
         String comment = this.mCommentView.getText().toString();
-        HtmlUtils.trimBr(comment);
-        if (StringUtils.isEmpty(comment) && this.mAttachedFile == null) {
+
+        if (StringUtils.isEmpty(comment) && this.mAttachedFile == null && this.mAttachedVideo == null) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_write_comment));
             return;
         }
@@ -296,7 +292,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         boolean isSage = this.mSageCheckBox.isChecked();
 
         File attachment = this.mAttachedFile != null ? this.mAttachedFile.file : null;
-        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && attachment == null) {
+        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && attachment == null && this.mAttachedVideo == null) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }
@@ -458,33 +454,22 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
             case R.id.menu_attach_youtube_id:
-                // A dialog with a text input
-                final EditText linkTextView = new EditText(this);
-                linkTextView.setHint(this.getString(R.string.attach_youtube_hint));
-                FrameLayout rootLayout = new FrameLayout(this);
-                rootLayout.setPadding(10, 0, 10, 0);
-                rootLayout.addView(linkTextView);
-
-                final AlertDialog d = new AlertDialog.Builder(this).setTitle(this.getString(R.string.attach_youtube_title)).setView(rootLayout).setNegativeButton(this.getString(R.string.cancel), null).setPositiveButton(this.getString(R.string.ok), null).create();
-
-                // don't hide the dialog if there was an error
-                d.setOnShowListener(new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface dialog) {
-                        Button b = d.getButton(DialogInterface.BUTTON_POSITIVE);
-                        b.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                boolean success = AddPostActivity.this.setVideoAttachment(linkTextView.getText().toString());
-                                if (success) {
-                                    d.dismiss();
-                                }
-                            }
-                        });
-                    }
+            	final EditTextDialog dialog = new EditTextDialog(this);
+            	dialog.setTitle(this.getString(R.string.attach_youtube_title));
+            	dialog.setHint(this.getString(R.string.attach_youtube_hint));
+ 
+                dialog.setPositiveButtonListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						boolean success = AddPostActivity.this.setVideoAttachment(dialog.getText());
+                        // don't hide the dialog if there was an error, only if success
+                        if (success) {
+                        	dialog.dismiss();
+                        }
+					}
                 });
 
-                d.show();
+                dialog.show();
                 break;
         }
 

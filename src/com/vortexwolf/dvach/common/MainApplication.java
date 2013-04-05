@@ -59,14 +59,14 @@ public class MainApplication extends Application {
 
         Container container = Factory.getContainer();
         container.register(Resources.class, this.getResources());
+        container.register(ApplicationSettings.class, settings);
         container.register(DefaultHttpClient.class, httpClient);
         container.register(DvachUriBuilder.class, dvachUriBuilder);
         container.register(IJsonApiReader.class, jsonApiReader);
-        container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder));
+        container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());
         container.register(INavigationService.class, navigationService);
         container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
-        container.register(ApplicationSettings.class, settings);
         container.register(Tracker.class, tracker);
         container.register(ICacheDirectoryManager.class, cacheManager);
         container.register(IPagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));

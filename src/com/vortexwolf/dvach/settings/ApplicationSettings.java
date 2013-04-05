@@ -50,6 +50,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public String getName() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_name_key), null);
     }
+    
+    public String getPasscode() {
+    	return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
+    }
 
     public Uri getDomainUri() {
         String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_domain_key), null);

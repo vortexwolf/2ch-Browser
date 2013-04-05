@@ -10,19 +10,25 @@
         android:summary="@string/pref_homepage_summary"
         android:title="@string/pref_homepage" />
     <EditTextPreference
-        android:hint="@string/pref_name_hint"
-        android:inputType="text"
-        android:key="@string/pref_name_key"
-        android:singleLine="true"
-        android:summary="@string/pref_name_summary"
-        android:title="@string/pref_name" />
-    <EditTextPreference
         android:hint="@string/pref_domain_hint"
         android:inputType="text"
         android:key="@string/pref_domain_key"
         android:singleLine="true"
         android:summary="@string/pref_domain_summary"
         android:title="@string/pref_domain" />
+    <EditTextPreference
+        android:key="@string/pref_name_key"
+        android:title="@string/pref_name"
+        android:hint="@string/pref_name_hint"
+        android:summary="@string/pref_name_summary"
+        android:inputType="text"
+        android:singleLine="true" />
+    <EditTextPreference
+        android:key="@string/pref_passcode_key"
+        android:title="@string/pref_passcode"
+        android:summary="@string/pref_passcode_summary"
+        android:inputType="text"
+        android:singleLine="true" />
 
     <PreferenceCategory android:title="@string/pref_category_images" >
         <CheckBoxPreference

@@ -18,7 +18,7 @@
     <string name="postitem_replies">Replies:</string>
     <string name="fileslist_nofiles">No files.</string>
     <string name="tabs_opentabs">Tabs</string>
-    <string name="tabs_bookmarks">Bookmarks</string>
+    <string name="tabs_bookmarks">Favorites</string>
     <string name="tabs_history">History</string>
     <string name="addpost_politics_prompt">Political preferences</string>
     <string name="share_via">Share via</string>
@@ -66,9 +66,10 @@
     <string name="menu_tabs">Tabs</string>
     <string name="menu_clear_history">Clear history</string>
     <string name="menu_share">Share</string>
-    <string name="menu_add_favorites">Add to bookmarks</string>
-    <string name="menu_remove_favorites">Remove from bookmarks</string>
+    <string name="menu_add_favorites">Add to favorites</string>
+    <string name="menu_remove_favorites">Remove from favorites</string>
     <string name="menu_attach_youtube">Attach YouTube video</string>
+    <string name="menu_add_board">Add board</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -79,8 +80,8 @@
     <string name="cmenu_copy_post">Copy the post</string>
     <string name="cmenu_copy_url">Copy the link</string>
     <string name="cmenu_view_op_post">View OP post</string>
-    <string name="cmenu_add_to_favorites">Add to bookmarks</string>
-    <string name="cmenu_remove_from_favorites">Remove from bookmarks</string>
+    <string name="cmenu_add_to_favorites">Add to favorites</string>
+    <string name="cmenu_remove_from_favorites">Remove from favorites</string>
     <string name="cmenu_search_image">Search image in TinEye</string>
     <string name="cmenu_hide_thread">Hide thread</string>
 
@@ -147,7 +148,9 @@
     <string name="pref_file_cache_clear">Clear cache</string>
     <string name="pref_display_all_boards">Show all boards</string>
     <string name="pref_display_all_boards_summary">Enable to show all boards in the boards list</string>
-
+    <string name="pref_passcode">Passcode</string>
+    <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
+    
     <!-- Errors -->
     <string name="error_send_post">An error has occured while sending the post.</string>
     <string name="error_download_data">Unable to connect to the page.</string>
@@ -164,7 +167,7 @@
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code</string>
     <string name="warning_write_comment">Write a comment</string>
-    <string name="warning_enter_board">Specify a board name</string>
+    <string name="warning_enter_board">Enter a valid board name</string>
     <string name="warning_attach_file_new_thread">Attach a file to create a new thread</string>
 
     <!-- Notifications -->

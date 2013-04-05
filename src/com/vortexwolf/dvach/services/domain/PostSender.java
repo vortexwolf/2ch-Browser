@@ -3,13 +3,20 @@ package com.vortexwolf.dvach.services.domain;
 import java.nio.charset.Charset;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import android.content.res.Resources;
 
@@ -24,6 +31,7 @@ import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostSender implements IPostSender {
     private static final String TAG = "PostSender";
@@ -32,13 +40,15 @@ public class PostSender implements IPostSender {
     private final IHttpStringReader mHttpStringReader;
     private final PostResponseParser mResponseParser;
     private final DvachUriBuilder mDvachUriBuilder;
+    private final ApplicationSettings mApplicationSettings;
 
-    public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder) {
+    public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings) {
         this.mHttpClient = client;
         this.mResources = resources;
         this.mResponseParser = new PostResponseParser();
         this.mHttpStringReader = new HttpStringReader(this.mHttpClient);
         this.mDvachUriBuilder = dvachUriBuilder;
+        this.mApplicationSettings = settings;
     }
 
     @Override
@@ -105,6 +115,18 @@ public class PostSender implements IPostSender {
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
 
+        // passcode as a cookie
+        CookieStore cookieStore = new BasicCookieStore();
+        HttpContext localContext = new BasicHttpContext();
+        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+        
+        String passcode = this.mApplicationSettings.getPasscode();
+        if(StringUtils.isEmpty(passcode) == false) {
+        	Cookie c = new BasicClientCookie("usercode", passcode);
+            cookieStore.addCookie(c);
+        	//httpPost.addHeader("Cookie", "usercode=" + passcode);
+        }
+        
         HttpResponse response = null;
         try {
             Charset utf = Constants.UTF8_CHARSET;
@@ -137,7 +159,7 @@ public class PostSender implements IPostSender {
             }
 
             httpPost.setEntity(multipartEntity);
-            response = this.mHttpClient.execute(httpPost);
+            response = this.mHttpClient.execute(httpPost, localContext);
         } catch (Exception e) {
             MyLog.e(TAG, e);
             throw new SendPostException(this.mResources.getString(R.string.error_send_post));

@@ -27,6 +27,10 @@ public class DvachUriBuilder {
         return this.create2chBoardUri(board, "res/" + threadNumber + ".html").toString();
     }
 
+    public Uri create2chBoardUri(String board) {
+        return this.create2chBoardUri(board, 0);
+    }
+    
     public Uri create2chBoardUri(String board, int pageNumber) {
         return this.create2chBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
     }
