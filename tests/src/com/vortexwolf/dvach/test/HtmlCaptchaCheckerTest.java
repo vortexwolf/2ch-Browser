@@ -19,7 +19,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
 
     private ApplicationSettings createSettings() {
         Context context = this.getInstrumentation().getContext();
-        ApplicationSettings settings = new ApplicationSettings(context, context.getResources(), null);
+        ApplicationSettings settings = new ApplicationSettings(context, context.getResources());
 
         return settings;
     }

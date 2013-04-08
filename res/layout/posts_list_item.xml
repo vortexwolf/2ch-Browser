@@ -86,26 +86,13 @@
             android:layout_marginRight="5dip"
             android:orientation="vertical" >
 
-            <FrameLayout
+            <com.vortexwolf.dvach.common.controls.ExtendedImageView
+                android:id="@+id/thumbnail"
                 android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size" >
-
-                <com.vortexwolf.dvach.common.controls.ExtendedImageView
-                    android:id="@+id/thumbnail"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside" />
-
-                <ProgressBar
-                    android:id="@+id/indeterminate_progress"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:indeterminate="true"
-                    android:visibility="gone" />
-            </FrameLayout>
+                android:layout_height="@dimen/thumbnail_size" 
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="centerInside" />
 
             <TextView
                 android:id="@+id/attachment_info"

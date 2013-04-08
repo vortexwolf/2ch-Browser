@@ -103,7 +103,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
             vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
             vb.thumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
-            vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
 
             view.setTag(vb);
         }
@@ -137,7 +136,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
+        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
         ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
     }
 
@@ -145,6 +144,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     public void setAdapterData(ThreadInfo[] threads) {
         this.clear();
 
+        if (threads == null) {
+            return;
+        }
+        
         for (ThreadInfo ti : threads) {
             ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme, this.mDvachUriBuilder);
             boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mBoardName, model.getNumber());
@@ -175,7 +178,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
                 AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
                 if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                    ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
+                    ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
                 }
             }
         }
@@ -188,6 +191,5 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         TextView attachmentInfoView;
         ImageView thumbnailView;
         View fullThumbnailView;
-        ProgressBar indeterminateProgressBar;
     }
 }

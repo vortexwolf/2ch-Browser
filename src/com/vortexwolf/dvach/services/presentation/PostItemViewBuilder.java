@@ -61,7 +61,6 @@ public class PostItemViewBuilder {
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
             vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
-            vb.indeterminateProgressBar = (ProgressBar) view.findViewById(R.id.indeterminate_progress);
             view.setTag(vb);
         }
 
@@ -104,7 +103,7 @@ public class PostItemViewBuilder {
 
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
         ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView);
 
         // Комментарий (обновляем после файла)
@@ -163,7 +162,7 @@ public class PostItemViewBuilder {
             AttachmentInfo attachment = item.getAttachment(this.mBoardName);
 
             if (vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, vb.indeterminateProgressBar, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+                ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
             }
         }
     }
@@ -178,6 +177,5 @@ public class PostItemViewBuilder {
         TextView postRepliesView;
         View fullThumbnailView;
         ImageView imageView;
-        ProgressBar indeterminateProgressBar;
     }
 }

@@ -139,7 +139,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         int newPostsCount = 0;
 
         for (PostInfo pi : posts) {
-            if (Integer.valueOf(pi.getNum()) > lastPostNumber) {
+            Integer currentNumber = !StringUtils.isEmpty(pi.getNum()) ? Integer.valueOf(pi.getNum()) : 0;
+            if (currentNumber > lastPostNumber) {
                 this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings, this, this.mDvachUriBuilder));
                 newPostsCount++;
             }

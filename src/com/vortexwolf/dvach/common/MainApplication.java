@@ -45,7 +45,7 @@ public class MainApplication extends Application {
 
         Tracker tracker = new Tracker();
         DefaultHttpClient httpClient = new ExtendedHttpClient();
-        ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), httpClient);
+        ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
         JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);

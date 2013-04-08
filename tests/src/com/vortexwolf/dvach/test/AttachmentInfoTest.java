@@ -20,7 +20,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         Instrumentation instr = this.getInstrumentation();
-        this.mSettings = new ApplicationSettings(instr.getContext(), instr.getContext().getResources(), null);
+        this.mSettings = new ApplicationSettings(instr.getContext(), instr.getContext().getResources());
         this.mDvachUriBuilder = new DvachUriBuilder(Uri.parse("http://2ch.hk"));
     }
 

@@ -97,7 +97,10 @@ public class ThreadPostUtils {
      */
     public static void handleAttachmentImage(boolean isBusy, AttachmentInfo attachment, ImageView imageView, ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, ApplicationSettings settings, Context context) {
 
-        indeterminateProgressBar.setVisibility(View.GONE);
+        if(indeterminateProgressBar != null) {
+            indeterminateProgressBar.setVisibility(View.GONE);
+        }
+        
         imageView.setImageResource(android.R.color.transparent); // clear the
                                                                  // image
                                                                  // content
@@ -114,7 +117,9 @@ public class ThreadPostUtils {
             OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getThumbnailOnClickListener(attachment, context, settings);
             if (thumbnailOnClickListener != null) {
                 imageView.setOnClickListener(thumbnailOnClickListener);
-                indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);
+                if(indeterminateProgressBar != null) {
+                    indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);
+                }
             }
 
             String thumbnailUrl = attachment.getThumbnailUrl();
