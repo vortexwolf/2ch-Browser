@@ -134,7 +134,10 @@ public class ThreadsListActivity extends BaseListActivity {
         SettingsEntity newSettings = this.mSettings.getCurrentSettings();
 
         if (this.mCurrentSettings.theme != newSettings.theme) {
-            this.resetUI();
+            this.finish();
+            Intent i = new Intent(this, this.getClass());
+            i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
+            this.startActivity(i);
             return;
         }
 

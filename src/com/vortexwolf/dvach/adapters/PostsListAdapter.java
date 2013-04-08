@@ -176,7 +176,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     }
 
     private final boolean hasStatusView() {
-        return this.mIsLoadingMore && super.getCount() > 0;
+        return this.mIsLoadingMore;
     }
 
     private final boolean isStatusView(int position) {
@@ -194,7 +194,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
     @Override
     public PostItemViewModel getItem(int position) {
-        return this.isStatusView(position) ? null : super.getItem(position);
+        return (position < super.getCount()) ? super.getItem(position) : null;
     }
 
     @Override

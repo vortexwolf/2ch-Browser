@@ -46,7 +46,7 @@ public class AppearanceUtils {
     }
 
     public static void showImageProgressBar(final View indeterminateProgressBar, final ImageView imageView) {
-        imageView.setVisibility(View.GONE);
+        imageView.setVisibility(View.INVISIBLE);
         
         if (indeterminateProgressBar != null) {
             indeterminateProgressBar.setVisibility(View.VISIBLE);

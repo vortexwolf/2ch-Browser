@@ -1,14 +1,39 @@
 package com.vortexwolf.dvach.common.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.net.Uri;
 import android.os.Environment;
 
+import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class IoUtils {
 
+    public static String convertStreamToString(InputStream stream) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        
+        copyStream(stream, output);
+        
+        String result = output.toString(Constants.UTF8_CHARSET.name());
+        return result;
+    }
+    
+    public static void copyStream(InputStream from, OutputStream to) throws IOException {
+        byte data[] = new byte[8192];
+        int count;
+
+        while ((count = from.read(data)) != -1) {
+            to.write(data, 0, count);
+        }
+        
+        from.close();
+    }
+    
     public static long dirSize(File dir) {
         if (dir == null || !dir.exists()) {
             return 0;

@@ -11,6 +11,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 
 public class HttpStringReader implements IHttpStringReader {
@@ -55,15 +56,8 @@ public class HttpStringReader implements IHttpStringReader {
     public String fromResponse(HttpResponse response) {
         try {
             InputStream stream = response.getEntity().getContent();
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte data[] = new byte[8192];
-            int count;
-
-            while ((count = stream.read(data)) != -1) {
-                output.write(data, 0, count);
-            }
-
-            String result = output.toString(Constants.UTF8_CHARSET.name());
+            
+            String result = IoUtils.convertStreamToString(stream);
             return result;
         } catch (Exception e) {
             MyLog.e(TAG, e);
