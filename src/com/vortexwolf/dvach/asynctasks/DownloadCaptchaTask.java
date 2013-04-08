@@ -27,6 +27,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final DefaultHttpClient mHttpClient;
 
     private boolean mCanSkip = false;
+    private boolean mSkipPasscode = false;
     private CaptchaEntity mCaptcha;
     private Bitmap mCaptchaImage;
     private String mUserError;
@@ -48,7 +49,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     @Override
     public void onPostExecute(Boolean success) {
         if (this.mCanSkip) {
-            this.mView.skipCaptcha();
+            this.mView.skipCaptcha(this.mSkipPasscode);
         } else if (success && this.mCaptcha != null) {
             this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
         } else {
@@ -60,6 +61,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     protected Boolean doInBackground(String... params) {
         HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
         this.mCanSkip = result.canSkip;
+        this.mSkipPasscode = result.passCode;
         String captchaKey = result.captchaKey;
 
         if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) {

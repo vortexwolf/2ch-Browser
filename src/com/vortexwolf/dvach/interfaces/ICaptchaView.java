@@ -8,7 +8,7 @@ public interface ICaptchaView {
 
     void showCaptchaLoading();
 
-    void skipCaptcha();
+    void skipCaptcha(boolean withPasscode);
 
     void showCaptcha(CaptchaEntity captcha, Bitmap captchaImage);
 

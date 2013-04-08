@@ -1,10 +1,13 @@
 package com.vortexwolf.dvach.services.domain;
 
 import java.nio.charset.Charset;
+import java.util.Random;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
@@ -19,6 +22,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import android.content.res.Resources;
+import android.webkit.CookieSyncManager;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
@@ -59,7 +63,8 @@ public class PostSender implements IPostSender {
         }
 
         String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, "/wakaba.pl").toString();
-
+        //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
+    	
         // 1 - 'ро' на кириллице, 2 - 'р' на кириллице, 3 - 'о' на кириллице, 4
         // - все латинскими буквами,
         String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post", };
@@ -72,7 +77,7 @@ public class PostSender implements IPostSender {
         try {
             for (int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++) {
                 httpPost = new HttpPost(uri);
-                response = this.executeHttpPost(httpPost, threadNumber, possibleTasks[i], fields, entity);
+                response = this.executeHttpPost(httpPost, boardName, threadNumber, possibleTasks[i], fields, entity);
                 // Проверяем код ответа
                 statusCode = response.getStatusLine().getStatusCode();
 
@@ -110,23 +115,18 @@ public class PostSender implements IPostSender {
         }
     }
 
-    private HttpResponse executeHttpPost(HttpPost httpPost, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException {
+    private HttpResponse executeHttpPost(HttpPost httpPost, String boardName, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
 
+        // It seems that without this policy the website doesn't accept cookies
+        httpPost.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
+
         // passcode as a cookie
-        CookieStore cookieStore = new BasicCookieStore();
-        HttpContext localContext = new BasicHttpContext();
-        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-        
         String passcode = this.mApplicationSettings.getPasscode();
-        if(StringUtils.isEmpty(passcode) == false) {
-        	Cookie c = new BasicClientCookie("usercode", passcode);
-            cookieStore.addCookie(c);
-        	//httpPost.addHeader("Cookie", "usercode=" + passcode);
-        }
-        
+        httpPost.addHeader("Cookie", "usercode=" + passcode);
+
         HttpResponse response = null;
         try {
             Charset utf = Constants.UTF8_CHARSET;
@@ -134,10 +134,13 @@ public class PostSender implements IPostSender {
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
             multipartEntity.addPart("task", new StringBody(task, utf));
             multipartEntity.addPart("parent", new StringBody(threadNumber, utf));
-            multipartEntity.addPart(fields.getCaptchaKey(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaKey()), utf));
-            multipartEntity.addPart(fields.getCaptcha(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaAnswer()), utf));
             multipartEntity.addPart(fields.getComment(), new StringBody(StringUtils.emptyIfNull(entity.getComment()), utf));
 
+            if(!StringUtils.isEmpty(entity.getCaptchaKey())) {
+                multipartEntity.addPart(fields.getCaptchaKey(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaKey()), utf));
+                multipartEntity.addPart(fields.getCaptcha(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaAnswer()), utf));
+            } 
+            
             if (entity.isSage()) {
                 multipartEntity.addPart(fields.getEmail(), new StringBody(Constants.SAGE_EMAIL, utf));
             }
@@ -159,7 +162,7 @@ public class PostSender implements IPostSender {
             }
 
             httpPost.setEntity(multipartEntity);
-            response = this.mHttpClient.execute(httpPost, localContext);
+            response = this.mHttpClient.execute(httpPost);
         } catch (Exception e) {
             MyLog.e(TAG, e);
             throw new SendPostException(this.mResources.getString(R.string.error_send_post));

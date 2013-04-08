@@ -9,6 +9,7 @@
     <string name="addpost_message_hint">Сообщение</string>
     <string name="addpost_subject_hint">Тема</string>
     <string name="addpost_captcha_can_skip">Без кода подтверждения</string>
+    <string name="addpost_captcha_can_skip_passcode">У вас введен пасс-код</string>
     <string name="addpost_captcha_hint">Код подтверждения</string>
     <string name="addpost_send_button">Отправить</string>
     <string name="addpost_refresh_button">Обновить</string>
@@ -153,8 +154,8 @@
     <string name="pref_file_cache_clear">Очистить кэш</string>
     <string name="pref_display_all_boards">Все форумы</string>
     <string name="pref_display_all_boards_summary">Отображать все форумы в списке</string>
-    <string name="pref_passcode">Passcode</string>
-    <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым людям</string>
+    <string name="pref_passcode">Пасс-код</string>
+    <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
     
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>
@@ -181,5 +182,7 @@
     <string name="notification_save_image_started">Файл будет сохранен в %1$s</string>
     <string name="notification_post_not_found">Сообщение не найдено</string>
     <string name="notification_post_copied">Сообщение скопировано</string>
+    <string name="notification_passcode_correct">Пасс-код был успешно проверен</string>
+    <string name="notification_passcode_incorrect">Неверный пасс-код</string>
 
 </resources>

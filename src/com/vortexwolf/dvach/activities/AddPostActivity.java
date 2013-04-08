@@ -84,7 +84,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private SendPostTask mCurrentPostSendTask = null;
     private DownloadCaptchaTask mCurrentDownloadCaptchaTask = null;
 
-    private View mCaptchaSkipView = null;
+    private TextView mCaptchaSkipView = null;
     private View mCaptchaLoadingView = null;
     private ImageView mCaptchaImageView = null;
     private EditText mCaptchaAnswerView = null;
@@ -144,7 +144,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mSageCheckBox.setChecked(draft.isSage());
 
             if (draft.getCaptchaType() == CaptchaViewType.SKIP) {
-                this.skipCaptcha();
+                this.skipCaptcha(false);
             } else if (draft.getCaptchaType() == CaptchaViewType.IMAGE && draft.getCaptchaImage() != null && draft.getCaptchaImage().isRecycled() == false) {
                 this.showCaptcha(draft.getCaptcha(), draft.getCaptchaImage());
             }
@@ -206,7 +206,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaImageView = (ImageView) this.findViewById(R.id.addpost_captcha_image);
         this.mCaptchaLoadingView = this.findViewById(R.id.addpost_captcha_loading);
-        this.mCaptchaSkipView = this.findViewById(R.id.addpost_captcha_skip_text);
+        this.mCaptchaSkipView = (TextView)this.findViewById(R.id.addpost_captcha_skip_text);
         this.mCaptchaAnswerView = (EditText) this.findViewById(R.id.addpost_captcha_input);
         this.mCommentView = (EditText) this.findViewById(R.id.addpost_comment_input);
         this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
@@ -377,7 +377,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     @Override
-    public void skipCaptcha() {
+    public void skipCaptcha(boolean withPasscode) {
+    	if (withPasscode){
+    		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip_passcode));
+    	} else {
+    		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip));
+    	}
+    	
         this.switchToCaptchaView(CaptchaViewType.SKIP);
     }
 

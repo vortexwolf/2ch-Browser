@@ -9,6 +9,7 @@
     <string name="addpost_message_hint">Message</string>
     <string name="addpost_subject_hint">Subject</string>
     <string name="addpost_captcha_can_skip">Send without confirmation</string>
+    <string name="addpost_captcha_can_skip_passcode">You have a passcode</string>
     <string name="addpost_captcha_hint">Confirmation code</string>
     <string name="addpost_send_button">Send</string>
     <string name="addpost_refresh_button">Refresh</string>
@@ -176,5 +177,7 @@
     <string name="notification_save_image_started">The file will be saved to %1$s</string>
     <string name="notification_post_not_found">The post isn\'t found</string>
     <string name="notification_post_copied">Copied to clipboard</string>
+    <string name="notification_passcode_correct">The passcode has been successfully validated</string>
+    <string name="notification_passcode_incorrect">The passcode is incorrect</string>
 
 </resources>

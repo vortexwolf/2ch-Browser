@@ -44,8 +44,8 @@ public class MainApplication extends Application {
         super.onCreate();
 
         Tracker tracker = new Tracker();
-        ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), tracker);
         DefaultHttpClient httpClient = new ExtendedHttpClient();
+        ApplicationSettings settings = new ApplicationSettings(this, this.getResources(), httpClient);
         DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
         JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
@@ -59,9 +59,9 @@ public class MainApplication extends Application {
 
         Container container = Factory.getContainer();
         container.register(Resources.class, this.getResources());
+        container.register(DvachUriBuilder.class, dvachUriBuilder);
         container.register(ApplicationSettings.class, settings);
         container.register(DefaultHttpClient.class, httpClient);
-        container.register(DvachUriBuilder.class, dvachUriBuilder);
         container.register(IJsonApiReader.class, jsonApiReader);
         container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());

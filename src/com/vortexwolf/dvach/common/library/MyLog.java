@@ -5,24 +5,25 @@ import org.apache.http.StatusLine;
 import android.util.Log;
 
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 
 public class MyLog {
 
     public static void d(String tag, String msg) {
         if (Constants.LOGGING) {
-            Log.d(tag, msg);
+            Log.d(tag, StringUtils.emptyIfNull(msg));
         }
     }
 
     public static void i(String tag, String msg) {
         if (Constants.LOGGING) {
-            Log.i(tag, msg);
+            Log.i(tag, StringUtils.emptyIfNull(msg));
         }
     }
 
     public static void e(String tag, String msg) {
         if (Constants.LOGGING) {
-            Log.e(tag, msg);
+            Log.e(tag, StringUtils.emptyIfNull(msg));
         }
     }
 

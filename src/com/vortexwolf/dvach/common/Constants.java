@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.http.protocol.HTTP;
+
 import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class Constants {
@@ -33,7 +35,7 @@ public class Constants {
     // Для http-запросов
     public static final String USER_AGENT_STRING = "2ch browser (Android)";
     public static final String SAGE_EMAIL = "sage";
-    public static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    public static final Charset UTF8_CHARSET = Charset.forName(HTTP.UTF_8);
 
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;

@@ -1,5 +1,7 @@
 package com.vortexwolf.dvach.settings;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -7,21 +9,23 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
-import com.vortexwolf.dvach.services.Tracker;
 
 public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    public static final String TAG = "ApplicationSettings";
+
+    private final Context mContext;
     private final SharedPreferences mSettings;
     private final Resources mResources;
-    private final Tracker mTracker;
 
-    public ApplicationSettings(Context context, Resources resources, Tracker tracker) {
+    public ApplicationSettings(Context context, Resources resources) {
+        this.mContext = context;
         this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
         this.mResources = resources;
-        this.mTracker = tracker;
     }
 
     public void startTrackChanges() {
@@ -34,6 +38,17 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(this.mResources.getString(R.string.pref_passcode_key))) {
+            String passcode = this.getPasscode();
+            this.sendPasscodeToServer(passcode);
+        }
+    }
+
+    private void sendPasscodeToServer(String passcode) {
+        final Uri uri = Uri.withAppendedPath(this.getDomainUri(), "makaba/makaba.fcgi");
+
+        CheckPasscodeTask task = new CheckPasscodeTask(this.mContext, uri, passcode);
+        task.execute();
     }
 
     public String getHomepage() {
@@ -50,9 +65,9 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public String getName() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_name_key), null);
     }
-    
+
     public String getPasscode() {
-    	return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
+        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
     }
 
     public Uri getDomainUri() {

@@ -87,6 +87,10 @@ public class ExtendedHttpClient extends DefaultHttpClient {
     }
 
     public static String getLocationHeader(HttpResponse response) {
+    	if (response == null){
+            return null;
+    	}
+    	
         Header header = response.getFirstHeader("Location");
         if (header != null) {
             return header.getValue();

@@ -36,11 +36,17 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
         CaptchaResult result = new CaptchaResult();
-        result.canSkip = false;
-
-        if (captchaBlock != null && (captchaBlock.startsWith("OK") || captchaBlock.startsWith("VIP"))) {
+        if(captchaBlock == null){
+            return result;
+        }
+        
+        if (captchaBlock.startsWith("OK")) {
             result.canSkip = true;
-        } else if (captchaBlock != null) {
+        } else if (captchaBlock.startsWith("VIP")) {
+            result.canSkip = true;
+            result.passCode = true;
+        } else if (captchaBlock.startsWith("CHECK")) {
+            result.canSkip = false;
             result.captchaKey = captchaBlock.substring(captchaBlock.indexOf('\n') + 1);
         }
 
@@ -49,6 +55,7 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 
     public class CaptchaResult {
         public boolean canSkip;
+        public boolean passCode;
         public String captchaKey;
     }
 }
