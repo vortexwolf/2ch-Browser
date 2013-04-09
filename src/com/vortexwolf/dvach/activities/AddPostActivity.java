@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore.MediaColumns;
@@ -56,6 +55,7 @@ import com.vortexwolf.dvach.models.presentation.ImageFileModel;
 import com.vortexwolf.dvach.models.presentation.SerializableFileModel;
 import com.vortexwolf.dvach.services.Tracker;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
+import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.EditTextDialog;
@@ -68,7 +68,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private IJsonApiReader mJsonReader;
     private IPostSender mPostSender;
     private IHtmlCaptchaChecker mHtmlCaptchaChecker;
-    private NetworkResourceLoader mNetworkResourceLoader;
+    private HttpBitmapReader mHttpBitmapReader;
     private IDraftPostsStorage mDraftPostsStorage;
     private Tracker mTracker;
 
@@ -109,8 +109,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mPostSender = this.mApplication.getPostSender();
         ApplicationSettings settings = this.mApplication.getSettings();
         DefaultHttpClient httpClient = MainApplication.getHttpClient();
-        this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient), Factory.getContainer().resolve(DvachUriBuilder.class), settings);
-        this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
+        this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient, this.getResources()), Factory.getContainer().resolve(DvachUriBuilder.class), settings);
+        this.mHttpBitmapReader = new HttpBitmapReader(httpClient, this.getResources());
         this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
         this.mTracker = this.mApplication.getTracker();
         DvachUriBuilder uriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
@@ -581,7 +581,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mCurrentDownloadCaptchaTask.cancel(true);
         }
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mNetworkResourceLoader, this.mHtmlCaptchaChecker, MainApplication.getHttpClient());
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mHttpBitmapReader, this.mHtmlCaptchaChecker, MainApplication.getHttpClient());
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

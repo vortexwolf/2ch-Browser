@@ -113,7 +113,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
         this.resetUI();
 
-        this.setAdapter();
+        this.setAdapter(savedInstanceState);
 
         this.mTracker.setBoardVar(this.mBoardName);
         this.mTracker.setPageNumberVar(this.mPageNumber);
@@ -195,7 +195,7 @@ public class ThreadsListActivity extends BaseListActivity {
         });
     }
 
-    private void setAdapter() {
+    private void setAdapter(Bundle savedInstanceState) {
         if (this.mAdapter != null) {
             return;
         }
@@ -209,7 +209,8 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         ThreadInfo[] threads = null;
-        if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)) {
+        if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
+            || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED)) {
             threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
         }
 
@@ -454,12 +455,14 @@ public class ThreadsListActivity extends BaseListActivity {
 
         @Override
         public void showLoadingScreen() {
-            ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             ThreadsListActivity.this.switchToLoadingView();
         }
 
         @Override
         public void hideLoadingScreen() {
+            ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
+            ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+            
             ThreadsListActivity.this.switchToListView();
             ThreadsListActivity.this.mCurrentDownloadTask = null;
         }

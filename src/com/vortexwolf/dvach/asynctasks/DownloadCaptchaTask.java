@@ -7,13 +7,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.vortexwolf.dvach.common.utils.UriUtils;
+import com.vortexwolf.dvach.exceptions.HttpRequestException;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.ICaptchaView;
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
-import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.models.domain.CaptchaEntity;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
+import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
 import com.vortexwolf.dvach.services.domain.YandexCaptchaService;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
@@ -22,7 +23,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final ICaptchaView mView;
     private final IJsonApiReader mJsonReader;
     private final Uri mRefererUri;
-    private final INetworkResourceLoader mNetworkResourceLoader;
+    private final HttpBitmapReader mHttpBitmapReader;
     private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
     private final DefaultHttpClient mHttpClient;
 
@@ -32,11 +33,11 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, INetworkResourceLoader networkResourceLoader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
+    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, HttpBitmapReader httpBitmapReader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
         this.mView = view;
         this.mJsonReader = jsonReader;
         this.mRefererUri = refererUri;
-        this.mNetworkResourceLoader = networkResourceLoader;
+        this.mHttpBitmapReader = httpBitmapReader;
         this.mHtmlCaptchaChecker = htmlCaptchaChecker;
         this.mHttpClient = httpClient;
     }
@@ -67,14 +68,22 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) {
             return true;
         }
-
-        this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
-
-        if (this.mCaptcha == null || this.isCancelled()) {
+        if(!this.mCanSkip && captchaKey == null) {
             return false;
         }
 
-        this.mCaptchaImage = this.mNetworkResourceLoader.loadBitmap(Uri.parse(this.mCaptcha.getUrl()));
+        this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
+
+        if (this.isCancelled()) {
+            return false;
+        }
+
+        try {
+            this.mCaptchaImage = this.mHttpBitmapReader.fromUri(this.mCaptcha.getUrl());
+        } catch (HttpRequestException e) {
+            this.mUserError = e.getMessage();
+            return false;
+        }
 
         return true;
     }

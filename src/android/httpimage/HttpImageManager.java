@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
@@ -17,7 +18,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
+import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
 
 /**
  * HttpImageManager uses 3-level caching to download and store network images.
@@ -74,7 +75,7 @@ public class HttpImageManager {
 
     private final BitmapCache mCache;
     private final BitmapCache mPersistence;
-    private final INetworkResourceLoader mNetworkResourceLoader;
+    private final HttpBitmapReader mNetworkResourceLoader;
 
     private final Handler mHandler = new Handler();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
@@ -158,14 +159,14 @@ public class HttpImageManager {
         public void onLoadError(LoadRequest r, Throwable e);
     }
 
-    public HttpImageManager(BitmapCache cache, BitmapCache persistence, DefaultHttpClient httpClient) {
+    public HttpImageManager(BitmapCache cache, BitmapCache persistence, DefaultHttpClient httpClient, Resources resources) {
         this.mCache = cache;
         this.mPersistence = persistence;
-        this.mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
+        this.mNetworkResourceLoader = new HttpBitmapReader(httpClient, resources);
     }
 
-    public HttpImageManager(BitmapCache persistence, DefaultHttpClient httpClient) {
-        this(new BasicBitmapCache(), persistence, httpClient);
+    public HttpImageManager(BitmapCache persistence, DefaultHttpClient httpClient, Resources resources) {
+        this(new BasicBitmapCache(), persistence, httpClient, resources);
     }
 
     public Bitmap loadImage(Uri uri) {
@@ -251,11 +252,8 @@ public class HttpImageManager {
                             HttpImageManager.this.mCache.storeData(key, data);
                         } else {
                             // we go to network
-                            data = HttpImageManager.this.mNetworkResourceLoader.loadBitmap(request.getUri());
-                            if (data == null) {
-                                throw new RuntimeException("data from remote can't be decoded to bitmap");
-                            }
-
+                            data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
+                            
                             // load it into memory
                             HttpImageManager.this.mCache.storeData(key, data);
 

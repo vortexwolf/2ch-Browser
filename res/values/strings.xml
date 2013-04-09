@@ -164,6 +164,8 @@
     <string name="error_image_search">The TinEye website doesn\'t work.</string>
     <string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
     <string name="error_incorrect_youtube_link">Incorrect format of the link to the video.</string>
+    <string name="error_create_request">Unable to make a request to the page.</string>
+    <string name="error_read_response">Unable to read the response from the server.</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code</string>

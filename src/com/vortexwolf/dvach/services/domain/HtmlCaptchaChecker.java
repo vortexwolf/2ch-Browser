@@ -29,17 +29,24 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         org.apache.http.Header xRequest = new BasicHeader("Referer", refererUri.toString());
 
         org.apache.http.Header[] extraHeaders = new org.apache.http.Header[] { xRequest };
-        String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
-
-        return this.checkHtmlBlock(captchaBlock);
+        
+        CaptchaResult result;
+        try {
+            String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
+            result = this.checkHtmlBlock(captchaBlock);
+        } catch (Exception e) {
+            result = this.createEmptyResult();
+        }
+        
+        return result;
     }
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
-        CaptchaResult result = new CaptchaResult();
         if(captchaBlock == null){
-            return result;
+            return this.createEmptyResult();
         }
         
+        CaptchaResult result = new CaptchaResult();
         if (captchaBlock.startsWith("OK")) {
             result.canSkip = true;
         } else if (captchaBlock.startsWith("VIP")) {
@@ -51,6 +58,10 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         }
 
         return result;
+    }
+    
+    private CaptchaResult createEmptyResult(){
+        return new CaptchaResult();
     }
 
     public class CaptchaResult {

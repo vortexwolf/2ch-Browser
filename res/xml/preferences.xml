@@ -11,7 +11,7 @@
         android:title="@string/pref_homepage" />
     <EditTextPreference
         android:hint="@string/pref_domain_hint"
-        android:inputType="text"
+        android:inputType="textUri"
         android:key="@string/pref_domain_key"
         android:singleLine="true"
         android:summary="@string/pref_domain_summary"
@@ -27,7 +27,7 @@
         android:key="@string/pref_passcode_key"
         android:title="@string/pref_passcode"
         android:summary="@string/pref_passcode_summary"
-        android:inputType="text"
+        android:inputType="textVisiblePassword"
         android:singleLine="true" />
 
     <PreferenceCategory android:title="@string/pref_category_images" >

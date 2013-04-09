@@ -18,34 +18,43 @@ public class CancellableInputStream extends FilterInputStream {
 
     @Override
     public int read() throws IOException {
-        this.checkCancelled();
+        if (this.checkCancelled()) {
+            this.closeWithoutExceptions();
+            return -1;
+        }
+        
         return super.read();
     }
 
     @Override
     public int read(byte[] b) throws IOException {
-        this.checkCancelled();
+        if (this.checkCancelled()) {
+            this.closeWithoutExceptions();
+            return -1;
+        }
+        
         return super.read(b);
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        this.checkCancelled();
+        if (this.checkCancelled()) {
+            this.closeWithoutExceptions();
+            return -1;
+        }
+        
         return super.read(b, off, len);
     }
 
     private boolean checkCancelled() {
-        if (this.mTask != null && this.mTask.isCancelled()) {
-            MyLog.v(TAG, "stream reading was cancelled");
-            try {
-                this.close();
-            } catch (IOException e) {
-                MyLog.e(TAG, e);
-            }
-
-            return true;
+        return this.mTask != null && this.mTask.isCancelled();
+    }
+    
+    private void closeWithoutExceptions(){
+        try {
+            this.close();
+        } catch (IOException e) {
+            MyLog.e(TAG, e);
         }
-
-        return false;
     }
 }

@@ -63,18 +63,16 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
         } else {
             this.mView.showLoadingScreen();
         }
-
-        if (this.mContentLength == -1) {
-            this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
-        } else {
-            this.mView.setWindowProgress(0);
-        }
     }
 
     @Override
     public void onPostExecute(Boolean success) {
         // Прячем все индикаторы загрузки
-        this.onFinished();
+        if (this.mIsPartialLoading) {
+            this.mView.hideUpdateLoading();
+        } else {
+            this.mView.hideLoadingScreen();
+        }
 
         // Обновляем список или отображаем ошибку
         if (success && this.mPostsList != null) {
@@ -92,17 +90,6 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
         }
 
         // else show "No new posts"
-    }
-
-    private void onFinished() {
-        if (this.mIsPartialLoading) {
-            this.mView.hideUpdateLoading();
-        } else {
-            this.mView.hideLoadingScreen();
-        }
-
-        // Hide progress anyway
-        this.mView.setWindowProgress(Window.PROGRESS_END);
     }
 
     @Override

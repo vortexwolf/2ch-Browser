@@ -110,7 +110,7 @@ public class PostsListActivity extends BaseListActivity {
 
         this.resetUI();
 
-        this.setAdapter();
+        this.setAdapter(savedInstanceState);
 
         final Runnable refreshTask = new Runnable() {
             @Override
@@ -178,7 +178,7 @@ public class PostsListActivity extends BaseListActivity {
         this.registerForContextMenu(this.getListView());
     }
 
-    private void setAdapter() {
+    private void setAdapter(Bundle savedInstanceState) {
         if (this.mAdapter != null) {
             return;
         }
@@ -203,7 +203,11 @@ public class PostsListActivity extends BaseListActivity {
             }
 
             // Обновляем посты, если не был установлен ограничивающий extra
-            if (!this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)) {
+            if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
+                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED)) {
+                // nothing
+            }
+            else {
                 this.refreshPosts();
             }
         } else {
@@ -452,6 +456,9 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void hideLoadingScreen() {
+            PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
+            PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+            
             PostsListActivity.this.switchToListView();
             PostsListActivity.this.mCurrentDownloadTask = null;
         }
@@ -481,6 +488,9 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void hideUpdateLoading() {
+            PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
+            PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+            
             PostsListActivity.this.mAdapter.setLoadingMore(false);
             PostsListActivity.this.mCurrentDownloadTask = null;
         }

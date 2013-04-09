@@ -15,16 +15,10 @@ import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 public class ProgressInputStream extends FilterInputStream {
     public static final String TAG = "ProgressInputStream";
     private final List<IProgressChangeListener> mListeners = new ArrayList<IProgressChangeListener>();
-    private final long mMaxNumBytes;
     private volatile long mTotalNumBytesRead;
 
-    public ProgressInputStream(InputStream in, long maxNumBytes) {
+    public ProgressInputStream(InputStream in) {
         super(in);
-        this.mMaxNumBytes = maxNumBytes;
-    }
-
-    public long getMaxNumBytes() {
-        return this.mMaxNumBytes;
     }
 
     public long getTotalNumBytesRead() {

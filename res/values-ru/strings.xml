@@ -169,6 +169,8 @@
     <string name="error_image_search">Поиск в TinEye не работает.</string>
     <string name="error_download_no_space_sdcard">Не удалось сохранить файл, нет места в памяти устройства.</string>
     <string name="error_incorrect_youtube_link">Неправильный формат ссылки на видео.</string>
+    <string name="error_create_request">Невозможно выполнить запрос к странице.</string>
+    <string name="error_read_response">Невозможно прочитать ответ сервера.</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения</string>

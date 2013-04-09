@@ -57,11 +57,6 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
         }
 
         @Override
-        public String fromResponse(HttpResponse response) {
-            return this.mResponse;
-        }
-
-        @Override
         public String fromUri(String uri, Header[] customHeaders) {
             return null;
         }

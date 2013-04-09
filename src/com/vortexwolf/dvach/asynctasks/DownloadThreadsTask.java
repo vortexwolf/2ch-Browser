@@ -53,18 +53,12 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     public void onPreExecute() {
         // Отображаем экран загрузки и запускаем прогресс бар
         this.mView.showLoadingScreen();
-
-        if (this.mContentLength == -1) {
-            this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
-        } else {
-            this.mView.setWindowProgress(0);
-        }
     }
 
     @Override
     public void onPostExecute(Boolean success) {
         // Прячем все индикаторы загрузки
-        this.onFinished();
+        this.mView.hideLoadingScreen();
 
         // Обновляем список или отображаем ошибку
         if (success && this.mThreadsList != null) {
@@ -72,16 +66,6 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         } else if (!success) {
             this.mView.showError(this.mUserError);
         }
-    }
-
-    private void onFinished() {
-        this.mView.hideLoadingScreen();
-
-        if (this.mContentLength == -1) {
-            this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_OFF);
-        }
-        // Hide progress anyway
-        this.mView.setWindowProgress(10000);
     }
 
     @Override

@@ -1,25 +1,62 @@
 package com.vortexwolf.dvach.common.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 
 import android.net.Uri;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.CancellableInputStream;
+import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.library.ProgressInputStream;
+import com.vortexwolf.dvach.interfaces.ICancelled;
+import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class IoUtils {
+    public static final String TAG = "IoUtils";
 
     public static String convertStreamToString(InputStream stream) throws IOException {
+        byte[] bytes = convertStreamToBytes(stream);
+        
+        String result = convertBytesToString(bytes);
+        return result;
+    }
+    
+    public static byte[] convertStreamToBytes(InputStream stream) throws IOException {
+        if (stream == null) {
+            return null;
+        }
+        
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         
         copyStream(stream, output);
+
+        return output.toByteArray();
+    }
+    
+    public static String convertBytesToString(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
         
-        String result = output.toString(Constants.UTF8_CHARSET.name());
+        String result;
+        try {
+            result = new String(bytes, Constants.UTF8_CHARSET.name());
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+        
         return result;
     }
     
@@ -32,6 +69,33 @@ public class IoUtils {
         }
         
         from.close();
+    }
+    
+    public static InputStream modifyInputStream(InputStream stream, long contentLength, IProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
+        if (listener != null) {
+            listener.setContentLength(contentLength);
+
+            ProgressInputStream pin = new ProgressInputStream(stream);
+            pin.addProgressChangeListener(listener);
+            
+            stream = pin;
+        }
+
+        if (task != null) {
+            stream = new CancellableInputStream(stream, task);
+        }
+
+        return stream;
+    }
+    
+    public static void closeStream(Closeable stream) {
+        try {
+            if (stream != null) {
+                stream.close();
+            }
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+        }
     }
     
     public static long dirSize(File dir) {

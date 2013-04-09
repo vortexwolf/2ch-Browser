@@ -70,19 +70,29 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 
     /** Releases all resources of the request and response objects */
     public static void releaseRequestResponse(HttpRequestBase request, HttpResponse response) {
-        if (response != null) {
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                try {
-                    entity.consumeContent();
-                } catch (Exception e) {
-                    MyLog.e(TAG, e);
-                }
-            }
-        }
+        releaseResponse(response);
 
+        releaseRequest(request);
+    }
+    
+    public static void releaseRequest(HttpRequestBase request) {
         if (request != null) {
             request.abort();
+        }
+    }
+    
+    public static void releaseResponse(HttpResponse response) {
+        if (response == null) {
+            return;
+        }
+        
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            try {
+                entity.consumeContent();
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+            }
         }
     }
 

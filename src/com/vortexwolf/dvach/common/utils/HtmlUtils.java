@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.httpimage.HttpImageManager;
-import android.httpimage.NetworkResourceLoader;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
@@ -24,7 +23,6 @@ import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
 import com.vortexwolf.dvach.common.library.Html;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
-import com.vortexwolf.dvach.interfaces.INetworkResourceLoader;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 
@@ -34,9 +32,6 @@ public class HtmlUtils {
     private static final DefaultHttpClient httpClient = MainApplication.getHttpClient();
     // Картинки со смайликами во время всяких праздников
     public static final Html.ImageGetter sImageGetter = new Html.ImageGetter() {
-
-        private final INetworkResourceLoader mNetworkResourceLoader = new NetworkResourceLoader(httpClient);
-
         @Override
         public Drawable getDrawable(String ref) {
             Uri uri = Factory.getContainer().resolve(DvachUriBuilder.class).adjust2chRelativeUri(Uri.parse(ref));

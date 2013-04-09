@@ -53,7 +53,7 @@ public class MainApplication extends Application {
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
-        HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager), httpClient);
+        HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager), httpClient, this.getResources());
         NavigationService navigationService = new NavigationService();
         DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpClient);
 

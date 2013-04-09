@@ -29,8 +29,8 @@ import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.exceptions.HttpRequestException;
 import com.vortexwolf.dvach.exceptions.SendPostException;
-import com.vortexwolf.dvach.interfaces.IHttpStringReader;
 import com.vortexwolf.dvach.interfaces.IPostSender;
 import com.vortexwolf.dvach.models.domain.PostEntity;
 import com.vortexwolf.dvach.models.domain.PostFields;
@@ -41,7 +41,7 @@ public class PostSender implements IPostSender {
     private static final String TAG = "PostSender";
     private final DefaultHttpClient mHttpClient;
     private final Resources mResources;
-    private final IHttpStringReader mHttpStringReader;
+    private final HttpStringReader mHttpStringReader;
     private final PostResponseParser mResponseParser;
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
@@ -50,7 +50,7 @@ public class PostSender implements IPostSender {
         this.mHttpClient = client;
         this.mResources = resources;
         this.mResponseParser = new PostResponseParser();
-        this.mHttpStringReader = new HttpStringReader(this.mHttpClient);
+        this.mHttpStringReader = new HttpStringReader(this.mHttpClient, resources);
         this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
     }
@@ -105,7 +105,13 @@ public class PostSender implements IPostSender {
             }
 
             // Проверяю 200-response на наличие html-разметки с ошибкой
-            String responseText = this.mHttpStringReader.fromResponse(response);
+            String responseText = null;
+            try {
+                this.mHttpStringReader.fromResponse(response);
+            } catch (HttpRequestException e) {
+                throw new SendPostException(e.getMessage());
+            }
+            
             // Вызываю только для выброса exception
             this.mResponseParser.isPostSuccessful(responseText);
 
