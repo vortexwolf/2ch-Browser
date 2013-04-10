@@ -48,6 +48,7 @@ public class HttpStreamReader {
         HttpGet request = null;
         HttpResponse response = null;
         InputStream stream = null;
+        boolean wasNotModified = false;;
 
         try {
             request = this.createRequest(uri, customHeaders);
@@ -55,7 +56,7 @@ public class HttpStreamReader {
             
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() == 304) {
-                stream = null;
+                wasNotModified = true;
             }
             else if (status.getStatusCode() != 200) {
                 throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
@@ -73,6 +74,7 @@ public class HttpStreamReader {
         result.stream = stream;
         result.request = request;
         result.response = response;
+        result.notModifiedResult = wasNotModified;
         
         return result;
     }

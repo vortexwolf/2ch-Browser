@@ -35,11 +35,11 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
     private File mSaveTo;
     private String mUserError = null;
+    private long mContentLength = 0;
 
     {
         this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
         this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        ;
         this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
     }
 
@@ -139,6 +139,12 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
     @Override
     public void setContentLength(long value) {
+        this.mContentLength = value;
         this.mProgressView.setMax((int) value / 1024);
+    }
+    
+    @Override
+    public long getContentLength() {
+        return this.mContentLength;
     }
 }

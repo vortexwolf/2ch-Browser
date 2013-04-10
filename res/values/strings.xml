@@ -166,6 +166,7 @@
     <string name="error_incorrect_youtube_link">Incorrect format of the link to the video.</string>
     <string name="error_create_request">Unable to make a request to the page.</string>
     <string name="error_read_response">Unable to read the response from the server.</string>
+    <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code</string>

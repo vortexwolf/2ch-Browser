@@ -9,4 +9,5 @@ public class HttpStreamModel {
     public InputStream stream;
     public HttpRequestBase request;
     public HttpResponse response;
+    public boolean notModifiedResult;
 }

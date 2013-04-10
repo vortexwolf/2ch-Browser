@@ -107,7 +107,7 @@ public class PostSender implements IPostSender {
             // Проверяю 200-response на наличие html-разметки с ошибкой
             String responseText = null;
             try {
-                this.mHttpStringReader.fromResponse(response);
+                responseText = this.mHttpStringReader.fromResponse(response);
             } catch (HttpRequestException e) {
                 throw new SendPostException(e.getMessage());
             }
