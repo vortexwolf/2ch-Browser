@@ -2,18 +2,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="?activityRootBackground" >
+    android:background="?activityRootBackground">
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="4dp"
         android:fastScrollEnabled="true"
-        android:padding="2dp"
-        android:smoothScrollbar="true" />
+        android:padding="2dp" />
 
     <include
         android:id="@+id/loadingView"

@@ -28,6 +28,8 @@
                 <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/.\\.html" />
                 <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/1.\\.html" />
             </intent-filter>
+            
+            <meta-data android:name="android.app.default_searchable" android:value=".activities.SearchableActivity" />
         </activity>
 		<activity android:name=".activities.PostsListActivity" android:configChanges="keyboardHidden|orientation">
 		    <intent-filter>
@@ -40,7 +42,12 @@
                 <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*/res/.*\\.html#.*" />
             </intent-filter>
 		</activity>
-		        
+	    <activity android:name=".activities.SearchableActivity" android:launchMode="singleTop">
+	        <intent-filter>
+	            <action android:name="android.intent.action.SEARCH" />
+	        </intent-filter>
+	        <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
+	    </activity>
         <activity android:name=".activities.BrowserActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name=".activities.PickBoardActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name=".activities.AddPostActivity" android:configChanges="keyboardHidden|orientation"></activity>

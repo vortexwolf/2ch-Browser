@@ -225,6 +225,16 @@ public class ThreadsListActivity extends BaseListActivity {
             }
         }
     }
+    
+    @Override
+    public boolean onSearchRequested() {
+        Bundle data = new Bundle();
+        data.putString(Constants.EXTRA_BOARD_NAME, this.mBoardName);
+        
+        this.startSearch(null, false, data, false);
+        
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -260,6 +270,9 @@ public class ThreadsListActivity extends BaseListActivity {
                 break;
             case R.id.add_menu_id:
                 this.navigateToAddThreadView();
+                break;
+            case R.id.menu_search_id:
+                this.onSearchRequested();
                 break;
         }
 
@@ -444,7 +457,8 @@ public class ThreadsListActivity extends BaseListActivity {
                 ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
                 ThreadsListActivity.this.mAdapter.setAdapterData(threads);
             } else {
-                MyLog.e(TAG, "threads = null");
+                ThreadsListActivity.this.mAdapter.clear();
+                this.showError(ThreadsListActivity.this.getString(R.string.error_list_empty));
             }
         }
 

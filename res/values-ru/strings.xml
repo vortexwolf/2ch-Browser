@@ -28,7 +28,9 @@
     <string name="attach_youtube_title">Добавить youtube видео</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
-    <string name="favorites">Избранное</string>
+    <string name="favorites">Избранное</string>    
+    <string name="search_board_hint">Поиск</string>
+    <string name="data_search_posts_title">Поиск: %1$s</string>
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -76,7 +78,8 @@
     <string name="menu_remove_favorites">Удалить из закладок</string>
     <string name="menu_attach_youtube">Прикрепить YouTube видео</string>
     <string name="menu_add_board">Добавить форум</string>
-
+    <string name="menu_search">Поиск</string>
+    
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
     <string name="cmenu_open_attachment">Открыть файл</string>
@@ -172,6 +175,7 @@
     <string name="error_create_request">Невозможно выполнить запрос к странице.</string>
     <string name="error_read_response">Невозможно прочитать ответ сервера.</string>
     <string name="error_not_json">Невозможно использовать JSON API. Откройте страницу во внешнем браузере.</string>
+    <string name="error_list_empty">Список пуст.</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения</string>

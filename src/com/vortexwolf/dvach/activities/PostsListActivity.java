@@ -401,16 +401,12 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void refreshPosts(boolean checkModified) {
-        // На всякий случай отменю, чтобы не было проблем с обновлениями
-        // Возможно, лучше бы не запускать совсем
         if (this.mCurrentDownloadTask != null) {
             this.mCurrentDownloadTask.cancel(true);
         }
-        // Если адаптер пустой, то значит была ошибка при загрузке, в таком
-        // случае запускаю загрузку заново
+
         if (!this.mAdapter.isEmpty()) {
-            // Здесь запускаю с индикатором того, что происходит обновление, а
-            // не загрузка заново
+            // load new posts
             this.mCurrentDownloadTask = new DownloadPostsTask(this.mPostsReaderListener, this.mBoardName, this.mThreadNumber, true, this.mJsonReader, true);
             this.mCurrentDownloadTask.execute(this.mAdapter.getLastPostNumber());
         } else {
@@ -433,15 +429,14 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void setData(PostsList postsList) {
-            MyLog.d(TAG, "setData was called");
             if (postsList != null) {
                 PostInfo[] posts = postsList.getThread();
                 PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
                 PostsListActivity.this.mAdapter.setAdapterData(posts);
             } else {
-                MyLog.e(TAG, "posts = null");
+                PostsListActivity.this.mAdapter.clear();
+                this.showError(PostsListActivity.this.getString(R.string.error_list_empty));
             }
-
         }
 
         @Override

@@ -38,7 +38,7 @@ public abstract class BaseListActivity extends ListActivity {
         AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(this.getListView());
 
         // completely reload the root view, get loading and error views
-        this.setContentView(this.getLayoutId());
+        this.setContentView(this.getLayoutId());        
         this.mLoadingView = this.findViewById(R.id.loadingView);
         this.mErrorView = this.findViewById(R.id.error);
 

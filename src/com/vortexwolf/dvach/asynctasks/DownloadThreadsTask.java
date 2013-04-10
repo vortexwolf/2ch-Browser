@@ -78,7 +78,6 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         if (this.mContentLength > 0) {
             long absoluteProgress = this.mProgressOffset + (long)(progress[0].longValue() * this.mProgressScale);
             double relativeProgress = absoluteProgress / (double)this.mContentLength;
-            MyLog.d(TAG, "progress: " + relativeProgress);
             this.mView.setWindowProgress((int)(relativeProgress * 9999));
         }
     }

@@ -24,6 +24,10 @@
         android:icon="@drawable/ic_menu_browser"
         android:title="@string/menu_open_browser"/>
     <item
+        android:id="@+id/menu_search_id"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/menu_search"/>
+    <item
         android:id="@+id/preferences_menu_id"
         android:alphabeticShortcut="p"
         android:icon="@drawable/ic_menu_preferences"

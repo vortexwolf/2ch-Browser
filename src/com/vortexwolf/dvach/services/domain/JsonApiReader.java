@@ -31,6 +31,7 @@ import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.dvach.interfaces.IProgressChangeListener;
+import com.vortexwolf.dvach.models.domain.FoundPostsList;
 import com.vortexwolf.dvach.models.domain.HttpStreamModel;
 import com.vortexwolf.dvach.models.domain.PostsList;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
@@ -65,6 +66,13 @@ public class JsonApiReader implements IJsonApiReader {
         return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/" + threadId + ".json").toString();
     }
 
+    @Override
+    public FoundPostsList searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+        String uri = String.format("http://m2-ch.ru/%s/search?q=%s&out=json&nocheck", boardName, searchQuery);
+        
+        return this.readData(uri, FoundPostsList.class, listener, task);
+    }
+    
     @Override
     public ThreadsList readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
         String uri = this.formatThreadsUri(boardName, page);

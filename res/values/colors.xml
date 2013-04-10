@@ -26,8 +26,8 @@
     <color name="white_url_link">#5555FF</color>
     <color name="neutron_url_link">#C9BE89</color>
     <color name="photon_url_link">#FF6600</color>
-    <color name="white_tab_separator">#D9D9D9</color>
-    <color name="neutron_tab_separator">#333333</color>
+    <color name="white_tab_separator">#DDDDDD</color>
+    <color name="neutron_tab_separator">#232323</color>
     <color name="photon_tab_separator">@color/white_tab_separator</color>
     <color name="white_post_quote">#789922</color>
     <color name="neutron_post_quote">@color/white_post_quote</color>
