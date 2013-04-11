@@ -81,6 +81,7 @@ public class DownloadFileService {
     private void saveFromUri(Uri uri, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException{
         HttpStreamModel streamModel = null;
         try {
+            this.mHttpStreamReader.removeIfModifiedForUri(uri.toString());
             streamModel = this.mHttpStreamReader.fromUri(uri.toString(), null, listener, task);
         
             this.saveStream(streamModel.stream, to);
@@ -95,6 +96,8 @@ public class DownloadFileService {
         InputStream input = null;
         try {
             input = IoUtils.modifyInputStream(new FileInputStream(from), from.length(), listener, task);
+            
+            this.saveStream(input, to);
         } finally {
             IoUtils.closeStream(input);
         }

@@ -1,5 +1,8 @@
 package com.vortexwolf.dvach.services.domain;
 
+import org.apache.http.Header;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.message.BasicHeader;
 
 import android.net.Uri;
@@ -26,9 +29,9 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         Uri uri = this.mDvachUriBuilder.create2chUri("makaba/captcha.fcgi?usercode=" + this.mApplicationSettings.getPasscode());
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it
-        org.apache.http.Header xRequest = new BasicHeader("Referer", refererUri.toString());
+        Header refererHeader = new BasicHeader("Referer", refererUri.toString());
 
-        org.apache.http.Header[] extraHeaders = new org.apache.http.Header[] { xRequest };
+        Header[] extraHeaders = new Header[] { refererHeader };
         
         CaptchaResult result;
         try {

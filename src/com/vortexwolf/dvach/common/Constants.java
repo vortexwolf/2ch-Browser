@@ -80,4 +80,6 @@ public class Constants {
     public static final int CONTEXT_MENU_REMOVE_FAVORITES = 1010;
     public static final int CONTEXT_MENU_SEARCH_IMAGE = 1011;
     public static final int CONTEXT_MENU_HIDE_THREAD = 1012;
+    public static final int CONTEXT_MENU_SHARE = 1013;
+    public static final int CONTEXT_MENU_OPEN_THREAD = 1014;
 }

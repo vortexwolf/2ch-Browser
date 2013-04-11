@@ -30,7 +30,7 @@
     <string name="cancel">Отмена</string>
     <string name="favorites">Избранное</string>    
     <string name="search_board_hint">Поиск</string>
-    <string name="data_search_posts_title">Поиск: %1$s</string>
+    <string name="data_search_posts_title">Поиск /%1$s/: %2$s</string>
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -79,6 +79,7 @@
     <string name="menu_attach_youtube">Прикрепить YouTube видео</string>
     <string name="menu_add_board">Добавить форум</string>
     <string name="menu_search">Поиск</string>
+    <string name="menu_share_link">Поделиться ссылкой</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -93,6 +94,8 @@
     <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
     <string name="cmenu_search_image">Поиск изображения в TinEye</string>
     <string name="cmenu_hide_thread">Скрыть тред</string>
+    <string name="cmenu_share">Поделиться</string>
+    <string name="cmenu_open_thread">Открыть тред</string>
 
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>

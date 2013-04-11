@@ -102,6 +102,11 @@ public class PostItemViewModel {
     public String getNumber() {
         return this.mModel.getNum();
     }
+    
+    public String getParentThreadNumber() {
+        String parent = this.mModel.getParent();
+        return parent != null && !parent.equals("0") ? parent : this.getNumber();
+    }
 
     public String getName() {
         return this.mModel.getName();

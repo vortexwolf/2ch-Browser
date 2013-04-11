@@ -112,8 +112,9 @@ public class PickBoardActivity extends ListActivity {
         List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
         
         if (favoriteBoards.size() > 0) {
-            for (FavoritesEntity f : favoriteBoards) {            	
-                String boardName = UriUtils.getBoardName(Uri.parse(f.getUrl()));
+            for (FavoritesEntity f : favoriteBoards) {
+                Uri uri = Uri.parse(f.getUrl());  	
+                String boardName = UriUtils.getBoardName(uri);
                 this.mAdapter.addItemToFavoritesSection(boardName);
             }
         }

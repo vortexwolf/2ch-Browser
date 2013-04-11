@@ -45,10 +45,12 @@ public class BrowserActivity extends Activity {
 
     private Uri mUri = null;
     private String mTitle = null;
-    private OnCancelListener mCurrentCancelListener;
 
     private Menu mMenu;
     private boolean mImageLoaded = false;
+    private ViewType mViewType = null;
+    
+    private DownloadFileTask mCurrentTask = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,15 +74,7 @@ public class BrowserActivity extends Activity {
         this.mTitle = this.mUri.toString();
         this.setTitle(this.mTitle);
 
-        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
-        if (cachedFile.exists()) {
-            // show from cache
-            this.setImage(cachedFile);
-        } else {
-            // download image and cache it
-            File writeCachedFile = this.mCacheDirectoryManager.getCachedImageFileForWrite(this.mUri);
-            new DownloadFileTask(this, this.mUri, writeCachedFile, new BrowserDownloadFileView(), false).execute();
-        }
+        this.loadImage();
 
         this.mTracker.trackActivityView(TAG);
     }
@@ -88,8 +82,8 @@ public class BrowserActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (this.mCurrentCancelListener != null) {
-            this.mCurrentCancelListener.onCancel(null);
+        if (this.mCurrentTask != null) {
+            this.mCurrentTask.cancel(true);
         }
 
         // Must remove the WebView from the view system before destroying.
@@ -133,20 +127,42 @@ public class BrowserActivity extends Activity {
             case R.id.save_menu_id:
                 new DownloadFileTask(this, this.mUri).execute();
                 break;
+            case R.id.refresh_menu_id:
+                this.loadImage();
+                break;
             case R.id.share_menu_id:
-                Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("image/jpeg");
-                i.putExtra(Intent.EXTRA_STREAM, this.mUri);
-                this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
+                Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
+                shareImageIntent.setType("image/jpeg");
+                shareImageIntent.putExtra(Intent.EXTRA_STREAM, this.mUri);
+                this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
+                break;
+            case R.id.share_link_menu_id:
+                Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
+                shareLinkIntent.setType("text/plain");
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mUri.toString());
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mUri.toString());
+                this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
                 break;
         }
 
         return true;
     }
-
-    @Override
-    public File getCacheDir() {
-        return this.getApplicationContext().getCacheDir();
+    
+    private void loadImage(){
+        if (this.mCurrentTask != null) {
+            this.mCurrentTask.cancel(true);
+        }
+        
+        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
+        if (cachedFile.exists()) {
+            // show from cache
+            this.setImage(cachedFile);
+        } else {
+            // download image and cache it
+            File writeCachedFile = this.mCacheDirectoryManager.getCachedImageFileForWrite(this.mUri);
+            this.mCurrentTask = new DownloadFileTask(this, this.mUri, writeCachedFile, new BrowserDownloadFileView(), false);
+            this.mCurrentTask.execute();
+        }
     }
 
     private void setImage(File file) {
@@ -163,9 +179,11 @@ public class BrowserActivity extends Activity {
 
         MenuItem saveMenuItem = this.mMenu.findItem(R.id.save_menu_id);
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
+        MenuItem refreshMenuItem = this.mMenu.findItem(R.id.refresh_menu_id);
 
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
+        refreshMenuItem.setVisible(this.mViewType == ViewType.ERROR);
     }
 
     private void switchToLoadingView() {
@@ -178,12 +196,14 @@ public class BrowserActivity extends Activity {
 
     private void switchToErrorView(String message) {
         this.switchToView(ViewType.ERROR);
+        this.updateOptionsMenu();
 
         TextView errorTextView = (TextView) this.mErrorView.findViewById(R.id.error_text);
         errorTextView.setText(message != null ? message : this.getString(R.string.error_unknown));
     }
 
     private void switchToView(ViewType vt) {
+        this.mViewType = vt;
         if (vt == null) {
             return;
         }
@@ -239,7 +259,6 @@ public class BrowserActivity extends Activity {
 
         @Override
         public void setOnCancelListener(OnCancelListener listener) {
-            BrowserActivity.this.mCurrentCancelListener = listener;
         }
 
         @Override

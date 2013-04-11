@@ -75,12 +75,12 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
         
         for(PostInfo item : posts) {
             String thumbnail = item.getThumbnail();
-            if(!StringUtils.isEmpty(thumbnail)) {
+            if(thumbnail != null && thumbnail.startsWith(this.mBoardName + "/")) {
                 item.setThumbnail(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
             }
             
             String image = item.getImage();
-            if(!StringUtils.isEmpty(image)) {
+            if(image != null && image.startsWith(this.mBoardName + "/")) {
                 item.setImage(image.substring(image.indexOf("/") + 1, image.length()));
             }
             

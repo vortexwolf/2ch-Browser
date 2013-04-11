@@ -68,6 +68,7 @@ public class PostsListActivity extends BaseListActivity {
     private OpenTabModel mTabModel;
     private String mBoardName;
     private String mThreadNumber;
+    private String mPostNumber = null;
 
     private Menu mMenu;
 
@@ -82,6 +83,7 @@ public class PostsListActivity extends BaseListActivity {
         if (data != null) {
             this.mBoardName = UriUtils.getBoardName(data);
             this.mThreadNumber = UriUtils.getThreadNumber(data);
+            this.mPostNumber = data.getFragment();
         }
 
         this.mSettings = this.mApplication.getSettings();
@@ -194,14 +196,8 @@ public class PostsListActivity extends BaseListActivity {
         // Пробуем десериализовать в любом случае
         PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
         if (posts != null) {
-            this.mAdapter.setAdapterData(posts);
-
-            // Устанавливаем позицию, если открываем как уже открытую вкладку
-            AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
-            if (savedPosition != null) {
-                this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
-            }
-
+            this.setAdapterData(posts);
+            
             // Обновляем посты, если не был установлен ограничивающий extra
             if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
                 || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED)) {
@@ -212,6 +208,23 @@ public class PostsListActivity extends BaseListActivity {
             }
         } else {
             this.refreshPosts(false);
+        }
+    }
+    
+    private void setAdapterData(PostInfo[] posts){
+        boolean isFirstTime = this.mAdapter.isEmpty();
+        this.mAdapter.setAdapterData(posts);
+        
+        if (isFirstTime) {
+            if (this.mPostNumber != null) {
+                this.mAdapter.scrollToPost(this.mPostNumber);
+            } else {
+                // Устанавливаем позицию, если открываем как уже открытую вкладку
+                AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
+                if (savedPosition != null) {
+                    this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
+                }
+            }
         }
     }
 
@@ -299,6 +312,9 @@ public class PostsListActivity extends BaseListActivity {
         if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 4, this.getString(R.string.cmenu_search_image));
         }
+        if (!StringUtils.isEmpty(item.getSpannedComment())) {
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 5, this.getString(R.string.cmenu_share));
+        }
     }
 
     @Override
@@ -307,35 +323,37 @@ public class PostsListActivity extends BaseListActivity {
         PostItemViewModel info = this.mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
-            case Constants.CONTEXT_MENU_REPLY_POST: {
+            case Constants.CONTEXT_MENU_REPLY_POST:
                 this.navigateToAddPostView(info.getNumber(), null);
-                return true;
-            }
-            case Constants.CONTEXT_MENU_REPLY_POST_QUOTE: {
+                break;
+            case Constants.CONTEXT_MENU_REPLY_POST_QUOTE:
                 this.navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
-                return true;
-            }
-            case Constants.CONTEXT_MENU_COPY_TEXT: {
+                break;
+            case Constants.CONTEXT_MENU_COPY_TEXT:
                 ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
                 clipboard.setText(info.getSpannedComment().toString());
 
                 AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
-                return true;
-            }
-            case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
+                break;
+            case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
                 AttachmentInfo attachment = info.getAttachment(this.mBoardName);
                 Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
                 new DownloadFileTask(this, fileUri).execute();
-                return true;
-            }
-            case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
+                break;
+            case Constants.CONTEXT_MENU_SEARCH_IMAGE:
                 String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
                 new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
-                return true;
-            }
+                break;
+            case Constants.CONTEXT_MENU_SHARE:
+                Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
+                shareLinkIntent.setType("text/plain");
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getUri().toString() + "#" + info.getNumber());
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, info.getSpannedComment().toString());
+                this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
+                break;
         }
 
-        return false;
+        return true;
     }
 
     @Override
@@ -432,7 +450,7 @@ public class PostsListActivity extends BaseListActivity {
             if (postsList != null) {
                 PostInfo[] posts = postsList.getThread();
                 PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
-                PostsListActivity.this.mAdapter.setAdapterData(posts);
+                PostsListActivity.this.setAdapterData(posts);
             } else {
                 PostsListActivity.this.mAdapter.clear();
                 this.showError(PostsListActivity.this.getString(R.string.error_list_empty));

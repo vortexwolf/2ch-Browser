@@ -34,9 +34,11 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
+        HttpPost post = null;
+        HttpResponse response = null;
         try {
             DefaultHttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(this.mUri);
+            post = new HttpPost(this.mUri);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
             nameValuePairs.add(new BasicNameValuePair("task", "auth"));
@@ -46,15 +48,15 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             HttpClientParams.setRedirecting(post.getParams(), false);
 
-            HttpResponse response = client.execute(post);
+            response = client.execute(post);
 
             String location = ExtendedHttpClient.getLocationHeader(response);
-
-            post.abort();
 
             return location;
         } catch (Exception e) {
             MyLog.e("CheckPasscodeTask", e);
+        } finally {
+            ExtendedHttpClient.releaseRequestResponse(post, response);
         }
 
         return null;

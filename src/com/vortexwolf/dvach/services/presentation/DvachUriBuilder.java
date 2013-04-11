@@ -26,6 +26,10 @@ public class DvachUriBuilder {
     public String create2chThreadUrl(String board, String threadNumber) {
         return this.create2chBoardUri(board, "res/" + threadNumber + ".html").toString();
     }
+    
+    public String create2chThreadUrl(String board, String threadNumber, String postNumber) {
+        return this.create2chThreadUrl(board, threadNumber) + "#" + postNumber;
+    }
 
     public Uri create2chBoardUri(String board) {
         return this.create2chBoardUri(board, 0);

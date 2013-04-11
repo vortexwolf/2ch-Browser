@@ -86,6 +86,6 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
             return this.getCurrentActivity().onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 }

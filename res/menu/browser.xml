@@ -11,8 +11,15 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
+        android:id="@+id/refresh_menu_id"
+        android:icon="?iconRefresh"
+        android:title="@string/menu_refresh"/>
+    <item
         android:id="@+id/share_menu_id"
         android:icon="@drawable/ic_menu_share"
         android:title="@string/menu_share"/>
-
+    <item
+        android:id="@+id/share_link_menu_id"
+        android:icon="@drawable/ic_menu_share"
+        android:title="@string/menu_share_link"/>
 </menu>

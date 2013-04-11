@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
 import org.apache.http.Header;
@@ -68,6 +70,12 @@ public class JsonApiReader implements IJsonApiReader {
 
     @Override
     public FoundPostsList searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+        try {
+            searchQuery = URLEncoder.encode(searchQuery, Constants.UTF8_CHARSET.name());
+        } catch (UnsupportedEncodingException e) {
+            MyLog.e(TAG, e);
+        }
+        
         String uri = String.format("http://m2-ch.ru/%s/search?q=%s&out=json&nocheck", boardName, searchQuery);
         
         return this.readData(uri, FoundPostsList.class, listener, task);

@@ -67,7 +67,8 @@ public class FavoritesDataSource {
         List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
-            if (UriUtils.isBoardUri(Uri.parse(f.getUrl()))) {
+            Uri uri = Uri.parse(f.getUrl());
+            if (UriUtils.isBoardUri(uri) && UriUtils.getBoardPageNumber(uri) == 0) {
                 boardFavorites.add(f);
             }
         }

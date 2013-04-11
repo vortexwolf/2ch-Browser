@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.asynctasks;
 import android.os.AsyncTask;
 import android.view.Window;
 
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IJsonProgressChangeListener;
@@ -64,8 +65,8 @@ public class SearchPostsTask extends AsyncTask<Void, Long, Boolean> implements I
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
         if (this.mContentLength > 0) {
-            long absoluteProgress = this.mProgressOffset + (long)(progress[0].longValue() * this.mProgressScale);
-            double relativeProgress = absoluteProgress / (double)this.mContentLength;
+            double relativeProgress = progress[0].longValue() / (double)this.mContentLength;
+            MyLog.v("SearchPostsTask", relativeProgress + "");
             this.mView.setWindowProgress((int)(relativeProgress * 9999));
         }
     }
@@ -75,8 +76,8 @@ public class SearchPostsTask extends AsyncTask<Void, Long, Boolean> implements I
         if (this.isCancelled()) {
             return;
         }
-
-        this.publishProgress(newValue);
+        long absoluteProgress = this.mProgressOffset + (long)(newValue * this.mProgressScale);
+        this.publishProgress(absoluteProgress);
     }
 
     @Override

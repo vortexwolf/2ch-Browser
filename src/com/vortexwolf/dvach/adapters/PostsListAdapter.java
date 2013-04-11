@@ -119,6 +119,20 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings, this, this.mDvachUriBuilder));
         }
     }
+    
+    public void scrollToPost(String postNumber) {
+        if (StringUtils.isEmpty(postNumber)) {
+            return;
+        }
+        
+        int position = this.findPostByNumber(postNumber);
+        if (position == -1) {
+            AppearanceUtils.showToastMessage(this.getContext(), this.getContext().getString(R.string.notification_post_not_found));
+            return;
+        }
+        
+        this.mListView.setSelection(position);
+    }
 
     /**
      * Добавляет новые данные в адаптер

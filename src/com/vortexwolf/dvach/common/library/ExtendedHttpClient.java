@@ -12,6 +12,8 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -47,7 +49,9 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         HttpConnectionParams.setSocketBufferSize(params, 8192);
 
         HttpProtocolParams.setUserAgent(params, Constants.USER_AGENT_STRING);
-
+        
+        params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
+        
         // HTTPS scheme registry
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));

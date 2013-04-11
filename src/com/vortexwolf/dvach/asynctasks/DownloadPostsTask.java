@@ -99,8 +99,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
         if (this.mContentLength > 0) {
-            long absoluteProgress = this.mProgressOffset + (long)(progress[0].longValue() * this.mProgressScale);
-            double relativeProgress = absoluteProgress / (double)this.mContentLength;
+            double relativeProgress = progress[0].longValue() / (double)this.mContentLength;
             this.mView.setWindowProgress((int)(relativeProgress * 9999));
         }
     }
@@ -110,8 +109,9 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
         if (this.isCancelled()) {
             return;
         }
-
-        this.publishProgress(newValue);
+        
+        long absoluteProgress = this.mProgressOffset + (long)(newValue * this.mProgressScale);
+        this.publishProgress(absoluteProgress);
     }
 
     @Override
