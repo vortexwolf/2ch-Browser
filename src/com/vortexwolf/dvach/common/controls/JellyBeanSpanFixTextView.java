@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Build;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.ClickableSpan;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.MyLog;
 
 /**
  * <p>
@@ -71,6 +77,7 @@ public class JellyBeanSpanFixTextView extends TextView {
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         } catch (IndexOutOfBoundsException e) {
+            MyLog.w(TAG, e.getMessage());
             this.fixOnMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }

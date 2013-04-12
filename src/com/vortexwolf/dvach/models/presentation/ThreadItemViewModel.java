@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.models.domain.ThreadInfo;
@@ -43,7 +44,9 @@ public class ThreadItemViewModel {
     }
 
     public String getSubject() {
-        return this.mOpPost.getSubject();
+        String subject = StringUtils.emptyIfNull(this.mOpPost.getSubject());
+        subject = subject.replaceAll("&#44;", ",");
+        return subject;
     }
 
     public boolean hasAttachment() {

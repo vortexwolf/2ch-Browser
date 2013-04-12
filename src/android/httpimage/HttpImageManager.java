@@ -210,9 +210,9 @@ public class HttpImageManager {
             if (r.mListener != null) {
                 r.mListener.beforeLoad(r);
             }
-            
+
             final Callable<LoadRequest> callable = this.newRequestCall(r);
-            
+
             // TODO: rewrite by using a real async task
             AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                 @Override
@@ -222,13 +222,13 @@ public class HttpImageManager {
                     } catch (Exception e) {
                         MyLog.e(TAG, e);
                     }
-                    
+
                     return null;
                 }
             };
-            
+
             task.execute();
-            
+
             return null;
         }
 
@@ -268,26 +268,24 @@ public class HttpImageManager {
                                 ? HttpImageManager.this.mPersistence.loadData(key)
                                 : null;
                         if (data != null) {
-                            // MyLog.d(TAG, "found in persistent: " +
-                            // request.getUri().toString());
                             // load it into memory
                             resizedData = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
                             HttpImageManager.this.mCache.storeData(key, resizedData);
                         } else {
                             // we go to network
                             data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
-                            
+
                             // load it into memory
                             resizedData = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
                             HttpImageManager.this.mCache.storeData(key, resizedData);
 
                             // persist it
                             if (HttpImageManager.this.mPersistence.isEnabled()) {
-                                HttpImageManager.this.mPersistence.storeData(key, data);
+                                HttpImageManager.this.mPersistence.storeData(key, resizedData);
                             }
                         }
                     }
-                    
+
                     if (resizedData != null) {
                         data = resizedData;
                     }

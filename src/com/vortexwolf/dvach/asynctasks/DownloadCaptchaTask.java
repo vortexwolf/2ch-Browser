@@ -65,10 +65,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mSkipPasscode = result.passCode;
         String captchaKey = result.captchaKey;
 
-        if (this.mCanSkip && !UriUtils.isThreadUri(this.mRefererUri)) {
+        if (this.mSkipPasscode || this.mCanSkip && !UriUtils.isBoardUri(this.mRefererUri)) {
             return true;
         }
-        if(!this.mCanSkip && captchaKey == null) {
+        if(captchaKey == null) {
             return false;
         }
 

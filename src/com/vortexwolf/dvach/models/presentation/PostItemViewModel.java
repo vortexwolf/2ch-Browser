@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
+import android.text.style.URLSpan;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.library.MyHtml;
@@ -44,6 +45,7 @@ public class PostItemViewModel {
 
     public boolean isFloatImageComment = false;
     private boolean mIsLocalDateTime = false;
+    private boolean mHasUrlSpans = false;
 
     public PostItemViewModel(int position, PostInfo model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
         this.mModel = model;
@@ -79,7 +81,12 @@ public class PostItemViewModel {
 
         String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
         SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
-        HtmlUtils.replaceUrls(builder, this.mUrlListener, this.mTheme);
+        
+        URLSpan[] urlSpans = builder.getSpans(0, builder.length(), URLSpan.class);
+        if (urlSpans.length > 0) {
+            this.mHasUrlSpans = true;
+            HtmlUtils.replaceUrls(builder, this.mUrlListener, this.mTheme);
+        }
 
         return builder;
     }
@@ -156,6 +163,10 @@ public class PostItemViewModel {
         return this.mPostDate;
     }
 
+    public boolean hasUrls() {
+        return this.mHasUrlSpans;
+    }
+    
     public boolean hasReferencesFrom() {
         return !this.referencesFrom.isEmpty();
     }
@@ -193,8 +204,6 @@ public class PostItemViewModel {
 
             if (iterator.hasNext()) {
                 sb.append(", ");
-            } else {
-                sb.append("\n");
             }
         }
         // Разбираю строку на объекты-ссылки и добавляю обработчики событий

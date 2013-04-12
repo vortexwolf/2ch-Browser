@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.common.library;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -20,9 +21,11 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.params.CookieSpecPNames;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.cookie.DateUtils;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
@@ -49,8 +52,6 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         HttpConnectionParams.setSocketBufferSize(params, 8192);
 
         HttpProtocolParams.setUserAgent(params, Constants.USER_AGENT_STRING);
-        
-        params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
         
         // HTTPS scheme registry
         SchemeRegistry schemeRegistry = new SchemeRegistry();

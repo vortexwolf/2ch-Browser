@@ -69,6 +69,7 @@ public class BrowserActivity extends Activity {
         settings.setBuiltInZoomControls(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setBlockNetworkLoads(true);
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();

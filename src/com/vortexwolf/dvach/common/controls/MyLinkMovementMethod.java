@@ -202,7 +202,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
                 return true;
             } else {
-                Selection.removeSelection(buffer);
+                this.removeSelection(buffer);
             }
         }
 
@@ -216,17 +216,17 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
             @Override
             public boolean onLongClick(View v) {
                 MyLinkMovementMethod.this.mSkipNextClick = true;
-                Selection.removeSelection(text);
+                MyLinkMovementMethod.this.removeSelection(text);
                 return false;
             }
         });
-        Selection.removeSelection(text);
+        this.removeSelection(text);
         text.removeSpan(FROM_BELOW);
     }
 
     @Override
     public void onTakeFocus(TextView view, Spannable text, int dir) {
-        Selection.removeSelection(text);
+        this.removeSelection(text);
 
         if ((dir & View.FOCUS_BACKWARD) != 0) {
             text.setSpan(FROM_BELOW, 0, 0, Spanned.SPAN_POINT_POINT);
@@ -241,6 +241,10 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
         }
 
         return sInstance;
+    }
+    
+    private void removeSelection(Spannable text) {
+        Selection.removeSelection(text);
     }
 
     private static MyLinkMovementMethod sInstance;

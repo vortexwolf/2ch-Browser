@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.text.SpannableStringBuilder;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +115,11 @@ public class PostItemViewBuilder {
         }
 
         vb.commentView.setText(item.getSpannedComment());
-        vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
+        //if(item.hasUrls()) {
+            //vb.commentView.setAutoLinkMask(Linkify.ALL);
+            //HtmlUtils.removeUrlSpans(item.getSpannedComment());
+            //vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
+        //}
 
         // Ответы на сообщение
         if (this.mThreadNumber != null && item.hasReferencesFrom()) {
