@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.services;
 import java.io.File;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.vortexwolf.dvach.common.Constants;
@@ -99,31 +100,24 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
 
     @Override
     public void trimCacheIfNeeded() {
-        new Thread(new Runnable() {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
+            public Void doInBackground(Void... params) {
                 long cacheSize = IoUtils.dirSize(CacheDirectoryManager.this.getCurrentCacheDirectory());
                 long maxSize = Constants.FILE_CACHE_THRESHOLD;
 
                 if (cacheSize > maxSize) {
                     long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
-                    IoUtils.deleteDirectory(CacheDirectoryManager.this.getReversedCacheDirectory()); // remove
-                    // completly
-                    // the
-                    // reversed
-                    // cache
-                    // directory
-                    deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount); // remove
-                    // images
-                    // first
-                    IoUtils.freeSpace(CacheDirectoryManager.this.getCurrentCacheDirectory(), deleteAmount); // other
-                    // cache
-                    // items
-                    // if
-                    // needed
+                    IoUtils.deleteDirectory(CacheDirectoryManager.this.getReversedCacheDirectory());
+                    deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount); 
+                    IoUtils.freeSpace(CacheDirectoryManager.this.getCurrentCacheDirectory(), deleteAmount);
                 }
+                
+                return null;
             }
-        }).start();
+        };
+        
+        task.execute();
     }
 
     @Override
