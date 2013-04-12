@@ -182,6 +182,7 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();
         result.isDisplayDate = this.isDisplayPostItemDate();
+        result.isLocalDate = this.isLocalDateTime();
         result.isLoadThumbnails = this.isLoadThumbnails();
 
         return result;

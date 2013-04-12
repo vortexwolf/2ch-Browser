@@ -3,8 +3,7 @@ package com.vortexwolf.dvach.services.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.text.Html;
-
+import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.exceptions.SendPostException;
 
@@ -24,7 +23,7 @@ public class PostResponseParser {
             Matcher m = this.mErrorPattern.matcher(centerMatcher.group(1));
             if (m.find() && m.groupCount() > 0) {
                 String htmlText = m.group(1);
-                String text = Html.fromHtml(htmlText).toString().replaceAll("\n", "");
+                String text = MyHtml.fromHtml(htmlText).toString().replaceAll("\n", "");
 
                 MyLog.v(TAG, text);
                 throw new SendPostException(text);

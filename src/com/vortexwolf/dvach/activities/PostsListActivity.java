@@ -154,11 +154,16 @@ public class PostsListActivity extends BaseListActivity {
         // Проверяем изменение настроек
         SettingsEntity newSettings = this.mSettings.getCurrentSettings();
         if (this.mCurrentSettings.theme != newSettings.theme) {
-            this.resetUI();
+            this.finish();
+            Intent i = new Intent(this, this.getClass());
+            i.putExtra(Constants.EXTRA_PREFER_DESERIALIZED, true);
+            this.startActivity(i);
             return;
         }
 
-        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails) {
+        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate 
+            || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails
+            || this.mCurrentSettings.isLocalDate != newSettings.isLocalDate) {
             this.mAdapter.notifyDataSetChanged();
         }
 

@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -43,6 +43,7 @@ public class PostItemViewModel {
     private final ArrayList<String> referencesFrom = new ArrayList<String>();
 
     public boolean isFloatImageComment = false;
+    private boolean mIsLocalDateTime = false;
 
     public PostItemViewModel(int position, PostInfo model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
         this.mModel = model;
@@ -109,7 +110,8 @@ public class PostItemViewModel {
     }
 
     public String getName() {
-        return this.mModel.getName();
+        String name = this.mModel.getName();
+        return name != null ? name : this.mModel.getPostername();
     }
 
     public boolean hasAttachment() {
@@ -137,23 +139,18 @@ public class PostItemViewModel {
     }
 
     public String getPostDate(Context context) {
-        if (this.mPostDate == null) {
-            long realTimeStamp = (this.mModel.getTimestamp() - 3600) * 1000; // the
-                                                                             // returned
-                                                                             // value
-                                                                             // is
-                                                                             // incorrect,
-                                                                             // I
-                                                                             // need
-                                                                             // to
-                                                                             // substract
-                                                                             // 1
-                                                                             // hour
-            Date date = this.mSettings.isLocalDateTime()
-                    ? ThreadPostUtils.getLocalDateFromTimestamp(realTimeStamp)
-                    : ThreadPostUtils.getMoscowDateFromTimestamp(realTimeStamp);
+        if (this.mPostDate == null || this.mIsLocalDateTime != this.mSettings.isLocalDateTime()) {
+            long realTimeStamp = (this.mModel.getTimestamp()) * 1000;
+            if (realTimeStamp == 0) {
+                realTimeStamp = ThreadPostUtils.parseMoscowTextDate(this.mModel.getDate());
+            }
+            
+            this.mIsLocalDateTime = this.mSettings.isLocalDateTime();
+            String formattedDate = this.mIsLocalDateTime
+                    ? ThreadPostUtils.getLocalDateFromTimestamp(context, realTimeStamp)
+                    : ThreadPostUtils.getMoscowDateFromTimestamp(context, realTimeStamp);
 
-            this.mPostDate = DateFormat.getDateFormat(context).format(date) + ", " + DateFormat.getTimeFormat(context).format(date);
+            this.mPostDate = formattedDate;
         }
 
         return this.mPostDate;
@@ -202,7 +199,7 @@ public class PostItemViewModel {
         }
         // Разбираю строку на объекты-ссылки и добавляю обработчики событий
         String joinedLinks = sb.toString();
-        SpannableStringBuilder builder = (SpannableStringBuilder) Html.fromHtml(joinedLinks);
+        SpannableStringBuilder builder = (SpannableStringBuilder) MyHtml.fromHtml(joinedLinks);
         HtmlUtils.replaceUrls(builder, this.mUrlListener, this.mTheme);
 
         return builder;

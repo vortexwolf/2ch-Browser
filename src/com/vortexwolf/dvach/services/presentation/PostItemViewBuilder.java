@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
-import com.vortexwolf.dvach.common.library.Html;
+import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
@@ -87,7 +87,7 @@ public class PostItemViewBuilder {
         // Имя
         String name = item.getName();
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")) {
-            vb.postNameView.setText(Html.fromHtml(name, HtmlUtils.sImageGetter, null));
+            vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
             vb.postNameView.setVisibility(View.GONE);

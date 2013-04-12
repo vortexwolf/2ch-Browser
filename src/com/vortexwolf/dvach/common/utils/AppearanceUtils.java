@@ -1,6 +1,13 @@
 package com.vortexwolf.dvach.common.utils;
 
+import com.vortexwolf.dvach.R;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -59,6 +66,28 @@ public class AppearanceUtils {
         if (indeterminateProgressBar != null) {
             indeterminateProgressBar.setVisibility(View.GONE);
         }
+    }
+    
+    public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int newSize = resources.getDimensionPixelSize(R.dimen.thumbnail_size);
+        
+        float scaleWidth = newSize / (float)width;
+        float scaleHeight = newSize / (float)height;
+
+        if(scaleWidth >= 1.0 || scaleHeight >= 1.0) {
+            return bitmap;
+        }
+        
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        bitmap.recycle();
+        
+        return resizedBitmap;
     }
 
     public static class ListViewPosition {

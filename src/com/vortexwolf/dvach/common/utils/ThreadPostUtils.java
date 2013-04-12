@@ -1,11 +1,19 @@
 package com.vortexwolf.dvach.common.utils;
 
+import java.text.DateFormatSymbols;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -21,25 +29,57 @@ import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadPostUtils {
-
+    private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
+    private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" };
     private static final IClickListenersFactory sThumbnailOnClickListenerFactory = new ClickListenersFactory();
 
-    public static Date getDateFromTimestamp(long timeInMiliseconds, TimeZone timeZone) {
-        long localOffset = TimeZone.getDefault().getOffset(timeInMiliseconds);
-        Date gmtTime = new Date(timeInMiliseconds - localOffset);
-
-        long timeZoneOffset = timeZone.getOffset(timeInMiliseconds);
-        Date timeZoneTime = new Date(gmtTime.getTime() + timeZoneOffset);
-
-        return timeZoneTime;
+    public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
+        java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
+        dateFormat.setTimeZone(timeZone);
+        
+        java.text.DateFormat timeFormat = DateFormat.getTimeFormat(context);
+        timeFormat.setTimeZone(timeZone);
+        
+        Date date = new Date(timeInMiliseconds);
+        return dateFormat.format(date) + ", " + timeFormat.format(date);
     }
 
-    public static Date getMoscowDateFromTimestamp(long timeInMiliseconds) {
-        return getDateFromTimestamp(timeInMiliseconds, TimeZone.getTimeZone("GMT+4"));
+    public static String getMoscowDateFromTimestamp(Context context, long timeInMiliseconds) {
+        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getTimeZone("GMT+4"));
     }
 
-    public static Date getLocalDateFromTimestamp(long timeInMiliseconds) {
-        return getDateFromTimestamp(timeInMiliseconds, TimeZone.getDefault());
+    public static String getLocalDateFromTimestamp(Context context, long timeInMiliseconds) {
+        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getDefault());
+    }
+    
+    //text = "Птн 12 Апр 2013 12:37:12";
+    public static long parseMoscowTextDate(String text) {
+        if(StringUtils.isEmpty(text)) {
+            return 0;
+        }
+        
+        Matcher m = dateTextPattern.matcher(text);
+        if(!m.find()) {
+            return 0;
+        }
+        
+        int day = Integer.valueOf(m.group(1));
+        String monthStr = m.group(2);
+        int monthIndex = Arrays.asList(sMonthNames).indexOf(monthStr);
+        int month = monthIndex != -1 ? monthIndex : 0;
+        int year = Integer.valueOf(m.group(3));
+        int hour = Integer.valueOf(m.group(4));
+        int minute = Integer.valueOf(m.group(5));
+        int second = Integer.valueOf(m.group(6));
+
+        Date date  = new Date(year - 1900, month, day, hour, minute, second);
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.HOUR, -4); // from GMT+4 to UTC
+        
+        long result = cal.getTimeInMillis();
+        return result;
     }
 
     /**

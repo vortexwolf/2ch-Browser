@@ -43,11 +43,11 @@ public class HtmlToSpannedConverter implements ContentHandler {
     private String mSource;
     private XMLReader mReader;
     private SpannableStringBuilder mSpannableStringBuilder;
-    private Html.ImageGetter mImageGetter;
-    private Html.TagHandler mTagHandler;
+    private MyHtml.ImageGetter mImageGetter;
+    private MyHtml.TagHandler mTagHandler;
     private Stack<Attributes> mUnknownTagsAttributes = new Stack<Attributes>();
 
-    public HtmlToSpannedConverter(String source, Html.ImageGetter imageGetter, Html.TagHandler tagHandler, Parser parser) {
+    public HtmlToSpannedConverter(String source, MyHtml.ImageGetter imageGetter, MyHtml.TagHandler tagHandler, Parser parser) {
         this.mSource = source;
         this.mSpannableStringBuilder = new SpannableStringBuilder();
         this.mImageGetter = imageGetter;
@@ -243,7 +243,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
         return;
     }
 
-    private static void startImg(SpannableStringBuilder text, Attributes attributes, Html.ImageGetter img) {
+    private static void startImg(SpannableStringBuilder text, Attributes attributes, MyHtml.ImageGetter img) {
         String src = attributes.getValue("", "src");
         Drawable d = null;
 

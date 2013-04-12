@@ -18,6 +18,8 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     private int height;
     private long timestamp;
     private String parent;
+    private String date;
+    private String postername;
 
     public String getNum() {
         return this.num;
@@ -117,5 +119,21 @@ public class PostInfo implements IAttachmentEntity, Serializable {
 
     public void setParent(String parent) {
         this.parent = parent;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getPostername() {
+        return postername;
+    }
+
+    public void setPostername(String postername) {
+        this.postername = postername;
     }
 }

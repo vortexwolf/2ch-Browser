@@ -21,7 +21,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.ClickableURLSpan;
-import com.vortexwolf.dvach.common.library.Html;
+import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.library.UnknownTagsHandler;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
@@ -31,7 +31,7 @@ public class HtmlUtils {
 
     private static final DefaultHttpClient httpClient = MainApplication.getHttpClient();
     // Картинки со смайликами во время всяких праздников
-    public static final Html.ImageGetter sImageGetter = new Html.ImageGetter() {
+    public static final MyHtml.ImageGetter sImageGetter = new MyHtml.ImageGetter() {
         @Override
         public Drawable getDrawable(String ref) {
             Uri uri = Factory.getContainer().resolve(DvachUriBuilder.class).adjust2chRelativeUri(Uri.parse(ref));
@@ -51,7 +51,7 @@ public class HtmlUtils {
     };
 
     public static SpannableStringBuilder createSpannedFromHtml(String htmlText, Theme theme) {
-        SpannableStringBuilder builder = (SpannableStringBuilder) Html.fromHtml(StringUtils.emptyIfNull(htmlText), sImageGetter, new UnknownTagsHandler(theme));
+        SpannableStringBuilder builder = (SpannableStringBuilder) MyHtml.fromHtml(StringUtils.emptyIfNull(htmlText), sImageGetter, new UnknownTagsHandler(theme));
 
         return builder;
     }

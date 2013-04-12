@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
 
 /**
@@ -76,6 +77,7 @@ public class HttpImageManager {
     private final BitmapCache mCache;
     private final BitmapCache mPersistence;
     private final HttpBitmapReader mNetworkResourceLoader;
+    private final Resources mResources;
 
     private final Handler mHandler = new Handler();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
@@ -163,6 +165,7 @@ public class HttpImageManager {
         this.mCache = cache;
         this.mPersistence = persistence;
         this.mNetworkResourceLoader = new HttpBitmapReader(httpClient, resources);
+        this.mResources = resources;
     }
 
     public HttpImageManager(BitmapCache persistence, DefaultHttpClient httpClient, Resources resources) {
@@ -249,12 +252,14 @@ public class HttpImageManager {
                             // MyLog.d(TAG, "found in persistent: " +
                             // request.getUri().toString());
                             // load it into memory
+                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
                             HttpImageManager.this.mCache.storeData(key, data);
                         } else {
                             // we go to network
                             data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
                             
                             // load it into memory
+                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
                             HttpImageManager.this.mCache.storeData(key, data);
 
                             // persist it
