@@ -11,10 +11,13 @@ import android.view.MenuItem;
 import android.widget.TabHost;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
+import com.vortexwolf.dvach.services.Tracker;
 
 public class TabsHistoryBookmarksActivity extends TabActivity {
+    private static final String TAG = "TabsHistoryBookmarksActivity";
     private Menu mSoftwareMenu;
     private boolean mIsSoftwareMenu;
 
@@ -53,6 +56,10 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
                 }
             });
         }
+        
+        Tracker tracker = Factory.getContainer().resolve(Tracker.class);
+        tracker.clearBoardVar();
+        tracker.trackActivityView(TAG);
     }
 
     @Override

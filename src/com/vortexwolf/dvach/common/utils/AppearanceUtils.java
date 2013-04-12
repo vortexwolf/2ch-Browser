@@ -2,11 +2,13 @@ package com.vortexwolf.dvach.common.utils;
 
 import com.vortexwolf.dvach.R;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,22 +73,17 @@ public class AppearanceUtils {
     public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap){
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-
+        
+        int oldSize = Math.max(width, height);
         int newSize = resources.getDimensionPixelSize(R.dimen.thumbnail_size);
         
-        float scaleWidth = newSize / (float)width;
-        float scaleHeight = newSize / (float)height;
+        float scale = newSize / (float)oldSize;
 
-        if(scaleWidth >= 1.0 || scaleHeight >= 1.0) {
+        if(scale >= 1.0) {
             return bitmap;
         }
-        
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
 
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-        bitmap.recycle();
-        
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int)(width * scale), (int)(height * scale), true);
         return resizedBitmap;
     }
 

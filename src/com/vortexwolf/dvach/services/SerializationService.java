@@ -9,30 +9,20 @@ import java.io.ObjectOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.os.AsyncTask;
+
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class SerializationService {
     private static final String TAG = "SerializingService";
 
-    private final ExecutorService mExecutor;
-
     public SerializationService() {
-        this.mExecutor = Executors.newFixedThreadPool(1);
     }
 
     public void serializeObject(final File file, final Object obj) {
-        this.mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(file));
-                    os.writeObject(obj);
-                    os.close();
-                } catch (IOException e) {
-                    MyLog.e(TAG, e);
-                }
-            }
-        });
+        SerializeTask task = new SerializeTask(file, obj);
+        task.execute();
     }
 
     public Object deserializeObject(File file) {
@@ -40,16 +30,43 @@ public class SerializationService {
             return null;
         }
 
+        ObjectInputStream is = null;
         try {
-            ObjectInputStream is = new ObjectInputStream(new FileInputStream(file));
+            is = new ObjectInputStream(new FileInputStream(file));
             Object obj = is.readObject();
-            is.close();
 
             return obj;
         } catch (Exception e) {
             MyLog.e(TAG, e);
+        } finally {
+            IoUtils.closeStream(is);
         }
 
         return null;
+    }
+    
+    private static class SerializeTask extends AsyncTask<Void, Void, Void> {
+        private final File mFile;
+        private final Object mObject;
+        
+        public SerializeTask(File file, Object object) {
+            this.mFile = file;
+            this.mObject = object;
+        }
+        
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            ObjectOutputStream os = null;
+            try {
+                os = new ObjectOutputStream(new FileOutputStream(this.mFile));
+                os.writeObject(this.mObject);
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+            } finally {
+                IoUtils.closeStream(os);
+            }
+            
+            return null;
+        }
     }
 }
