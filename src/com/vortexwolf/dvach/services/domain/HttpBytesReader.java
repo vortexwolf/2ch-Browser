@@ -71,6 +71,10 @@ public class HttpBytesReader {
         }
     }
     
+    public void removeIfModifiedForUri(String uri) {
+        this.mHttpStreamReader.removeIfModifiedForUri(uri);
+    }
+    
     private byte[] convertStreamToBytes(InputStream stream) throws HttpRequestException{
         try {
             byte[] result = IoUtils.convertStreamToBytes(stream);

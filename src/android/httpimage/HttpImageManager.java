@@ -273,6 +273,7 @@ public class HttpImageManager {
                             HttpImageManager.this.mCache.storeData(key, resizedData);
                         } else {
                             // we go to network
+                            HttpImageManager.this.mNetworkResourceLoader.removeIfModifiedForUri(request.getUri().toString());
                             data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
 
                             // load it into memory

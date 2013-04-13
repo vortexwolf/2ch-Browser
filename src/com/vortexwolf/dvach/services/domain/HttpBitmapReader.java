@@ -38,4 +38,8 @@ public class HttpBitmapReader {
         
         return bmp;
     }
+    
+    public void removeIfModifiedForUri(String uri) {
+        this.mHttpBytesReader.removeIfModifiedForUri(uri);
+    }
 }
