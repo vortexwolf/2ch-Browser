@@ -3,11 +3,14 @@ package com.vortexwolf.dvach.common.controls;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 
 /**
  * <p>
@@ -36,7 +40,8 @@ import com.vortexwolf.dvach.common.library.MyLog;
  * @author "Pierre-Yves Ricau" <py.ricau@gmail.com>
  * 
  */
-public class JellyBeanSpanFixTextView extends TextView {
+@SuppressLint("WrongCall")
+public class JellyBeanSpanFixTextView extends ClickableLinksTextView {
 
     private static class FixingResult {
         public final boolean fixed;

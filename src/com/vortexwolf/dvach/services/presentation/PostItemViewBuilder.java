@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.services.presentation;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources.Theme;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.MyHtml;
+import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
@@ -115,11 +117,9 @@ public class PostItemViewBuilder {
         }
 
         vb.commentView.setText(item.getSpannedComment());
-        //if(item.hasUrls()) {
-            //vb.commentView.setAutoLinkMask(Linkify.ALL);
-            //HtmlUtils.removeUrlSpans(item.getSpannedComment());
-            //vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
-        //}
+        if(item.hasUrls() && !CompatibilityUtils.isTextSelectable(vb.commentView)) {
+            vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
+        }
 
         // Ответы на сообщение
         if (this.mThreadNumber != null && item.hasReferencesFrom()) {
