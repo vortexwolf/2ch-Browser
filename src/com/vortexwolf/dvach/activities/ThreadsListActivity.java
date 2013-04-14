@@ -334,9 +334,7 @@ public class ThreadsListActivity extends BaseListActivity {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(R.string.cmenu_download_file));
         }
 
-        if (item.isEllipsized()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
-        }
+        menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
 
         if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 3, this.getString(R.string.cmenu_search_image));

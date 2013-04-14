@@ -102,9 +102,14 @@ public class IoUtils {
         if (dir == null || !dir.exists()) {
             return 0;
         }
+        
+        File[] files = dir.listFiles();
+        if (files == null) {
+            return 0;
+        }
 
         long result = 0;
-        for (File file : dir.listFiles()) {
+        for (File file : files) {
             // Recursive call if it's a directory
             if (file.isDirectory()) {
                 result += dirSize(file);
@@ -118,7 +123,12 @@ public class IoUtils {
 
     public static void deleteDirectory(File path) {
         if (path != null && path.exists()) {
-            for (File file : path.listFiles()) {
+            File[] files = path.listFiles();
+            if (files == null) {
+                return;
+            }
+            
+            for (File file : files) {
                 if (file.isDirectory()) {
                     deleteDirectory(file);
                 } else {
@@ -134,7 +144,12 @@ public class IoUtils {
         long released = 0;
 
         if (path != null && path.exists()) {
-            for (File file : path.listFiles()) {
+            File[] files = path.listFiles();
+            if (files == null) {
+                return 0;
+            }
+            
+            for (File file : files) {
                 if (file.isDirectory()) {
                     released += freeSpace(file, bytesToRelease);
                 } else {
