@@ -1,15 +1,21 @@
 package com.vortexwolf.dvach.common.controls;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.UUID;
 
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.text.Editable;
 import android.text.Layout;
+import android.text.Selection;
 import android.text.Spannable;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.view.ActionMode;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
@@ -18,8 +24,8 @@ import android.widget.TextView;
 public class ClickableLinksTextView extends TextView {
     public static final String TAG = "ClickableLinksTextView";
     
-    private boolean mEditorCreated = false;
-    private Object mEditor = null;
+    private boolean mBaseEditorCopied = false;
+    private Object mBaseEditor = null;
     private Field mDiscardNextActionUpField = null;
     private Field mIgnoreActionUpEventField = null;
     
@@ -35,58 +41,19 @@ public class ClickableLinksTextView extends TextView {
         super(context, attrs);
     }
     
-    private final void copyBaseEditorIfNecessary(){
-        if(this.mEditorCreated) {
-            return;
-        }
+    @Override
+    public void onStartTemporaryDetach() {
+        super.onStartTemporaryDetach();
         
-        try {
-            Field field = TextView.class.getDeclaredField("mEditor");
-            field.setAccessible(true);
-            this.mEditor = field.get(this);
-            
-            if (this.mEditor != null) {
-                this.mDiscardNextActionUpField = this.mEditor.getClass().getDeclaredField("mDiscardNextActionUp");
-                this.mDiscardNextActionUpField.setAccessible(true);
-            
-                this.mIgnoreActionUpEventField = this.mEditor.getClass().getDeclaredField("mIgnoreActionUpEvent");
-                this.mIgnoreActionUpEventField.setAccessible(true);
-            }
-            
-        } catch (Exception e) {
-            MyLog.e(TAG, e);
-        } finally {
-            this.mEditorCreated = true;
+        // listview scrolling behaves incorrectly after you select and copy some text, so I've added this code
+        if (this.isFocused()) {
+            this.clearFocus();
         }
     }
-    
-    private boolean getDiscardNextActionUp() {
-        if(this.mEditor == null) {
-            return false;
-        }
-        
-        try {
-            return this.mDiscardNextActionUpField.getBoolean(this.mEditor);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
-    private boolean getIgnoreActionUpEvent() {
-        if(this.mEditor == null) {
-            return false;
-        }
-        
-        try {
-            return this.mIgnoreActionUpEventField.getBoolean(this.mEditor);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // TextView checks if getAutoLinkMask != 0, so I add a similar code for == 0
+        // the base TextView class checks if getAutoLinkMask != 0, so I added a similar code for == 0
         if(CompatibilityUtils.isTextSelectable(this)
             && this.getText() instanceof Spannable
             && this.getAutoLinkMask() == 0
@@ -107,11 +74,9 @@ public class ClickableLinksTextView extends TextView {
         
         // call the base method anyway
         final boolean superResult = super.onTouchEvent(event);
-        MyLog.v(TAG, "superResult = " + superResult);
         
         // the same check as in the super.onTouchEvent(event)
         if(discardNextActionUp && action == MotionEvent.ACTION_UP) {
-            MyLog.v(TAG, "discardNextActionUp");
             return superResult;
         }
 
@@ -142,5 +107,55 @@ public class ClickableLinksTextView extends TextView {
         }
         
         return superResult;
+    }
+    
+    private void copyBaseEditorIfNecessary(){
+        if(this.mBaseEditorCopied) {
+            return;
+        }
+        
+        try {
+            Field field = TextView.class.getDeclaredField("mEditor");
+            field.setAccessible(true);
+            this.mBaseEditor = field.get(this);
+            
+            if (this.mBaseEditor != null) {
+                Class editorClass = this.mBaseEditor.getClass();
+                this.mDiscardNextActionUpField = editorClass.getDeclaredField("mDiscardNextActionUp");
+                this.mDiscardNextActionUpField.setAccessible(true);
+            
+                this.mIgnoreActionUpEventField = editorClass.getDeclaredField("mIgnoreActionUpEvent");
+                this.mIgnoreActionUpEventField.setAccessible(true);
+            }
+            
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+        } finally {
+            this.mBaseEditorCopied = true;
+        }
+    }
+    
+    private boolean getDiscardNextActionUp() {
+        if(this.mBaseEditor == null) {
+            return false;
+        }
+        
+        try {
+            return this.mDiscardNextActionUpField.getBoolean(this.mBaseEditor);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    private boolean getIgnoreActionUpEvent() {
+        if(this.mBaseEditor == null) {
+            return false;
+        }
+        
+        try {
+            return this.mIgnoreActionUpEventField.getBoolean(this.mBaseEditor);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

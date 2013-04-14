@@ -5,7 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
+import android.os.Build;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.ArrowKeyMovementMethod;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.controls.ClickableLinksTextView;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
