@@ -80,6 +80,7 @@
     <string name="menu_add_board">Добавить форум</string>
     <string name="menu_search">Поиск</string>
     <string name="menu_share_link">Поделиться ссылкой</string>
+    <string name="menu_close_tabs">Закрыть все вкладки</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>

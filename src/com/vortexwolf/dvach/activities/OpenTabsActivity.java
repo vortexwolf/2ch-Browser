@@ -68,6 +68,18 @@ public class OpenTabsActivity extends ListActivity {
             this.mTabsManager.navigate(item, this);
         }
     }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_close_tabs_id:
+                this.mTabsManager.removeAll();
+                this.mAdapter.clear();
+                break;
+        }
+
+        return true;
+    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {

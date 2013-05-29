@@ -7,6 +7,6 @@ import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker.CaptchaResult;
 public interface IHtmlCaptchaChecker {
 
     /** Возвращает ответ нужно ли вводить капчу */
-    public abstract CaptchaResult canSkipCaptcha(Uri refererUri);
+    public abstract CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode);
 
 }

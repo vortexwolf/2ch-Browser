@@ -6,5 +6,11 @@
         android:icon="@drawable/ic_menu_close_clear_cancel"
         android:showAsAction="never"
         android:title="@string/menu_clear_history"/>
+    
+    <item
+        android:id="@+id/menu_close_tabs_id"
+        android:icon="@drawable/ic_menu_close_clear_cancel"
+        android:showAsAction="never"
+        android:title="@string/menu_close_tabs"/>
 
 </menu>

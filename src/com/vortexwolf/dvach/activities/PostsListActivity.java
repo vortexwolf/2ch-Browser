@@ -199,7 +199,7 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         // Пробуем десериализовать в любом случае
-        PostInfo[] posts = this.mSerializationService.deserializePosts(this.mThreadNumber);
+        PostInfo[] posts = this.mSerializationService.deserializePosts(this.mBoardName, this.mThreadNumber);
         if (posts != null) {
             this.setAdapterData(posts);
             
@@ -454,7 +454,7 @@ public class PostsListActivity extends BaseListActivity {
         public void setData(PostsList postsList) {
             if (postsList != null) {
                 PostInfo[] posts = postsList.getThread();
-                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
+                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
                 PostsListActivity.this.setAdapterData(posts);
             } else {
                 PostsListActivity.this.mAdapter.clear();
@@ -489,7 +489,7 @@ public class PostsListActivity extends BaseListActivity {
             if (addedCount != 0) {
                 // Нужно удостовериться, что элементы из posts не менялись после
                 // добавления в адаптер, чтобы сериализация прошла правильно
-                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mThreadNumber, posts);
+                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             }
         }

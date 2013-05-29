@@ -60,7 +60,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri);
+        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
         this.mCanSkip = result.canSkip;
         this.mSkipPasscode = result.passCode;
         String captchaKey = result.captchaKey;

@@ -7,10 +7,10 @@ public interface IPagesSerializationService {
 
     public void serializeThreads(String boardName, int pageNumber, ThreadInfo[] threads);
 
-    public void serializePosts(String threadNumber, PostInfo[] posts);
+    public void serializePosts(String boardName, String threadNumber, PostInfo[] posts);
 
     public ThreadInfo[] deserializeThreads(String boardName, int pageNumber);
 
-    public PostInfo[] deserializePosts(String threadNumber);
+    public PostInfo[] deserializePosts(String boardName, String threadNumber);
 
 }

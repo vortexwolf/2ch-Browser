@@ -77,13 +77,20 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
 
     private void updateMenu(Menu menu) {
         MenuItem clearHistory = menu.findItem(R.id.menu_clear_history_id);
+        MenuItem closeTabs = menu.findItem(R.id.menu_close_tabs_id);
+        
         Activity currentActivity = this.getCurrentActivity();
-
         // the clear history menu item is visible only for the history tab
         if (currentActivity instanceof HistoryActivity) {
             clearHistory.setVisible(true);
         } else {
             clearHistory.setVisible(false);
+        }
+        
+        if (currentActivity instanceof OpenTabsActivity) {
+            closeTabs.setVisible(true);
+        } else {
+            closeTabs.setVisible(false);
         }
     }
 

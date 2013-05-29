@@ -404,7 +404,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     @Override
     public void showCaptchaError(String errorMessage) {
         this.mCaptchaImageView.setImageResource(android.R.color.transparent);
-        AppearanceUtils.showToastMessage(this, errorMessage);
+        AppearanceUtils.showToastMessage(this, !StringUtils.isEmpty(errorMessage) ? errorMessage : this.getResources().getString(R.string.error_read_response));
 
         this.switchToCaptchaView(CaptchaViewType.ERROR);
     }
@@ -580,6 +580,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (this.mCurrentDownloadCaptchaTask != null) {
             this.mCurrentDownloadCaptchaTask.cancel(true);
         }
+        
+        this.mCaptchaAnswerView.setText("");
 
         this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mHttpBitmapReader, this.mHtmlCaptchaChecker, MainApplication.getHttpClient());
         this.mCurrentDownloadCaptchaTask.execute();

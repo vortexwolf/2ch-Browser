@@ -13,7 +13,6 @@
         <attr name="postItemBackground" format="color|reference" />
         <attr name="urlLinkForeground" format="color|reference" />
         <attr name="tabCloseButtonBackground" format="color|reference" />
-        <attr name="tabSeparatorBackground" format="color|reference" />
         <attr name="iconRefresh" format="integer|reference" />
         <attr name="iconSave" format="integer|reference" />
         <attr name="iconPicture" format="integer|reference" />

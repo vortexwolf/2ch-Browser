@@ -38,7 +38,6 @@ Light theme
         <item name="postItemBackground">@drawable/border_light</item>
         <item name="urlLinkForeground">@color/white_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
-        <item name="tabSeparatorBackground">@color/white_tab_separator</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/white_post_quote</item>
         <item name="spoilerForeground">@color/white_spoiler_text</item>
@@ -62,7 +61,6 @@ Dark theme
         <item name="postItemBackground">@drawable/border_dark</item>
         <item name="urlLinkForeground">@color/neutron_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
-        <item name="tabSeparatorBackground">@color/neutron_tab_separator</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/neutron_post_quote</item>
         <item name="spoilerForeground">@color/neutron_spoiler_text</item>
@@ -86,7 +84,6 @@ Photon theme
         <item name="postItemBackground">@drawable/border_photon</item>
         <item name="urlLinkForeground">@color/photon_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
-        <item name="tabSeparatorBackground">@color/photon_tab_separator</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/photon_post_quote</item>
         <item name="spoilerForeground">@color/photon_spoiler_text</item>

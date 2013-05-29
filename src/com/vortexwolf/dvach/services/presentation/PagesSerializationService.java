@@ -22,21 +22,21 @@ public class PagesSerializationService implements IPagesSerializationService {
 
     @Override
     public void serializeThreads(String boardName, int pageNumber, ThreadInfo[] threads) {
-        File file = this.getFilePath(boardName + "-" + pageNumber);
+        File file = this.getBoardFilePath(boardName, pageNumber);
 
         this.mSerializationService.serializeObject(file, threads);
     }
 
     @Override
-    public void serializePosts(String threadNumber, PostInfo[] posts) {
-        File file = this.getFilePath(threadNumber);
+    public void serializePosts(String boardName, String threadNumber, PostInfo[] posts) {
+        File file = this.getThreadFilePath(boardName, threadNumber);
 
         this.mSerializationService.serializeObject(file, posts);
     }
 
     @Override
     public ThreadInfo[] deserializeThreads(String boardName, int pageNumber) {
-        File file = this.getFilePath(boardName + "-" + pageNumber);
+        File file = this.getBoardFilePath(boardName, pageNumber);
 
         ThreadInfo[] threads = (ThreadInfo[]) this.mSerializationService.deserializeObject(file);
 
@@ -44,12 +44,20 @@ public class PagesSerializationService implements IPagesSerializationService {
     }
 
     @Override
-    public PostInfo[] deserializePosts(String threadNumber) {
-        File file = this.getFilePath(threadNumber);
+    public PostInfo[] deserializePosts(String boardName, String threadNumber) {
+        File file = this.getThreadFilePath(boardName, threadNumber);
 
         PostInfo[] posts = (PostInfo[]) this.mSerializationService.deserializeObject(file);
 
         return posts;
+    }
+    
+    private File getBoardFilePath(String boardName, int pageNumber){
+        return this.getFilePath(boardName + "_page" + pageNumber);
+    }
+    
+    private File getThreadFilePath(String boardName, String threadNumber){
+        return this.getFilePath(boardName + "_thread" + threadNumber);
     }
 
     private File getFilePath(String fileName) {

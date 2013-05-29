@@ -75,6 +75,7 @@
     <string name="menu_add_board">Add board</string>
     <string name="menu_search">Search</string>
     <string name="menu_share_link">Share link</string>
+    <string name="menu_close_tabs">Close all tabs</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>

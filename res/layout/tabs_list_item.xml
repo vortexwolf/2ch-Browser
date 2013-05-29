@@ -33,15 +33,6 @@
             android:textColor="?android:textColorSecondary" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="0.5dip"
-        android:layout_height="fill_parent"
-        android:layout_marginBottom="5.0dip"
-        android:layout_marginLeft="8.0dip"
-        android:layout_marginTop="5.0dip"
-        android:background="?tabSeparatorBackground" />
-
     <com.vortexwolf.dvach.common.controls.NonParentFocusableImageView
         android:id="@+id/tabs_item_delete"
         android:layout_width="wrap_content"

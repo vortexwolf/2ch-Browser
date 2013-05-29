@@ -27,7 +27,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
     public void testCanSkip() {
         String responseText = "OK";
 
-        IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
+        HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
         HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(null);
 
         assertTrue(result.canSkip);
@@ -36,7 +36,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
     public void testMustEnter() {
         String responseText = "CHECK\nSomeKey";
 
-        IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
+        HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
         HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(null);
 
         assertFalse(result.canSkip);

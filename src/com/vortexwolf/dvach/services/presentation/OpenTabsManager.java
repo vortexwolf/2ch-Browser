@@ -46,6 +46,10 @@ public class OpenTabsManager implements IOpenTabsManager {
     public void remove(OpenTabModel tab) {
         this.mTabs.remove(tab);
     }
+    
+    public void removeAll() {
+        this.mTabs.clear();
+    }
 
     @Override
     public void navigate(OpenTabModel tab, Activity activity) {
