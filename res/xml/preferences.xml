@@ -105,6 +105,13 @@
             android:key="@string/pref_display_all_boards_key"
             android:summary="@string/pref_display_all_boards_summary"
             android:title="@string/pref_display_all_boards" />
+        <EditTextPreference
+            android:key="@string/pref_cut_posts_key"
+            android:inputType="number"
+            android:singleLine="true"
+            android:hint="@string/pref_cut_posts_hint"
+            android:summary="@string/pref_cut_posts_summary"
+            android:title="@string/pref_cut_posts" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_category_cache" >
         <CheckBoxPreference

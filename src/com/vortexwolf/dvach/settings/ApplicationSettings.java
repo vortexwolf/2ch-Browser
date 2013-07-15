@@ -77,6 +77,22 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 
         return uri;
     }
+    
+    public int getLongPostsMaxHeight() {
+        String maxHeightStr = this.mSettings.getString(this.mResources.getString(R.string.pref_cut_posts_key), null);
+        int defaultValue = 400;
+        
+        if (maxHeightStr == null) {
+            return defaultValue;
+        }
+        
+        try {
+            int maxHeight = Integer.parseInt(maxHeightStr);
+            return maxHeight;
+        } catch(NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 
     public boolean isLocalDateTime() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_convert_post_date_key), true);

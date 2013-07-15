@@ -596,6 +596,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         int selectionStart = Math.max(0, this.mCommentView.getSelectionStart());
         int selectionEnd = Math.min(text.length(), this.mCommentView.getSelectionEnd());
+        if (selectionStart > text.length() || selectionEnd > text.length()) {
+            return;
+        }
+        
         String selectedText = text.substring(selectionStart, selectionEnd);
 
         // Проверяем текст на краях выделенной области, на случай если уже была

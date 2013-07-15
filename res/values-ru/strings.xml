@@ -94,6 +94,7 @@
     <string name="cmenu_add_to_favorites">Добавить в закладки</string>
     <string name="cmenu_remove_from_favorites">Удалить из закладок</string>
     <string name="cmenu_search_image">Поиск изображения в TinEye</string>
+    <string name="cmenu_search_image_google">Поиск изображения в Google</string>
     <string name="cmenu_hide_thread">Скрыть тред</string>
     <string name="cmenu_share">Поделиться</string>
     <string name="cmenu_open_thread">Открыть тред</string>
@@ -133,6 +134,9 @@
     <string name="pref_display_name">Имена</string>
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
     <string name="pref_text_size">Размер текста</string>
+    <string name="pref_cut_posts">Длинные сообщения</string>
+    <string name="pref_cut_posts_hint">0 - не обрезать; по умолчанию - 400px</string>
+    <string name="pref_cut_posts_summary">Обрезать длинные сообщения, если их высота больше заданного значения</string>
 
     <string-array name="pref_text_size_choices">
         <item>Средний</item>

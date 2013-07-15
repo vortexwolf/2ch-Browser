@@ -316,9 +316,10 @@ public class PostsListActivity extends BaseListActivity {
         }
         if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 4, this.getString(R.string.cmenu_search_image));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE_GOOGLE, 5, this.getString(R.string.cmenu_search_image_google));
         }
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 5, this.getString(R.string.cmenu_share));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 6, this.getString(R.string.cmenu_share));
         }
     }
 
@@ -348,6 +349,11 @@ public class PostsListActivity extends BaseListActivity {
             case Constants.CONTEXT_MENU_SEARCH_IMAGE:
                 String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
                 new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
+                break;
+            case Constants.CONTEXT_MENU_SEARCH_IMAGE_GOOGLE:
+                String imageUrl2 = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
+                String googleSearchUrl = "http://www.google.com/searchbyimage?image_url=" + imageUrl2;
+                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
                 break;
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);

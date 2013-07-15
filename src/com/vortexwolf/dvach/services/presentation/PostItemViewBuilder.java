@@ -10,12 +10,17 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.ArrowKeyMovementMethod;
 import android.text.util.Linkify;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -25,6 +30,7 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.controls.ClickableLinksTextView;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.MyHtml;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -53,7 +59,7 @@ public class PostItemViewBuilder {
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
-        View view = convertView == null ? this.mInflater.inflate(R.layout.posts_list_item, null) : convertView;
+        final View view = convertView == null ? this.mInflater.inflate(R.layout.posts_list_item, null) : convertView;
 
         // Get inner controls
         ViewBag vb = (ViewBag) view.getTag();
@@ -68,9 +74,10 @@ public class PostItemViewBuilder {
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
             vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
+            vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
             view.setTag(vb);
         }
-
+        
         if (item.canMakeCommentFloat() || item.isCommentFloat()) {
             FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
         } else {
@@ -141,6 +148,42 @@ public class PostItemViewBuilder {
 
         return view;
     }
+    
+    public void setMaxHeight(final View view, final int maxHeight){
+        final ViewBag vb = (ViewBag) view.getTag();
+
+        // set max height anyway, it will not affect views with small height
+        vb.commentView.setMaxHeight(maxHeight);
+        vb.showFullTextView.setVisibility(View.GONE);
+        
+        // wait until the text is drawn
+        vb.commentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                vb.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
+                
+                int textHeight = vb.commentView.getHeight();
+                //MyLog.v("PostItemViewBuilder", "onPreDraw Text height: " + textHeight);
+                if (textHeight >= maxHeight) { 
+                    vb.showFullTextView.setVisibility(View.VISIBLE);
+                    vb.showFullTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            PostItemViewBuilder.this.removeMaxHeight(view);
+                        }
+                    }); 
+                }
+                
+                return true;
+            }
+        });
+    }
+    
+    public void removeMaxHeight(View view) {
+        ViewBag vb = (ViewBag) view.getTag();
+        vb.commentView.setMaxHeight(Integer.MAX_VALUE);
+        vb.showFullTextView.setVisibility(View.GONE);
+    }
 
     public void displayPopupDialog(final PostItemViewModel item, Context activityContext, Theme theme) {
         View view = this.getView(item, null, false);
@@ -184,6 +227,7 @@ public class PostItemViewBuilder {
         TextView commentView;
         TextView attachmentInfoView;
         TextView postRepliesView;
+        TextView showFullTextView;
         View fullThumbnailView;
         ImageView imageView;
     }

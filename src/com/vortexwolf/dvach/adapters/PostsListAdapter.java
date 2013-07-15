@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
@@ -69,6 +70,14 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
         View view = this.mPostItemViewBuilder.getView(this.getItem(position), convertView, this.mIsBusy);
 
+        // cut long posts if necessary
+        int maxPostHeight = this.mSettings.getLongPostsMaxHeight();
+        if (maxPostHeight > 0) {
+            this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight);
+        } else {
+            this.mPostItemViewBuilder.removeMaxHeight(view);
+        }
+        
         return view;
     }
 

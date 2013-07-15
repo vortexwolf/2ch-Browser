@@ -33,6 +33,7 @@ Light theme
         <item name="activityRootBackground">@color/white_background</item>
         <item name="threadTitleForeground">@color/white_thread_title</item>
         <item name="itemInfoForeground">@color/white_item_info</item>
+        <item name="postBackground">@color/white_post_background</item>
         <item name="postNumberForeground">@color/white_post_number</item>
         <item name="listSectionBackground">@color/white_list_section</item>
         <item name="postItemBackground">@drawable/border_light</item>
@@ -56,6 +57,7 @@ Dark theme
         <item name="activityRootBackground">@color/neutron_background</item>
         <item name="threadTitleForeground">@color/neutron_thread_title</item>
         <item name="itemInfoForeground">@color/neutron_item_info</item>
+        <item name="postBackground">@color/neutron_post_background</item>
         <item name="postNumberForeground">@color/neutron_post_number</item>
         <item name="listSectionBackground">@color/neutron_list_section</item>
         <item name="postItemBackground">@drawable/border_dark</item>
@@ -79,6 +81,7 @@ Photon theme
         <item name="activityRootBackground">@color/photon_background</item>
         <item name="threadTitleForeground">@color/photon_thread_title</item>
         <item name="itemInfoForeground">@color/photon_item_info</item>
+        <item name="postBackground">@color/photon_post_background</item>
         <item name="postNumberForeground">@color/photon_post_number</item>
         <item name="listSectionBackground">@color/photon_list_section</item>
         <item name="postItemBackground">@drawable/border_photon</item>

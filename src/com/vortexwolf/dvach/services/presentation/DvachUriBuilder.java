@@ -60,7 +60,7 @@ public class DvachUriBuilder {
     }
 
     private Uri appendPath(Uri baseUri, String path) {
-        path = path.replaceFirst("^/*", "");
+        path = path == null ? "" : path.replaceFirst("^/*", "");
         return Uri.withAppendedPath(baseUri, path);
     }
 

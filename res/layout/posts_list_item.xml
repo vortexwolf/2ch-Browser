@@ -4,6 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="?postItemBackground"
+    android:gravity="center"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:orientation="vertical"
     android:padding="4dip" >
@@ -115,6 +116,22 @@
             local:spoilerBackground="?spoilerBackground"
             local:spoilerForeground="?spoilerForeground"
             local:urlLinkForeground="?urlLinkForeground" />
+        
+    
+        <TextView         
+            android:id="@+id/show_full_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/show_full_comment"
+            android:autoLink="web"
+            android:background="?postBackground"
+            android:gravity="center"
+            android:paddingTop="5dip"
+            android:paddingBottom="5dip"
+            android:visibility="gone"
+                     />
     </RelativeLayout>
 
     <!-- Bottom row -->

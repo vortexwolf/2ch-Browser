@@ -5,6 +5,7 @@
         <attr name="activityRootBackground" format="color|reference" />
         <attr name="threadTitleForeground" format="color|reference" />
         <attr name="itemInfoForeground" format="color|reference" />
+        <attr name="postBackground" format="color|reference" />
         <attr name="postNumberForeground" format="color|reference" />
         <attr name="postQuoteForeground" format="color|reference" />
         <attr name="spoilerForeground" format="color|reference" />
