@@ -30,6 +30,7 @@
     <string name="cancel">Отмена</string>
     <string name="favorites">Избранное</string>    
     <string name="search_board_hint">Поиск</string>
+    <string name="show_full_comment"><a href=''>Показать весь текст</a></string>
     <string name="data_search_posts_title">Поиск /%1$s/: %2$s</string>
 
     <!-- Data strings -->
