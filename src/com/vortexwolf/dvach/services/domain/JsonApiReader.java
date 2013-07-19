@@ -76,7 +76,8 @@ public class JsonApiReader implements IJsonApiReader {
             MyLog.e(TAG, e);
         }
         
-        String uri = String.format("http://m2-ch.ru/%s/search?q=%s&out=json&nocheck", boardName, searchQuery);
+        // m2-ch.ru
+        String uri = String.format("http://91.227.18.102/%s/search?q=%s&out=json&nocheck", boardName, searchQuery);
         
         return this.readData(uri, FoundPostsList.class, listener, task);
     }
