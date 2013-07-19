@@ -489,6 +489,11 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void updateData(String from, PostsList list) {
+            if (list == null) {
+                AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
+                return;
+            }
+            
             PostInfo[] posts = list.getThread();
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
@@ -497,6 +502,8 @@ public class PostsListActivity extends BaseListActivity {
                 // добавления в адаптер, чтобы сериализация прошла правильно
                 PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
+            } else {
+                AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
             }
         }
 

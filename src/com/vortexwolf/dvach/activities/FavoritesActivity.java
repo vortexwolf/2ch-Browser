@@ -87,8 +87,8 @@ public class FavoritesActivity extends BaseListActivity {
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                this.mDatasource.removeFromFavorites(model.getUrl());
-                this.mAdapter.remove(model);
+                // removes from the SQL data source and from UI
+                this.mAdapter.removeItem(model);
                 return true;
             }
         }
@@ -101,8 +101,7 @@ public class FavoritesActivity extends BaseListActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
             List<FavoritesEntity> favorites = FavoritesActivity.this.mDatasource.getAllFavorites();
-
-            FavoritesActivity.this.mAdapter = new FavoritesAdapter(FavoritesActivity.this, favorites);
+            FavoritesActivity.this.mAdapter = new FavoritesAdapter(FavoritesActivity.this, favorites, FavoritesActivity.this.mDatasource);
 
             return null;
         }

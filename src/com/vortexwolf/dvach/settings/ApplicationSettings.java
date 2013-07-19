@@ -38,17 +38,7 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(this.mResources.getString(R.string.pref_passcode_key))) {
-            String passcode = this.getPasscode();
-            this.sendPasscodeToServer(passcode);
-        }
-    }
-
-    private void sendPasscodeToServer(String passcode) {
-        final Uri uri = Uri.withAppendedPath(this.getDomainUri(), "makaba/makaba.fcgi");
-
-        CheckPasscodeTask task = new CheckPasscodeTask(this.mContext, uri, passcode);
-        task.execute();
+        // nothing so far
     }
 
     public String getHomepage() {

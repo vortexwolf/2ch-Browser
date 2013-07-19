@@ -3,6 +3,9 @@ package com.vortexwolf.dvach.asynctasks;
 import android.os.AsyncTask;
 import android.view.Window;
 
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.activities.PostsListActivity;
+import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.ICancelled;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IJsonProgressChangeListener;
@@ -78,7 +81,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
         }
 
         // Обновляем список или отображаем ошибку
-        if (success && this.mPostsList != null) {
+        if (success) {
             if (this.mIsPartialLoading) {
                 this.mView.updateData(this.mLoadAfterPost, this.mPostsList);
             } else {

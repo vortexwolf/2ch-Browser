@@ -23,7 +23,7 @@
         android:summary="@string/pref_name_summary"
         android:inputType="text"
         android:singleLine="true" />
-    <EditTextPreference
+    <com.vortexwolf.dvach.settings.PasscodePreference
         android:key="@string/pref_passcode_key"
         android:title="@string/pref_passcode"
         android:summary="@string/pref_passcode_summary"

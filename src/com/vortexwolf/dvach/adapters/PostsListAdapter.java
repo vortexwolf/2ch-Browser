@@ -73,7 +73,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         // cut long posts if necessary
         int maxPostHeight = this.mSettings.getLongPostsMaxHeight();
         if (maxPostHeight > 0) {
-            this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight);
+            this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight, this.mTheme);
         } else {
             this.mPostItemViewBuilder.removeMaxHeight(view);
         }
