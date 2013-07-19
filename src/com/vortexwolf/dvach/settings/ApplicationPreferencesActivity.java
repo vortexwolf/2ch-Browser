@@ -1,5 +1,6 @@
 package com.vortexwolf.dvach.settings;
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferenceChangeListener.onSharedPreferenceChanged(this.mSharedPreferences, this.mResources.getString(R.string.pref_text_size_key));
 
         Factory.getContainer().resolve(Tracker.class).trackActivityView("ApplicationPreferencesActivity");
+        
+        this.updateNameSummary();
     }
 
     @Override
@@ -59,19 +62,21 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(ApplicationPreferencesActivity.this.mResources.getString(R.string.pref_theme_key)) || key.equals(ApplicationPreferencesActivity.this.mResources.getString(R.string.pref_text_size_key))) {
-
                 ListPreference preference = (ListPreference) ApplicationPreferencesActivity.this.getPreferenceManager().findPreference(key);
                 preference.setSummary(preference.getEntry());
             } else if (key.equals(ApplicationPreferencesActivity.this.mResources.getString(R.string.pref_name_key))) {
-                EditTextPreference preference = (EditTextPreference) ApplicationPreferencesActivity.this.getPreferenceManager().findPreference(key);
-                String text = preference.getText();
-                if (!StringUtils.isEmpty(text)) {
-                    preference.setSummary(text);
-                } else {
-                    preference.setSummary(ApplicationPreferencesActivity.this.mResources.getString(R.string.pref_name_summary, ""));
-                }
+                ApplicationPreferencesActivity.this.updateNameSummary();
             }
-
+        }
+    }
+    
+    private void updateNameSummary(){
+        EditTextPreference preference = (EditTextPreference) this.getPreferenceManager().findPreference(this.mResources.getString(R.string.pref_name_key));
+        String text = preference.getText();
+        if (!StringUtils.isEmpty(text)) {
+            preference.setSummary(text);
+        } else {
+            preference.setSummary(ApplicationPreferencesActivity.this.mResources.getString(R.string.pref_name_summary, ""));
         }
     }
 }

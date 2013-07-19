@@ -41,8 +41,17 @@ public class HistoryActivity extends BaseListActivity {
         this.mNavigationService = Factory.getContainer().resolve(INavigationService.class);
 
         this.resetUI();
-
+        // load history only 1 time
         new OpenDataSourceTask().execute();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // update if favorites were changed
+        if (this.mAdapter != null) {
+            this.mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

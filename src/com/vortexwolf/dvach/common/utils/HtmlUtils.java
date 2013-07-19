@@ -58,17 +58,15 @@ public class HtmlUtils {
 
     /** Добавляет обработчики событий к ссылкам */
     public static SpannableStringBuilder replaceUrls(SpannableStringBuilder builder, IURLSpanClickListener listener, Theme theme) {
-        if (listener != null) {
-            URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
+        URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
 
-            if (spans.length > 0) {
-                TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
-                int urlColor = a.getColor(R.styleable.Theme_urlLinkForeground, Color.BLUE);
+        if (spans.length > 0) {
+            TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
+            int urlColor = a.getColor(R.styleable.Theme_urlLinkForeground, Color.BLUE);
 
-                for (URLSpan span : spans) {
-                    ClickableURLSpan newSpan = ClickableURLSpan.replaceURLSpan(builder, span, urlColor);
-                    newSpan.setOnClickListener(listener);
-                }
+            for (URLSpan span : spans) {
+                ClickableURLSpan newSpan = ClickableURLSpan.replaceURLSpan(builder, span, urlColor);
+                newSpan.setOnClickListener(listener);
             }
         }
 

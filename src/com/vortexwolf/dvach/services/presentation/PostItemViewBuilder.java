@@ -149,18 +149,22 @@ public class PostItemViewBuilder {
         return view;
     }
     
-    public void setMaxHeight(final View view, final int maxHeight){
+    public void setMaxHeight(final View view, final int maxHeight, final Theme theme){
         final ViewBag vb = (ViewBag) view.getTag();
 
         // set max height anyway, it will not affect views with small height
         vb.commentView.setMaxHeight(maxHeight);
         vb.showFullTextView.setVisibility(View.GONE);
         
+        SpannableStringBuilder builder = new SpannableStringBuilder(vb.showFullTextView.getText());
+        HtmlUtils.replaceUrls(builder, null, theme);
+        vb.showFullTextView.setText(builder);
+        
         // wait until the text is drawn
-        vb.commentView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                vb.commentView.getViewTreeObserver().removeOnPreDrawListener(this);
+                view.getViewTreeObserver().removeOnPreDrawListener(this);
                 
                 int textHeight = vb.commentView.getHeight();
                 //MyLog.v("PostItemViewBuilder", "onPreDraw Text height: " + textHeight);
@@ -171,7 +175,8 @@ public class PostItemViewBuilder {
                         public void onClick(View v) {
                             PostItemViewBuilder.this.removeMaxHeight(view);
                         }
-                    }); 
+                    });  
+                    return false;
                 }
                 
                 return true;

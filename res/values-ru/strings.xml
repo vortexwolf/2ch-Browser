@@ -136,7 +136,7 @@
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
     <string name="pref_text_size">Размер текста</string>
     <string name="pref_cut_posts">Длинные сообщения</string>
-    <string name="pref_cut_posts_hint">0 - не обрезать; по умолчанию - 400px</string>
+    <string name="pref_cut_posts_hint">0 - не обрезать; 400px по умолчанию</string>
     <string name="pref_cut_posts_summary">Обрезать длинные сообщения, если их высота больше заданного значения</string>
 
     <string-array name="pref_text_size_choices">

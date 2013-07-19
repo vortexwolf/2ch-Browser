@@ -131,7 +131,7 @@
     <string name="pref_display_name_summary">Display names of namefags above their posts</string>
     <string name="pref_text_size">Text size</string>
     <string name="pref_cut_posts">Long posts</string>
-    <string name="pref_cut_posts_hint">0 - do not cut; default value - 400px</string>
+    <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
 
     <string-array name="pref_text_size_choices">

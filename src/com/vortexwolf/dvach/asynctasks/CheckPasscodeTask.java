@@ -20,15 +20,16 @@ import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.common.utils.StringUtils;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private Context mContext;
-    private String mUri;
+    private ApplicationSettings mSettings;
     private String mPasscode;
 
-    public CheckPasscodeTask(Context context, Uri uri, String passcode) {
+    public CheckPasscodeTask(Context context, ApplicationSettings settings, String passcode) {
         this.mContext = context;
-        this.mUri = uri.toString();
+        this.mSettings = settings;
         this.mPasscode = passcode;
     }
 
@@ -38,7 +39,8 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpResponse response = null;
         try {
             DefaultHttpClient client = new DefaultHttpClient();
-            post = new HttpPost(this.mUri);
+            Uri uri = Uri.withAppendedPath(this.mSettings.getDomainUri(), "makaba/makaba.fcgi");
+            post = new HttpPost(uri.toString());
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
             nameValuePairs.add(new BasicNameValuePair("task", "auth"));
