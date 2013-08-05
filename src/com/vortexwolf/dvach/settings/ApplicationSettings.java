@@ -40,6 +40,21 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         // nothing so far
     }
+    
+    public void savePassCodeCookie(String passCodeCookie){
+        SharedPreferences.Editor editor = this.mSettings.edit();
+        editor.putString(this.mResources.getString(R.string.pref_passcode_cookie_key), passCodeCookie);
+        editor.commit();
+    }
+    
+    public String getPassCodeCookie() {
+        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
+    }
+    
+    public String getPassCode(){
+        // should be removed after everyone updates their applications
+        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
+    }
 
     public String getHomepage() {
         String boardName = this.mSettings.getString(this.mResources.getString(R.string.pref_homepage_key), Constants.DEFAULT_BOARD).toLowerCase();
@@ -54,10 +69,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
 
     public String getName() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_name_key), null);
-    }
-
-    public String getPasscode() {
-        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
     }
 
     public Uri getDomainUri() {

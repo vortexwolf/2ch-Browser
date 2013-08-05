@@ -31,8 +31,8 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
     @Override
     public CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode) {
         String checkUri = "makaba/captcha.fcgi";
-        if (usePasscode && !StringUtils.isEmpty(this.mApplicationSettings.getPasscode())) {
-            checkUri += "?usercode=" + this.mApplicationSettings.getPasscode();
+        if (usePasscode && (!StringUtils.isEmpty(this.mApplicationSettings.getPassCodeCookie()) || !StringUtils.isEmpty(this.mApplicationSettings.getPassCode()))) {
+            checkUri += "?usercode=" + this.mApplicationSettings.getPassCodeCookie();
         }
         
         Uri uri = this.mDvachUriBuilder.create2chUri(checkUri);
@@ -44,10 +44,6 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         try {
             String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
             result = this.checkHtmlBlock(captchaBlock);
-            
-            if (result.checkAgain && usePasscode) {
-                result = this.canSkipCaptcha(refererUri, false);
-            }
         } catch (Exception e) {
             result = this.createEmptyResult();
         }
@@ -65,12 +61,13 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
             result.canSkip = true;
         } else if (captchaBlock.equals("VIP")) {
             result.canSkip = true;
-            result.passCode = true;
+            result.successPassCode = true;
         } else if (captchaBlock.startsWith("CHECK")) {
             result.canSkip = false;
             result.captchaKey = captchaBlock.substring(captchaBlock.indexOf('\n') + 1);
         } else if (captchaBlock.equals("VIPFAIL")) {
-            result.checkAgain = true;
+            result.canSkip = true;
+            result.failPassCode = true;
         }
 
         return result;
@@ -82,8 +79,8 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 
     public class CaptchaResult {
         public boolean canSkip;
-        public boolean passCode;
-        public boolean checkAgain;
+        public boolean successPassCode;
+        public boolean failPassCode;
         public String captchaKey;
     }
 }

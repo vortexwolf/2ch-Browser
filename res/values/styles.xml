@@ -43,6 +43,13 @@ Light theme
         <item name="postQuoteForeground">@color/white_post_quote</item>
         <item name="spoilerForeground">@color/white_spoiler_text</item>
         <item name="spoilerBackground">@color/white_spoiler</item>
+        <!-- Markup icons -->
+        <item name="iconMarkupBold">@drawable/markup_bold</item>
+        <item name="iconMarkupItalic">@drawable/markup_italic</item>
+        <item name="iconMarkupUnderline">@drawable/markup_underline</item>
+        <item name="iconMarkupStrike">@drawable/markup_strike</item>
+        <item name="iconMarkupSpoiler">@drawable/markup_spoiler</item>
+        <item name="iconMarkupQuote">@drawable/markup_quote</item>
         <!-- Android built-in styles -->
         <item name="android:windowBackground">@color/white_background</item>
         <item name="android:colorBackground">@color/white_background</item>
@@ -67,6 +74,13 @@ Dark theme
         <item name="postQuoteForeground">@color/neutron_post_quote</item>
         <item name="spoilerForeground">@color/neutron_spoiler_text</item>
         <item name="spoilerBackground">@color/neutron_spoiler</item>
+        <!-- Markup icons -->
+        <item name="iconMarkupBold">@drawable/markup_bold_blue</item>
+        <item name="iconMarkupItalic">@drawable/markup_italic_blue</item>
+        <item name="iconMarkupUnderline">@drawable/markup_underline_blue</item>
+        <item name="iconMarkupStrike">@drawable/markup_strike_blue</item>
+        <item name="iconMarkupSpoiler">@drawable/markup_spoiler_blue</item>
+        <item name="iconMarkupQuote">@drawable/markup_quote_blue</item>
         <!-- Android built-in styles -->
         <item name="android:windowBackground">@color/neutron_background</item>
         <item name="android:colorBackground">@color/neutron_background</item>
@@ -91,6 +105,13 @@ Photon theme
         <item name="postQuoteForeground">@color/photon_post_quote</item>
         <item name="spoilerForeground">@color/photon_spoiler_text</item>
         <item name="spoilerBackground">@color/photon_spoiler</item>
+        <!-- Markup icons -->
+        <item name="iconMarkupBold">@drawable/markup_bold</item>
+        <item name="iconMarkupItalic">@drawable/markup_italic</item>
+        <item name="iconMarkupUnderline">@drawable/markup_underline</item>
+        <item name="iconMarkupStrike">@drawable/markup_strike</item>
+        <item name="iconMarkupSpoiler">@drawable/markup_spoiler</item>
+        <item name="iconMarkupQuote">@drawable/markup_quote</item>
         <!-- Android built-in styles -->
         <item name="android:windowBackground">@color/photon_background</item>
         <item name="android:colorBackground">@color/photon_background</item>

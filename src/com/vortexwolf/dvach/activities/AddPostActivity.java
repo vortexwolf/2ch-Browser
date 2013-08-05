@@ -80,6 +80,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private Uri mRefererUri;
     private CaptchaViewType mCurrentCaptchaView = null;
     private Bitmap mCaptchaBitmap;
+    private boolean mCaptchaPasscodeSuccess;
+    private boolean mCaptchaPasscodeFail;
 
     private SendPostTask mCurrentPostSendTask = null;
     private DownloadCaptchaTask mCurrentDownloadCaptchaTask = null;
@@ -144,7 +146,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mSageCheckBox.setChecked(draft.isSage());
 
             if (draft.getCaptchaType() == CaptchaViewType.SKIP) {
-                this.skipCaptcha(false);
+                this.skipCaptcha(draft.isCaptchaPasscodeSuccess(), draft.isCaptchaPasscodeFail());
             } else if (draft.getCaptchaType() == CaptchaViewType.IMAGE && draft.getCaptchaImage() != null && draft.getCaptchaImage().isRecycled() == false) {
                 this.showCaptcha(draft.getCaptcha(), draft.getCaptchaImage());
             }
@@ -190,7 +192,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     protected void onPause() {
         MyLog.v(TAG, "save state");
         if (!this.mFinishedSuccessfully) {
-            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.mAttachedFile, this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap);
+            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.mAttachedFile, this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaPasscodeSuccess, this.mCaptchaPasscodeFail);
 
             this.mDraftPostsStorage.saveDraft(this.mBoardName, this.mThreadNumber, draft);
         } else {
@@ -377,14 +379,18 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     @Override
-    public void skipCaptcha(boolean withPasscode) {
-    	if (withPasscode){
+    public void skipCaptcha(boolean successPasscode, boolean failPasscode) {
+    	if (successPasscode){
     		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip_passcode));
-    	} else {
+    	} else if (failPasscode){
+            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_fail_passcode));
+        } else {
     		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip));
     	}
     	
         this.switchToCaptchaView(CaptchaViewType.SKIP);
+        this.mCaptchaPasscodeSuccess = successPasscode;
+        this.mCaptchaPasscodeFail = failPasscode;
     }
 
     @Override
@@ -596,7 +602,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         int selectionStart = Math.max(0, this.mCommentView.getSelectionStart());
         int selectionEnd = Math.min(text.length(), this.mCommentView.getSelectionEnd());
-        if (selectionStart > text.length() || selectionEnd > text.length()) {
+        if (selectionStart < 0 || selectionEnd > text.length() || selectionStart > selectionEnd) {
             return;
         }
         

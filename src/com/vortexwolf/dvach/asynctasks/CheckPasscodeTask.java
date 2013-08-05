@@ -8,6 +8,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -23,9 +24,11 @@ import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
-    private Context mContext;
-    private ApplicationSettings mSettings;
-    private String mPasscode;
+    private final Context mContext;
+    private final ApplicationSettings mSettings;
+    private final String mPasscode;
+    
+    private String mUserCodeCookie = null;
 
     public CheckPasscodeTask(Context context, ApplicationSettings settings, String passcode) {
         this.mContext = context;
@@ -53,7 +56,15 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
             response = client.execute(post);
 
             String location = ExtendedHttpClient.getLocationHeader(response);
-
+            
+            List<Cookie> cookies = client.getCookieStore().getCookies();
+            for (Cookie c : cookies) {
+                if (c.getName().equals("usercode")) {
+                    this.mUserCodeCookie = c.getValue();
+                    break;
+                }
+            }
+            
             return location;
         } catch (Exception e) {
             MyLog.e("CheckPasscodeTask", e);
@@ -66,6 +77,9 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        // update settings anyway
+        this.mSettings.savePassCodeCookie(this.mUserCodeCookie);
+        
         if (StringUtils.isEmpty(this.mPasscode)) {
             return;
         }
