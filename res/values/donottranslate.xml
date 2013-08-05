@@ -29,6 +29,7 @@
     <string name="pref_convert_post_date_key">pref_convert_post_date_key</string>
     <string name="pref_display_all_boards_key">pref_display_all_boards_key</string>
     <string name="pref_passcode_key">pref_passcode_key</string>
+    <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
     <string name="pref_cut_posts_key">pref_cut_posts_key</string>
     
     <string-array name="pref_text_size_values" translatable="false">

@@ -130,8 +130,10 @@ public class PostSender implements IPostSender {
         httpPost.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
 
         // passcode as a cookie
-        String passcode = this.mApplicationSettings.getPasscode();
-        httpPost.addHeader("Cookie", "usercode=" + passcode);
+        String passCodeCookie = this.mApplicationSettings.getPassCodeCookie();
+        if (!StringUtils.isEmpty(passCodeCookie)) {
+            httpPost.addHeader("Cookie", "usercode=" + passCodeCookie);
+        }
 
         HttpResponse response = null;
         try {

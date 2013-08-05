@@ -48,6 +48,7 @@ public class BrowserActivity extends Activity {
 
     private Menu mMenu;
     private boolean mImageLoaded = false;
+    private File mLoadedFile = null;
     private ViewType mViewType = null;
     
     private DownloadFileTask mCurrentTask = null;
@@ -134,7 +135,7 @@ public class BrowserActivity extends Activity {
             case R.id.share_menu_id:
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
                 shareImageIntent.setType("image/jpeg");
-                shareImageIntent.putExtra(Intent.EXTRA_STREAM, this.mUri);
+                shareImageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(this.mLoadedFile));
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
             case R.id.share_link_menu_id:
@@ -167,6 +168,7 @@ public class BrowserActivity extends Activity {
     }
 
     private void setImage(File file) {
+        this.mLoadedFile = file;
         this.mWebView.loadUrl(Uri.fromFile(file).toString());
 
         this.mImageLoaded = true;

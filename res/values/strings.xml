@@ -10,6 +10,7 @@
     <string name="addpost_subject_hint">Subject</string>
     <string name="addpost_captcha_can_skip">Send without confirmation</string>
     <string name="addpost_captcha_can_skip_passcode">You have a passcode</string>
+    <string name="addpost_captcha_fail_passcode">Bad passcode, relogin in settings</string>
     <string name="addpost_captcha_hint">Confirmation code</string>
     <string name="addpost_send_button">Send</string>
     <string name="addpost_refresh_button">Refresh</string>

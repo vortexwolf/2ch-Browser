@@ -80,39 +80,39 @@
 
         <LinearLayout
             android:id="@+id/addpost_textformat_view"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
             <ImageButton
                 android:id="@+id/addpost_textformat_b"
                 style="@style/TextFormatButton"
-                android:src="@drawable/bold" />
+                android:src="?iconMarkupBold" />
 
             <ImageButton
                 android:id="@+id/addpost_textformat_i"
                 style="@style/TextFormatButton"
-                android:src="@drawable/italic" />
+                android:src="?iconMarkupItalic" />
 
             <ImageButton
                 android:id="@+id/addpost_textformat_u"
                 style="@style/TextFormatButton"
-                android:src="@drawable/underline" />
+                android:src="?iconMarkupUnderline" />
 
             <ImageButton
                 android:id="@+id/addpost_textformat_s"
                 style="@style/TextFormatButton"
-                android:src="@drawable/strike" />
+                android:src="?iconMarkupStrike" />
 
             <ImageButton
                 android:id="@+id/addpost_textformat_spoiler"
                 style="@style/TextFormatButtonLong"
-                android:src="@drawable/spoiler" />
+                android:src="?iconMarkupSpoiler" />
 
             <ImageButton
                 android:id="@+id/addpost_textformat_quote"
                 style="@style/TextFormatButton"
-                android:src="@drawable/quote1" />
+                android:src="?iconMarkupQuote" />
         </LinearLayout>
 
         <EditText

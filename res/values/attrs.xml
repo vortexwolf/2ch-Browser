@@ -20,6 +20,12 @@
         <attr name="iconEdit" format="integer|reference" />
         <attr name="iconBack" format="integer|reference" />
         <attr name="iconForward" format="integer|reference" />
+        <attr name="iconMarkupBold" format="integer|reference" />
+        <attr name="iconMarkupItalic" format="integer|reference" />
+        <attr name="iconMarkupUnderline" format="integer|reference" />
+        <attr name="iconMarkupStrike" format="integer|reference" />
+        <attr name="iconMarkupSpoiler" format="integer|reference" />
+        <attr name="iconMarkupQuote" format="integer|reference" />
     </declare-styleable>
     <declare-styleable name="SeekBarPreference">
         <attr name="minValue" format="integer" />

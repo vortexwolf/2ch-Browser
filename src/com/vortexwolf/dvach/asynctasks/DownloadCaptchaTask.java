@@ -28,7 +28,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final DefaultHttpClient mHttpClient;
 
     private boolean mCanSkip = false;
-    private boolean mSkipPasscode = false;
+    private boolean mSuccessPasscode = false;
+    private boolean mFailPasscode = false;
     private CaptchaEntity mCaptcha;
     private Bitmap mCaptchaImage;
     private String mUserError;
@@ -50,7 +51,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     @Override
     public void onPostExecute(Boolean success) {
         if (this.mCanSkip) {
-            this.mView.skipCaptcha(this.mSkipPasscode);
+            this.mView.skipCaptcha(this.mSuccessPasscode, this.mFailPasscode);
         } else if (success && this.mCaptcha != null) {
             this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
         } else {
@@ -62,10 +63,11 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     protected Boolean doInBackground(String... params) {
         HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
         this.mCanSkip = result.canSkip;
-        this.mSkipPasscode = result.passCode;
+        this.mSuccessPasscode = result.successPassCode;
+        this.mFailPasscode = result.failPassCode;
         String captchaKey = result.captchaKey;
 
-        if (this.mSkipPasscode || this.mCanSkip && !UriUtils.isBoardUri(this.mRefererUri)) {
+        if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !UriUtils.isBoardUri(this.mRefererUri)) {
             return true;
         }
         if(captchaKey == null) {
