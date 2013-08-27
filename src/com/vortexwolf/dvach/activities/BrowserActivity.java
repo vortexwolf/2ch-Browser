@@ -2,11 +2,13 @@ package com.vortexwolf.dvach.activities;
 
 import java.io.File;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +55,7 @@ public class BrowserActivity extends Activity {
     
     private DownloadFileTask mCurrentTask = null;
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +73,9 @@ public class BrowserActivity extends Activity {
         settings.setBuiltInZoomControls(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setBlockNetworkLoads(true);
+        if (Integer.valueOf(Build.VERSION.SDK) >= 8) {
+            settings.setBlockNetworkLoads(true);
+        }
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();
@@ -105,6 +110,8 @@ public class BrowserActivity extends Activity {
 
         TypedArray a = this.mApplication.getTheme().obtainStyledAttributes(R.styleable.Theme);
         int background = a.getColor(R.styleable.Theme_activityRootBackground, 0);
+        a.recycle();
+        
         this.mWebView.setBackgroundColor(background);
     }
 
