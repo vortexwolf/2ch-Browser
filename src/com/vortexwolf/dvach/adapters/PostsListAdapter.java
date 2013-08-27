@@ -1,5 +1,9 @@
 package com.vortexwolf.dvach.adapters;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.net.Uri;
@@ -124,8 +128,10 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     /** Обновляет адаптер полностью */
     public void setAdapterData(PostInfo[] posts) {
         this.clear();
-        for (PostInfo pi : posts) {
-            this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings, this, this.mDvachUriBuilder));
+        
+        List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder);
+        for (PostItemViewModel model : models) {
+            this.add(model);
         }
     }
     
@@ -159,23 +165,26 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             lastPostNumber = 0;
         }
 
-        int newPostsCount = 0;
-
+        ArrayList<PostInfo> newPosts = new ArrayList<PostInfo>();
         for (PostInfo pi : posts) {
             Integer currentNumber = !StringUtils.isEmpty(pi.getNum()) ? Integer.valueOf(pi.getNum()) : 0;
             if (currentNumber > lastPostNumber) {
-                this.add(this.mPostsViewModel.createModel(pi, this.mTheme, this.mSettings, this, this.mDvachUriBuilder));
-                newPostsCount++;
+                newPosts.add(pi);
             }
+        }
+        
+        List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder);
+        for (PostItemViewModel model : newModels) {
+            this.add(model);
         }
 
         // обновить все видимые элементы, чтобы правильно перерисовался список
         // ссылок replies
-        if (newPostsCount > 0) {
+        if (newPosts.size() > 0) {
             this.notifyDataSetChanged();
         }
 
-        return newPostsCount;
+        return newPosts.size();
     }
 
     @Override

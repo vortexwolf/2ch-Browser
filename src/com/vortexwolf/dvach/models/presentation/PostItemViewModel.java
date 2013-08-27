@@ -37,6 +37,7 @@ public class PostItemViewModel {
     private final ApplicationSettings mSettings;
 
     private SpannableStringBuilder mSpannedComment = null;
+    private SpannableStringBuilder mCachedReferencesString = null;
     private AttachmentInfo mAttachment;
     private String mPostDate = null;
 
@@ -56,6 +57,9 @@ public class PostItemViewModel {
         this.mSettings = settings;
 
         this.parseReferences();
+        
+        // temporary assignment for testing
+        this.mSpannedComment = this.createSpannedComment();
     }
 
     private void parseReferences() {
@@ -101,6 +105,7 @@ public class PostItemViewModel {
 
     public void addReferenceFrom(String postNumber) {
         this.referencesFrom.add(postNumber);
+        this.mCachedReferencesString = null;
     }
 
     public int getPosition() {
@@ -172,10 +177,12 @@ public class PostItemViewModel {
     }
 
     public SpannableStringBuilder getReferencesFromAsSpannableString(Resources res, String boardName, String threadNumber) {
-        String firstWord = res.getString(R.string.postitem_replies);
-        SpannableStringBuilder builder = this.createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
-
-        return builder;
+        if (this.mCachedReferencesString == null) {
+            String firstWord = res.getString(R.string.postitem_replies);
+            this.mCachedReferencesString = this.createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
+        }
+        
+        return this.mCachedReferencesString;
     }
 
     private SpannableStringBuilder createReferencesString(String firstWord, ArrayList<String> references, String boardName, String threadNumber) {
@@ -195,12 +202,7 @@ public class PostItemViewModel {
             String refUrl = this.mDvachUriBuilder.create2chPostUrl(boardName, threadNumber, refNumber);
             // String htmlLink = String.format("<a href=\"%s\">%s</a>", refUrl,
             // "&gt;&gt;" + refNumber);
-            sb.append("<a href=\"");
-            sb.append(refUrl);
-            sb.append("\">");
-            sb.append("&gt;&gt;");
-            sb.append(refNumber);
-            sb.append("</a>");
+            sb.append("<a href=\"" + refUrl + "\">" + "&gt;&gt;" + refNumber + "</a>");
 
             if (iterator.hasNext()) {
                 sb.append(", ");

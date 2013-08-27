@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="?postItemBackground"
     android:gravity="top"
@@ -89,7 +89,7 @@
             <com.vortexwolf.dvach.common.controls.ExtendedImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size" 
+                android:layout_height="@dimen/thumbnail_size"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="centerInside" />
@@ -115,22 +115,20 @@
             local:spoilerBackground="?spoilerBackground"
             local:spoilerForeground="?spoilerForeground"
             local:urlLinkForeground="?urlLinkForeground" />
-        
-    
-        <TextView         
+
+        <TextView
             android:id="@+id/show_full_text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/show_full_comment"
             android:autoLink="web"
             android:background="?postBackground"
             android:gravity="center"
-            android:paddingTop="5dip"
             android:paddingBottom="5dip"
-            android:visibility="gone"
-                     />
+            android:paddingTop="5dip"
+            android:text="@string/show_full_comment"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <!-- Bottom row -->

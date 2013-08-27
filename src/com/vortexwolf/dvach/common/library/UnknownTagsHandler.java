@@ -36,6 +36,7 @@ public class UnknownTagsHandler implements TagHandler {
         this.mPostQuoteForeground = a.getColor(R.styleable.Theme_postQuoteForeground, -1);
         this.mSpoilerForeground = a.getColor(R.styleable.Theme_spoilerForeground, -1);
         this.mSpoilerBackground = a.getColor(R.styleable.Theme_spoilerBackground, -1);
+        a.recycle();
     }
 
     @Override

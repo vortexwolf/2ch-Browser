@@ -1,6 +1,8 @@
 package com.vortexwolf.dvach.models.presentation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.content.res.Resources.Theme;
 
@@ -15,7 +17,7 @@ public class PostsViewModel {
     private String mLastPostNumber = null;
 
     // Обновляет ссылки у других постов и добавляет модель в список
-    private void ProcessPostItem(PostItemViewModel viewModel) {
+    private void processPostItem(PostItemViewModel viewModel) {
         for (String refPostNumber : viewModel.getRefersTo()) {
             PostItemViewModel refModel = this.mViewModels.get(refPostNumber);
             if (refModel != null) {
@@ -30,24 +32,23 @@ public class PostsViewModel {
         return this.mViewModels.get(postNumber);
     }
 
-    /**
-     * Создает view model на основе модели
-     * 
-     * @param item
-     *            Модель какого-нибудь сообщения в треде
-     * @param theme
-     *            Текущая тема приложения
-     * @param listener
-     *            Обработчик события нажатия на ссылку в посте
-     * @return Созданная view model
-     */
-    public PostItemViewModel createModel(PostInfo item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
+    private PostItemViewModel createModel(PostInfo item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
         PostItemViewModel viewModel = new PostItemViewModel(this.mViewModels.size(), item, theme, settings, listener, uriBuilder);
         this.mLastPostNumber = viewModel.getNumber();
 
-        this.ProcessPostItem(viewModel);
+        this.processPostItem(viewModel);
 
         return viewModel;
+    }
+    
+    public List<PostItemViewModel> addModels(List<PostInfo> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
+        List<PostItemViewModel> result = new ArrayList<PostItemViewModel>();
+        for (PostInfo item : items) {
+            PostItemViewModel model = this.createModel(item, theme, settings, listener, uriBuilder);
+            result.add(model);
+        }
+        
+        return result;
     }
 
     /**

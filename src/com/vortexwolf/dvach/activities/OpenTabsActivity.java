@@ -55,7 +55,8 @@ public class OpenTabsActivity extends ListActivity {
         this.setTheme(this.mApplicationSettings.getTheme());
         TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
         this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
-
+        a.recycle();
+        
         this.registerForContextMenu(this.getListView());
     }
 
