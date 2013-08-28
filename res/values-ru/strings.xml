@@ -83,6 +83,9 @@
     <string name="menu_search">Поиск</string>
     <string name="menu_share_link">Поделиться ссылкой</string>
     <string name="menu_close_tabs">Закрыть все вкладки</string>
+    <string name="menu_search_image_tineye">Поиск в TinEye</string>
+    <string name="menu_search_image_google">Поиск в Google</string>
+    <string name="menu_image_operations">Действия c изображением</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -121,7 +124,7 @@
     <string name="pref_name_summary">Оставьте пустым</string>
     <string name="pref_name_hint">Аноним</string>
     <string name="pref_domain">Домен</string>
-    <string name="pref_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
+    <string name="pref_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
     <string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
     <string name="pref_display_post_date">Время сообщений</string>
     <string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>

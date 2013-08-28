@@ -78,6 +78,9 @@
     <string name="menu_search">Search</string>
     <string name="menu_share_link">Share link</string>
     <string name="menu_close_tabs">Close all tabs</string>
+    <string name="menu_search_image_tineye">Search in TinEye</string>
+    <string name="menu_search_image_google">Search in Google</string>
+    <string name="menu_image_operations">Image operations</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -116,7 +119,7 @@
     <string name="pref_name_summary">Leave it blank</string>
     <string name="pref_name_hint">Anonymous</string>
     <string name="pref_domain">Domain</string>
-    <string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so, 2-ch.ru</string>
+    <string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
     <string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
     <string name="pref_display_post_date">Time of posts</string>
     <string name="pref_display_post_date_summary">Enable to display the time of each post</string>

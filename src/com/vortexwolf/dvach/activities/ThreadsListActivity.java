@@ -336,12 +336,8 @@ public class ThreadsListActivity extends BaseListActivity {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
 
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 3, this.getString(R.string.cmenu_search_image));
-        }
-
         if (!item.isHidden()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_HIDE_THREAD, 4, this.getString(R.string.cmenu_hide_thread));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_HIDE_THREAD, 3, this.getString(R.string.cmenu_hide_thread));
         }
     }
 
@@ -367,11 +363,6 @@ public class ThreadsListActivity extends BaseListActivity {
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
                 PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), this.mSettings, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder), this.mDvachUriBuilder);
                 this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
-                return true;
-            }
-            case Constants.CONTEXT_MENU_SEARCH_IMAGE: {
-                String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings).replace("2ch.so", "2-ch.so");
-                new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {

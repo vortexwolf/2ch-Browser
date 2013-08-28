@@ -124,22 +124,41 @@ public class HttpStreamReader {
     
     private HttpResponse getResponse(HttpGet request) throws HttpRequestException {
         HttpResponse response = null;
-        try {
-            response = this.mHttpClient.execute(request);
-
-            if(response.getStatusLine().getStatusCode() == 200) {
-                // save the last modified date
-                Header header = response.getFirstHeader("Last-Modified");
-                if (header != null) {
-                    this.mIfModifiedMap.put(request.getURI().toString(), header.getValue());
+        Exception responseException = null;
+        
+        // try several times if exception, break the loop after a successful read
+        for (int i = 0; i < 3; i++) {
+            try {
+                response = this.mHttpClient.execute(request);
+    
+                if(response.getStatusLine().getStatusCode() == 200) {
+                    // save the last modified date
+                    Header header = response.getFirstHeader("Last-Modified");
+                    if (header != null) {
+                        this.mIfModifiedMap.put(request.getURI().toString(), header.getValue());
+                    }
+                }
+                
+                responseException = null;
+                break;
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+                responseException = e;
+                
+                if ("recvfrom failed: ECONNRESET (Connection reset by peer)".equals(e.getMessage())) {
+                    // a stupid error, I have no idea how to solve it so I just try again
+                    continue;
+                } else {
+                    break;
                 }
             }
-            
-            return response;
-        } catch (Exception e) {
-            MyLog.e(TAG, e);
-            ExtendedHttpClient.releaseRequestResponse(request, response);
-            throw new HttpRequestException(this.mResources.getString(R.string.error_download_data), e);
         }
+        
+        if (responseException != null) {
+            ExtendedHttpClient.releaseRequestResponse(request, response);
+            throw new HttpRequestException(this.mResources.getString(R.string.error_download_data), responseException);
+        }
+        
+        return response;
     }
 }
