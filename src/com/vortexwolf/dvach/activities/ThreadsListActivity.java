@@ -22,7 +22,6 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
-import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
@@ -314,9 +313,7 @@ public class ThreadsListActivity extends BaseListActivity {
             info.setHidden(false);
             this.mAdapter.notifyDataSetChanged();
         } else {
-            String threadSubject = !StringUtils.isEmpty(info.getSubject())
-                    ? info.getSubject()
-                    : StringUtils.cutIfLonger(StringUtils.emptyIfNull(info.getSpannedComment().toString()), 50);
+            String threadSubject = info.getSubjectOrText();
             this.navigateToThread(info.getNumber(), threadSubject);
         }
     }

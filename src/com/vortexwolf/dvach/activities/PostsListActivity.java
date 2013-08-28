@@ -19,7 +19,6 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
-import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
@@ -57,6 +56,7 @@ public class PostsListActivity extends BaseListActivity {
     private IPagesSerializationService mSerializationService;
     private DvachUriBuilder mDvachUriBuilder;
     private FavoritesDataSource mFavoritesDatasource;
+    private IOpenTabsManager mTabsManager;
 
     private PostsListAdapter mAdapter = null;
     private DownloadPostsTask mCurrentDownloadTask = null;
@@ -92,23 +92,18 @@ public class PostsListActivity extends BaseListActivity {
         this.mTracker = this.mApplication.getTracker();
         this.mSerializationService = this.mApplication.getSerializationService();
         this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
-        IOpenTabsManager tabsManager = this.mApplication.getOpenTabsManager();
+        this.mTabsManager = this.mApplication.getOpenTabsManager();
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
 
-        // Заголовок страницы
+        // Page title and new tab
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT)
                 ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT)
                 : null;
-        String pageTitle = pageSubject != null
-                ? String.format(this.getString(R.string.data_thread_withsubject_title), this.mBoardName, pageSubject)
-                : String.format(this.getString(R.string.data_thread_title), this.mBoardName, this.mThreadNumber);
 
-        this.setTitle(pageTitle);
-
-        // Сохраняем во вкладках
-        String tabTitle = pageSubject != null ? pageSubject : pageTitle;
-        OpenTabModel tabModel = new OpenTabModel(tabTitle, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
-        this.mTabModel = tabsManager.add(tabModel);
+        OpenTabModel tabModel = new OpenTabModel(null, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
+        this.mTabModel = this.mTabsManager.add(tabModel);
+        
+        this.updateTitle(pageSubject);
 
         this.resetUI();
 
@@ -218,7 +213,9 @@ public class PostsListActivity extends BaseListActivity {
     
     private void setAdapterData(PostInfo[] posts){
         boolean isFirstTime = this.mAdapter.isEmpty();
+        
         this.mAdapter.setAdapterData(posts);
+        this.updateTitle(this.mAdapter.getItem(0).getSubjectOrText());
         
         if (isFirstTime) {
             if (this.mPostNumber != null) {
@@ -231,6 +228,17 @@ public class PostsListActivity extends BaseListActivity {
                 }
             }
         }
+    }
+    
+    private void updateTitle(String title){
+        String pageTitle = title != null
+                ? String.format(this.getString(R.string.data_thread_withsubject_title), this.mBoardName, title)
+                : String.format(this.getString(R.string.data_thread_title), this.mBoardName, this.mThreadNumber);
+
+        this.setTitle(pageTitle);
+        
+        String tabTitle = title != null ? title : pageTitle;
+        this.mTabModel.setTitle(tabTitle);
     }
 
     @Override

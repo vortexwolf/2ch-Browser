@@ -17,8 +17,8 @@ public class StringUtils {
         return isEmpty(emptyIfNull(s).trim());
     }
 
-    public static String emptyIfNull(String s) {
-        return s == null ? "" : s;
+    public static String emptyIfNull(CharSequence s) {
+        return s == null ? "" : s.toString();
     }
 
     public static String nullIfEmpty(String s) {

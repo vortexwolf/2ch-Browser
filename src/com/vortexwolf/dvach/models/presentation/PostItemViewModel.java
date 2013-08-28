@@ -61,6 +61,15 @@ public class PostItemViewModel {
         // temporary assignment for testing
         this.mSpannedComment = this.createSpannedComment();
     }
+    
+    public String getSubjectOrText(){
+        String subject = this.mModel.getSubject();
+        if (!StringUtils.isEmpty(subject)) {
+            return subject;
+        }
+        
+        return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50);
+    }
 
     private void parseReferences() {
         String comment = this.mModel.getComment();

@@ -86,9 +86,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
         threadNumberView.setText("№" + item.getNumber());
 
-        CharSequence description = !StringUtils.isEmpty(item.getSubject())
-                ? item.getSubject()
-                : item.getSpannedComment();
+        CharSequence description = item.getSubjectOrText();
         threadDescriptionView.setText(description);
     }
 

@@ -47,6 +47,11 @@ public class PostInfo implements IAttachmentEntity, Serializable {
     }
 
     public String getSubject() {
+        if (this.subject == null) {
+            return null;
+        }
+        
+        this.subject = this.subject.replaceAll("&#44;", ",");
         return this.subject;
     }
 

@@ -3,13 +3,15 @@ package android.httpimage;
 import android.graphics.Bitmap;
 
 import com.vortexwolf.dvach.common.library.LruCache;
+import com.vortexwolf.dvach.common.library.MyLog;
+import com.vortexwolf.dvach.interfaces.ILruCacheListener;
 
-public class BasicBitmapCache implements BitmapCache {
+public class BitmapMemoryCache implements BitmapCache {
 
-    private final LruCache<String, Bitmap> mMap = new LruCache<String, Bitmap>();
+    private final LruCache<String, Bitmap> mMap;
 
-    public BasicBitmapCache() {
-
+    public BitmapMemoryCache() {
+        this.mMap = new LruCache<String, Bitmap>(new BitmapLruCacheListener());
     }
 
     @Override
@@ -39,12 +41,20 @@ public class BasicBitmapCache implements BitmapCache {
         if (this.exists(key)) {
             return;
         }
-
+        
         this.mMap.put(key, data);
     }
 
     @Override
     public boolean isEnabled() {
         return false;
+    }
+    
+    private class BitmapLruCacheListener implements ILruCacheListener<String, Bitmap> {
+        @Override
+        public void onEntryRemoved(String key, Bitmap value) {
+            MyLog.d("BitmapMemoryCache", "removed from memory " + key);
+            // check if the bitmap is displayed
+        }
     }
 }

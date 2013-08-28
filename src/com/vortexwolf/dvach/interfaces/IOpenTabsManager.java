@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.interfaces;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.net.Uri;
 
 import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 
