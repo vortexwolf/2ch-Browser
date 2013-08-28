@@ -47,6 +47,7 @@ public class PostItemViewModel {
     public boolean isFloatImageComment = false;
     private boolean mIsLocalDateTime = false;
     private boolean mHasUrlSpans = false;
+    private boolean mIsLongTextExpanded = false;
 
     public PostItemViewModel(int position, PostInfo model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
         this.mModel = model;
@@ -183,6 +184,14 @@ public class PostItemViewModel {
     
     public boolean hasReferencesFrom() {
         return !this.referencesFrom.isEmpty();
+    }
+    
+    public boolean isLongTextExpanded() {
+        return this.mIsLongTextExpanded;
+    }
+    
+    public void setLongTextExpanded(boolean isExpanded) {
+        this.mIsLongTextExpanded = isExpanded;
     }
 
     public SpannableStringBuilder getReferencesFromAsSpannableString(Resources res, String boardName, String threadNumber) {

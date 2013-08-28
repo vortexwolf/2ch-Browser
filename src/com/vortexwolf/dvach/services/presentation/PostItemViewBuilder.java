@@ -78,6 +78,8 @@ public class PostItemViewBuilder {
             view.setTag(vb);
         }
         
+        vb.currentModel = item;
+        
         if (item.canMakeCommentFloat() || item.isCommentFloat()) {
             FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
         } else {
@@ -173,6 +175,7 @@ public class PostItemViewBuilder {
                     vb.showFullTextView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            vb.currentModel.setLongTextExpanded(true);
                             PostItemViewBuilder.this.removeMaxHeight(view);
                         }
                     });  
@@ -224,16 +227,18 @@ public class PostItemViewBuilder {
         }
     }
 
-    private static class ViewBag {
-        TextView postIdView;
-        TextView postNameView;
-        TextView postIndexView;
-        TextView postDateView;
-        TextView commentView;
-        TextView attachmentInfoView;
-        TextView postRepliesView;
-        TextView showFullTextView;
-        View fullThumbnailView;
-        ImageView imageView;
+    public static class ViewBag {
+        public PostItemViewModel currentModel;
+        
+        public TextView postIdView;
+        public TextView postNameView;
+        public TextView postIndexView;
+        public TextView postDateView;
+        public TextView commentView;
+        public TextView attachmentInfoView;
+        public TextView postRepliesView;
+        public TextView showFullTextView;
+        public View fullThumbnailView;
+        public ImageView imageView;
     }
 }

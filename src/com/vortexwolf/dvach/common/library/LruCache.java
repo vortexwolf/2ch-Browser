@@ -7,14 +7,12 @@ import com.vortexwolf.dvach.interfaces.ILruCacheListener;
 
 @SuppressWarnings("serial")
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
-    private static final int INITIAL_CAPACITY = 60;
-    private static final float LOAD_FACTOR = 0.75F;
-    public static final int MAX_CAPACITY = 120;
+    public static final int MAX_CAPACITY = 50;
     
     private final ILruCacheListener<K, V> mListener;
 
     public LruCache(ILruCacheListener<K, V> listener) {
-        super(INITIAL_CAPACITY, LOAD_FACTOR, true);
+        super(16, 1, true);
         
         this.mListener = listener;
     }

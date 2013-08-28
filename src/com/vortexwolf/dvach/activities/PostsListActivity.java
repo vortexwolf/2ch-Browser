@@ -100,7 +100,7 @@ public class PostsListActivity extends BaseListActivity {
                 ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT)
                 : null;
 
-        OpenTabModel tabModel = new OpenTabModel(null, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
+        OpenTabModel tabModel = new OpenTabModel(pageSubject, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
         this.mTabModel = this.mTabsManager.add(tabModel);
         
         this.updateTitle(pageSubject);

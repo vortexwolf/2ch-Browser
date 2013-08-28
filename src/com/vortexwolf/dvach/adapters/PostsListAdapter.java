@@ -30,6 +30,7 @@ import com.vortexwolf.dvach.models.presentation.PostsViewModel;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.PostItemViewBuilder;
+import com.vortexwolf.dvach.services.presentation.PostItemViewBuilder.ViewBag;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener, IBusyAdapter {
@@ -72,14 +73,15 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             return this.mInflater.inflate(R.layout.loading, null);
         }
 
-        View view = this.mPostItemViewBuilder.getView(this.getItem(position), convertView, this.mIsBusy);
+        PostItemViewModel model = this.getItem(position);
+        View view = this.mPostItemViewBuilder.getView(model, convertView, this.mIsBusy);
 
         // cut long posts if necessary
         int maxPostHeight = this.mSettings.getLongPostsMaxHeight();
-        if (maxPostHeight > 0) {
-            this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight, this.mTheme);
-        } else {
+        if (maxPostHeight == 0 || model.isLongTextExpanded()) {
             this.mPostItemViewBuilder.removeMaxHeight(view);
+        } else {
+            this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight, this.mTheme);
         }
         
         return view;
