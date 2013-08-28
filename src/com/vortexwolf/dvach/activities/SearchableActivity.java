@@ -4,7 +4,6 @@ import com.vortexwolf.dvach.R;
 import com.vortexwolf.dvach.adapters.FoundPostsListAdapter;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
-import com.vortexwolf.dvach.asynctasks.SearchImageTask;
 import com.vortexwolf.dvach.asynctasks.SearchPostsTask;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.Factory;

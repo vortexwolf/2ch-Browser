@@ -6,8 +6,8 @@ import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 
 public class OpenTabModel {
 
-    private final String mTitle;
     private final Uri mUri;
+    private String mTitle;
 
     private AppearanceUtils.ListViewPosition mPosition;
 
@@ -18,6 +18,10 @@ public class OpenTabModel {
 
     public String getTitle() {
         return this.mTitle;
+    }
+    
+    public void setTitle(String title) {
+        this.mTitle = title;
     }
 
     public Uri getUri() {

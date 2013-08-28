@@ -6,6 +6,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Application;
 import android.content.res.Resources;
+import android.httpimage.BitmapMemoryCache;
+import android.httpimage.BitmapCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
@@ -53,7 +55,8 @@ public class MainApplication extends Application {
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
-        HttpImageManager imageManager = new HttpImageManager(new FileSystemPersistence(cacheManager), httpClient, this.getResources());
+        BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
+        HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), httpClient, this.getResources());
         NavigationService navigationService = new NavigationService();
         DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpClient);
 
@@ -70,6 +73,7 @@ public class MainApplication extends Application {
         container.register(Tracker.class, tracker);
         container.register(ICacheDirectoryManager.class, cacheManager);
         container.register(IPagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
+        container.register(BitmapMemoryCache.class, bitmapMemoryCache);
         container.register(HttpImageManager.class, imageManager);
         container.register(IBitmapManager.class, new BitmapManager(imageManager));
         container.register(HistoryDataSource.class, historyDataSource);

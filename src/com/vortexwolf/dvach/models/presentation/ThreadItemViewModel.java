@@ -44,9 +44,16 @@ public class ThreadItemViewModel {
     }
 
     public String getSubject() {
-        String subject = StringUtils.emptyIfNull(this.mOpPost.getSubject());
-        subject = subject.replaceAll("&#44;", ",");
-        return subject;
+        return StringUtils.emptyIfNull(this.mOpPost.getSubject());
+    }
+    
+    public String getSubjectOrText(){
+        String subject = this.mOpPost.getSubject();
+        if (!StringUtils.isEmpty(subject)) {
+            return subject;
+        }
+        
+        return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50) + "...";
     }
 
     public boolean hasAttachment() {

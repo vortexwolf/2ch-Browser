@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.services.presentation;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.vortexwolf.dvach.common.Constants;
@@ -57,5 +58,15 @@ public class OpenTabsManager implements IOpenTabsManager {
         extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
 
         this.mNavigationService.navigate(tab.getUri(), activity, extras);
+    }
+    
+    public OpenTabModel getByUri(Uri uri) {
+        for (OpenTabModel model : this.mTabs) {
+            if (model.getUri().equals(uri)) {
+                return model;
+            }
+        }
+        
+        return null;
     }
 }
