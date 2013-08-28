@@ -152,6 +152,18 @@ public class BrowserActivity extends Activity {
                 shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mUri.toString());
                 this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
                 break;
+            case R.id.menu_search_tineye_id:
+                String tineyeSearchUrl = "http://www.tineye.com/search?url=" + this.mUri;
+                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), tineyeSearchUrl);
+                break;
+            case R.id.menu_search_google_id:
+                String googleSearchUrl = "http://www.google.com/searchbyimage?image_url=" + this.mUri;
+                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
+                break;
+            case R.id.menu_image_operations_id:
+                String imageOpsUrl = "http://imgops.com/" + this.mUri;
+                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), imageOpsUrl);
+                break;
         }
 
         return true;

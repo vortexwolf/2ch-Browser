@@ -27,6 +27,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.cookie.DateUtils;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
@@ -45,12 +46,12 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 
         // Client parameters
         BasicHttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setStaleCheckingEnabled(params, false);
-        HttpConnectionParams.setConnectionTimeout(params, SOCKET_OPERATION_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(params, SOCKET_OPERATION_TIMEOUT);
-        ConnManagerParams.setTimeout(params, SOCKET_OPERATION_TIMEOUT);
-        HttpConnectionParams.setSocketBufferSize(params, 8192);
+        params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_OPERATION_TIMEOUT)
+                .setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, SOCKET_OPERATION_TIMEOUT)
+                .setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024)
+                .setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
 
+        ConnManagerParams.setTimeout(params, SOCKET_OPERATION_TIMEOUT);
         HttpProtocolParams.setUserAgent(params, Constants.USER_AGENT_STRING);
         
         // HTTPS scheme registry
@@ -69,6 +70,8 @@ public class ExtendedHttpClient extends DefaultHttpClient {
     public ExtendedHttpClient() {
         super(sConnectionManager, sParams);
 
+        //System.setProperty("http.KeepAlive","false");
+        
         this.addRequestInterceptor(new DefaultRequestInterceptor());
         this.addResponseInterceptor(new GzipResponseInterceptor());
     }

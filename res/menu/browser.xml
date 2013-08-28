@@ -13,6 +13,7 @@
     <item
         android:id="@+id/refresh_menu_id"
         android:icon="?iconRefresh"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_refresh"/>
     <item
         android:id="@+id/share_menu_id"
@@ -22,4 +23,16 @@
         android:id="@+id/share_link_menu_id"
         android:icon="@drawable/ic_menu_share"
         android:title="@string/menu_share_link"/>
+    <item
+        android:id="@+id/menu_search_tineye_id"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/menu_search_image_tineye"/>
+    <item
+        android:id="@+id/menu_search_google_id"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/menu_search_image_google"/>
+    <item
+        android:id="@+id/menu_image_operations_id"
+        android:icon="@drawable/ic_menu_crop"
+        android:title="@string/menu_image_operations"/>
 </menu>
