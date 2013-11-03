@@ -103,9 +103,6 @@ public class FilesListActivity extends ListActivity {
 
     @Override
     protected void onDestroy() {
-        AppearanceUtils.unbindDrawables(this.getListView());
-        System.gc();
-
         super.onDestroy();
     }
 

@@ -77,14 +77,17 @@
         <item>d; обсуждение двача</item>
         <item>fag; фагготрия</item>
         <item>soc; общение</item>
+        <item>fs; фэнтези</item>
         <item>r; просьбы</item>
+        <item>gif; анимированные GIF</item>
         <item>int; international</item>
         <item>Тематика</item>
-        <item>app; мобильные приложения</item>
+        <item>mobi; мобильные устройства</item>
         <item>au; автомобили и транспорт</item>
         <item>bi; велосипеды</item>
         <item>biz; бизнес</item>
         <item>bo; книги</item>
+        <item>br; барахолка</item>
         <item>c; комиксы и мультфильмы</item>
         <item>di; столовая</item>
         <item>em; другие страны и туризм</item>
@@ -123,6 +126,7 @@
         <item>wh; warhammer</item>
         <item>wm; военная техника</item>
         <item>w; оружие</item>
+        <item>wrk; работа и карьера</item>
         <item>Творчество</item>
         <item>de; дизайн</item>
         <item>diy; хобби</item>
@@ -141,6 +145,7 @@
         <item>gb; азартные игры</item>
         <item>mc; minecraft</item>
         <item>mmo; MMO</item>
+        <item>moba; MOBA</item>
         <item>vg; видеоигры</item>
         <item>wr; текстовые ролевые игры</item>
         <item>tes; the elder scrolls</item>
@@ -167,11 +172,6 @@
         <item>e; extreme pron</item>
         <item>fet; фетиш</item>
         <item>sex; секс и отношения</item>
-        <item>Пробное</item>
-        <item>gif; анимированные GIF</item>
-        <item>br; барахолка</item>
-        <item>wrk; работа и карьера</item>
-        <item>fs; фэнтези</item>
     </string-array>
 
 </resources>

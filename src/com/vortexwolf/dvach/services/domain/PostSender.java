@@ -170,7 +170,20 @@ public class PostSender implements IPostSender {
             }
 
             httpPost.setEntity(multipartEntity);
-            response = this.mHttpClient.execute(httpPost);
+            // post and ignore recvfrom exceptions
+            for (int i = 0; i < 3; i++) {
+                try {
+                    response = this.mHttpClient.execute(httpPost);
+                    break;
+                } catch (Exception e) {
+                    if ("recvfrom failed: ECONNRESET (Connection reset by peer)".equals(e.getMessage())) {
+                        // a stupid error, I have no idea how to solve it so I just try again
+                        continue;
+                    } else {
+                        throw e;
+                    }
+                }
+            }
         } catch (Exception e) {
             MyLog.e(TAG, e);
             throw new SendPostException(this.mResources.getString(R.string.error_send_post));

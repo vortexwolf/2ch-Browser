@@ -2,6 +2,7 @@ package com.vortexwolf.dvach.services.domain;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpCookie;
 import java.util.HashMap;
 
 import org.apache.http.Header;
@@ -9,7 +10,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 
 import android.content.res.Resources;
 
@@ -129,6 +132,7 @@ public class HttpStreamReader {
         // try several times if exception, break the loop after a successful read
         for (int i = 0; i < 3; i++) {
             try {
+                //this.mHttpClient.getCookieStore().addCookie(new BasicClientCookie("key", Math.random() + ""));
                 response = this.mHttpClient.execute(request);
     
                 if(response.getStatusLine().getStatusCode() == 200) {

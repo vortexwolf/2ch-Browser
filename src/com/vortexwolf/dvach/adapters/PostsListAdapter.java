@@ -3,6 +3,8 @@ package com.vortexwolf.dvach.adapters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.Context;
 import android.content.res.Resources.Theme;
@@ -47,9 +49,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private final Context mActivityContext;
     private final PostItemViewBuilder mPostItemViewBuilder;
     private final DvachUriBuilder mDvachUriBuilder;
+    private final Timer mLoadImagesTimer;
 
     private boolean mIsBusy = false;
     private boolean mIsLoadingMore = false;
+    private LoadImagesTimerTask mCurrentLoadImagesTask;
 
     public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder) {
         super(context.getApplicationContext(), 0);
@@ -65,6 +69,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mActivityContext = context;
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings);
         this.mDvachUriBuilder = dvachUriBuilder;
+        this.mLoadImagesTimer = new Timer();
     }
 
     @Override
@@ -191,17 +196,26 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
     @Override
     public void setBusy(boolean value, AbsListView listView) {
+        if (this.mCurrentLoadImagesTask != null) {
+            this.mCurrentLoadImagesTask.cancel();
+        }
+        
         if (this.mIsBusy == true && value == false) {
-            int count = listView.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View v = listView.getChildAt(i);
-                int position = listView.getPositionForView(v);
-
-                this.mPostItemViewBuilder.displayThumbnail(v, this.getItem(position));
-            }
+            this.mCurrentLoadImagesTask = new LoadImagesTimerTask();
+            this.mLoadImagesTimer.schedule(this.mCurrentLoadImagesTask, 500);
         }
 
         this.mIsBusy = value;
+    }
+    
+    private void loadListImages(){
+        int count = this.mListView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View v = this.mListView.getChildAt(i);
+            int position = this.mListView.getPositionForView(v);
+
+            this.mPostItemViewBuilder.displayThumbnail(v, this.getItem(position));
+        }
     }
 
     public void setLoadingMore(boolean isLoadingMore) {
@@ -244,5 +258,20 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     @Override
     public boolean isEnabled(int position) {
         return !this.isStatusView(position);
+    }
+    
+    private class LoadImagesTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            MyLog.d(TAG, "LoadImagesTimerTask");
+            PostsListAdapter.this.mListView.post(new LoadImagesRunnable());
+        }
+    }
+    
+    private class LoadImagesRunnable implements Runnable {
+        @Override
+        public void run() {
+            PostsListAdapter.this.loadListImages();
+        }
     }
 }
