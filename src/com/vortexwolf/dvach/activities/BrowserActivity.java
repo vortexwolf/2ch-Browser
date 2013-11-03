@@ -7,9 +7,12 @@ import android.app.Activity;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -71,6 +74,8 @@ public class BrowserActivity extends Activity {
         this.mWebView.setInitialScale(100);
         WebSettings settings = this.mWebView.getSettings();
         settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(true);
+        settings.setAllowFileAccess(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         if (Integer.valueOf(Build.VERSION.SDK) >= 8) {
@@ -92,11 +97,6 @@ public class BrowserActivity extends Activity {
         if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
-
-        // Must remove the WebView from the view system before destroying.
-        this.mRootView.removeView(this.mWebView);
-        this.mWebView.removeAllViews();
-        this.mWebView.destroy();
     }
 
     private void resetUI() {
@@ -188,6 +188,7 @@ public class BrowserActivity extends Activity {
 
     private void setImage(File file) {
         this.mLoadedFile = file;
+
         this.mWebView.loadUrl(Uri.fromFile(file).toString());
 
         this.mImageLoaded = true;

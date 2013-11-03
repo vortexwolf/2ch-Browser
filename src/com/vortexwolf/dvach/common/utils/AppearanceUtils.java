@@ -37,23 +37,6 @@ public class AppearanceUtils {
         return position;
     }
 
-    public static void unbindDrawables(View view) {
-        if (view.getBackground() != null) {
-            view.getBackground().setCallback(null);
-            view.setBackgroundDrawable(null);
-        }
-        if (view instanceof ImageView) {
-            ImageView imageView = (ImageView) view;
-            imageView.setImageDrawable(null);
-        }
-
-        if (view instanceof ViewGroup) {
-            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                unbindDrawables(((ViewGroup) view).getChildAt(i));
-            }
-        }
-    }
-
     public static void showImageProgressBar(final View indeterminateProgressBar, final ImageView imageView) {
         imageView.setVisibility(View.INVISIBLE);
         
