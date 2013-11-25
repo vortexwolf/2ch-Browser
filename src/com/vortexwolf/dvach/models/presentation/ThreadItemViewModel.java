@@ -19,7 +19,7 @@ public class ThreadItemViewModel {
     private final int mImageCount;
     private final DvachUriBuilder mDvachUriBuilder;
 
-    private SpannableStringBuilder mSpannedComment = null;
+    private final SpannableStringBuilder mSpannedComment;
     private AttachmentInfo mAttachment = null;
     private boolean mEllipsized = false;
     private boolean mHidden = false;
@@ -31,16 +31,18 @@ public class ThreadItemViewModel {
         this.mOpPost = model.getPosts()[0];
         this.mReplyCount = model.getReplyCount();
         this.mImageCount = model.getImageCount();
+        
+        this.mSpannedComment = this.createSpannedComment();
     }
 
     public SpannableStringBuilder getSpannedComment() {
-        if (this.mSpannedComment == null) {
-            String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
-            Spanned spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
-            this.mSpannedComment = (SpannableStringBuilder) spanned;
-        }
-
         return this.mSpannedComment;
+    }
+    
+    private SpannableStringBuilder createSpannedComment() {
+        String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
+        SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
+        return spanned;
     }
 
     public String getSubject() {

@@ -3,7 +3,8 @@
     xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.dvach"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="?postItemBackground"
+    android:background="?postBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:gravity="top"
     android:orientation="vertical"
     android:padding="4dip" >
@@ -62,6 +63,29 @@
             android:text="anon anonanonanonanon"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
+    <LinearLayout 
+            android:id="@+id/badge_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+        <com.vortexwolf.dvach.common.controls.DynamicWidthImageView
+            android:id="@+id/badge_image"
+            android:layout_width="wrap_content"
+            android:layout_height="15dip"
+            android:minWidth="15dip"
+            android:adjustViewBounds="false"
+            android:scaleType="fitStart" />
+        <TextView
+            android:id="@+id/badge_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_marginLeft="4dip"
+            android:text="ru"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 
     <!-- Content -->
 

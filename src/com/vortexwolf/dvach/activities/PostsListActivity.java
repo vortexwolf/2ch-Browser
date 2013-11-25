@@ -3,6 +3,7 @@ package com.vortexwolf.dvach.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.ClipboardManager;
@@ -193,22 +194,11 @@ public class PostsListActivity extends BaseListActivity {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        // Пробуем десериализовать в любом случае
-        PostInfo[] posts = this.mSerializationService.deserializePosts(this.mBoardName, this.mThreadNumber);
-        if (posts != null) {
-            this.setAdapterData(posts);
-            
-            // Обновляем посты, если не был установлен ограничивающий extra
-            if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
-                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED)) {
-                // nothing
-            }
-            else {
-                this.refreshPosts();
-            }
-        } else {
-            this.refreshPosts(false);
-        }
+        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
+                                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+        
+        LoadPostsTask task = new LoadPostsTask(preferDeserialized);
+        task.execute();
     }
     
     private void setAdapterData(PostInfo[] posts){
@@ -452,6 +442,44 @@ public class PostsListActivity extends BaseListActivity {
         } else {
             this.mCurrentDownloadTask = new DownloadPostsTask(this.mPostsReaderListener, this.mBoardName, this.mThreadNumber, checkModified, this.mJsonReader, false);
             this.mCurrentDownloadTask.execute();
+        }
+    }
+    
+    private class LoadPostsTask extends AsyncTask<Void, Long, PostInfo[]> {
+        private boolean mPreferDeserialized;
+        public LoadPostsTask(boolean preferDeserialized){
+            this.mPreferDeserialized = preferDeserialized;
+        }
+        
+        @Override
+        protected PostInfo[] doInBackground(Void... arg0) {
+            // Пробуем десериализовать в любом случае
+            PostInfo[] posts = mSerializationService.deserializePosts(mBoardName, mThreadNumber);
+            return posts;
+        }   
+        
+        @Override
+        public void onPreExecute() {
+            mPostsReaderListener.showLoadingScreen();
+        }
+
+        @Override
+        public void onPostExecute(PostInfo[] posts) {
+            mPostsReaderListener.hideLoadingScreen();
+
+            if (posts != null) {
+                PostsListActivity.this.setAdapterData(posts);
+                
+                // Обновляем посты, если не был установлен ограничивающий extra
+                if (this.mPreferDeserialized) {
+                    // nothing
+                }
+                else {
+                    PostsListActivity.this.refreshPosts();
+                }
+            } else {
+                PostsListActivity.this.refreshPosts(false);
+            }
         }
     }
 

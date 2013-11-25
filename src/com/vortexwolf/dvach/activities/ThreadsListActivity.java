@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -34,6 +35,7 @@ import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
 import com.vortexwolf.dvach.interfaces.IJsonApiReader;
 import com.vortexwolf.dvach.interfaces.IListView;
 import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
+import com.vortexwolf.dvach.models.domain.PostInfo;
 import com.vortexwolf.dvach.models.domain.ThreadInfo;
 import com.vortexwolf.dvach.models.domain.ThreadsList;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
@@ -96,9 +98,9 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mTracker = this.mApplication.getTracker();
         this.mSerializationService = this.mApplication.getSerializationService();
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings);
-        this.mHiddenThreadsDataSource = Factory.getContainer().resolve(HiddenThreadsDataSource.class);
         this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings, this.mDvachUriBuilder);
+        this.mHiddenThreadsDataSource = Factory.getContainer().resolve(HiddenThreadsDataSource.class);
 
         // Заголовок страницы
         String pageTitle = this.mPageNumber != 0
@@ -207,21 +209,22 @@ public class ThreadsListActivity extends BaseListActivity {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        ThreadInfo[] threads = null;
-        if (this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
-            || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED)) {
-            threads = this.mSerializationService.deserializeThreads(this.mBoardName, this.mPageNumber);
-        }
-
-        if (threads == null) {
-            this.refreshThreads(false);
+        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
+                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+        
+        if (preferDeserialized) {
+            new LoadThreadsTask().execute();
         } else {
-            this.mAdapter.setAdapterData(threads);
-            // Устанавливаем позицию, если открываем как уже открытую вкладку
-            AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
-            if (savedPosition != null) {
-                this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
-            }
+            this.refreshThreads(false);
+        }
+    }
+    
+    private void setAdapterData(ThreadInfo[] threads){
+        this.mAdapter.setAdapterData(threads);
+        // Устанавливаем позицию, если открываем как уже открытую вкладку
+        AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
+        if (savedPosition != null) {
+            this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
         }
     }
     
@@ -423,6 +426,30 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mCurrentDownloadTask.execute();
         }
     }
+    
+    private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadInfo[]> {
+        @Override
+        protected ThreadInfo[] doInBackground(Void... arg0) {
+            ThreadInfo[] threads = mSerializationService.deserializeThreads(mBoardName, mPageNumber);
+            return threads;
+        }   
+        
+        @Override
+        public void onPreExecute() {
+            mThreadsReaderListener.showLoadingScreen();
+        }
+
+        @Override
+        public void onPostExecute(ThreadInfo[] threads) {
+            mThreadsReaderListener.hideLoadingScreen();
+
+            if (threads == null) {
+                ThreadsListActivity.this.refreshThreads(false);
+            } else {
+                ThreadsListActivity.this.setAdapterData(threads);
+            }
+        }
+    }
 
     private class ThreadsReaderListener implements IListView<ThreadsList> {
 
@@ -441,7 +468,7 @@ public class ThreadsListActivity extends BaseListActivity {
             if (threadsList != null) {
                 ThreadInfo[] threads = threadsList.getThreads();
                 ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
-                ThreadsListActivity.this.mAdapter.setAdapterData(threads);
+                ThreadsListActivity.this.setAdapterData(threads);
             } else {
                 ThreadsListActivity.this.mAdapter.clear();
                 this.showError(ThreadsListActivity.this.getString(R.string.error_list_empty));

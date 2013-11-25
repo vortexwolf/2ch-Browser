@@ -24,11 +24,13 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         MainApplication application = (MainApplication) this.getApplication();
         this.mSettings = application.getSettings();
         this.mResources = application.getResources();
+        
+        this.setTheme(this.mSettings.getTheme()); // set theme before creating
+        super.onCreate(savedInstanceState);
+        
         this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -57,7 +59,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this.mSharedPreferenceChangeListener);
         this.mSettings.stopTrackChanges();
     }
-
+    
     private class SharedPreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

@@ -124,14 +124,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
                 boundItem.setEllipsized(ellipsized);
             }
         });
-
+        
         // Количество ответов
         String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
         String imagesQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
         String repliesFormat = this.getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
-
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
         ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
@@ -161,8 +160,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mIsBusy = isBusy;
 
         if (prevBusy == true && isBusy == false) {
-            // this.notifyDataSetChanged();
-            // MyLog.v("ThreadsListAdapter", "Non busy");
             int count = view.getChildCount();
             for (int i = 0; i < count; i++) {
                 View v = view.getChildAt(i);

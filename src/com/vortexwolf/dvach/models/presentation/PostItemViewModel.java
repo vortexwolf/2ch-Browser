@@ -28,6 +28,7 @@ import com.vortexwolf.dvach.settings.ApplicationSettings;
 public class PostItemViewModel {
 
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>&gt;&gt;(\\d+)</a>");
+    private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?title=\"(.+?)\".+?/>");
 
     private final int mPosition;
     private final PostInfo mModel;
@@ -36,10 +37,12 @@ public class PostItemViewModel {
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mSettings;
 
-    private SpannableStringBuilder mSpannedComment = null;
+    private final SpannableStringBuilder mSpannedComment;
     private SpannableStringBuilder mCachedReferencesString = null;
     private AttachmentInfo mAttachment;
     private String mPostDate = null;
+    private final BadgeModel mBadge;
+    private String mName = null;
 
     private final ArrayList<String> refersTo = new ArrayList<String>();
     private final ArrayList<String> referencesFrom = new ArrayList<String>();
@@ -58,6 +61,7 @@ public class PostItemViewModel {
         this.mSettings = settings;
 
         this.parseReferences();
+        this.mBadge = this.parseBadge();
         
         // temporary assignment for testing
         this.mSpannedComment = this.createSpannedComment();
@@ -70,6 +74,23 @@ public class PostItemViewModel {
         }
         
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50);
+    }
+    
+    private BadgeModel parseBadge(){
+        this.mName = this.mModel.getName();
+        if (this.mName == null) return null;
+        
+        Matcher m = sBadgePattern.matcher(this.mName);
+        if (m.find() && m.groupCount() > 0) {
+            this.mName = this.mName.replace(m.group(0), "");
+            
+            BadgeModel model = new BadgeModel();
+            model.source = m.group(1);
+            model.title = m.group(2);
+            return model;
+        }
+        
+        return null;
     }
 
     private void parseReferences() {
@@ -109,7 +130,7 @@ public class PostItemViewModel {
         // Игнорируем, если был уже сделан или у поста нет прикрепленного файла
         if (this.canMakeCommentFloat()) {
             this.isFloatImageComment = true;
-            this.mSpannedComment = FlowTextHelper.tryFlowText(this.getSpannedComment(), floatModel);
+            FlowTextHelper.tryFlowText(this.getSpannedComment(), floatModel);
         }
     }
 
@@ -126,14 +147,17 @@ public class PostItemViewModel {
         return this.mModel.getNum();
     }
     
+    public BadgeModel getBadge(){
+        return mBadge;
+    }
+    
     public String getParentThreadNumber() {
         String parent = this.mModel.getParent();
         return parent != null && !parent.equals("0") ? parent : this.getNumber();
     }
 
     public String getName() {
-        String name = this.mModel.getName();
-        return name != null ? name : this.mModel.getPostername();
+        return this.mName != null ? this.mName : this.mModel.getPostername();
     }
 
     public boolean hasAttachment() {
@@ -149,10 +173,6 @@ public class PostItemViewModel {
     }
 
     public SpannableStringBuilder getSpannedComment() {
-        if (this.mSpannedComment == null) {
-            this.mSpannedComment = this.createSpannedComment();
-        }
-
         return this.mSpannedComment;
     }
 

@@ -63,19 +63,20 @@
         <item>Технократия</item>
         <item>Христианство</item>
 		<item>Украина</item>
+        <item>ХТО, ЯК НЕ МИ</item>
 		<item>Беларусь</item>
 		<item>ЛГБТ</item>
 		<item>Nya</item>
-		<item>ЖЖшчка</item>
-		<item>Втентакль</item>
+		<item>Экологи</item>
+		<item>Госдеп</item>
 		<item>YARRR!!!</item>
+        <item>Родноверы</item>
+        <item>Соцдем</item>
     </string-array>
     <string-array name="pickboard_boards">
         <item>Разное</item>
-        <item>abu; абу</item>
         <item>b; бред</item>
         <item>d; обсуждение двача</item>
-        <item>fag; фагготрия</item>
         <item>soc; общение</item>
         <item>fs; фэнтези</item>
         <item>r; просьбы</item>

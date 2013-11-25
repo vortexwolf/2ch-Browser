@@ -5,10 +5,10 @@
     <color name="blue">#0000FF</color>
     <color name="darkBlueText">#456793</color>
     <color name="darkGrayText">#808080</color>
-    <color name="white_background">@android:color/white</color>
+    <color name="white_background">#f3f3f3</color>
     <color name="neutron_background">#212121</color>
     <color name="photon_background">#EEEEEE</color>
-    <color name="white_post_background">@android:color/white</color>
+    <color name="white_post_background">#f3f3f3</color>
     <color name="neutron_post_background">#2C2C2C</color>
     <color name="photon_post_background">#DDDDDD</color>
     <color name="white_primary_text">@android:color/black</color>
@@ -26,7 +26,7 @@
     <color name="white_list_section">#ebeff9</color>
     <color name="neutron_list_section">#191919</color>
     <color name="photon_list_section">@color/white_list_section</color>
-    <color name="white_url_link">#5555FF</color>
+    <color name="white_url_link">#0000ee</color>
     <color name="neutron_url_link">#C9BE89</color>
     <color name="photon_url_link">#FF6600</color>
     <color name="white_post_quote">#789922</color>
@@ -38,5 +38,8 @@
     <color name="white_spoiler">#BBBBBB</color>
     <color name="neutron_spoiler">#575757</color>
     <color name="photon_spoiler">@color/white_spoiler</color>
+    <color name="white_post_divider">@color/white</color>
+    <color name="neutron_post_divider">@android:color/transparent</color>
+    <color name="photon_post_divider">@android:color/transparent</color>
 
 </resources>
