@@ -67,8 +67,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mSettings = settings;
         this.mListView = listView;
         this.mActivityContext = context;
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings);
         this.mDvachUriBuilder = dvachUriBuilder;
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
         this.mLoadImagesTimer = new Timer();
     }
 
@@ -136,7 +136,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     public void setAdapterData(PostInfo[] posts) {
         this.clear();
         
-        List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder);
+        List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : models) {
             this.add(model);
         }
@@ -180,7 +180,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             }
         }
         
-        List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder);
+        List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : newModels) {
             this.add(model);
         }

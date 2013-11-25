@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
@@ -17,7 +18,7 @@ public class PostsViewModel {
     private String mLastPostNumber = null;
 
     // Обновляет ссылки у других постов и добавляет модель в список
-    private void processPostItem(PostItemViewModel viewModel) {
+    private void processReferences(PostItemViewModel viewModel) {
         for (String refPostNumber : viewModel.getRefersTo()) {
             PostItemViewModel refModel = this.mViewModels.get(refPostNumber);
             if (refModel != null) {
@@ -36,16 +37,20 @@ public class PostsViewModel {
         PostItemViewModel viewModel = new PostItemViewModel(this.mViewModels.size(), item, theme, settings, listener, uriBuilder);
         this.mLastPostNumber = viewModel.getNumber();
 
-        this.processPostItem(viewModel);
-
+        this.processReferences(viewModel);
+        
         return viewModel;
     }
     
-    public List<PostItemViewModel> addModels(List<PostInfo> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
+    public List<PostItemViewModel> addModels(List<PostInfo> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder, Resources resources, String boardName, String threadNumber) {
         List<PostItemViewModel> result = new ArrayList<PostItemViewModel>();
         for (PostInfo item : items) {
             PostItemViewModel model = this.createModel(item, theme, settings, listener, uriBuilder);
             result.add(model);
+        }
+        
+        for (PostItemViewModel model : result) {
+            model.getReferencesFromAsSpannableString(resources, boardName, threadNumber);
         }
         
         return result;

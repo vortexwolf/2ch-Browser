@@ -87,30 +87,17 @@ public class HttpImageManager {
     public static class LoadRequest {
 
         public LoadRequest(Uri uri) {
-            this(uri, null, null);
-        }
-
-        public LoadRequest(Uri uri, ImageView v) {
-            this(uri, v, null);
+            this(uri, null);
         }
 
         public LoadRequest(Uri uri, OnLoadResponseListener l) {
-            this(uri, null, l);
-        }
-
-        public LoadRequest(Uri uri, ImageView v, OnLoadResponseListener l) {
             if (uri == null) {
                 throw new NullPointerException("uri must not be null");
             }
 
             this.mUri = uri;
             this.mHashedUri = this.computeHashedName(uri.toString());
-            this.mImageView = v;
             this.mListener = l;
-        }
-
-        public ImageView getImageView() {
-            return this.mImageView;
         }
 
         public Uri getUri() {
@@ -150,7 +137,6 @@ public class HttpImageManager {
         private String mHashedUri;
 
         private OnLoadResponseListener mListener;
-        private ImageView mImageView;
     }
 
     public static interface OnLoadResponseListener {
@@ -188,14 +174,6 @@ public class HttpImageManager {
     public Bitmap loadImage(LoadRequest r) {
         if (r == null || r.getUri() == null || TextUtils.isEmpty(r.getUri().toString())) {
             throw new IllegalArgumentException("null or empty request");
-        }
-
-        ImageView v = r.getImageView();
-        if (v != null) {
-            synchronized (v) {
-                v.setTag(r.getUri()); // bind URI to the ImageView, to prevent
-                                      // image write-back of earlier requests.
-            }
         }
 
         String key = r.getHashedUri();
@@ -244,6 +222,7 @@ public class HttpImageManager {
                         try {
                             HttpImageManager.this.mActiveRequests.wait();
                         } catch (InterruptedException e) {
+                            MyLog.e(TAG, e);
                         }
                     }
 
@@ -251,7 +230,6 @@ public class HttpImageManager {
                 }
 
                 Bitmap data = null;
-                Bitmap resizedData = null;
 
                 try {
                     String key = request.getHashedUri();
@@ -265,62 +243,44 @@ public class HttpImageManager {
                                 : null;
                         if (data != null) {
                             // load it into memory
-                            resizedData = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
-                            HttpImageManager.this.mCache.storeData(key, resizedData);
+                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            HttpImageManager.this.mCache.storeData(key, data);
                         } else {
                             // we go to network
                             HttpImageManager.this.mNetworkResourceLoader.removeIfModifiedForUri(request.getUri().toString());
                             data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
 
                             // load it into memory
-                            resizedData = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
-                            HttpImageManager.this.mCache.storeData(key, resizedData);
+                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            HttpImageManager.this.mCache.storeData(key, data);
 
                             // persist it
                             if (HttpImageManager.this.mPersistence.isEnabled()) {
-                                HttpImageManager.this.mPersistence.storeData(key, resizedData);
+                                HttpImageManager.this.mPersistence.storeData(key, data);
                             }
                         }
                     }
 
-                    if (resizedData != null) {
-                        data = resizedData;
-                    }
-
-                    if (data != null) {
+                    if (data != null && request.mListener != null) {
                         final Bitmap theData = data;
-                        final ImageView iv = request.getImageView();
-
-                        if (iv != null) {
-                            HttpImageManager.this.mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (iv.getTag() == request.getUri()) {
-                                        iv.setImageBitmap(theData);
-                                    }
-                                }
-                            });
-                        }
 
                         HttpImageManager.this.mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (request.mListener != null) {
-                                    request.mListener.onLoadResponse(request, theData);
-                                }
+                                request.mListener.onLoadResponse(request, theData);
                             }
                         });
                     }
 
                 } catch (final Throwable e) {
-                    HttpImageManager.this.mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (request.mListener != null) {
+                    if (request.mListener != null) {
+                        HttpImageManager.this.mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
                                 request.mListener.onLoadError(request, e);
                             }
-                        }
-                    });
+                        });
+                    }
                     MyLog.e(TAG, e);
                 } finally {
                     synchronized (HttpImageManager.this.mActiveRequests) {

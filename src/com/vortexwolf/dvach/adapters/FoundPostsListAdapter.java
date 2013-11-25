@@ -41,7 +41,7 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
         this.mTheme = theme;
         this.mDvachUriBuilder = dvachUriBuilder;
         
-        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mBoardName, null, this.mBitmapManager, this.mSettings);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mBoardName, null, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
     }
     
     @Override

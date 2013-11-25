@@ -8,11 +8,9 @@
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:divider="@android:color/transparent"
+        android:divider="?postDivider"
         android:dividerHeight="4dp"
         android:fastScrollEnabled="true"
-        android:padding="2dp"
-        android:animationCache="false"
         android:scrollingCache="false" />
 
     <include

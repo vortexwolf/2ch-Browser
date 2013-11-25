@@ -4,7 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources.Theme;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -37,6 +41,7 @@ import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
+import com.vortexwolf.dvach.models.presentation.BadgeModel;
 import com.vortexwolf.dvach.models.presentation.FloatImageModel;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
@@ -48,14 +53,18 @@ public class PostItemViewBuilder {
     private final String mThreadNumber;
     private final Context mAppContext;
     private final ApplicationSettings mSettings;
+    private final WindowManager mWindowManager;
+    private final DvachUriBuilder mDvachUriBuilder;
 
-    public PostItemViewBuilder(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings) {
+    public PostItemViewBuilder(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, DvachUriBuilder dvachUriBuilder) {
         this.mAppContext = context.getApplicationContext();
         this.mInflater = LayoutInflater.from(context);
         this.mBitmapManager = bitmapManager;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mSettings = settings;
+        this.mWindowManager = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
+        this.mDvachUriBuilder = dvachUriBuilder;
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
@@ -75,6 +84,9 @@ public class PostItemViewBuilder {
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
             vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
             vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
+            vb.badgeView = (View) view.findViewById(R.id.badge_view);
+            vb.badgeImage = (ImageView) view.findViewById(R.id.badge_image);
+            vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
             view.setTag(vb);
         }
         
@@ -124,8 +136,7 @@ public class PostItemViewBuilder {
 
         // Комментарий (обновляем после файла)
         if (item.canMakeCommentFloat()) {
-            WindowManager wm = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
-            FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), wm.getDefaultDisplay(), this.mAppContext.getResources());
+            FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView, vb.commentView.getPaint(), this.mWindowManager.getDefaultDisplay(), this.mAppContext.getResources());
             item.makeCommentFloat(floatModel);
         }
 
@@ -142,6 +153,18 @@ public class PostItemViewBuilder {
             vb.postRepliesView.setVisibility(View.VISIBLE);
         } else {
             vb.postRepliesView.setVisibility(View.GONE);
+        }
+        
+        // badge
+        BadgeModel badge = item.getBadge();
+        if (badge != null) {
+            vb.badgeView.setVisibility(View.VISIBLE);
+            vb.badgeTitle.setText(badge.title);
+            
+            Uri uri = this.mDvachUriBuilder.adjust2chRelativeUri(Uri.parse(badge.source));
+            this.mBitmapManager.fetchBitmapOnThread(uri.toString(), vb.badgeImage, null, null);
+        } else {
+            vb.badgeView.setVisibility(View.GONE);
         }
 
         // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой
@@ -240,5 +263,8 @@ public class PostItemViewBuilder {
         public TextView showFullTextView;
         public View fullThumbnailView;
         public ImageView imageView;
+        public View badgeView;
+        public ImageView badgeImage;
+        public TextView badgeTitle;
     }
 }

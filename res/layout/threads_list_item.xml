@@ -29,7 +29,6 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?itemInfoForeground" />
     </LinearLayout>
-    <!-- Top row -->
 
     <TextView
         android:id="@+id/title"
@@ -40,7 +39,7 @@
         android:layout_toRightOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="?threadTitleForeground" />
-
+ 
     <com.vortexwolf.dvach.common.controls.EllipsizingTextView
         android:id="@+id/comment"
         android:layout_width="fill_parent"
@@ -63,5 +62,5 @@
         android:layout_toRightOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?itemInfoForeground" />
-
+ 
 </RelativeLayout>

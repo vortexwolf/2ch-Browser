@@ -38,16 +38,12 @@ public class AppearanceUtils {
     }
 
     public static void showImageProgressBar(final View indeterminateProgressBar, final ImageView imageView) {
-        imageView.setVisibility(View.INVISIBLE);
-        
         if (indeterminateProgressBar != null) {
             indeterminateProgressBar.setVisibility(View.VISIBLE);
         }
     }
 
     public static void hideImageProgressBar(final View indeterminateProgressBar, final ImageView imageView) {
-        imageView.setVisibility(View.VISIBLE);
-        
         if (indeterminateProgressBar != null) {
             indeterminateProgressBar.setVisibility(View.GONE);
         }
@@ -67,6 +63,7 @@ public class AppearanceUtils {
         }
 
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int)(width * scale), (int)(height * scale), true);
+        bitmap.recycle();
         return resizedBitmap;
     }
 
