@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">2ch Browser</string>
- 
+    
     <!-- UI Text -->
     <string name="loading">Loading...</string>
-	<string name="addpost_sage">Sage</string>
-	<string name="addpost_message_hint">Message</string>
-	<string name="addpost_subject_hint">Subject</string>
-	<string name="addpost_captcha_can_skip">Send without confirmation</string>
-	<string name="addpost_captcha_hint">Confirmation code</string>
-	<string name="addpost_send_button">Send</string>
-	<string name="addpost_refresh_button">Refresh</string>
-	<string name="pick_board_input_hint">Board code</string>
-	<string name="pick_board_button">Go</string>
-	<string name="pick_board_title">Pick board</string>
-	<string name="postitem_replies">Replies:</string>
-	<string name="fileslist_nofiles">No files.</string>
-	
+    <string name="addpost_sage">Sage</string>
+    <string name="addpost_message_hint">Message</string>
+    <string name="addpost_subject_hint">Subject</string>
+    <string name="addpost_captcha_can_skip">Send without confirmation</string>
+    <string name="addpost_captcha_can_skip_passcode">You have a passcode</string>
+    <string name="addpost_captcha_fail_passcode">Bad passcode, relogin in settings</string>
+    <string name="addpost_captcha_hint">Confirmation code</string>
+    <string name="addpost_send_button">Send</string>
+    <string name="addpost_refresh_button">Refresh</string>
+    <string name="pick_board_input_hint">Board code</string>
+    <string name="pick_board_button">Go</string>
+    <string name="pick_board_title">Pick board</string>
+    <string name="postitem_replies">Replies:</string>
+    <string name="fileslist_nofiles">No files.</string>
+    <string name="tabs_opentabs">Tabs</string>
+    <string name="tabs_bookmarks">Favorites</string>
+    <string name="tabs_history">History</string>
+    <string name="addpost_politics_prompt">Political preferences</string>
+    <string name="share_via">Share via</string>
+    <string name="attach_youtube_hint">http://youtube.com/watch?v=code or just a code</string>
+    <string name="attach_youtube_title">Add youtube video</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="favorites">Favorites</string>
+    <string name="search_board_hint">Search</string>
+    <string name="show_full_comment"><a href=''>Show the full text</a></string>
+
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
         <item quantity="one">%d post</item>
@@ -30,16 +45,19 @@
         <item quantity="one">%d new post</item>
         <item quantity="other">%d new posts</item>
     </plurals>
+
     <string name="data_posts_files">%1$s and %2$s</string>
-    <string name="data_file_size_measure">KB</string>   
-    <string name="data_board_title">2ch.so/%1$s/</string> 
-    <string name="data_board_title_with_page">2ch.so/%1$s/%2$s</string> 
-    <string name="data_thread_title">2ch.so/%1$s/%2$s</string> 
-    <string name="data_thread_withsubject_title">2ch.so/%1$s/ - %2$s</string> 
-    <string name="data_add_thread_title">2ch.so/%1$s/ - Add new thread</string> 
-    <string name="data_add_post_title">2ch.so/%1$s/%2$s - Add new post</string> 
-    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string> 
-    
+    <string name="data_file_size_measure">KB</string>
+    <string name="data_board_title">/%1$s/</string>
+    <string name="data_board_title_with_page">/%1$s/%2$s</string>
+    <string name="data_thread_title">/%1$s/%2$s</string>
+    <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string>
+    <string name="data_add_thread_title">/%1$s/ - Add new thread</string>
+    <string name="data_add_post_title">/%1$s/%2$s - Add new post</string>
+    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string>
+    <string name="data_add_post_video_attachment_name">Video %1$s</string>
+    <string name="data_search_posts_title">Search /%1$s/: %2$s</string>
+
     <!-- Menus -->
     <string name="menu_pick_board">Pick board</string>
     <string name="menu_refresh">Refresh</string>
@@ -51,7 +69,19 @@
     <string name="menu_save">Save</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_tabs">Tabs</string>
-    
+    <string name="menu_clear_history">Clear history</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_add_favorites">Add to favorites</string>
+    <string name="menu_remove_favorites">Remove from favorites</string>
+    <string name="menu_attach_youtube">Attach YouTube video</string>
+    <string name="menu_add_board">Add board</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_share_link">Share link</string>
+    <string name="menu_close_tabs">Close all tabs</string>
+    <string name="menu_search_image_tineye">Search in TinEye</string>
+    <string name="menu_search_image_google">Search in Google</string>
+    <string name="menu_image_operations">Image operations</string>
+
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
     <string name="cmenu_open_attachment">Open attachment</string>
@@ -61,108 +91,113 @@
     <string name="cmenu_copy_post">Copy the post</string>
     <string name="cmenu_copy_url">Copy the link</string>
     <string name="cmenu_view_op_post">View OP post</string>
-    
+    <string name="cmenu_add_to_favorites">Add to favorites</string>
+    <string name="cmenu_remove_from_favorites">Remove from favorites</string>
+    <string name="cmenu_search_image">Search image in TinEye</string>
+    <string name="cmenu_search_image_google">Search image in Google</string>
+    <string name="cmenu_hide_thread">Hide thread</string>
+    <string name="cmenu_share">Share</string>
+    <string name="cmenu_open_thread">Open thread</string>
+
     <!-- Preferences -->
     <string name="pref_category_appearance">Appearance</string>
     <string name="pref_category_autorefresh">AutoRefresh</string>
     <string name="pref_category_cache">Cache</string>
-        
-    <string name="pref_homepage_key">homepage</string>
+    <string name="pref_category_images">Images</string>
+    <string name="pref_category_datetime">Date &amp; Time</string>
     <string name="pref_homepage">Default starting board</string>
     <string name="pref_homepage_summary">Change start page</string>
-	<string name="pref_homepage_hint">Leave blank to use /b</string>
-	<string name="pref_load_thumbnails_key">load_thumbnails</string>
-	<string name="pref_load_thumbnails">Display thumbnails</string>
-	<string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
-	<string name="pref_display_post_date_key">display_post_date</string>
-	<string name="pref_display_post_date">Time of posts</string>
-	<string name="pref_display_post_date_summary">Enable to display the time of each post</string>
-	<string name="pref_display_navigation_bar_key">display_navigation_bar</string>
-	<string name="pref_display_navigation_bar">Navigation bar</string>
-	<string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
-	
-	<string name="pref_youtube_mobile_links_key">youtube_mobile_links</string>
-	<string name="pref_youtube_mobile_links">Video attachments</string>
-	<string name="pref_youtube_mobile_links_summary">Open YouTube mobile link instead of PC link</string>
-	
-	<string name="pref_popup_link_key">popup_link</string>
-	<string name="pref_popup_link">Popup links</string>
-	<string name="pref_popup_link_summary">Open links of the current thread in the popup window</string>
-	
-	<string name="pref_text_size_key">text_size</string>
-	<string name="pref_text_size">Text size</string>
-	<string-array name="pref_text_size_choices">
-    	<item>Medium</item>
-    	<item>Large</item>
-    	<item>Larger</item>
-    	<item>Huge</item>
-   	</string-array>
-	<string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
-	<string name="pref_text_size_large_value">TEXT_SIZE_LARGE</string>
-	<string name="pref_text_size_larger_value">TEXT_SIZE_LARGER</string>
-	<string name="pref_text_size_huge_value">TEXT_SIZE_HUGE</string>
-	<string-array name="pref_text_size_values" translatable="false">
-        <item>@string/pref_text_size_default_value</item>
-        <item>@string/pref_text_size_large_value</item>
-        <item>@string/pref_text_size_larger_value</item>
-        <item>@string/pref_text_size_huge_value</item>
+    <string name="pref_homepage_hint">Leave blank to use /b</string>
+    <string name="pref_load_thumbnails">Display thumbnails</string>
+    <string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
+    <string name="pref_download_path">Downloads folder</string>
+    <string name="pref_download_path_hint">/download/2ch Browser/</string>
+    <string name="pref_download_path_summary">Change a folder where images should be saved</string>
+    <string name="pref_download_background">Download images in background</string>
+    <string name="pref_download_background_summary">The progress dialog will not be displayed and the downloading cannot be cancelled</string>
+    <string name="pref_name">Name</string>
+    <string name="pref_name_summary">Leave it blank</string>
+    <string name="pref_name_hint">Anonymous</string>
+    <string name="pref_domain">Domain</string>
+    <string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    <string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
+    <string name="pref_display_post_date">Time of posts</string>
+    <string name="pref_display_post_date_summary">Enable to display the time of each post</string>
+    <string name="pref_convert_post_date">Show local time</string>
+    <string name="pref_convert_post_date_summary">Enable to display your local time instead of Moscow time</string>
+    <string name="pref_display_navigation_bar">Navigation bar</string>
+    <string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
+    <string name="pref_youtube_mobile_links">Video attachments</string>
+    <string name="pref_youtube_mobile_links_summary">Open YouTube mobile link instead of PC link</string>
+    <string name="pref_popup_link">Popup links</string>
+    <string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
+    <string name="pref_display_name">Names</string>
+    <string name="pref_display_name_summary">Display names of namefags above their posts</string>
+    <string name="pref_text_size">Text size</string>
+    <string name="pref_cut_posts">Long posts</string>
+    <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
+    <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
+
+    <string-array name="pref_text_size_choices">
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Larger</item>
+        <item>Huge</item>
     </string-array>
-    
-	<string name="pref_theme_key">theme</string>
-	<string name="pref_theme">Theme</string>
-	<string-array name="pref_theme_choices">
-    	<item>Light</item>
-    	<item>Neutron</item>
-    	<item>Photon</item>
-   	</string-array>
-	<string name="pref_theme_default_value">THEME_LIGHT</string>
-	<string name="pref_theme_dark_value">THEME_DARK</string>
-	<string name="pref_theme_photon_value">THEME_PHOTON</string>
-	<string-array name="pref_theme_values" translatable="false">
-        <item>@string/pref_theme_default_value</item>
-        <item>@string/pref_theme_dark_value</item>
-        <item>@string/pref_theme_photon_value</item>
+
+    <string name="pref_theme">Theme</string>
+
+    <string-array name="pref_theme_choices">
+        <item>Light</item>
+        <item>Neutron</item>
+        <item>Photon</item>
     </string-array>
+
+    <string name="pref_auto_refresh">AutoRefresh</string>
+    <string name="pref_auto_refresh_summary">Refresh the current thread</string>
+    <string name="pref_auto_refresh_interval">Interval</string>
+    <string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
+    <string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
+    <string name="pref_file_cache">Thumbnails cache</string>
+    <string name="pref_file_cache_summary">Enable to cache thumbnails of images</string>
+    <string name="pref_file_cache_sdcard">Use SD Card</string>
+    <string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
+    <string name="pref_file_cache_clear">Clear cache</string>
+    <string name="pref_display_all_boards">Show all boards</string>
+    <string name="pref_display_all_boards_summary">Enable to show all boards in the boards list</string>
+    <string name="pref_passcode">Passcode</string>
+    <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
     
-	<string name="pref_auto_refresh_key">auto_refresh</string>
-	<string name="pref_auto_refresh">AutoRefresh</string>
-	<string name="pref_auto_refresh_summary">Refresh the current thread</string>
-	
-	<string name="pref_auto_refresh_interval_key">auto_refresh_interval</string>
-	<string name="pref_auto_refresh_interval">Interval</string>
-	<string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
-	<string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
-	
-	<string name="pref_file_cache_key">file_cache</string>
-	<string name="pref_file_cache">File system cache</string>
-	<string name="pref_file_cache_summary">Enable to cache images on the file system</string>
-	
-	<string name="pref_file_cache_sdcard_key">file_cache_sdcard</string>
-	<string name="pref_file_cache_sdcard">Use SD Card</string>
-	<string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
-	
-	<string name="pref_file_cache_clear">Clear cache</string>
-	
-	<!-- Errors -->
-	<string name="error_send_post">An error has occured while sending the post.</string>
-	<string name="error_download_data">Unable to connect to the page.</string>
-	<string name="error_unknown">An unknown error occured.</string>
-	<string name="error_incorrect_argument">The function argument is incorrect.</string>
-	<string name="error_json_parse">Developers of this site cannot into json. Just refresh the page.</string>
-	<string name="error_file_exist">Such file already exists.</string>
-	<string name="error_save_file">An error has occured while saving the file.</string>
-	<string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
-	
-	<!-- Warnings -->
-	<string name="warning_enter_captcha">Enter the confirmation code</string>
-	<string name="warning_write_comment">Write a comment</string>
-	<string name="warning_enter_board">Specify a board name</string>
-	<string name="warning_attach_file_new_thread">Attach a file to create a new thread</string>
-	
-	<!-- Notifications -->
-	<string name="notification_send_post_success">The post was sent successfully</string>
-	<string name="notification_no_new_posts">No new posts</string>
-	<string name="notification_save_image_success">The file was saved to %1$s</string>
-	<string name="notification_post_not_found">The post isn\'t found</string>
-	<string name="notification_post_copied">Copied to clipboard</string>
+    <!-- Errors -->
+    <string name="error_send_post">An error has occured while sending the post.</string>
+    <string name="error_download_data">Unable to connect to the page.</string>
+    <string name="error_unknown">An unknown error occured.</string>
+    <string name="error_incorrect_argument">The function argument is incorrect.</string>
+    <string name="error_json_parse">Error while reading the page. Try to refresh.</string>
+    <string name="error_file_exist">Such file already exists.</string>
+    <string name="error_save_file">An error has occured while saving the file.</string>
+    <string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
+    <string name="error_image_search">The TinEye website doesn\'t work.</string>
+    <string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
+    <string name="error_incorrect_youtube_link">Incorrect format of the link to the video.</string>
+    <string name="error_create_request">Unable to make a request to the page.</string>
+    <string name="error_read_response">Unable to read the response from the server.</string>
+    <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
+    <string name="error_list_empty">The list is empty.</string>
+
+    <!-- Warnings -->
+    <string name="warning_enter_captcha">Enter the confirmation code</string>
+    <string name="warning_write_comment">Write a comment</string>
+    <string name="warning_enter_board">Enter a valid board name</string>
+    <string name="warning_attach_file_new_thread">Attach a file to create a new thread</string>
+
+    <!-- Notifications -->
+    <string name="notification_send_post_success">The post was sent successfully</string>
+    <string name="notification_no_new_posts">No new posts</string>
+    <string name="notification_save_image_started">The file will be saved to %1$s</string>
+    <string name="notification_post_not_found">The post isn\'t found</string>
+    <string name="notification_post_copied">Copied to clipboard</string>
+    <string name="notification_passcode_correct">The passcode has been successfully validated</string>
+    <string name="notification_passcode_incorrect">The passcode is incorrect</string>
+
 </resources>

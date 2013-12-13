@@ -3,15 +3,19 @@ package com.vortexwolf.dvach.interfaces;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import com.vortexwolf.dvach.presentation.models.OpenTabModel;
+import android.net.Uri;
+
+import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 
 public interface IOpenTabsManager {
-	public ArrayList<OpenTabModel> getOpenTabs();
+    public ArrayList<OpenTabModel> getOpenTabs();
 
-	public abstract void remove(OpenTabModel tab);
+    public abstract void remove(OpenTabModel tab);
 
-	public abstract void navigate(OpenTabModel tab, Activity activity);
+    public abstract void navigate(OpenTabModel tab, Activity activity);
 
-	public abstract OpenTabModel add(OpenTabModel tab);
+    public abstract OpenTabModel add(OpenTabModel tab);
+    
+    void removeAll();
 
 }

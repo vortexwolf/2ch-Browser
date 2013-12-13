@@ -1,5 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/open_browser_menu_id" android:title="@string/menu_open_browser" android:icon="@drawable/ic_menu_browser" />
-	<item android:id="@+id/save_menu_id" android:title="@string/menu_save" android:icon="@drawable/ic_menu_save" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/open_browser_menu_id"
+        android:icon="@drawable/ic_menu_browser"
+        android:title="@string/menu_open_browser"/>
+    <item
+        android:id="@+id/save_menu_id"
+        android:icon="?iconSave"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_save"/>
+    <item
+        android:id="@+id/refresh_menu_id"
+        android:icon="?iconRefresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/share_menu_id"
+        android:icon="@drawable/ic_menu_share"
+        android:title="@string/menu_share"/>
+    <item
+        android:id="@+id/share_link_menu_id"
+        android:icon="@drawable/ic_menu_share"
+        android:title="@string/menu_share_link"/>
+    <item
+        android:id="@+id/menu_search_tineye_id"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/menu_search_image_tineye"/>
+    <item
+        android:id="@+id/menu_search_google_id"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/menu_search_image_google"/>
+    <item
+        android:id="@+id/menu_image_operations_id"
+        android:icon="@drawable/ic_menu_crop"
+        android:title="@string/menu_image_operations"/>
 </menu>

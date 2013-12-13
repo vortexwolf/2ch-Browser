@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<integer name="opPostMaxLines">5</integer>
+
+    <integer name="opPostMaxLines">5</integer>
+    <integer name="fling_animation_duration">200</integer>
+
 </resources>

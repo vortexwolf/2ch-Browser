@@ -1,88 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:fillViewport="true" 
-	android:background="?activityRootBackground">
-	<LinearLayout 
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical">
-		<CheckBox android:id="@+id/addpost_sage_checkbox"
-			android:layout_width="wrap_content"
-	        android:layout_height="wrap_content" 
-	        android:text="@string/addpost_sage"
-	        android:textAppearance="?android:attr/textAppearanceMedium"/>
-	    <EditText android:id="@+id/addpost_subject"
-			android:layout_width="fill_parent"
-	        android:layout_height="wrap_content" 
-	        android:maxLength="255"
-	        android:singleLine="true"
-	        android:hint="@string/addpost_subject_hint" 
-	   		android:inputType="textShortMessage|textCapSentences"
-	   		android:visibility="gone"
-	        />
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?activityRootBackground"
+    android:fillViewport="true" >
 
-  	    <LinearLayout android:id="@+id/addpost_attachment_view" 
-        	android:visibility="gone"
-          	android:orientation="horizontal"
-          	android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			>
-			    <ImageView 
-			        android:layout_width="32dip" 
-			        android:layout_height="32dip"
-			        android:layout_gravity="center_vertical" 
-			        android:src="@drawable/ic_email_attachment"
-			        android:paddingLeft="5dip" 
-			        />
-			    
-			    <LinearLayout 
-			        android:orientation="vertical" 
-			        android:layout_width="0dip" 
-			        android:layout_height="wrap_content" 
-			        android:layout_weight="1.0"
-			        android:paddingLeft="5dip" >
-			        <TextView android:id="@+id/addpost_attachment_name" android:textAppearance="?android:textAppearanceMedium" android:layout_width="fill_parent" android:layout_height="wrap_content" />
-			        <TextView android:id="@+id/addpost_attachment_size" android:textAppearance="?android:textAppearanceMedium" android:layout_width="fill_parent" android:layout_height="wrap_content" />
-			    </LinearLayout>
-			    
-			    <Button android:id="@+id/addpost_attachment_remove" android:textAppearance="?android:textAppearanceSmall" android:layout_gravity="center_vertical" android:background="@android:drawable/btn_dialog" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-			</LinearLayout>
-			
-		<LinearLayout android:id="@+id/addpost_textformat_view" 
-	            		android:orientation="horizontal"
-	            		android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						>
-			    <ImageButton android:id="@+id/addpost_textformat_b" android:src="@drawable/format_b" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_i" android:src="@drawable/format_i" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_u" android:src="@drawable/format_u" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_s" android:src="@drawable/format_s" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_spoiler" android:src="@drawable/format_spoiler" style="@style/TextFormatButton" />
-			    <ImageButton android:id="@+id/addpost_textformat_c" android:src="@drawable/format_c" style="@style/TextFormatButton" />
-		</LinearLayout>
-		
-		<EditText android:id="@+id/addpost_comment_input"
-			android:layout_width="fill_parent"
-			android:layout_height="0dip"
-			android:layout_weight="1.0" 
-			android:minLines="3"
-			android:maxLength="15000"
-			android:gravity="top|left"
-			android:hint="@string/addpost_message_hint" 
-	   		android:inputType="textLongMessage|textMultiLine|textCapSentences"
-		/>
-		
-   		<include layout="@layout/add_post_captcha_view"
-   		    android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-   		    />
-		
-		<Button android:id="@+id/addpost_send_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/addpost_send_button"
-			/>
-	</LinearLayout>		
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <CheckBox
+            android:id="@+id/addpost_sage_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/addpost_sage"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/addpost_subject"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/addpost_subject_hint"
+            android:inputType="textShortMessage|textCapSentences"
+            android:maxLength="255"
+            android:singleLine="true"
+            android:visibility="gone" />
+
+        <Spinner
+            android:id="@+id/addpost_politics"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/addpost_politics"
+            android:prompt="@string/addpost_politics_prompt"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/addpost_attachment_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+            <ImageView
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="5dip"
+                android:src="@drawable/ic_email_attachment" />
+
+            <LinearLayout
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:orientation="vertical"
+                android:paddingLeft="5dip" >
+
+                <TextView
+                    android:id="@+id/addpost_attachment_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/addpost_attachment_size"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceMedium" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/addpost_attachment_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:src="@android:drawable/btn_dialog" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/addpost_textformat_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_b"
+                style="@style/TextFormatButton"
+                android:src="?iconMarkupBold" />
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_i"
+                style="@style/TextFormatButton"
+                android:src="?iconMarkupItalic" />
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_u"
+                style="@style/TextFormatButton"
+                android:src="?iconMarkupUnderline" />
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_s"
+                style="@style/TextFormatButton"
+                android:src="?iconMarkupStrike" />
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_spoiler"
+                style="@style/TextFormatButtonLong"
+                android:src="?iconMarkupSpoiler" />
+
+            <ImageButton
+                android:id="@+id/addpost_textformat_quote"
+                style="@style/TextFormatButton"
+                android:src="?iconMarkupQuote" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/addpost_comment_input"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1.0"
+            android:gravity="top|left"
+            android:hint="@string/addpost_message_hint"
+            android:inputType="textLongMessage|textMultiLine|textCapSentences"
+            android:maxLength="15000"
+            android:minLines="3" />
+
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/add_post_captcha_view" />
+
+        <Button
+            android:id="@+id/addpost_send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/addpost_send_button" />
+    </LinearLayout>
+
 </ScrollView>

@@ -1,51 +1,64 @@
 package com.vortexwolf.dvach.test;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
-import com.vortexwolf.dvach.api.HtmlCaptchaChecker;
+import android.content.Context;
+import android.net.Uri;
+import android.test.InstrumentationTestCase;
+
 import com.vortexwolf.dvach.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.dvach.interfaces.IHttpStringReader;
-import com.vortexwolf.dvach.test.R;
-
-import android.test.InstrumentationTestCase;
+import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
 
-	public void testCanSkip(){
-		
-		String responseText = "<style>#captcha_i { display: none };</style>Вам не надо вводить капчу.&nbsp;<a href=\"#\" id=\"capup\" onclick=\"javascript:load('captcha','/test/wakaba.pl?task=captcha&thread=1&dummy=1'); Recaptcha.reload(); return false;\">обновить</a>";
-		
-		IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText));
-		boolean canSkeep = checker.canSkipCaptcha(null, null);
-		
-		assertTrue(canSkeep);
-	}
-	
-	public void testMustEnter(){
-		
-		String responseText = "<style>#captcha_i { display: inline };</style><div id=\"recaptcha_widget\"><div id=\"recaptcha_data\"><div id=\"recaptcha_image\" onclick=\"javascript:Recaptcha.reload()\"></div></div></div>";
-		
-		IHtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText));
-		boolean canSkeep = checker.canSkipCaptcha(null, null);
-		
-		assertFalse(canSkeep);
-	}
-	
-	private class FakeHttpStringReader implements IHttpStringReader{
+    private final DvachUriBuilder mDvachUriBuilder = new DvachUriBuilder(Uri.parse("http://2ch.hk"));
 
-		private final String mResponse;
-		public FakeHttpStringReader(String response){
-			this.mResponse = response;
-		}
-		
-		@Override
-		public String fromUri(String uri) {
-			return mResponse;
-		}
+    private ApplicationSettings createSettings() {
+        Context context = this.getInstrumentation().getContext();
+        ApplicationSettings settings = new ApplicationSettings(context, context.getResources());
 
-		@Override
-		public String fromResponse(HttpResponse response) {
-			return mResponse;
-		}
-	}
+        return settings;
+    }
+
+    public void testCanSkip() {
+        String responseText = "OK";
+
+        HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(null);
+
+        assertTrue(result.canSkip);
+    }
+
+    public void testMustEnter() {
+        String responseText = "CHECK\nSomeKey";
+
+        HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), this.mDvachUriBuilder, this.createSettings());
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(null);
+
+        assertFalse(result.canSkip);
+        assertEquals("SomeKey", result.captchaKey);
+    }
+
+    private class FakeHttpStringReader implements IHttpStringReader {
+
+        private final String mResponse;
+
+        public FakeHttpStringReader(String response) {
+            this.mResponse = response;
+        }
+
+        @Override
+        public String fromUri(String uri) {
+            return this.mResponse;
+        }
+
+        @Override
+        public String fromUri(String uri, Header[] customHeaders) {
+            return null;
+        }
+    }
 }

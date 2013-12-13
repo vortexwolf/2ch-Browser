@@ -1,155 +1,148 @@
 package com.vortexwolf.dvach.common;
 
 import java.io.File;
+
 import org.apache.http.impl.client.DefaultHttpClient;
-import com.vortexwolf.dvach.activities.addpost.PostSender;
-import com.vortexwolf.dvach.api.BoardSettingsStorage;
-import com.vortexwolf.dvach.api.JsonApiReader;
-import com.vortexwolf.dvach.api.ObjectMapperFactory;
-import com.vortexwolf.dvach.common.library.GzipHttpClientFactory;
-import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IBoardSettingsStorage;
-import com.vortexwolf.dvach.interfaces.ICacheManager;
-import com.vortexwolf.dvach.interfaces.ICacheSettingsChangedListener;
-import com.vortexwolf.dvach.interfaces.IDownloadFileService;
-import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
-import com.vortexwolf.dvach.interfaces.IJsonApiReader;
-import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
-import com.vortexwolf.dvach.interfaces.IPostSender;
-import com.vortexwolf.dvach.interfaces.ISerializationService;
-import com.vortexwolf.dvach.presentation.services.BitmapManager;
-import com.vortexwolf.dvach.presentation.services.CacheManager;
-import com.vortexwolf.dvach.presentation.services.DownloadFileService;
-import com.vortexwolf.dvach.presentation.services.DraftPostsStorage;
-import com.vortexwolf.dvach.presentation.services.OpenTabsManager;
-import com.vortexwolf.dvach.presentation.services.SerializationService;
-import com.vortexwolf.dvach.presentation.services.Tracker;
-import com.vortexwolf.dvach.settings.ApplicationSettings;
+
 import android.app.Application;
+import android.content.res.Resources;
+import android.httpimage.BitmapMemoryCache;
+import android.httpimage.BitmapCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
+import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
+import com.vortexwolf.dvach.common.library.ExtendedObjectMapper;
+import com.vortexwolf.dvach.db.DvachSqlHelper;
+import com.vortexwolf.dvach.db.FavoritesDataSource;
+import com.vortexwolf.dvach.db.HiddenThreadsDataSource;
+import com.vortexwolf.dvach.db.HistoryDataSource;
+import com.vortexwolf.dvach.interfaces.IBitmapManager;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.dvach.interfaces.IDraftPostsStorage;
+import com.vortexwolf.dvach.interfaces.IJsonApiReader;
+import com.vortexwolf.dvach.interfaces.INavigationService;
+import com.vortexwolf.dvach.interfaces.IOpenTabsManager;
+import com.vortexwolf.dvach.interfaces.IPagesSerializationService;
+import com.vortexwolf.dvach.interfaces.IPostSender;
+import com.vortexwolf.dvach.services.BitmapManager;
+import com.vortexwolf.dvach.services.CacheDirectoryManager;
+import com.vortexwolf.dvach.services.NavigationService;
+import com.vortexwolf.dvach.services.SerializationService;
+import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.domain.DownloadFileService;
+import com.vortexwolf.dvach.services.domain.JsonApiReader;
+import com.vortexwolf.dvach.services.domain.PostSender;
+import com.vortexwolf.dvach.services.presentation.DraftPostsStorage;
+import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
+import com.vortexwolf.dvach.services.presentation.OpenTabsManager;
+import com.vortexwolf.dvach.services.presentation.PagesSerializationService;
+import com.vortexwolf.dvach.settings.ApplicationSettings;
+
 public class MainApplication extends Application {
-	
-	private static final DefaultHttpClient sHttpClient = new GzipHttpClientFactory().createHttpClient();
-	
-	private ApplicationSettings mSettings;
-	private Errors mErrors;
-	private IJsonApiReader mJsonApiReader;
-	private IPostSender mPostSender;
-	private IBoardSettingsStorage mBoardSettingsStorage;
-	private IDraftPostsStorage mDraftPostsStorage;
-	private IDownloadFileService mDownloadFileService;
-	private Tracker mTracker;
-	private HttpImageManager mHttpImageManager;
-    private IBitmapManager mBitmapManager;
-    private IOpenTabsManager mOpenTabsMaganer;
-    private CacheManager mCacheManager;
-    private ISerializationService mSerializationService;
-    
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		
-		this.mErrors = new Errors(this.getResources());
-		this.mJsonApiReader = new JsonApiReader(sHttpClient, this.mErrors, ObjectMapperFactory.createObjectMapper());
-		this.mPostSender = new PostSender(sHttpClient, this.mErrors);
-		this.mBoardSettingsStorage = new BoardSettingsStorage(this.mJsonApiReader);
-		this.mDraftPostsStorage = new DraftPostsStorage();
-		this.mDownloadFileService = new DownloadFileService(this.mErrors);
-		this.mOpenTabsMaganer = new OpenTabsManager();
 
-		this.mTracker = Tracker.getInstance();
-		this.mTracker.startSession(this);
-		
-		this.mSettings = new ApplicationSettings(this, this.getResources(), mTracker);
-		this.mSettings.setCacheSettingsChangedListener(new CacheSettingsChangedListener());
-		
-		this.mCacheManager = new CacheManager(super.getCacheDir(), this.getPackageName(), this.mSettings, mTracker);
-		this.mCacheManager.clearExcessCache();
-		this.mSerializationService = new SerializationService(this.mCacheManager);
-		
-		this.mHttpImageManager = new HttpImageManager(null);
-		this.updateImageManager();
-		this.mBitmapManager = new BitmapManager(this.mHttpImageManager);
-		
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-	}
+        Tracker tracker = new Tracker();
+        DefaultHttpClient httpClient = new ExtendedHttpClient();
+        ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
+        DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
+        JsonApiReader jsonApiReader = new JsonApiReader(httpClient, this.getResources(), new ExtendedObjectMapper(), dvachUriBuilder);
+        DvachSqlHelper dbHelper = new DvachSqlHelper(this);
+        HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
+        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
+        HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
+        CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
+        BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
+        HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), httpClient, this.getResources());
+        NavigationService navigationService = new NavigationService();
+        DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpClient);
 
-	@Override
-	public void onTerminate() {
-		this.mTracker.stopSession();
+        Container container = Factory.getContainer();
+        container.register(Resources.class, this.getResources());
+        container.register(DvachUriBuilder.class, dvachUriBuilder);
+        container.register(ApplicationSettings.class, settings);
+        container.register(DefaultHttpClient.class, httpClient);
+        container.register(IJsonApiReader.class, jsonApiReader);
+        container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings));
+        container.register(IDraftPostsStorage.class, new DraftPostsStorage());
+        container.register(INavigationService.class, navigationService);
+        container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
+        container.register(Tracker.class, tracker);
+        container.register(ICacheDirectoryManager.class, cacheManager);
+        container.register(IPagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
+        container.register(BitmapMemoryCache.class, bitmapMemoryCache);
+        container.register(HttpImageManager.class, imageManager);
+        container.register(IBitmapManager.class, new BitmapManager(imageManager));
+        container.register(HistoryDataSource.class, historyDataSource);
+        container.register(FavoritesDataSource.class, favoritesDataSource);
+        container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
+        container.register(DownloadFileService.class, downloadFileService);
 
-		super.onTerminate();
-	}
+        historyDataSource.open();
+        favoritesDataSource.open();
+        hiddenThreadsDataSource.open();
 
-	public static DefaultHttpClient getHttpClient(){
-		return sHttpClient;
-	}
-	
-	public ApplicationSettings getSettings(){
-		return mSettings;
-	}
-	
-	public Errors getErrors(){
-		return mErrors;
-	}
-	
-	public IJsonApiReader getJsonApiReader(){
-		return mJsonApiReader;
-	}
-	
-	public IPostSender getPostSender(){
-		return mPostSender;
-	}
+        tracker.startSession(this);
+        cacheManager.trimCacheIfNeeded();
+    }
 
-	public IBoardSettingsStorage getBoardSettingsStorage() {
-		return mBoardSettingsStorage;
-	}
-	
-	public IDraftPostsStorage getDraftPostsStorage(){
-		return mDraftPostsStorage;
-	}
-	
-	public IDownloadFileService getDownloadFileService(){
-		return mDownloadFileService;
-	}
-	
-	public Tracker getTracker(){
-		return mTracker;
-	}
+    @Override
+    public void onTerminate() {
+        Factory.getContainer().resolve(Tracker.class).stopSession();
 
-	public IBitmapManager getBitmapManager(){
-		return mBitmapManager;
-	}
-	
-	public IOpenTabsManager getOpenTabsManager(){
-		return mOpenTabsMaganer;
-	}
-	
-	public ICacheManager getCacheManager(){
-		return mCacheManager;
-	}
-	
-	public ISerializationService getSerializationService(){
-		return mSerializationService;
-	}
-	
-	@Override
-	public File getCacheDir() {
-		// NOTE: this method is used in Android 2.2 and higher
-		return this.mCacheManager.getCurrentCacheDirectory();
-	}
-	
-	private void updateImageManager(){
-		mHttpImageManager.setPersistenceCache(
-				mCacheManager.isCacheEnabled() ? new FileSystemPersistence(this.mCacheManager.getThumbnailsCacheDirectory()) : null);
-	}
-	
-	private class CacheSettingsChangedListener implements ICacheSettingsChangedListener{
-		@Override
-		public void onCacheSettingsChanged() {
-			updateImageManager();
-		}
-	}
+        super.onTerminate();
+    }
+
+    public static DefaultHttpClient getHttpClient() {
+        return Factory.getContainer().resolve(DefaultHttpClient.class);
+    }
+
+    public ApplicationSettings getSettings() {
+        return Factory.getContainer().resolve(ApplicationSettings.class);
+    }
+
+    public IJsonApiReader getJsonApiReader() {
+        return Factory.getContainer().resolve(IJsonApiReader.class);
+    }
+
+    public IPostSender getPostSender() {
+        return Factory.getContainer().resolve(IPostSender.class);
+    }
+
+    public IDraftPostsStorage getDraftPostsStorage() {
+        return Factory.getContainer().resolve(IDraftPostsStorage.class);
+    }
+
+    public Tracker getTracker() {
+        return Factory.getContainer().resolve(Tracker.class);
+    }
+
+    public IBitmapManager getBitmapManager() {
+        return Factory.getContainer().resolve(IBitmapManager.class);
+    }
+
+    public IOpenTabsManager getOpenTabsManager() {
+        return Factory.getContainer().resolve(IOpenTabsManager.class);
+    }
+
+    public ICacheDirectoryManager getCacheManager() {
+        return Factory.getContainer().resolve(ICacheDirectoryManager.class);
+    }
+
+    public IPagesSerializationService getSerializationService() {
+        return Factory.getContainer().resolve(IPagesSerializationService.class);
+    }
+
+    public HistoryDataSource getHistoryDataSource() {
+        return Factory.getContainer().resolve(HistoryDataSource.class);
+    }
+
+    @Override
+    public File getCacheDir() {
+        // NOTE: this method is used in Android 2.2 and higher
+        return Factory.getContainer().resolve(ICacheDirectoryManager.class).getCurrentCacheDirectory();
+    }
 }

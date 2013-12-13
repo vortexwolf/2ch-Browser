@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <declare-styleable name="Theme">
         <attr name="activityRootBackground" format="color|reference" />
         <attr name="threadTitleForeground" format="color|reference" />
         <attr name="itemInfoForeground" format="color|reference" />
+        <attr name="postBackground" format="color|reference" />
         <attr name="postNumberForeground" format="color|reference" />
         <attr name="postQuoteForeground" format="color|reference" />
         <attr name="spoilerForeground" format="color|reference" />
@@ -12,13 +14,25 @@
         <attr name="postItemBackground" format="color|reference" />
         <attr name="urlLinkForeground" format="color|reference" />
         <attr name="tabCloseButtonBackground" format="color|reference" />
-        <attr name="tabSeparatorBackground" format="color|reference" />
+        <attr name="postDivider" format="color|reference" />
+        <attr name="iconRefresh" format="integer|reference" />
+        <attr name="iconSave" format="integer|reference" />
+        <attr name="iconPicture" format="integer|reference" />
+        <attr name="iconEdit" format="integer|reference" />
+        <attr name="iconBack" format="integer|reference" />
+        <attr name="iconForward" format="integer|reference" />
+        <attr name="iconMarkupBold" format="integer|reference" />
+        <attr name="iconMarkupItalic" format="integer|reference" />
+        <attr name="iconMarkupUnderline" format="integer|reference" />
+        <attr name="iconMarkupStrike" format="integer|reference" />
+        <attr name="iconMarkupSpoiler" format="integer|reference" />
+        <attr name="iconMarkupQuote" format="integer|reference" />
     </declare-styleable>
-    
     <declare-styleable name="SeekBarPreference">
-		<attr name="minValue" format="integer" />
-		<attr name="maxValue" format="integer" />
-		<attr name="step" format="integer" />
-		<attr name="valueFormat" format="string|reference" />
-	</declare-styleable>
+        <attr name="minValue" format="integer" />
+        <attr name="maxValue" format="integer" />
+        <attr name="step" format="integer" />
+        <attr name="valueFormat" format="string|reference" />
+    </declare-styleable>
+
 </resources>

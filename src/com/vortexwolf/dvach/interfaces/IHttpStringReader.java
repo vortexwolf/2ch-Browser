@@ -1,11 +1,13 @@
 package com.vortexwolf.dvach.interfaces;
 
-import org.apache.http.HttpResponse;
+import org.apache.http.Header;
+
+import com.vortexwolf.dvach.exceptions.HttpRequestException;
 
 public interface IHttpStringReader {
 
-	public String fromUri(String uri);
+    public abstract String fromUri(String uri) throws HttpRequestException;
 
-	public String fromResponse(HttpResponse response);
+    public abstract String fromUri(String uri, Header[] customHeaders) throws HttpRequestException;
 
 }

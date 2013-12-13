@@ -1,74 +1,76 @@
 package com.vortexwolf.dvach.settings;
 
 import java.io.File;
-import com.vortexwolf.dvach.R;
-import com.vortexwolf.dvach.common.MainApplication;
-import com.vortexwolf.dvach.common.utils.IoUtils;
-import com.vortexwolf.dvach.interfaces.ICacheManager;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.Preference;
 import android.util.AttributeSet;
 
+import com.vortexwolf.dvach.R;
+import com.vortexwolf.dvach.common.Factory;
+import com.vortexwolf.dvach.common.utils.IoUtils;
+import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
+
 public class CacheSizePreference extends Preference {
-    private final CalculateCacheSizeTask mCalculateCacheSizeTask;
-	private final File mExternalCacheDir;
-	private final File mInternalCacheDir;
-	
-	public CacheSizePreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		
-		final Activity activity = (Activity)context;
-		final MainApplication app = (MainApplication)activity.getApplication();
-		ICacheManager cacheManager = app.getCacheManager();
-		mExternalCacheDir = cacheManager.getExternalCacheDir();
-		mInternalCacheDir = cacheManager.getInternalCacheDir();
-		
-		mCalculateCacheSizeTask = new CalculateCacheSizeTask();
-		mCalculateCacheSizeTask.execute();
-	}
-	
-	@Override
-	protected void onPrepareForRemoval() {
-		mCalculateCacheSizeTask.cancel(true);
-		super.onPrepareForRemoval();
-	}
+    private final File mExternalCacheDir;
+    private final File mInternalCacheDir;
 
-	@Override
-	protected void onClick() {
-		if(mExternalCacheDir != null){
-			IoUtils.deleteDirectory(mExternalCacheDir);
-			mExternalCacheDir.mkdir();
-		}
-		
-		IoUtils.deleteDirectory(mInternalCacheDir);
-		mInternalCacheDir.mkdir();
-		
-		this.setSummary(this.getSummary());
-		
-		super.onClick();
-	}
+    private CalculateCacheSizeTask mCalculateCacheSizeTask;
 
-	private class CalculateCacheSizeTask extends AsyncTask<Void, Long, Double>{
+    public CacheSizePreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-		@Override
-		protected void onPreExecute() {
-			setSummary(getContext().getString(R.string.loading));
-		}
-		
-		@Override
-		protected void onPostExecute(Double result) {
-			String summary = result + " MB";
-			setSummary(summary);
-		}
-		
-		@Override
-		protected Double doInBackground(Void... arg0) {
-			double cacheSize = IoUtils.getSizeInMegabytes(mExternalCacheDir, mInternalCacheDir);
-			
-			return cacheSize;
-		}
-	}
+        ICacheDirectoryManager cacheManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+        this.mExternalCacheDir = cacheManager.getExternalCacheDir();
+        this.mInternalCacheDir = cacheManager.getInternalCacheDir();
+
+        this.updateSummary();
+    }
+
+    @Override
+    protected void onPrepareForRemoval() {
+        this.mCalculateCacheSizeTask.cancel(true);
+        super.onPrepareForRemoval();
+    }
+
+    @Override
+    protected void onClick() {
+        this.setSummary(this.getContext().getString(R.string.loading));
+
+        IoUtils.deleteDirectory(this.mExternalCacheDir);
+        IoUtils.deleteDirectory(this.mInternalCacheDir);
+
+        this.updateSummary();
+
+        super.onClick();
+    }
+
+    private void updateSummary() {
+        this.mCalculateCacheSizeTask = new CalculateCacheSizeTask();
+        this.mCalculateCacheSizeTask.execute();
+    }
+
+    private class CalculateCacheSizeTask extends AsyncTask<Void, Long, Double> {
+
+        @Override
+        protected void onPreExecute() {
+            CacheSizePreference.this.setSummary(CacheSizePreference.this.getContext().getString(R.string.loading));
+        }
+
+        @Override
+        protected void onPostExecute(Double result) {
+            String summary = result + " MB";
+            CacheSizePreference.this.setSummary(summary);
+
+            CacheSizePreference.this.setEnabled(result > 0);
+        }
+
+        @Override
+        protected Double doInBackground(Void... arg0) {
+            double cacheSize = IoUtils.getSizeInMegabytes(CacheSizePreference.this.mExternalCacheDir, CacheSizePreference.this.mInternalCacheDir);
+
+            return cacheSize;
+        }
+    }
 }

@@ -3,73 +3,64 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="5dip">
-    
-    <LinearLayout android:id="@+id/thumbnail_view"
-    			  android:layout_width="wrap_content"
-				  android:layout_height="wrap_content"
-				  android:orientation="vertical"
-				  android:layout_alignParentRight="true">
-				  
-	    <FrameLayout android:layout_width="@dimen/thumbnail_size" android:layout_height="@dimen/thumbnail_size">
-		    <com.vortexwolf.dvach.controls.ExtendedImageView
-		    	android:id="@+id/thumbnail"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent"
-		        android:adjustViewBounds="true"
-		        android:layout_gravity="center"
-		        android:scaleType="centerInside"
-	    	/>
-	    	
-	    	<ProgressBar android:id="@+id/indeterminate_progress"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent"
-		        android:layout_gravity="center"
-		        android:visibility="gone"
-		        android:indeterminate="true"
-		    />       
-    	</FrameLayout>
-   	
-   		<TextView android:id="@+id/attachment_info"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:textColor="?itemInfoForeground"
-	        android:textAppearance="?android:attr/textAppearanceSmall"
-	    />
+    android:padding="5dip" >
+
+    <LinearLayout
+        android:id="@+id/thumbnail_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="3dip"
+        android:orientation="vertical" >
+
+        <com.vortexwolf.dvach.common.controls.ExtendedImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="@dimen/thumbnail_size"
+            android:layout_height="@dimen/thumbnail_size"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/attachment_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?itemInfoForeground" />
     </LinearLayout>
-	<!-- Top row -->
 
-    <TextView android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/thumbnail_view"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginBottom="1dip"
-        android:textColor="?threadTitleForeground"
+        android:layout_toRightOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceLarge"
-    />
-
-     <com.vortexwolf.dvach.controls.EllipsizingTextView android:id="@+id/comment"
-        android:layout_width="wrap_content"
+        android:textColor="?threadTitleForeground" />
+ 
+    <com.vortexwolf.dvach.common.controls.EllipsizingTextView
+        android:id="@+id/comment"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-    	android:layout_below="@id/title"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/thumbnail_view"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/title"
         android:layout_marginBottom="1dip"
+        android:layout_toRightOf="@id/thumbnail_view"
         android:maxLines="@integer/opPostMaxLines"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-    />
-     
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <!-- Next row -->
-       <TextView android:id="@+id/repliesNumber"
+
+    <TextView
+        android:id="@+id/repliesNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/comment"
-        android:layout_alignParentLeft="true"
-        android:textColor="?itemInfoForeground"
+        android:layout_toRightOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceSmall"
-    />
+        android:textColor="?itemInfoForeground" />
+ 
 </RelativeLayout>
