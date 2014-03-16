@@ -44,6 +44,10 @@ public class UriUtils {
         return testUriPath(uri, boardUriPattern);
     }
 
+    public static boolean isImageUriString(String str) {
+        return !StringUtils.isEmpty(str) && UriUtils.isImageUri(Uri.parse(str));
+    }
+    
     public static boolean isImageUri(Uri uri) {
         String extension = getFileExtension(uri);
 

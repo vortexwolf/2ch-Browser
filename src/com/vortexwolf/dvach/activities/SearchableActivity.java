@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.activities;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.adapters.FoundPostsListAdapter;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
@@ -24,7 +24,7 @@ import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -72,7 +72,8 @@ public class SearchableActivity extends BaseListActivity {
         
         this.handleIntent(this.getIntent());
         
-        Factory.getContainer().resolve(Tracker.class).trackActivityView(TAG);
+        Factory.getContainer().resolve(MyTracker.class).setBoardVar(this.mBoardName);
+        Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
     
     @Override
@@ -233,7 +234,7 @@ public class SearchableActivity extends BaseListActivity {
 
     @Override
     protected int getLayoutId() {
-        return com.vortexwolf.dvach.R.layout.search_posts_list_view;
+        return com.vortexwolf.chan.R.layout.search_posts_list_view;
     }
     
     private class FoundPostsListener implements IListView<FoundPostsList> {

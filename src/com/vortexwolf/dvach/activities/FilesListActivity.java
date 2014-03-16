@@ -10,6 +10,7 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.KeyEvent;
@@ -21,7 +22,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.library.MyLog;
@@ -225,8 +226,11 @@ public class FilesListActivity extends ListActivity {
                 String statusText = (object.file.length() / 1024) + "Kb";
 
                 ImageFileModel bitmapModel = new ImageFileModel(object.file);
-                if (bitmapModel.getBitmap() != null) {
-                    imageView.setImageBitmap(bitmapModel.getBitmap());
+                int maxSize = 70;
+                Bitmap b = bitmapModel.getBitmap(maxSize);
+                
+                if (b != null) {
+                    imageView.setImageBitmap(b);
                     frame.setVisibility(View.VISIBLE);
                     statusText += ", " + bitmapModel.imageWidth + "x" + bitmapModel.imageHeight;
                 } else {

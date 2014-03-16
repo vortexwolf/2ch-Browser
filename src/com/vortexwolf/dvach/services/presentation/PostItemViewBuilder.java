@@ -30,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.controls.ClickableLinksTextView;
 import com.vortexwolf.dvach.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.dvach.common.library.MyHtml;
@@ -131,7 +131,8 @@ public class PostItemViewBuilder {
 
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+        String threadUrl = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
         ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView);
 
         // Комментарий (обновляем после файла)
@@ -245,7 +246,8 @@ public class PostItemViewBuilder {
             AttachmentInfo attachment = item.getAttachment(this.mBoardName);
 
             if (vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext);
+                String threadUrl = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+                ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
             }
         }
     }

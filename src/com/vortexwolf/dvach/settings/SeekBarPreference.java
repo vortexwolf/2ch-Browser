@@ -10,7 +10,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 
 public class SeekBarPreference extends DialogPreference implements OnSeekBarChangeListener {
     // Namespaces to read attributes

@@ -35,7 +35,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         this.mActivity = activity;
         this.mJsonReader = jsonReader;
         this.mView = view;
-        this.mBoard = board != null ? board : Constants.DEFAULT_BOARD;
+        this.mBoard = board;
         this.mPageNumber = pageNumber;
         this.mIsCheckModified = checkModified;
     }

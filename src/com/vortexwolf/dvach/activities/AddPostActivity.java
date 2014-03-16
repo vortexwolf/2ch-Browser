@@ -29,7 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.dvach.asynctasks.SendPostTask;
 import com.vortexwolf.dvach.common.Constants;
@@ -53,7 +53,7 @@ import com.vortexwolf.dvach.models.presentation.CaptchaViewType;
 import com.vortexwolf.dvach.models.presentation.DraftPostModel;
 import com.vortexwolf.dvach.models.presentation.ImageFileModel;
 import com.vortexwolf.dvach.models.presentation.SerializableFileModel;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.domain.HtmlCaptchaChecker;
 import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
 import com.vortexwolf.dvach.services.domain.HttpStringReader;
@@ -70,7 +70,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private IHtmlCaptchaChecker mHtmlCaptchaChecker;
     private HttpBitmapReader mHttpBitmapReader;
     private IDraftPostsStorage mDraftPostsStorage;
-    private Tracker mTracker;
+    private MyTracker mTracker;
 
     private ImageFileModel mAttachedFile;
     private String mAttachedVideo;

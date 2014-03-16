@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:background="?activityRootBackground">
+    
+    <com.vortexwolf.dvach.common.controls.HackyViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/view_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" />
+    
+    <RelativeLayout
+        android:id="@+id/image_gallery_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/navigation_button_size" >
+
+        <ImageButton
+            android:id="@+id/image_gallery_prev"
+            android:layout_width="@dimen/navigation_button_size"
+            android:layout_height="@dimen/navigation_button_size"
+            android:layout_alignParentLeft="true"
+            android:background="@null"
+            android:src="?iconBack" />
+
+        <TextView
+            android:id="@+id/image_gallery_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageButton
+            android:id="@+id/image_gallery_next"
+            android:layout_width="@dimen/navigation_button_size"
+            android:layout_height="@dimen/navigation_button_size"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:src="?iconForward" />
+    </RelativeLayout>
+    
+</LinearLayout>

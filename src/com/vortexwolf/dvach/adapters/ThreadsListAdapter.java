@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.controls.EllipsizingTextView;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.ThreadPostUtils;
@@ -131,9 +131,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         String repliesFormat = this.getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
+        
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
+        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext(), null);
         ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
     }
 
@@ -173,7 +174,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
                 AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
                 if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                    ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, null, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext());
+                    ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext(), null);
                 }
             }
         }

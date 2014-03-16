@@ -10,9 +10,6 @@ import android.graphics.BitmapFactory;
 import com.vortexwolf.dvach.common.library.MyLog;
 
 public class ImageFileModel {
-
-    public static final int IMAGE_MAX_SIZE = 70;
-
     public File file;
     public int imageHeight;
     public int imageWidth;
@@ -43,11 +40,13 @@ public class ImageFileModel {
         return (int) Math.round(this.file.length() / 1024.0);
     }
 
-    public Bitmap getBitmap() {
+    public Bitmap getBitmap(double maxSize) {
         if (this.mBitmap == null) {
             int scale = 1;
-            if (this.imageHeight > IMAGE_MAX_SIZE || this.imageWidth > IMAGE_MAX_SIZE) {
-                scale = (int) Math.pow(2, (int) Math.round(Math.log(IMAGE_MAX_SIZE / (double) Math.max(this.imageHeight, this.imageWidth)) / Math.log(0.5)));
+            if (this.imageHeight > maxSize || this.imageWidth > maxSize) {
+                double realScale = Math.max(this.imageHeight, this.imageWidth) / (double)maxSize;
+                double roundedScale = Math.pow(2, Math.ceil(Math.log(realScale) / Math.log(2)));
+                scale = (int)roundedScale; // 2, 4, 8, 16
             }
 
             // Decode with inSampleSize
