@@ -10,11 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.CompatibilityUtils;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 
 public class TabsHistoryBookmarksActivity extends TabActivity {
     private static final String TAG = "TabsHistoryBookmarksActivity";
@@ -57,7 +57,7 @@ public class TabsHistoryBookmarksActivity extends TabActivity {
             });
         }
         
-        Tracker tracker = Factory.getContainer().resolve(Tracker.class);
+        MyTracker tracker = Factory.getContainer().resolve(MyTracker.class);
         tracker.clearBoardVar();
         tracker.trackActivityView(TAG);
     }

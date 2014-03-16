@@ -168,8 +168,8 @@
     <string name="pref_file_cache_sdcard">Использовать SD карту</string>
     <string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
     <string name="pref_file_cache_clear">Очистить кэш</string>
-    <string name="pref_display_all_boards">Все форумы</string>
-    <string name="pref_display_all_boards_summary">Отображать все форумы в списке</string>
+    <string name="pref_display_all_boards">Список форумов</string>
+    <string name="pref_display_all_boards_summary">Отображать форумы с немодерируемым содержимым</string>
     <string name="pref_passcode">Пасс-код</string>
     <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
     

@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.adapters.PostsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadPostsTask;
@@ -39,8 +39,9 @@ import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.services.BrowserLauncher;
+import com.vortexwolf.dvach.services.ThreadImagesService;
 import com.vortexwolf.dvach.services.TimerService;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
 import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
@@ -53,11 +54,12 @@ public class PostsListActivity extends BaseListActivity {
     private MainApplication mApplication;
     private ApplicationSettings mSettings;
     private IJsonApiReader mJsonReader;
-    private Tracker mTracker;
+    private MyTracker mTracker;
     private IPagesSerializationService mSerializationService;
     private DvachUriBuilder mDvachUriBuilder;
     private FavoritesDataSource mFavoritesDatasource;
     private IOpenTabsManager mTabsManager;
+    private ThreadImagesService mThreadImagesService;
 
     private PostsListAdapter mAdapter = null;
     private DownloadPostsTask mCurrentDownloadTask = null;
@@ -69,6 +71,7 @@ public class PostsListActivity extends BaseListActivity {
     private OpenTabModel mTabModel;
     private String mBoardName;
     private String mThreadNumber;
+    private String mUri;
     private String mPostNumber = null;
 
     private Menu mMenu;
@@ -78,15 +81,6 @@ public class PostsListActivity extends BaseListActivity {
         super.onCreate(savedInstanceState);
 
         this.mApplication = (MainApplication) this.getApplication();
-
-        // Парсим код доски и номер страницы
-        Uri data = this.getIntent().getData();
-        if (data != null) {
-            this.mBoardName = UriUtils.getBoardName(data);
-            this.mThreadNumber = UriUtils.getThreadNumber(data);
-            this.mPostNumber = data.getFragment();
-        }
-
         this.mSettings = this.mApplication.getSettings();
         this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
@@ -95,6 +89,16 @@ public class PostsListActivity extends BaseListActivity {
         this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
         this.mTabsManager = this.mApplication.getOpenTabsManager();
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
+        this.mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
+        
+        // Парсим код доски и номер страницы
+        Uri data = this.getIntent().getData();
+        if (data != null) {
+            this.mBoardName = UriUtils.getBoardName(data);
+            this.mThreadNumber = UriUtils.getThreadNumber(data);
+            this.mPostNumber = data.getFragment();
+            this.mUri = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+        }
 
         // Page title and new tab
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT)
@@ -131,7 +135,7 @@ public class PostsListActivity extends BaseListActivity {
     protected void onDestroy() {
         this.mAutoRefreshTimer.stop();
 
-        MyLog.d(TAG, "Destroyed");
+        this.mThreadImagesService.clearThreadImages(this.mUri);
 
         super.onDestroy();
     }
@@ -186,7 +190,7 @@ public class PostsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder);
+        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService);
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -256,10 +260,10 @@ public class PostsListActivity extends BaseListActivity {
             case R.id.pick_board_menu_id:
                 // Start new activity
                 Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
-                this.startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
+                this.startActivity(pickBoardIntent);
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber), true);
+                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber));
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -416,12 +420,6 @@ public class PostsListActivity extends BaseListActivity {
                 case Constants.REQUEST_CODE_ADD_POST_ACTIVITY:
                     this.refreshPosts();
                     break;
-                case Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY: {
-                    String boardCode = intent.getExtras().getString(Constants.EXTRA_SELECTED_BOARD);
-
-                    this.navigateToThreads(boardCode);
-                    break;
-                }
             }
         }
     }

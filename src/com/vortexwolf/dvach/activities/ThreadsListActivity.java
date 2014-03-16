@@ -19,7 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.adapters.ThreadsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.asynctasks.DownloadThreadsTask;
@@ -43,7 +43,7 @@ import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.ListViewScrollListener;
@@ -57,7 +57,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private MainApplication mApplication;
     private IJsonApiReader mJsonReader;
-    private Tracker mTracker;
+    private MyTracker mTracker;
     private ApplicationSettings mSettings;
     private IPagesSerializationService mSerializationService;
     private PostItemViewBuilder mPostItemViewBuilder;
@@ -87,10 +87,6 @@ public class ThreadsListActivity extends BaseListActivity {
         if (data != null) {
             this.mBoardName = UriUtils.getBoardName(data);
             this.mPageNumber = UriUtils.getBoardPageNumber(data);
-        }
-
-        if (StringUtils.isEmpty(this.mBoardName)) {
-            this.mBoardName = this.mApplication.getSettings().getHomepage();
         }
 
         this.mJsonReader = this.mApplication.getJsonApiReader();
@@ -150,7 +146,7 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mAdapter.notifyDataSetChanged();
         }
 
-        this.mCurrentSettings = this.mSettings.getCurrentSettings();
+        this.mCurrentSettings = newSettings;
     }
 
     @Override
@@ -257,13 +253,13 @@ public class ThreadsListActivity extends BaseListActivity {
             case android.R.id.home:
                 // Start new activity
                 Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
-                this.startActivityForResult(pickBoardIntent, Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY);
+                this.startActivity(pickBoardIntent);
                 break;
             case R.id.refresh_menu_id:
                 this.refreshThreads();
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber).toString(), true);
+                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber).toString());
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -286,13 +282,6 @@ public class ThreadsListActivity extends BaseListActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                case Constants.REQUEST_CODE_PICK_BOARD_ACTIVITY:
-                    String boardCode = intent.getExtras().getString(Constants.EXTRA_SELECTED_BOARD);
-                    // Открываем новую борду, если не совпадает с открытой
-                    if (!StringUtils.isEmpty(boardCode) && !this.mBoardName.equals(boardCode)) {
-                        this.navigateToBoardPageNumber(boardCode, 0);
-                    }
-                    break;
                 case Constants.REQUEST_CODE_ADD_POST_ACTIVITY:
                     // Получаем номер созданного треда и переходим к нему. Иначе
                     // обновляем список тредов на всякий случай

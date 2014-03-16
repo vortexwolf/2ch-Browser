@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 

@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.ClickableURLSpan;

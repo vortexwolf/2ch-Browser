@@ -5,7 +5,7 @@ import java.io.File;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
 import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 
@@ -23,11 +23,11 @@ public class BackgroundDownloadFileView implements IDownloadFileView {
     }
 
     @Override
-    public void setProgress(int value) {
+    public void setCurrentProgress(int value) {
     }
 
     @Override
-    public void setMax(int value) {
+    public void setMaxProgress(int value) {
     }
 
     @Override

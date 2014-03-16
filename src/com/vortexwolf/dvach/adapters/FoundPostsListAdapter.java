@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBusyAdapter;

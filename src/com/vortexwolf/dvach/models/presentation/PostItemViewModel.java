@@ -13,7 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 import android.text.style.URLSpan;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.library.MyHtml;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.HtmlUtils;

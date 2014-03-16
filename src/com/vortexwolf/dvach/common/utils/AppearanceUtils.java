@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.common.utils;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -47,6 +47,10 @@ public class AppearanceUtils {
         if (indeterminateProgressBar != null) {
             indeterminateProgressBar.setVisibility(View.GONE);
         }
+    }
+    
+    public static void clearImage(ImageView image) {
+        image.setImageResource(android.R.color.transparent);
     }
     
     public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap){

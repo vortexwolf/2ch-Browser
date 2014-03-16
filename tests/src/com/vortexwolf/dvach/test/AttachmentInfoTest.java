@@ -4,7 +4,7 @@ import android.app.Instrumentation;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;

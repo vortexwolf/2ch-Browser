@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.preference.Preference;
 import android.util.AttributeSet;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.utils.IoUtils;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;

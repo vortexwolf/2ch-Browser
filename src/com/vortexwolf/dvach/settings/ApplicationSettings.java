@@ -8,7 +8,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
@@ -54,11 +54,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public String getPassCode(){
         // should be removed after everyone updates their applications
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
-    }
-
-    public String getHomepage() {
-        String boardName = this.mSettings.getString(this.mResources.getString(R.string.pref_homepage_key), Constants.DEFAULT_BOARD).toLowerCase();
-        return !StringUtils.isEmpty(boardName) ? boardName : Constants.DEFAULT_BOARD;
     }
 
     public String getDownloadPath() {
@@ -144,7 +139,7 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     }
 
     public boolean isDisplayAllBoards() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_all_boards_key), false);
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_hidden_boards_key), false);
     }
 
     public int getTheme() {
@@ -201,6 +196,7 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
         result.isDisplayDate = this.isDisplayPostItemDate();
         result.isLocalDate = this.isLocalDateTime();
         result.isLoadThumbnails = this.isLoadThumbnails();
+        result.isDisplayAllBoards = this.isDisplayAllBoards();
 
         return result;
     }

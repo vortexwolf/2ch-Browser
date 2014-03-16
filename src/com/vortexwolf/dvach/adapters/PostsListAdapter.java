@@ -17,7 +17,7 @@ import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.MyLog;
 import com.vortexwolf.dvach.common.utils.AppearanceUtils;
@@ -27,8 +27,10 @@ import com.vortexwolf.dvach.interfaces.IBitmapManager;
 import com.vortexwolf.dvach.interfaces.IBusyAdapter;
 import com.vortexwolf.dvach.interfaces.IURLSpanClickListener;
 import com.vortexwolf.dvach.models.domain.PostInfo;
+import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
 import com.vortexwolf.dvach.models.presentation.PostItemViewModel;
 import com.vortexwolf.dvach.models.presentation.PostsViewModel;
+import com.vortexwolf.dvach.services.ThreadImagesService;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.PostItemViewBuilder;
@@ -42,6 +44,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private final IBitmapManager mBitmapManager;
     private final String mBoardName;
     private final String mThreadNumber;
+    private final String mUri;
     private final PostsViewModel mPostsViewModel;
     private final Theme mTheme;
     private final ApplicationSettings mSettings;
@@ -50,12 +53,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private final PostItemViewBuilder mPostItemViewBuilder;
     private final DvachUriBuilder mDvachUriBuilder;
     private final Timer mLoadImagesTimer;
+    private final ThreadImagesService mThreadImagesService;
 
     private boolean mIsBusy = false;
     private boolean mIsLoadingMore = false;
     private LoadImagesTimerTask mCurrentLoadImagesTask;
 
-    public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder) {
+    public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService) {
         super(context.getApplicationContext(), 0);
 
         this.mBoardName = boardName;
@@ -70,6 +74,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mDvachUriBuilder = dvachUriBuilder;
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
         this.mLoadImagesTimer = new Timer();
+        this.mThreadImagesService = threadImagesService;
+        this.mUri = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
     }
 
     @Override
@@ -138,6 +144,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         
         List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : models) {
+            AttachmentInfo attachment = model.getAttachment(this.mBoardName);
+            if (attachment != null && attachment.isImage()) {
+                this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+            }
+            
             this.add(model);
         }
     }
@@ -182,6 +193,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         
         List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : newModels) {
+            AttachmentInfo attachment = model.getAttachment(this.mBoardName);
+            if (attachment != null && attachment.isImage()) {
+                this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+            }
+            
             this.add(model);
         }
 

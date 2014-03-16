@@ -16,7 +16,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 import android.content.res.Resources;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.library.CancellableInputStream;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;

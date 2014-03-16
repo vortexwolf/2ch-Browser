@@ -18,6 +18,7 @@
         android:layout_marginBottom="1.0dip"
         android:layout_weight="1.0"
         android:paddingLeft="16.0dip"
+        android:textColor="?android:textColorPrimary"
         android:textAppearance="?android:textAppearanceLarge" />
 
 </LinearLayout>

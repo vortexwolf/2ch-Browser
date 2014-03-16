@@ -9,14 +9,15 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.utils.StringUtils;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 
 public class ApplicationPreferencesActivity extends PreferenceActivity {
-
+    private static final String TAG = "ApplicationPreferencesActivity";
+    
     private ApplicationSettings mSettings;
     private Resources mResources;
     private SharedPreferences mSharedPreferences;
@@ -39,7 +40,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferenceChangeListener.onSharedPreferenceChanged(this.mSharedPreferences, this.mResources.getString(R.string.pref_theme_key));
         this.mSharedPreferenceChangeListener.onSharedPreferenceChanged(this.mSharedPreferences, this.mResources.getString(R.string.pref_text_size_key));
 
-        Factory.getContainer().resolve(Tracker.class).trackActivityView("ApplicationPreferencesActivity");
+        Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
         
         this.updateNameSummary();
     }

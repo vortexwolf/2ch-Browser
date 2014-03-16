@@ -13,7 +13,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
 import com.vortexwolf.dvach.common.library.MyLog;

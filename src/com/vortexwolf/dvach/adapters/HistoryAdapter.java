@@ -12,7 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.db.HistoryEntity;
 
