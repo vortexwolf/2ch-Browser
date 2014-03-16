@@ -1,6 +1,6 @@
 package com.vortexwolf.dvach.services;
 
-import android.R;
+import com.vortexwolf.chan.R;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.httpimage.HttpImageManager;

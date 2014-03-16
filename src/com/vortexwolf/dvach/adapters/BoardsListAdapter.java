@@ -12,8 +12,10 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
+import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.models.presentation.BoardEntity;
+import com.vortexwolf.dvach.models.presentation.BoardModel;
 import com.vortexwolf.dvach.models.presentation.IBoardListEntity;
 import com.vortexwolf.dvach.models.presentation.SectionEntity;
 
@@ -25,11 +27,10 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
     private final LayoutInflater mInflater;
     
-    private boolean mHasFavoritesSection = false;
     private int mFavoritesCount = 0;
 
-    public BoardsListAdapter(Context context, ArrayList<IBoardListEntity> items) {
-    	super(context, -1, items);
+    public BoardsListAdapter(Context context) {
+    	super(context, -1);
         this.mInflater = LayoutInflater.from(context);
     }
 
@@ -55,7 +56,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
         if (convertView == null) {
             convertView = this.mInflater.inflate(item.isSection()
-                    ? com.vortexwolf.dvach.R.layout.pick_board_section
+                    ? com.vortexwolf.chan.R.layout.pick_board_section
                     : android.R.layout.simple_list_item_1, null);
         }
 
@@ -67,29 +68,37 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         } else {
             BoardEntity bi = (BoardEntity) item;
             final TextView text = (TextView) convertView.findViewById(android.R.id.text1);
-            text.setText(bi.getTitle());
+            
+            String description = !StringUtils.isEmpty(bi.getTitle()) ? bi.getCode() + " - " + bi.getTitle() : bi.getCode();
+            text.setText(description);
         }
 
         return convertView;
     }
     
-    public void addItemToFavoritesSection(String boardName){
-    	if(!this.mHasFavoritesSection) {
+    @Override
+    public void clear() {
+        super.clear();
+        
+        this.mFavoritesCount = 0;
+    }
+    
+    public void addItemToFavoritesSection(String boardName, BoardModel boardModel){
+    	if(this.mFavoritesCount == 0) {
     		this.insert(new SectionEntity(this.getContext().getString(R.string.favorites)), FAVORITES_SECTION_POSITION);
-    		this.mHasFavoritesSection = true;
     	}
     	
     	this.mFavoritesCount++;
-    	this.insert(new BoardEntity(boardName, boardName), this.mFavoritesCount);
+    	BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.title : null);
+    	this.insert(newItem, this.mFavoritesCount);
     }
     
     public void removeItemFromFavoritesSection(BoardEntity item){
     	this.mFavoritesCount = Math.max(0, this.mFavoritesCount - 1);
     	this.remove(item);
     	
-    	if(this.mFavoritesCount == 0 && this.mHasFavoritesSection) {
+    	if(this.mFavoritesCount == 0) {
     		this.remove(this.getItem(FAVORITES_SECTION_POSITION));
-    		this.mHasFavoritesSection = false;
     	}
     	
     	this.notifyDataSetChanged();

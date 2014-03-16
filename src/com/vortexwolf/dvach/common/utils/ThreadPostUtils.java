@@ -11,28 +11,36 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Debug;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
+import com.vortexwolf.dvach.activities.BrowserActivity;
+import com.vortexwolf.dvach.activities.ImageGalleryActivity;
+import com.vortexwolf.dvach.common.Constants;
+import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.interfaces.IBitmapManager;
-import com.vortexwolf.dvach.interfaces.IClickListenersFactory;
 import com.vortexwolf.dvach.models.domain.IAttachmentEntity;
 import com.vortexwolf.dvach.models.presentation.AttachmentInfo;
+import com.vortexwolf.dvach.services.BrowserLauncher;
+import com.vortexwolf.dvach.services.ThreadImagesService;
 import com.vortexwolf.dvach.services.presentation.ClickListenersFactory;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
 
 public class ThreadPostUtils {
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
     private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" };
-    private static final IClickListenersFactory sThumbnailOnClickListenerFactory = new ClickListenersFactory();
 
+    private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
+    private static long sHeapPad = 1024;
+    
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
@@ -97,9 +105,31 @@ public class ThreadPostUtils {
         return !StringUtils.isEmpty(item.getImage()) || !StringUtils.isEmpty(item.getVideo());
     }
 
-    public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings) {
-        if (attachment != null) {
-            sThumbnailOnClickListenerFactory.raiseThumbnailClick(attachment, context, settings);
+    public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings, final String threadUrl) {
+        if (attachment == null) {
+            return;
+        }
+        
+        int imageSize = attachment.getSize();
+        String url = attachment.getSourceUrl(settings);
+
+        long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
+        if (allocatedSize > sMaxVmHeap) {
+            long freeSize = Math.max(0, imageSize - (allocatedSize - sMaxVmHeap));
+            AppearanceUtils.showToastMessage(context, "Image is " + imageSize + "Kb. Available Memory is " + freeSize + "Kb");
+            return;
+        }
+
+        Uri uri = Uri.parse(url);
+        if (threadUrl != null && Constants.SDK_VERSION > 7 && Factory.getContainer().resolve(ThreadImagesService.class).hasImage(threadUrl, url)) {
+            // open a gallery activity
+            Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
+            imageGallery.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            imageGallery.setData(uri);
+            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, threadUrl);
+            context.startActivity(imageGallery);
+        } else {
+            BrowserLauncher.launchInternalBrowser(context, url);
         }
     }
 
@@ -122,28 +152,18 @@ public class ThreadPostUtils {
     /**
      * Разбирается с прикрепленным файлом для треда или поста; перенес сюда,
      * чтобы не повторять код
-     * 
      * @param attachment
      *            Модель прикрепленного к треду или посту файла
      * @param imageView
      *            Место для картинки
-     * @param indeterminateProgressBar
-     *            Индикатор загрузки
      * @param bitmapManager
      *            Для загрузки картинок с интернета
      * @param thumbnailOnClickListenerFactory
      *            Для обработки нажатия по картинке
      * @param activity
      */
-    public static void handleAttachmentImage(boolean isBusy, AttachmentInfo attachment, ImageView imageView, ProgressBar indeterminateProgressBar, View fullThumbnailView, IBitmapManager bitmapManager, ApplicationSettings settings, Context context) {
-
-        if(indeterminateProgressBar != null) {
-            indeterminateProgressBar.setVisibility(View.GONE);
-        }
-        
-        imageView.setImageResource(android.R.color.transparent); // clear the
-                                                                 // image
-                                                                 // content
+    public static void handleAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView, View fullThumbnailView, IBitmapManager bitmapManager, final ApplicationSettings settings, final Context context, final String threadUrl) {
+        imageView.setImageResource(android.R.color.transparent); // clear the image content
 
         // Ищем прикрепленный файл, в случае наличия добавляем его как ссылку
         if (attachment == null || attachment.isEmpty()) {
@@ -154,13 +174,12 @@ public class ThreadPostUtils {
             imageView.setVisibility(View.VISIBLE);
 
             // Обработчик события нажатия на картинку
-            OnClickListener thumbnailOnClickListener = sThumbnailOnClickListenerFactory.getThumbnailOnClickListener(attachment, context, settings);
-            if (thumbnailOnClickListener != null) {
-                imageView.setOnClickListener(thumbnailOnClickListener);
-                if(indeterminateProgressBar != null) {
-                    indeterminateProgressBar.setOnClickListener(thumbnailOnClickListener);
+            imageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ThreadPostUtils.openAttachment(attachment, context, settings, threadUrl);
                 }
-            }
+            });
 
             String thumbnailUrl = attachment.getThumbnailUrl();
             // Также добавляем уменьшенное изображение, нажатие на которое
@@ -173,7 +192,7 @@ public class ThreadPostUtils {
                     imageView.setTag(Uri.parse(thumbnailUrl));
 
                     if (!isBusy || bitmapManager.isCached(thumbnailUrl)) {
-                        bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, indeterminateProgressBar, R.drawable.error_image);
+                        bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, null, R.drawable.error_image);
                     }
                 }
             } else {

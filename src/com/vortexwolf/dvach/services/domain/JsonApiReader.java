@@ -20,7 +20,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import android.content.res.Resources;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.library.CancellableInputStream;
 import com.vortexwolf.dvach.common.library.ExtendedHttpClient;
@@ -65,6 +65,8 @@ public class JsonApiReader implements IJsonApiReader {
     }
 
     private String formatPostsUri(String boardName, String threadId) {
+        // later test new api
+        // String uri = String.format("/makaba/mobile.fcgi?task=get_thread&board=%s&thread=%s&post=0", boardName, threadId);
         return this.mDvachUriBuilder.create2chBoardUri(boardName, "/res/" + threadId + ".json").toString();
     }
 

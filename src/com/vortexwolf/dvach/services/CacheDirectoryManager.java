@@ -18,9 +18,9 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
     private final File mInternalCacheDir;
     private final File mExternalCacheDir;
     private final ApplicationSettings mSettings;
-    private final Tracker mTracker;
+    private final MyTracker mTracker;
 
-    public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings, Tracker tracker) {
+    public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings, MyTracker tracker) {
         this.mPackageName = packageName;
         this.mInternalCacheDir = internalCacheDir;
         this.mSettings = settings;

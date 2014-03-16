@@ -29,7 +29,8 @@ import com.vortexwolf.dvach.services.BitmapManager;
 import com.vortexwolf.dvach.services.CacheDirectoryManager;
 import com.vortexwolf.dvach.services.NavigationService;
 import com.vortexwolf.dvach.services.SerializationService;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.ThreadImagesService;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.domain.DownloadFileService;
 import com.vortexwolf.dvach.services.domain.JsonApiReader;
 import com.vortexwolf.dvach.services.domain.PostSender;
@@ -45,7 +46,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Tracker tracker = new Tracker();
+        MyTracker tracker = new MyTracker(this.getApplicationContext());
         DefaultHttpClient httpClient = new ExtendedHttpClient();
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
@@ -70,7 +71,7 @@ public class MainApplication extends Application {
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());
         container.register(INavigationService.class, navigationService);
         container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
-        container.register(Tracker.class, tracker);
+        container.register(MyTracker.class, tracker);
         container.register(ICacheDirectoryManager.class, cacheManager);
         container.register(IPagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
@@ -80,6 +81,7 @@ public class MainApplication extends Application {
         container.register(FavoritesDataSource.class, favoritesDataSource);
         container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
         container.register(DownloadFileService.class, downloadFileService);
+        container.register(ThreadImagesService.class, new ThreadImagesService());
 
         historyDataSource.open();
         favoritesDataSource.open();
@@ -91,7 +93,7 @@ public class MainApplication extends Application {
 
     @Override
     public void onTerminate() {
-        Factory.getContainer().resolve(Tracker.class).stopSession();
+        Factory.getContainer().resolve(MyTracker.class).stopSession();
 
         super.onTerminate();
     }
@@ -116,8 +118,8 @@ public class MainApplication extends Application {
         return Factory.getContainer().resolve(IDraftPostsStorage.class);
     }
 
-    public Tracker getTracker() {
-        return Factory.getContainer().resolve(Tracker.class);
+    public MyTracker getTracker() {
+        return Factory.getContainer().resolve(MyTracker.class);
     }
 
     public IBitmapManager getBitmapManager() {

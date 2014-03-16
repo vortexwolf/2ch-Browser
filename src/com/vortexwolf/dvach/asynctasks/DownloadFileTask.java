@@ -8,7 +8,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Factory;
 import com.vortexwolf.dvach.common.library.BackgroundDownloadFileView;
 import com.vortexwolf.dvach.common.library.DialogDownloadFileView;
@@ -124,7 +124,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
     @Override
     public void onProgressUpdate(Long... progress) {
-        this.mProgressView.setProgress(progress[0].intValue());
+        this.mProgressView.setCurrentProgress(progress[0].intValue());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     @Override
     public void setContentLength(long value) {
         this.mContentLength = value;
-        this.mProgressView.setMax((int) value / 1024);
+        this.mProgressView.setMaxProgress((int) value / 1024);
     }
     
     @Override

@@ -6,9 +6,9 @@ import android.content.DialogInterface;
 
 public interface IDownloadFileView {
 
-    public void setProgress(int value);
+    public void setCurrentProgress(int value);
 
-    public void setMax(int value);
+    public void setMaxProgress(int value);
 
     public void showLoading(String message);
 

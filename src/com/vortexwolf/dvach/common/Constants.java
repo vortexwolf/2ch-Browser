@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 import org.apache.http.protocol.HTTP;
 
+import android.os.Build;
+
 import com.vortexwolf.dvach.common.utils.IoUtils;
 
 public class Constants {
@@ -19,17 +21,17 @@ public class Constants {
 
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));
-
+    public static final String GIF_IMAGE = "gif";
+    
     public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
     public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);
 
-    // Доска по умолчанию
-    public static final String DEFAULT_BOARD = "b";
+    public static final int SDK_VERSION = Integer.parseInt(Build.VERSION.SDK);
 
     public static final String DEFAULT_DOWNLOAD_FOLDER = "/download/2ch Browser/";
 
     // Иногда меняется (когда-то был 2ch.so), поэтому добавил в настройки. 
-    public static final String DEFAULT_DOMAIN = "2ch.hk";
+    public static final String DEFAULT_DOMAIN = "2ch.pm";
 
     // Для http-запросов
     public static final String USER_AGENT_STRING = "2ch browser (Android)";
@@ -60,11 +62,11 @@ public class Constants {
     public static final String EXTRA_THREAD_SUBJECT = "ExtraThreadSubject";
     public static final String EXTRA_POST_NUMBER = "ExtraPostNumber";
     public static final String EXTRA_POST_COMMENT = "ExtraPostComment";
-    public static final String EXTRA_SELECTED_BOARD = "ExtraSelectedBoard";
     public static final String EXTRA_SELECTED_FILE = ".ExtraSelectedFile";
     public static final String EXTRA_REDIRECTED_THREAD_NUMBER = "ExtraRedirectedThreadNumber";
     public static final String EXTRA_CURRENT_URL = "ExtraCurrentUrl";
     public static final String EXTRA_PREFER_DESERIALIZED = "ExtraPreferDeserialized";
+    public static final String EXTRA_THREAD_URL = "ExtraThreadUrl";
 
     // Идентификаторы для контекстного меню
     public static final int CONTEXT_MENU_ANSWER = 1001;

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import android.net.Uri;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.common.Constants;
 import com.vortexwolf.dvach.common.utils.StringUtils;
 import com.vortexwolf.dvach.common.utils.UriUtils;
@@ -68,6 +68,14 @@ public class AttachmentInfo {
         } else {
             return this.mImageUrl;
         }
+    }
+    
+    public String getImageUrlIfImage(){
+        if (isImage()) {
+            return this.mImageUrl;
+        }
+        
+        return null;
     }
 
     public String getSourceExtension() {

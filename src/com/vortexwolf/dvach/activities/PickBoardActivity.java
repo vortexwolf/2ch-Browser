@@ -24,7 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.adapters.BoardsListAdapter;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.common.Constants;
@@ -36,14 +36,17 @@ import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.db.FavoritesDataSource;
 import com.vortexwolf.dvach.db.FavoritesEntity;
 import com.vortexwolf.dvach.models.presentation.BoardEntity;
+import com.vortexwolf.dvach.models.presentation.BoardModel;
 import com.vortexwolf.dvach.models.presentation.IBoardListEntity;
 import com.vortexwolf.dvach.models.presentation.OpenTabModel;
 import com.vortexwolf.dvach.models.presentation.SectionEntity;
 import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 import com.vortexwolf.dvach.services.presentation.DvachUriBuilder;
 import com.vortexwolf.dvach.services.presentation.EditTextDialog;
+import com.vortexwolf.dvach.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.dvach.settings.ApplicationSettings;
+import com.vortexwolf.dvach.settings.SettingsEntity;
 
 public class PickBoardActivity extends ListActivity {
 
@@ -52,11 +55,15 @@ public class PickBoardActivity extends ListActivity {
     private static final Pattern boardCodePattern = Pattern.compile("^/?\\w+/?$");
     
     private MainApplication mApplication;
-    private Tracker mTracker;
+    private MyTracker mTracker;
     private FavoritesDataSource mFavoritesDatasource;
     private ApplicationSettings mSettings;
     private DvachUriBuilder mDvachUriBuilder;
+    
     private BoardsListAdapter mAdapter = null;
+    private SettingsEntity mCurrentSettings = null;
+    
+    private final ArrayList<BoardModel> mBoards = new ArrayList<BoardModel>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,57 +74,100 @@ public class PickBoardActivity extends ListActivity {
         this.mSettings = this.mApplication.getSettings();
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
     	this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
+    	this.mCurrentSettings = this.mSettings.getCurrentSettings();
     	
-        this.mTracker.clearBoardVar();
-        this.mTracker.trackActivityView(TAG);
-
         this.resetUI();
 
-        ArrayList<IBoardListEntity> boards = this.createBoardList();
+        this.parseAllBoards();
 
-        this.mAdapter = new BoardsListAdapter(this, boards);
-        this.addFavoritesToAdapter();
+        this.mAdapter = new BoardsListAdapter(this);
+        this.updateVisibleBoards(this.mAdapter);
         this.setListAdapter(this.mAdapter);
 
         this.setTitle(this.getString(R.string.pick_board_title));
-    }
-
-    private ArrayList<IBoardListEntity> createBoardList() {
-        ArrayList<IBoardListEntity> boards = new ArrayList<IBoardListEntity>();
-
-        // default boards
-        this.addBoardsToTheList(R.array.pickboard_boards, boards);
         
-        // hidden boards
-        if (this.mSettings.isDisplayAllBoards()) {
-            this.addBoardsToTheList(R.array.pickboard_boards_hidden, boards);
-        }
-
-        return boards;
+        this.mTracker.clearBoardVar();
+        this.mTracker.trackActivityView(TAG);
     }
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-    private void addBoardsToTheList(int arrayId, ArrayList<IBoardListEntity> boards) {
-        String[] entities = this.getResources().getStringArray(arrayId);
-        for (String entity : entities) {
-            String[] parts = entity.split(";\\s?");
-            if (parts.length == 1) {
-                boards.add(new SectionEntity(parts[0]));
-            } else if (parts.length == 2) {
-                boards.add(new BoardEntity(parts[0], parts[1]));
-            }
+        SettingsEntity prevSettings = this.mCurrentSettings;
+        this.mCurrentSettings = this.mSettings.getCurrentSettings();
+        
+        if (this.mCurrentSettings.theme != prevSettings.theme) {
+            this.finish();
+            Intent i = new Intent(this.getIntent());
+            this.startActivity(i);
+            return;
+        }
+        
+        if (this.mCurrentSettings.isDisplayAllBoards != prevSettings.isDisplayAllBoards) {
+            this.updateVisibleBoards(this.mAdapter);
         }
     }
     
-    private void addFavoritesToAdapter(){
-        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
+    private void parseAllBoards() {
+        this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards));
+        this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards_hidden));
+    }
+
+    private void updateVisibleBoards(BoardsListAdapter adapter) {
+        adapter.clear();
         
-        if (favoriteBoards.size() > 0) {
-            for (FavoritesEntity f : favoriteBoards) {
-                Uri uri = Uri.parse(f.getUrl());  	
-                String boardName = UriUtils.getBoardName(uri);
-                this.mAdapter.addItemToFavoritesSection(boardName);
+        String currentGroup = null;
+        for (BoardModel board : this.mBoards) {
+            if (!board.isVisible && !this.mSettings.isDisplayAllBoards()) {
+                continue; // ignore hidden boards
+            }
+            
+            // add group header if necessary
+            if (board.group != null && !board.group.equals(currentGroup)) {
+                currentGroup = board.group;
+                adapter.add(new SectionEntity(currentGroup));
+            }
+            
+            // add item
+            adapter.add(new BoardEntity(board.code, board.title));
+        }
+        
+        // add favorite boards
+        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();      
+        for (FavoritesEntity f : favoriteBoards) {
+            Uri uri = Uri.parse(f.getUrl());    
+            String boardName = UriUtils.getBoardName(uri);
+            adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
+        }
+    }
+    
+    private BoardModel findBoardByCode(String code){
+        for (BoardModel board : this.mBoards) {
+            if (board.code.equals(code)) {
+                return board;
             }
         }
+        
+        return null;
+    }
+    
+    private ArrayList<BoardModel> parseBoardsList(int arrayId) {
+        ArrayList<BoardModel> boards = new ArrayList<BoardModel>();
+        
+        String[] entities = this.getResources().getStringArray(arrayId);
+        String currentGroup = null;
+        for (String entity : entities) {
+            String[] parts = entity.split(";\\s?");
+            if (parts.length == 1) {
+                currentGroup = parts[0];
+            } else if (parts.length >= 2) {
+                boolean isVisible = parts.length >= 3 && parts[2].equals("1");
+                boards.add(new BoardModel(parts[0], parts[1], isVisible, currentGroup));
+            }
+        }
+        
+        return boards;
     }
 
     private void resetUI() {
@@ -234,6 +284,10 @@ public class PickBoardActivity extends ListActivity {
 
                 dialog.show();
                 break;
+            case R.id.preferences_menu_id:
+                Intent preferencesIntent = new Intent(this.getApplicationContext(), ApplicationPreferencesActivity.class);
+                this.startActivity(preferencesIntent);
+                break;
         }
 
         return true;
@@ -247,16 +301,15 @@ public class PickBoardActivity extends ListActivity {
 
         boardCode = this.fixSlashes(boardCode);
 
-        Intent intent = new Intent();
-        intent.putExtra(Constants.EXTRA_SELECTED_BOARD, boardCode);
-        this.setResult(RESULT_OK, intent);
-        this.finish();
+        Intent intent = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
+        intent.setData(this.mDvachUriBuilder.create2chBoardUri(boardCode));
+        this.startActivity(intent);
     }
     
     private void addToFavorites(String boardCode) {
     	String uri = this.mDvachUriBuilder.create2chBoardUri(boardCode).toString();
         this.mFavoritesDatasource.addToFavorites(boardCode, uri);
-        this.mAdapter.addItemToFavoritesSection(boardCode);
+        this.mAdapter.addItemToFavoritesSection(boardCode, this.findBoardByCode(boardCode));
     }
     
     private void removeFromFavorites(BoardEntity model) {

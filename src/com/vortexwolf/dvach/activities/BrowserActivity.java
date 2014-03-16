@@ -23,14 +23,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
 
-import com.vortexwolf.dvach.R;
+import com.vortexwolf.chan.R;
 import com.vortexwolf.dvach.asynctasks.DownloadFileTask;
 import com.vortexwolf.dvach.common.MainApplication;
 import com.vortexwolf.dvach.common.controls.WebViewFixed;
+import com.vortexwolf.dvach.common.utils.UriUtils;
 import com.vortexwolf.dvach.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.dvach.interfaces.IDownloadFileView;
 import com.vortexwolf.dvach.services.BrowserLauncher;
-import com.vortexwolf.dvach.services.Tracker;
+import com.vortexwolf.dvach.services.MyTracker;
 
 public class BrowserActivity extends Activity {
     public static final String TAG = "BrowserActivity";
@@ -40,7 +41,7 @@ public class BrowserActivity extends Activity {
     }
 
     private MainApplication mApplication;
-    private Tracker mTracker;
+    private MyTracker mTracker;
     private ICacheDirectoryManager mCacheDirectoryManager;
 
     private ViewGroup mRootView;
@@ -88,6 +89,7 @@ public class BrowserActivity extends Activity {
 
         this.loadImage();
 
+        this.mTracker.setBoardVar(UriUtils.getBoardName(this.mUri));
         this.mTracker.trackActivityView(TAG);
     }
 
@@ -255,7 +257,7 @@ public class BrowserActivity extends Activity {
         private double mMaxValue = -1;
 
         @Override
-        public void setProgress(int value) {
+        public void setCurrentProgress(int value) {
             if (this.mMaxValue > 0) {
                 double percent = value / this.mMaxValue;
                 BrowserActivity.this.setProgress((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
@@ -265,7 +267,7 @@ public class BrowserActivity extends Activity {
         }
 
         @Override
-        public void setMax(int value) {
+        public void setMaxProgress(int value) {
             this.mMaxValue = value;
         }
 

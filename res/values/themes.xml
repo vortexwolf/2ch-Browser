@@ -6,8 +6,8 @@
         <item name="iconSave">@drawable/ic_menu_save</item>
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
         <item name="iconEdit">@drawable/ic_menu_add</item>
-        <item name="iconBack">@drawable/ic_menu_back</item>
-        <item name="iconForward">@drawable/ic_menu_forward</item>
+        <item name="iconBack">@drawable/ic_navigation_previous_item</item>
+        <item name="iconForward">@drawable/ic_navigation_next_item</item>
     </style>
 
     <style name="Theme_Dark_Switch" parent="@android:style/Theme">
@@ -15,8 +15,8 @@
         <item name="iconSave">@drawable/ic_menu_save</item>
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
         <item name="iconEdit">@drawable/ic_menu_add</item>
-        <item name="iconBack">@drawable/ic_menu_back</item>
-        <item name="iconForward">@drawable/ic_menu_forward</item>
+        <item name="iconBack">@drawable/ic_navigation_previous_item_dark</item>
+        <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
     </style>
 
 </resources>
