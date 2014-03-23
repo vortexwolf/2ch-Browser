@@ -18,9 +18,9 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.common.utils.AppearanceUtils;
-import com.vortexwolf.dvach.services.domain.HttpBitmapReader;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.services.domain.HttpBitmapReader;
 
 /**
  * HttpImageManager uses 3-level caching to download and store network images.

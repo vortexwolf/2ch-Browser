@@ -2,9 +2,9 @@ package android.httpimage;
 
 import android.graphics.Bitmap;
 
-import com.vortexwolf.dvach.common.library.LruCache;
-import com.vortexwolf.dvach.common.library.MyLog;
-import com.vortexwolf.dvach.interfaces.ILruCacheListener;
+import com.vortexwolf.chan.common.library.LruCache;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.interfaces.ILruCacheListener;
 
 public class BitmapMemoryCache implements BitmapCache {
 

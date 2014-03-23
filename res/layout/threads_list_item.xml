@@ -13,7 +13,7 @@
         android:layout_marginRight="3dip"
         android:orientation="vertical" >
 
-        <com.vortexwolf.dvach.common.controls.ExtendedImageView
+        <com.vortexwolf.chan.common.controls.ExtendedImageView
             android:id="@+id/thumbnail"
             android:layout_width="@dimen/thumbnail_size"
             android:layout_height="@dimen/thumbnail_size"
@@ -40,7 +40,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="?threadTitleForeground" />
  
-    <com.vortexwolf.dvach.common.controls.EllipsizingTextView
+    <com.vortexwolf.chan.common.controls.EllipsizingTextView
         android:id="@+id/comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

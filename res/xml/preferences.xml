@@ -15,7 +15,7 @@
         android:summary="@string/pref_name_summary"
         android:inputType="text"
         android:singleLine="true" />
-    <com.vortexwolf.dvach.settings.PasscodePreference
+    <com.vortexwolf.chan.settings.PasscodePreference
         android:key="@string/pref_passcode_key"
         android:title="@string/pref_passcode"
         android:summary="@string/pref_passcode_summary"
@@ -117,7 +117,7 @@
             android:summary="@string/pref_file_cache_sdcard_summary"
             android:title="@string/pref_file_cache_sdcard" />
 
-        <com.vortexwolf.dvach.settings.CacheSizePreference
+        <com.vortexwolf.chan.settings.CacheSizePreference
             android:key="@string/pref_clear_cache_key"
             android:title="@string/pref_file_cache_clear" />
     </PreferenceCategory>
@@ -128,7 +128,7 @@
             android:summary="@string/pref_auto_refresh_summary"
             android:title="@string/pref_auto_refresh" />
 
-        <com.vortexwolf.dvach.settings.SeekBarPreference
+        <com.vortexwolf.chan.settings.SeekBarPreference
             android:defaultValue="60"
             android:dependency="@string/pref_auto_refresh_key"
             android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"

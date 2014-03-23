@@ -70,7 +70,7 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
-        <com.vortexwolf.dvach.common.controls.DynamicWidthImageView
+        <com.vortexwolf.chan.common.controls.DynamicWidthImageView
             android:id="@+id/badge_image"
             android:layout_width="wrap_content"
             android:layout_height="15dip"
@@ -110,7 +110,7 @@
             android:layout_marginRight="5dip"
             android:orientation="vertical" >
 
-            <com.vortexwolf.dvach.common.controls.ExtendedImageView
+            <com.vortexwolf.chan.common.controls.ExtendedImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="@dimen/thumbnail_size"
                 android:layout_height="@dimen/thumbnail_size"
@@ -127,7 +127,7 @@
                 android:textColor="?itemInfoForeground" />
         </LinearLayout>
 
-        <com.vortexwolf.dvach.common.controls.JellyBeanSpanFixTextView
+        <com.vortexwolf.chan.common.controls.JellyBeanSpanFixTextView
             android:id="@+id/comment"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
