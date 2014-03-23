@@ -33,7 +33,7 @@
             android:textColor="?android:textColorSecondary" />
     </LinearLayout>
 
-    <com.vortexwolf.dvach.common.controls.NonParentFocusableImageView
+    <com.vortexwolf.chan.common.controls.NonParentFocusableImageView
         android:id="@+id/tabs_item_delete"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
