@@ -5,101 +5,103 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.services.MyTracker;
 
-public class TabsHistoryBookmarksActivity extends TabActivity {
+public class TabsHistoryBookmarksActivity extends FragmentActivity  {
     private static final String TAG = "TabsHistoryBookmarksActivity";
-    private Menu mSoftwareMenu;
-    private boolean mIsSoftwareMenu;
-
+    
+    public static final String FAVORITES_TAB_ID = "FavoritesTab";
+    
+    private TabsPagerAdapter mAdapter;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.requestWindowFeature(Window.FEATURE_PROGRESS);
+        
         MainApplication application = (MainApplication) this.getApplication();
         this.setTheme(application.getSettings().getTheme());
+        this.setContentView(R.layout.tabs_favorites_history_view);
 
-        TabHost tabHost = this.getTabHost();
-        Resources res = this.getResources();
-
-        Bundle extras = this.getIntent().getExtras();
-
-        Intent intent = new Intent(this, OpenTabsActivity.class);
-        intent.putExtras(extras);
-        tabHost.addTab(tabHost.newTabSpec("tabs").setIndicator(res.getString(R.string.tabs_opentabs), res.getDrawable(R.drawable.browser_visited_tab)).setContent(intent));
-
-        intent = new Intent(this, FavoritesActivity.class);
-        intent.putExtras(extras);
-        tabHost.addTab(tabHost.newTabSpec("bookmarks").setIndicator(res.getString(R.string.tabs_bookmarks), res.getDrawable(R.drawable.browser_bookmark_tab)).setContent(intent));
-
-        intent = new Intent(this, HistoryActivity.class);
-        intent.putExtras(extras);
-        tabHost.addTab(tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tabs_history), res.getDrawable(R.drawable.browser_history_tab)).setContent(intent));
-
-        // devices without hardware menu button work differently with tabs, so I add extra code so that the menu is updated properly
-        this.mIsSoftwareMenu = !CompatibilityUtils.hasHardwareMenu(this.getApplicationContext());
-
-        if (this.mIsSoftwareMenu) {
-            tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-                @Override
-                public void onTabChanged(String arg0) {
-                    TabsHistoryBookmarksActivity.this.updateMenu(TabsHistoryBookmarksActivity.this.mSoftwareMenu);
-                }
-            });
-        }
+        this.mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), this.getResources());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.tabs_pager);
+        viewPager.setAdapter(this.mAdapter);
         
+        Bundle extras = this.getIntent().getExtras();
+        if (extras.containsKey(Constants.EXTRA_SELECT_TAB) && extras.getString(Constants.EXTRA_SELECT_TAB).equals(FAVORITES_TAB_ID)) {
+            viewPager.setCurrentItem(1);
+        }
+
         MyTracker tracker = Factory.getContainer().resolve(MyTracker.class);
-        tracker.clearBoardVar();
         tracker.trackActivityView(TAG);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = this.getMenuInflater();
-        inflater.inflate(R.menu.history, menu);
-
-        this.updateMenu(menu);
-        if (this.mIsSoftwareMenu) {
-            this.mSoftwareMenu = menu;
-        }
-
-        return true;
-    }
-
-    private void updateMenu(Menu menu) {
-        MenuItem clearHistory = menu.findItem(R.id.menu_clear_history_id);
-        MenuItem closeTabs = menu.findItem(R.id.menu_close_tabs_id);
+    
+    public class TabsPagerAdapter extends FragmentStatePagerAdapter {
+        private final Resources mResources;
         
-        Activity currentActivity = this.getCurrentActivity();
-        // the clear history menu item is visible only for the history tab
-        if (currentActivity instanceof HistoryActivity) {
-            clearHistory.setVisible(true);
-        } else {
-            clearHistory.setVisible(false);
+        public TabsPagerAdapter(FragmentManager fm, Resources resources) {
+            super(fm);
+            this.mResources = resources;
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Fragment fragment = null;
+            switch (i) {
+                case 0:
+                    fragment = new OpenTabsFragment();
+                    fragment.setArguments(getIntent().getExtras());
+                    break;
+                case 1:
+                    fragment = new FavoritesFragment(); 
+                    break;
+                case 2:
+                    fragment = new HistoryFragment();
+                    break;
+            }
+            
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
         }
         
-        if (currentActivity instanceof OpenTabsActivity) {
-            closeTabs.setVisible(true);
-        } else {
-            closeTabs.setVisible(false);
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return this.mResources.getString(R.string.tabs_opentabs);
+                case 1:
+                    return this.mResources.getString(R.string.tabs_bookmarks);
+                case 2:
+                    return this.mResources.getString(R.string.tabs_history);
+            }
+            
+            return null;
         }
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (this.mIsSoftwareMenu) {
-            return this.getCurrentActivity().onOptionsItemSelected(item);
-        }
-
-        return true;
     }
 }

@@ -118,10 +118,10 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         this.mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(this.getListView()));
 
-        super.onStop();
+        super.onPause();
     }
 
     @Override

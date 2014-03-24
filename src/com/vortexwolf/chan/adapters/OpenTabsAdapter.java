@@ -29,7 +29,7 @@ public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
 
         final OpenTabModel item = this.getItem(position);
 
-        View view = convertView == null ? this.mInflater.inflate(R.layout.tabs_list_item, null) : convertView;
+        View view = convertView == null ? this.mInflater.inflate(R.layout.open_tabs_list_item, null) : convertView;
 
         this.fillItemView(view, item);
 

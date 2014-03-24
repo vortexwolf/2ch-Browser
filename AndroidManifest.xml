@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.vortexwolf.chan"
-      android:versionCode="57"
-      android:versionName="1.4"
+      android:versionCode="58"
+      android:versionName="1.4.1"
       android:installLocation="auto"
       >
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -41,9 +41,6 @@
         <activity android:name="com.vortexwolf.chan.activities.BrowserActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name="com.vortexwolf.chan.activities.AddPostActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name="com.vortexwolf.chan.activities.FilesListActivity" android:configChanges="keyboardHidden|orientation"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.OpenTabsActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.HistoryActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.FavoritesActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
         <activity android:name="com.vortexwolf.chan.settings.ApplicationPreferencesActivity"></activity>		
     </application>

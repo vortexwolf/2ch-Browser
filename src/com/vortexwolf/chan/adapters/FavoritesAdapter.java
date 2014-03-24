@@ -18,8 +18,8 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
     private final LayoutInflater mInflater;
     private final FavoritesDataSource mFavoritesDataSource;
     
-    public FavoritesAdapter(Context context, List<FavoritesEntity> objects, FavoritesDataSource favoritesDataSource) {
-        super(context, -1, objects);
+    public FavoritesAdapter(Context context, FavoritesDataSource favoritesDataSource) {
+        super(context, -1);
         this.mInflater = LayoutInflater.from(context);
         this.mFavoritesDataSource = favoritesDataSource;
     }
@@ -28,7 +28,7 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
     public View getView(int position, View convertView, ViewGroup parent) {
         final FavoritesEntity item = this.getItem(position);
 
-        View view = convertView == null ? this.mInflater.inflate(R.layout.tabs_list_item, null) : convertView;
+        View view = convertView == null ? this.mInflater.inflate(R.layout.open_tabs_list_item, null) : convertView;
 
         TextView titleView = (TextView) view.findViewById(R.id.tabs_item_title);
         TextView urlView = (TextView) view.findViewById(R.id.tabs_item_url);
@@ -49,6 +49,7 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
     
     public void removeItem(FavoritesEntity item) {
         this.mFavoritesDataSource.removeFromFavorites(item.getUrl());
+        this.mFavoritesDataSource.resetModifiedState();
         this.remove(item);
     }
 }

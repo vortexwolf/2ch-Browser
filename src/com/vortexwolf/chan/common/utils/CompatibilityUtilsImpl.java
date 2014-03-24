@@ -30,4 +30,15 @@ public class CompatibilityUtilsImpl {
     public static boolean isTextSelectable(TextView textView) {
         return textView.isTextSelectable();
     }
+    
+    public static void copyText(Activity activity, String label, String text, int currentVersion) {
+        if(currentVersion < 11) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE); 
+            android.content.ClipData clip = android.content.ClipData.newPlainText(label, text);
+            clipboard.setPrimaryClip(clip);
+        }
+    }
 }

@@ -19,6 +19,7 @@ public class FavoritesDataSource {
     private final DvachSqlHelper mDbHelper;
 
     private SQLiteDatabase mDatabase;
+    private boolean mModified = false;
 
     public FavoritesDataSource(DvachSqlHelper dbHelper) {
         this.mDbHelper = dbHelper;
@@ -31,6 +32,14 @@ public class FavoritesDataSource {
     public void close() {
         this.mDbHelper.close();
     }
+    
+    public boolean isModified() {
+        return this.mModified;
+    }
+    
+    public void resetModifiedState(){
+        this.mModified = false;
+    }
 
     public void addToFavorites(String title, String url) {
         if (!this.hasFavorites(url)) {
@@ -39,11 +48,13 @@ public class FavoritesDataSource {
             values.put(DvachSqlHelper.COLUMN_URL, url);
 
             long insertId = this.mDatabase.insert(TABLE, null, values);
+            this.mModified = true;
         }
     }
 
     public void removeFromFavorites(String url) {
         this.mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_URL + " = ?", new String[] { url });
+        this.mModified = true;
     }
 
     public List<FavoritesEntity> getAllFavorites() {

@@ -141,6 +141,10 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     public boolean isDisplayAllBoards() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_hidden_boards_key), false);
     }
+    
+    public boolean isLegacyImageViewer() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_legacy_image_viewer_key), false);
+    }
 
     public int getTheme() {
         final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_default_value);

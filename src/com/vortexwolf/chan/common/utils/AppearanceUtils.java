@@ -36,6 +36,18 @@ public class AppearanceUtils {
         ListViewPosition position = new ListViewPosition(index, top);
         return position;
     }
+    
+    public static View getListItemAtPosition(ListView listView, int position){
+        int firstPosition = listView.getFirstVisiblePosition() - listView.getHeaderViewsCount(); // This is the same as child #0
+        int wantedChild = position - firstPosition;
+
+        if (wantedChild < 0 || wantedChild >= listView.getChildCount()) {
+            return null;
+        }
+        
+        // Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
+        return listView.getChildAt(wantedChild);
+    }
 
     public static void showImageProgressBar(final View indeterminateProgressBar, final ImageView imageView) {
         if (indeterminateProgressBar != null) {

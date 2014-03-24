@@ -31,6 +31,7 @@
     <string name="pref_passcode_key">pref_passcode_key</string>
     <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
     <string name="pref_cut_posts_key">pref_cut_posts_key</string>
+    <string name="pref_legacy_image_viewer_key">pref_legacy_image_viewer_key</string>
     
     <string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>

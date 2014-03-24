@@ -21,8 +21,8 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
     private final LayoutInflater mInflater;
     private final FavoritesDataSource mFavoritesDataSource;
 
-    public HistoryAdapter(Context context, List<HistoryEntity> objects, FavoritesDataSource favoritesDataSource) {
-        super(context, -1, objects);
+    public HistoryAdapter(Context context, FavoritesDataSource favoritesDataSource) {
+        super(context, -1);
         this.mInflater = LayoutInflater.from(context);
         this.mFavoritesDataSource = favoritesDataSource;
     }

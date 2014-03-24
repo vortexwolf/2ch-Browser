@@ -280,9 +280,6 @@ public class ImageGalleryActivity extends Activity {
             view.setTag(vb);
             this.mViewBags[position] = vb;
             
-            //ThreadImageModel imageModel = this.mImages.get(position);
-            //loadImage(imageModel, vb);
-            
             container.addView(view);
             if (this.mFirstTime) {
                 // call onPageSelected the first time
@@ -320,8 +317,8 @@ public class ImageGalleryActivity extends Activity {
                 // unknown bug
                 return;
             }
+            
             ThreadImageModel imageModel = this.mImages.get(position);
-
             loadImage(imageModel, vb);
             
             this.mCurrentImageView = vb.image;

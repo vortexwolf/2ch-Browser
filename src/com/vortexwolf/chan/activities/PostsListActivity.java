@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.text.Selection;
+import android.text.Spannable;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -44,6 +46,7 @@ import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.TimerService;
 import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.vortexwolf.chan.settings.SettingsEntity;
@@ -317,12 +320,8 @@ public class PostsListActivity extends BaseListActivity {
         if (item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(R.string.cmenu_download_file));
         }
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isImage()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE, 4, this.getString(R.string.cmenu_search_image));
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SEARCH_IMAGE_GOOGLE, 5, this.getString(R.string.cmenu_search_image_google));
-        }
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 6, this.getString(R.string.cmenu_share));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 4, this.getString(R.string.cmenu_share));
         }
     }
 
@@ -339,27 +338,21 @@ public class PostsListActivity extends BaseListActivity {
                 this.navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
                 break;
             case Constants.CONTEXT_MENU_COPY_TEXT:
-                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(info.getSpannedComment().toString());
+                View view = AppearanceUtils.getListItemAtPosition(this.getListView(), menuInfo.position);
+                PostItemViewBuilder.ViewBag vb = (PostItemViewBuilder.ViewBag)view.getTag();
+                
+                if (CompatibilityUtils.isTextSelectable(vb.commentView)) {
+                    vb.commentView.startSelection();
+                } else {
+                    CompatibilityUtils.copyText(this, "#" + info.getNumber(), info.getSpannedComment().toString());
 
-                AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
+                    AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
+                }
                 break;
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
                 AttachmentInfo attachment = info.getAttachment(this.mBoardName);
                 Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
                 new DownloadFileTask(this, fileUri).execute();
-                break;
-            case Constants.CONTEXT_MENU_SEARCH_IMAGE:
-                //String imageUrl = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
-                //new SearchImageTask(imageUrl, this.getApplicationContext(), MainApplication.getHttpClient()).execute();
-                String imageUrl1 = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
-                String tineyeSearchUrl = "http://www.tineye.com/search?url=" + imageUrl1;
-                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), tineyeSearchUrl);
-                break;
-            case Constants.CONTEXT_MENU_SEARCH_IMAGE_GOOGLE:
-                String imageUrl2 = info.getAttachment(this.mBoardName).getSourceUrl(this.mSettings);
-                String googleSearchUrl = "http://www.google.com/searchbyimage?image_url=" + imageUrl2;
-                BrowserLauncher.launchExternalBrowser(this.getApplicationContext(), googleSearchUrl);
                 break;
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);

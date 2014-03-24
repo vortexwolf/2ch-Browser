@@ -93,7 +93,7 @@
     <string name="cmenu_reply_post">Ответить</string>
     <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
     <string name="cmenu_download_file">Загрузить файл</string>
-    <string name="cmenu_copy_post">Копировать текст</string>
+    <string name="cmenu_copy_post">Выделить/копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
     <string name="cmenu_view_op_post">Показать ОП-пост полностью</string>
     <string name="cmenu_add_to_favorites">Добавить в закладки</string>
@@ -172,6 +172,8 @@
     <string name="pref_display_all_boards_summary">Отображать форумы с немодерируемым содержимым</string>
     <string name="pref_passcode">Пасс-код</string>
     <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
+    <string name="pref_legacy_image_viewer">Просмотр изображений</string>
+    <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
     
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>

@@ -5,11 +5,11 @@ The existing boards are dedicated to a variety of topics such as music, videogam
 There is no registration and you don't have to write your name to participate in the community. 
 Select any board according to your interests and jump right in.
 
-![List of threads](https://lh3.ggpht.com/l1trjGygFflcWpGirBNn_5jqTSmyT_2jwgHUbnHtNa2iB2c4jrKDWoNBPXDGFoduz7A)
-![List of threads, black theme](https://lh4.ggpht.com/WqHdGasXUdYFBvy_g0PD900Uzl-bTJzX0Uwmw15Ti7MM2fOsYfRcFPeUC1VHY_B6wg)
-![List of posts](https://lh6.ggpht.com/gikWpKVmQK_vrWDWyqGwmU5c3DK_Hgd9p_YmIN6BsQAMmscLSOOCHBrPnVyQUMQJ9uc)
-![List of tabs](https://lh5.ggpht.com/SAfqIvfvia1GewTu_MDiQpsVO0RWEhYnFg8WNamhjvIQs4JL4-JL491Yy0phd58OdMc2)
-![Adding a new post](https://lh6.ggpht.com/Sz5T-wP8v3DpObPUVIBg76qtyrKsS_sXzXxd28JY-Uz2-TXBQy10bKnlL6d82KKj-g)
+![List of threads](https://lh3.ggpht.com/l1trjGygFflcWpGirBNn_5jqTSmyT_2jwgHUbnHtNa2iB2c4jrKDWoNBPXDGFoduz7A =200x)
+![List of threads, black theme](https://lh4.ggpht.com/WqHdGasXUdYFBvy_g0PD900Uzl-bTJzX0Uwmw15Ti7MM2fOsYfRcFPeUC1VHY_B6wg =200x)
+![List of posts](https://lh6.ggpht.com/gikWpKVmQK_vrWDWyqGwmU5c3DK_Hgd9p_YmIN6BsQAMmscLSOOCHBrPnVyQUMQJ9uc =200x)
+![List of tabs](https://lh5.ggpht.com/SAfqIvfvia1GewTu_MDiQpsVO0RWEhYnFg8WNamhjvIQs4JL4-JL491Yy0phd58OdMc2 =200x)
+![Adding a new post](https://lh6.ggpht.com/Sz5T-wP8v3DpObPUVIBg76qtyrKsS_sXzXxd28JY-Uz2-TXBQy10bKnlL6d82KKj-g =200x)
 
 ## Google Play
 

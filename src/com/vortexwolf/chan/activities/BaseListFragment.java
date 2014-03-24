@@ -1,16 +1,18 @@
 package com.vortexwolf.chan.activities;
 
-import android.app.ListActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.widget.TextView;
-
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 
-public abstract class BaseListActivity extends ListActivity {
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
+
+public abstract class BaseListFragment extends ListFragment {
     private enum ViewType {
         LIST, LOADING, ERROR
     };
@@ -20,31 +22,12 @@ public abstract class BaseListActivity extends ListActivity {
     private ViewType mCurrentView = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.requestWindowFeature(Window.FEATURE_PROGRESS);
-    }
-
-    /** Returns the layout resource Id associated with this activity */
-    protected abstract int getLayoutId();
-
-    /** Reloads UI on the page */
-    protected void resetUI() {
-        // setting of the theme goes first
-        this.setTheme(this.getMainApplication().getSettings().getTheme());
-
-        // completely reload the root view, get loading and error views
-        this.setContentView(this.getLayoutId());        
-        this.mLoadingView = this.findViewById(R.id.loadingView);
-        this.mErrorView = this.findViewById(R.id.error);
-
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        this.mLoadingView = view.findViewById(R.id.loadingView);
+        this.mErrorView = view.findViewById(R.id.error);
         this.switchToView(this.mCurrentView);
-    }
-
-    /** Returns the main class of the application */
-    protected MainApplication getMainApplication() {
-        return (MainApplication) super.getApplication();
     }
 
     /** Shows the loading indicator */
