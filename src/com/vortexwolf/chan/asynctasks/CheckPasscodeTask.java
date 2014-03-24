@@ -42,7 +42,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpResponse response = null;
         try {
             DefaultHttpClient client = new DefaultHttpClient();
-            Uri uri = Uri.withAppendedPath(this.mSettings.getDomainUri(), "makaba/makaba.fcgi");
+            Uri uri = Uri.parse("http://2ch.hk/makaba/makaba.fcgi"); // only .hk domain
             post = new HttpPost(uri.toString());
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);

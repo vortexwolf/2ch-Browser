@@ -31,4 +31,8 @@ public class CompatibilityUtils {
         
         return CompatibilityUtilsImpl.isTextSelectable(textView);
     }
+    
+    public static void copyText(Activity activity, String label, String text) {
+        CompatibilityUtilsImpl.copyText(activity, label, text, sCurrentVersion);
+    }
 }

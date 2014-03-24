@@ -45,10 +45,6 @@ public class MyTracker {
         this.mTracker.setCustomDimension(1, boardName);
     }
 
-    public void clearBoardVar() {
-        this.mTracker.setCustomDimension(1, "");
-    }
-
     public void setPageNumberVar(int pageNumber) {
         this.mTracker.setCustomDimension(2, String.valueOf(pageNumber));
     }

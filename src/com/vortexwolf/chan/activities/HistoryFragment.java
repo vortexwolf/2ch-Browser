@@ -2,30 +2,35 @@ package com.vortexwolf.chan.activities;
 
 import java.util.List;
 
+import android.app.Activity;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.ClipboardManager;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.HistoryAdapter;
+import com.vortexwolf.chan.adapters.OpenTabsAdapter;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.db.HistoryEntity;
 import com.vortexwolf.chan.interfaces.INavigationService;
 
-public class HistoryActivity extends BaseListActivity {
-
+public class HistoryFragment extends BaseListFragment {
     private HistoryDataSource mDatasource;
     private FavoritesDataSource mFavoritesDatasource;
     private INavigationService mNavigationService;
@@ -33,44 +38,54 @@ public class HistoryActivity extends BaseListActivity {
     private HistoryAdapter mAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         this.mDatasource = Factory.getContainer().resolve(HistoryDataSource.class);
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
         this.mNavigationService = Factory.getContainer().resolve(INavigationService.class);
+        
+        this.setHasOptionsMenu(true);
+    }
 
-        this.resetUI();
-        // load history only 1 time
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.history_list_view, container, false);
+    }
+    
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        this.mAdapter = new HistoryAdapter(getActivity(), mFavoritesDatasource);
+        this.setListAdapter(this.mAdapter);
+        
+        this.registerForContextMenu(this.getListView());
+        
         new OpenDataSourceTask().execute();
     }
     
     @Override
-    protected void onResume() {
-        super.onResume();
-        // update if favorites were changed
-        if (this.mAdapter != null) {
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && this.mAdapter != null) {
+            // update favorites icons
             this.mAdapter.notifyDataSetChanged();
         }
     }
-
+    
     @Override
-    protected int getLayoutId() {
-        return R.layout.history_list_view;
-    }
-
-    @Override
-    protected void resetUI() {
-        super.resetUI();
-
-        this.registerForContextMenu(this.getListView());
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    public void onListItemClick(ListView l, View v, int position, long id) {
         HistoryEntity item = this.mAdapter.getItem(position);
 
-        this.mNavigationService.navigate(Uri.parse(item.getUrl()), this);
+        this.mNavigationService.navigate(Uri.parse(item.getUrl()), this.getActivity());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.history, menu);
+        
+        super.onCreateOptionsMenu(menu,inflater);
     }
 
     @Override
@@ -79,7 +94,6 @@ public class HistoryActivity extends BaseListActivity {
             case R.id.menu_clear_history_id:
                 this.mDatasource.deleteAllHistory();
                 this.mAdapter.clear();
-                this.mAdapter.notifyDataSetChanged();
                 break;
         }
 
@@ -100,37 +114,38 @@ public class HistoryActivity extends BaseListActivity {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(model.getUrl());
-
-                AppearanceUtils.showToastMessage(this, model.getUrl());
+                String uri = model.getUrl();
+                CompatibilityUtils.copyText(this.getActivity(), uri, uri);
+                
+                AppearanceUtils.showToastMessage(this.getActivity(), model.getUrl());
                 return true;
             }
         }
 
         return false;
     }
-
-    private class OpenDataSourceTask extends AsyncTask<Void, Void, Void> {
+    
+    private class OpenDataSourceTask extends AsyncTask<Void, Void, List<HistoryEntity>> {
 
         @Override
-        protected Void doInBackground(Void... arg0) {
-            List<HistoryEntity> historyItems = HistoryActivity.this.mDatasource.getAllHistory();
-
-            HistoryActivity.this.mAdapter = new HistoryAdapter(HistoryActivity.this, historyItems, HistoryActivity.this.mFavoritesDatasource);
-
-            return null;
+        protected List<HistoryEntity> doInBackground(Void... arg0) {
+            List<HistoryEntity> historyItems = mDatasource.getAllHistory();
+            return historyItems;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            HistoryActivity.this.setListAdapter(HistoryActivity.this.mAdapter);
-            HistoryActivity.this.switchToListView();
+        protected void onPostExecute(List<HistoryEntity> result) {
+            mAdapter.clear();
+            for (HistoryEntity item : result) {
+                mAdapter.add(item);
+            }
+            
+            switchToListView();
         }
 
         @Override
         protected void onPreExecute() {
-            HistoryActivity.this.switchToLoadingView();
+            switchToLoadingView();
         }
     }
 }

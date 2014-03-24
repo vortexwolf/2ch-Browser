@@ -86,7 +86,6 @@ public class PickBoardActivity extends ListActivity {
 
         this.setTitle(this.getString(R.string.pick_board_title));
         
-        this.mTracker.clearBoardVar();
         this.mTracker.trackActivityView(TAG);
     }
     
@@ -287,6 +286,11 @@ public class PickBoardActivity extends ListActivity {
             case R.id.preferences_menu_id:
                 Intent preferencesIntent = new Intent(this.getApplicationContext(), ApplicationPreferencesActivity.class);
                 this.startActivity(preferencesIntent);
+                break;
+            case R.id.tabs_menu_id:
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
+                openTabsIntent.putExtra(Constants.EXTRA_SELECT_TAB, TabsHistoryBookmarksActivity.FAVORITES_TAB_ID);
+                this.startActivity(openTabsIntent);
                 break;
         }
 

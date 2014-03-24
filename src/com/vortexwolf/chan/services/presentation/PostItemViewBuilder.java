@@ -78,7 +78,7 @@ public class PostItemViewBuilder {
             vb.postNameView = (TextView) view.findViewById(R.id.post_name);
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
-            vb.commentView = (TextView) view.findViewById(R.id.comment);
+            vb.commentView = (ClickableLinksTextView) view.findViewById(R.id.comment);
             vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
@@ -259,7 +259,7 @@ public class PostItemViewBuilder {
         public TextView postNameView;
         public TextView postIndexView;
         public TextView postDateView;
-        public TextView commentView;
+        public ClickableLinksTextView commentView;
         public TextView attachmentInfoView;
         public TextView postRepliesView;
         public TextView showFullTextView;

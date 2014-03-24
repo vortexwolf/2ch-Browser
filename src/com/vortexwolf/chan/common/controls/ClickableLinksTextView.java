@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -62,7 +63,24 @@ public class ClickableLinksTextView extends TextView {
 
         return super.onTouchEvent(event);
     }
-
+    
+    public void startSelection(){
+        if (StringUtils.isEmpty(this.getText())) {
+            return;
+        }
+        
+        this.copyBaseEditorIfNecessary();
+        
+        Selection.setSelection((Spannable) this.getText(), 0, this.getText().length());
+        
+        try {
+            Method performLongClick = this.mBaseEditor.getClass().getMethod("performLongClick", Boolean.TYPE);
+            performLongClick.invoke(this.mBaseEditor, false);
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+        }
+    }
+    
     private boolean checkLinksOnTouch(MotionEvent event) {
         this.copyBaseEditorIfNecessary();
 

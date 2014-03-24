@@ -1,73 +1,85 @@
 package com.vortexwolf.chan.activities;
 
-import android.app.ListActivity;
-import android.content.res.TypedArray;
-import android.net.Uri;
-import android.os.Bundle;
-import android.text.ClipboardManager;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.OpenTabsAdapter;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public class OpenTabsActivity extends ListActivity {
+import android.app.Activity;
+import android.content.res.TypedArray;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
+import android.text.ClipboardManager;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+public class OpenTabsFragment extends ListFragment {
 
     private OpenTabsAdapter mAdapter;
     private IOpenTabsManager mTabsManager;
     private FavoritesDataSource mFavoritesDatasource;
-    private ApplicationSettings mApplicationSettings;
 
     private Uri mCurrentUri;
-
+    
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         this.mTabsManager = Factory.getContainer().resolve(IOpenTabsManager.class);
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
-        this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
 
-        Bundle extras = this.getIntent().getExtras();
-        if (extras != null) {
+        Bundle extras = this.getArguments();
+        if (extras != null && extras.containsKey(Constants.EXTRA_CURRENT_URL)) {
             this.mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
         }
-
-        this.resetUI();
-
-        this.mAdapter = new OpenTabsAdapter(this, this.mTabsManager.getOpenTabs(), this.mTabsManager);
-        this.getListView().setAdapter(this.mAdapter);
-    }
-
-    private void resetUI() {
-        this.setTheme(this.mApplicationSettings.getTheme());
-        TypedArray a = this.getTheme().obtainStyledAttributes(R.styleable.Theme);
-        this.getListView().setBackgroundColor(a.getColor(R.styleable.Theme_activityRootBackground, -1));
-        a.recycle();
         
-        this.registerForContextMenu(this.getListView());
+        this.setHasOptionsMenu(true);
     }
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        
+        this.mAdapter = new OpenTabsAdapter(this.getActivity(), this.mTabsManager.getOpenTabs(), this.mTabsManager);
+        this.setListAdapter(this.mAdapter);
+                
+        this.registerForContextMenu(this.getListView());
+    }
+       
+    
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
         OpenTabModel item = this.mAdapter.getItem(position);
         if (item.getUri().equals(this.mCurrentUri)) {
-            this.finish();
+            this.getActivity().finish();
         } else {
-            this.mTabsManager.navigate(item, this);
+            this.mTabsManager.navigate(item, this.getActivity());
         }
+    }
+       
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.opentabs, menu);
+        
+        super.onCreateOptionsMenu(menu,inflater);
     }
     
     @Override
@@ -105,10 +117,10 @@ public class OpenTabsActivity extends ListActivity {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(model.getUri().toString());
-
-                AppearanceUtils.showToastMessage(this, model.getUri().toString());
+                String uri = model.getUri().toString();
+                
+                CompatibilityUtils.copyText(this.getActivity(), uri, uri);
+                AppearanceUtils.showToastMessage(this.getActivity(), uri);
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
