@@ -5,7 +5,7 @@
     android:orientation="vertical" 
     android:background="?activityRootBackground">
     
-    <com.vortexwolf.chan.common.controls.HackyViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.vortexwolf.chan.common.controls.ExtendedViewPager
         android:id="@+id/view_pager"
         android:layout_width="fill_parent"
         android:layout_height="0dip"

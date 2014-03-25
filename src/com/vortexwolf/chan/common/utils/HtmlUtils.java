@@ -61,10 +61,7 @@ public class HtmlUtils {
         URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
 
         if (spans.length > 0) {
-            TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
-            int urlColor = a.getColor(R.styleable.Theme_urlLinkForeground, Color.BLUE);
-            a.recycle();
-            
+            int urlColor = AppearanceUtils.getThemeColor(theme, R.styleable.Theme_urlLinkForeground);
             for (URLSpan span : spans) {
                 ClickableURLSpan newSpan = ClickableURLSpan.replaceURLSpan(builder, span, urlColor);
                 newSpan.setOnClickListener(listener);

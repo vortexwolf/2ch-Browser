@@ -10,7 +10,7 @@ public class ThreadImagesService {
     private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<String, ArrayList<ThreadImageModel>> ();
     
     public void addThreadImage(String threadUrl, String imageUrl, double size) {
-        if (imageUrl == null || imageUrl.endsWith(Constants.GIF_IMAGE)) {
+        if (imageUrl == null) {
             return;
         }
         

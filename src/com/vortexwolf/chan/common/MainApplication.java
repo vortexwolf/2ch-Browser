@@ -5,6 +5,7 @@ import java.io.File;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.BitmapCache;
@@ -42,9 +43,15 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class MainApplication extends Application {
 
+    public static boolean MULTITOUCH_SUPPORT = false;
+    
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (Constants.SDK_VERSION >= 7) {
+            MULTITOUCH_SUPPORT = this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
+        }
 
         MyTracker tracker = new MyTracker(this.getApplicationContext());
         DefaultHttpClient httpClient = new ExtendedHttpClient();
@@ -86,7 +93,7 @@ public class MainApplication extends Application {
         historyDataSource.open();
         favoritesDataSource.open();
         hiddenThreadsDataSource.open();
-
+        
         tracker.startSession(this);
         cacheManager.trimCacheIfNeeded();
     }

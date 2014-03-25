@@ -27,6 +27,7 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
@@ -44,7 +45,6 @@ public class BrowserActivity extends Activity {
     private MyTracker mTracker;
     private ICacheDirectoryManager mCacheDirectoryManager;
 
-    private ViewGroup mRootView;
     private WebView mWebView = null;
     private View mLoadingView = null;
     private View mErrorView = null;
@@ -59,7 +59,6 @@ public class BrowserActivity extends Activity {
     
     private DownloadFileTask mCurrentTask = null;
 
-    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,18 +69,15 @@ public class BrowserActivity extends Activity {
         this.mTracker = this.mApplication.getTracker();
         this.mCacheDirectoryManager = this.mApplication.getCacheManager();
 
-        this.resetUI();
+        this.setTheme(this.mApplication.getSettings().getTheme());
+        this.setContentView(R.layout.browser);
 
-        this.mWebView.setInitialScale(100);
-        WebSettings settings = this.mWebView.getSettings();
-        settings.setBuiltInZoomControls(true);
-        settings.setSupportZoom(true);
-        settings.setAllowFileAccess(true);
-        settings.setUseWideViewPort(true);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        if (Integer.valueOf(Build.VERSION.SDK) >= 8) {
-            settings.setBlockNetworkLoads(true);
-        }
+        this.mWebView = (WebViewFixed) this.findViewById(R.id.webview);
+        this.mLoadingView = this.findViewById(R.id.loading);
+        this.mErrorView = this.findViewById(R.id.error);
+
+        int background = AppearanceUtils.getThemeColor(this.mApplication.getTheme(), R.styleable.Theme_activityRootBackground);
+        AppearanceUtils.prepareWebView(this.mWebView, background);
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();
@@ -99,22 +95,6 @@ public class BrowserActivity extends Activity {
         if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
-    }
-
-    private void resetUI() {
-        this.setTheme(this.mApplication.getSettings().getTheme());
-        this.setContentView(R.layout.browser);
-
-        this.mRootView = (ViewGroup) this.findViewById(R.id.browser_view);
-        this.mWebView = (WebViewFixed) this.findViewById(R.id.webview);
-        this.mLoadingView = this.findViewById(R.id.loadingView);
-        this.mErrorView = this.findViewById(R.id.error);
-
-        TypedArray a = this.mApplication.getTheme().obtainStyledAttributes(R.styleable.Theme);
-        int background = a.getColor(R.styleable.Theme_activityRootBackground, 0);
-        a.recycle();
-        
-        this.mWebView.setBackgroundColor(background);
     }
 
     @Override

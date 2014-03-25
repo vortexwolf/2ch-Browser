@@ -2,6 +2,7 @@ package com.vortexwolf.chan.activities;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public abstract class BaseListFragment extends ListFragment {
@@ -55,20 +57,28 @@ public abstract class BaseListFragment extends ListFragment {
         if (vt == null) {
             return;
         }
-
+        
+        ListView listView;
+        try {
+            listView = this.getListView();
+        } catch (IllegalStateException e) {
+            MyLog.e("BaseListFragment", e);
+            return;
+        }
+        
         switch (vt) {
             case LIST:
-                this.getListView().setVisibility(View.VISIBLE);
+                listView.setVisibility(View.VISIBLE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case LOADING:
-                this.getListView().setVisibility(View.GONE);
+                listView.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.VISIBLE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case ERROR:
-                this.getListView().setVisibility(View.GONE);
+                listView.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.VISIBLE);
                 break;

@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
@@ -42,7 +43,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpResponse response = null;
         try {
             DefaultHttpClient client = new DefaultHttpClient();
-            Uri uri = Uri.parse("http://2ch.hk/makaba/makaba.fcgi"); // only .hk domain
+            Uri uri = Uri.parse("http://" + Constants.DEFAULT_DOMAIN + "/makaba/makaba.fcgi"); // only .hk domain
             post = new HttpPost(uri.toString());
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
