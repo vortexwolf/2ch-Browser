@@ -1,17 +1,25 @@
 package com.vortexwolf.chan.common.utils;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.MainApplication;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.Resources.Theme;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -81,6 +89,34 @@ public class AppearanceUtils {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int)(width * scale), (int)(height * scale), true);
         bitmap.recycle();
         return resizedBitmap;
+    }
+    
+    public static void prepareWebView(WebView webView, int backgroundColor) {
+        webView.setBackgroundColor(backgroundColor);
+        webView.setInitialScale(1);
+        
+        WebSettings settings = webView.getSettings();
+        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(true);
+        settings.setAllowFileAccess(true);
+        settings.setUseWideViewPort(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        
+        if (Constants.SDK_VERSION >= 8) {
+            settings.setBlockNetworkLoads(true);
+        }
+        
+        if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
+            settings.setDisplayZoomControls(false);
+        }
+    }
+    
+    public static int getThemeColor(Theme theme, int styleableId) {
+        TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
+        int color = a.getColor(styleableId, 0);
+        a.recycle();
+        
+        return color;
     }
 
     public static class ListViewPosition {

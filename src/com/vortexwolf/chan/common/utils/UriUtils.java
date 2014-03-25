@@ -30,8 +30,9 @@ public class UriUtils {
                                                                                                                                                                                // video
                                                                                                                                                                                // code
 
-    public static Uri getUriForDomain(String domain) {
-        String url = domain.replaceAll("^(?:http\\://)?(.*?)/*$", "http://$1/");
+    public static Uri getUriForDomain(String domain, boolean isHttps) {
+        String scheme = isHttps ? "https" : "http";
+        String url = domain.replaceAll("^(?:https?\\://)?(.*?)/*$", scheme + "://$1/");
 
         return Uri.parse(url);
     }

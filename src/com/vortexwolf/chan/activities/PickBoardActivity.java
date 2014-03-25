@@ -76,6 +76,15 @@ public class PickBoardActivity extends ListActivity {
     	this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
     	this.mCurrentSettings = this.mSettings.getCurrentSettings();
     	
+    	if (this.mSettings.getStartPage() != null && Intent.ACTION_MAIN.equals(this.getIntent().getAction())) {
+    	    Intent openBoard = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
+    	    openBoard.setData(this.mDvachUriBuilder.create2chBoardUri(this.mSettings.getStartPage()));
+    	    openBoard.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(openBoard);
+            this.finish();
+            return;
+    	}
+    	
         this.resetUI();
 
         this.parseAllBoards();

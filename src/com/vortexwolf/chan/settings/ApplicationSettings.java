@@ -14,7 +14,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 
-public class ApplicationSettings implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class ApplicationSettings {
 
     public static final String TAG = "ApplicationSettings";
 
@@ -26,19 +26,6 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
         this.mContext = context;
         this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
         this.mResources = resources;
-    }
-
-    public void startTrackChanges() {
-        this.mSettings.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    public void stopTrackChanges() {
-        this.mSettings.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // nothing so far
     }
     
     public void savePassCodeCookie(String passCodeCookie){
@@ -67,10 +54,11 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
     }
 
     public Uri getDomainUri() {
+        boolean isHttps = this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_https_key), false);
         String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_domain_key), null);
         domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
-        Uri uri = UriUtils.getUriForDomain(domain);
-
+        
+        Uri uri = UriUtils.getUriForDomain(domain, isHttps);
         return uri;
     }
     
@@ -88,6 +76,11 @@ public class ApplicationSettings implements SharedPreferences.OnSharedPreference
         } catch(NumberFormatException e) {
             return defaultValue;
         }
+    }
+    
+    public String getStartPage(){
+        String startPage = this.mSettings.getString(this.mResources.getString(R.string.pref_homepage_key), "").toLowerCase();
+        return !StringUtils.isEmpty(startPage) ? startPage : null;
     }
 
     public boolean isLocalDateTime() {

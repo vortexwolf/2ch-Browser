@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.vortexwolf.chan"
-      android:versionCode="58"
-      android:versionName="1.4.1"
+      android:versionCode="60"
+      android:versionName="1.4.3"
       android:installLocation="auto"
       >
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11"/>
@@ -37,8 +37,8 @@
                 <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*" />
             </intent-filter>
 	    </activity>
-        <activity android:name="com.vortexwolf.chan.activities.ImageGalleryActivity" android:configChanges="keyboardHidden|orientation"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.BrowserActivity" android:configChanges="keyboardHidden|orientation"></activity>
+        <activity android:name="com.vortexwolf.chan.activities.ImageGalleryActivity" android:configChanges="keyboardHidden|orientation" android:hardwareAccelerated="true"></activity>
+        <activity android:name="com.vortexwolf.chan.activities.BrowserActivity" android:configChanges="keyboardHidden|orientation" android:hardwareAccelerated="true"></activity>
         <activity android:name="com.vortexwolf.chan.activities.AddPostActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name="com.vortexwolf.chan.activities.FilesListActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>

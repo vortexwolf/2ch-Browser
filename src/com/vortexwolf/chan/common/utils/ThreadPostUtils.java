@@ -121,11 +121,11 @@ public class ThreadPostUtils {
         }
 
         Uri uri = Uri.parse(url);
-        if (threadUrl != null && !settings.isLegacyImageViewer() && Constants.SDK_VERSION > 7 && Factory.getContainer().resolve(ThreadImagesService.class).hasImage(threadUrl, url)) {
+        if (threadUrl != null && !settings.isLegacyImageViewer() && Factory.getContainer().resolve(ThreadImagesService.class).hasImage(threadUrl, url)) {
             // open a gallery activity
             Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
-            imageGallery.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             imageGallery.setData(uri);
+            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, threadUrl);
             context.startActivity(imageGallery);
         } else {

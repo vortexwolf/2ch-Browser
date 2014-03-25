@@ -7,4 +7,8 @@ public class Factory {
     public static Container getContainer() {
         return sContainer;
     }
+    
+    public static <T> T resolve(Class<T> type) {
+        return getContainer().resolve(type);
+    }
 }

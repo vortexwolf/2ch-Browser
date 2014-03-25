@@ -2,13 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res/com.vortexwolf.chan" >
     <EditTextPreference
-        android:hint="@string/pref_domain_hint"
-        android:inputType="textUri"
-        android:key="@string/pref_domain_key"
-        android:singleLine="true"
-        android:summary="@string/pref_domain_summary"
-        android:title="@string/pref_domain" />
-    <EditTextPreference
         android:key="@string/pref_name_key"
         android:title="@string/pref_name"
         android:hint="@string/pref_name_hint"
@@ -26,6 +19,25 @@
             android:key="@string/pref_display_hidden_boards_key"
             android:summary="@string/pref_display_all_boards_summary"
             android:title="@string/pref_display_all_boards" />
+    <EditTextPreference
+        android:hint="@string/pref_homepage_hint"
+        android:inputType="text"
+        android:key="@string/pref_homepage_key"
+        android:singleLine="true"
+        android:summary="@string/pref_homepage_summary"
+        android:title="@string/pref_homepage" />
+    <EditTextPreference
+        android:hint="@string/pref_domain_hint"
+        android:inputType="textUri"
+        android:key="@string/pref_domain_key"
+        android:singleLine="true"
+        android:summary="@string/pref_domain_summary"
+        android:title="@string/pref_domain" />
+    <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_use_https_key"
+            android:summary="@string/pref_use_https_summary"
+            android:title="@string/pref_use_https" />
 
     <PreferenceCategory android:title="@string/pref_category_images" >
         <CheckBoxPreference

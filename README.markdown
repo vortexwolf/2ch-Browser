@@ -19,15 +19,6 @@ https://play.google.com/store/apps/details?id=com.vortexwolf.chan
 Direct link: 
 https://dl.dropbox.com/u/8047386/2ch-browser.apk
 
-## Source code
-
-The project is created by using Eclipse.
-
-It has dependency on the PhotoView library, source code of which you can download here (branch 'dev'): https://github.com/chrisbanes/PhotoView/tree/dev
-
-Download the source code of the PhotoView library -> add it to the same workspace -> right click -> Properties -> Android -> check 'Is Library' checkbox.
-Then right click on the 2ch Browser project -> Properties -> Android -> Library -> click Add button and select the PhotoView library.
-
 ## License
 
 [MIT License][license]

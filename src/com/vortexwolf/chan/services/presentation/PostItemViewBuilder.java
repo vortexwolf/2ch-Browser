@@ -35,6 +35,7 @@ import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
@@ -221,7 +222,7 @@ public class PostItemViewBuilder {
         View view = this.getView(item, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный
-        int backColor = theme.obtainStyledAttributes(R.styleable.Theme).getColor(R.styleable.Theme_activityRootBackground, android.R.color.transparent);
+        int backColor = AppearanceUtils.getThemeColor(theme, R.styleable.Theme_activityRootBackground);
         view.setBackgroundColor(backColor);
 
         // Перемещаем текст в ScrollView

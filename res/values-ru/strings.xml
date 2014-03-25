@@ -110,9 +110,9 @@
     <string name="pref_category_cache">Кэширование</string>
     <string name="pref_category_images">Изображения</string>
     <string name="pref_category_datetime">Дата и время</string>
-    <string name="pref_homepage">Форум по умолчанию</string>
-    <string name="pref_homepage_summary">Измените стартовую страницу</string>
-    <string name="pref_homepage_hint">По умолчанию /b</string>
+    <string name="pref_homepage">Стартовая страница</string>
+    <string name="pref_homepage_summary">Изменить стартовую страницу</string>
+    <string name="pref_homepage_hint">Код форума</string>
     <string name="pref_load_thumbnails">Загружать изображения</string>
     <string name="pref_load_thumbnails_summary">Отмените для экономии трафика</string>
     <string name="pref_download_path">Папка загрузок</string>
@@ -174,6 +174,8 @@
     <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
     <string name="pref_legacy_image_viewer">Просмотр изображений</string>
     <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
+    <string name="pref_use_https">Использовать HTTPS</string>
+    <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
     
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>

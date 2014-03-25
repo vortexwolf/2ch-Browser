@@ -105,9 +105,9 @@
     <string name="pref_category_cache">Cache</string>
     <string name="pref_category_images">Images</string>
     <string name="pref_category_datetime">Date &amp; Time</string>
-    <string name="pref_homepage">Default starting board</string>
-    <string name="pref_homepage_summary">Change start page</string>
-    <string name="pref_homepage_hint">Leave blank to use /b</string>
+    <string name="pref_homepage">Default start page</string>
+    <string name="pref_homepage_summary">Change the start page</string>
+    <string name="pref_homepage_hint">Enter a board code</string>
     <string name="pref_load_thumbnails">Display thumbnails</string>
     <string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
     <string name="pref_download_path">Downloads folder</string>
@@ -169,6 +169,8 @@
     <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
     <string name="pref_legacy_image_viewer">Image viewer</string>
     <string name="pref_legacy_image_viewer_summary">Do not use a gallery, open single images instead</string>
+    <string name="pref_use_https">Use HTTPS</string>
+    <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>
     
     <!-- Errors -->
     <string name="error_send_post">An error has occured while sending the post.</string>
