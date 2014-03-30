@@ -34,12 +34,7 @@ public class FileSystemPersistence implements BitmapCache {
             this.mBaseDir.mkdirs();
         }
     }
-
-    @Override
-    public boolean isEnabled() {
-        return this.mCacheManager.isCacheEnabled();
-    }
-
+    
     @Override
     public void clear() {
         IoUtils.deleteDirectory(this.mBaseDir);
@@ -52,72 +47,59 @@ public class FileSystemPersistence implements BitmapCache {
     }
 
     @Override
-    public void invalidate(String key) {
-
-    }
-
-    @Override
     public Bitmap loadData(String key) {
-        if (!this.mCacheManager.isCacheEnabled() || !this.exists(key)) {
+        if (!this.exists(key)) {
             return null;
         }
 
-        // load the bitmap as-is (no scaling, no crop)
-        Bitmap bitmap = null;
-
         File file = new File(this.mBaseDir, key);
+        Bitmap bitmap = null;
+        try {
+            bitmap = this.readBitmapFromFile(file);
+        } catch (FileNotFoundException e) {
+            // ignore
+        }
+        
+        return bitmap;
+    }
+
+    @Override
+    public void storeData(String key, Bitmap data) {
+        try {
+            File file = new File(this.mBaseDir, key);
+            this.writeBitmapToFile(data, file);
+        } catch (FileNotFoundException e) {
+            // No space left
+            this.mCacheManager.trimCacheIfNeeded();
+            MyLog.e(TAG, e);
+        } catch (IOException e) {
+            MyLog.e(TAG, e);
+        }
+    }
+    
+    private boolean writeBitmapToFile(Bitmap bitmap, File file) throws IOException, FileNotFoundException {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            return bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        } finally {
+            IoUtils.closeStream(out);
+        }
+    }
+    
+    private Bitmap readBitmapFromFile(File file) throws FileNotFoundException {
         FileInputStream fis = null;
+        Bitmap bitmap = null;
         try {
             fis = new FileInputStream(file);
             bitmap = BitmapFactory.decodeStream(fis);
             if (bitmap == null) {
                 file.delete();
-                // something wrong with the persistent data, can't be decoded to
-                // bitmap.
-                return null;
-                // throw new
-                // RuntimeException("data from db can't be decoded to bitmap");
             }
+            
             return bitmap;
-        } catch (IOException e) {
-            MyLog.e(TAG, e);
-            return null;
         } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    @Override
-    public void storeData(String key, Bitmap data) {
-        if (!this.mCacheManager.isCacheEnabled()) {
-            return;
-        }
-
-        OutputStream outputStream = null;
-
-        try {
-            File file = new File(this.mBaseDir, key);
-
-            outputStream = new FileOutputStream(file);
-            if (!data.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
-                throw new RuntimeException("failed to compress bitmap");
-            }
-        } catch (FileNotFoundException e) {
-            // No space left
-            this.mCacheManager.trimCacheIfNeeded();
-            MyLog.e(TAG, e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                }
-            }
+            IoUtils.closeStream(fis);
         }
     }
 }

@@ -83,7 +83,7 @@ public class ImageGalleryActivity extends Activity {
         this.mThreadUri = this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_URL);
         
         // get the current image
-        ArrayList<ThreadImageModel> images = (ArrayList<ThreadImageModel>)this.mThreadImagesService.getImagesList(this.mThreadUri).clone();
+        ArrayList<ThreadImageModel> images = this.mThreadImagesService.getImagesList(this.mThreadUri);
         ThreadImageModel currentImage = this.mThreadImagesService.getImageByUrl(images, imageUrl);
         int imagePosition = images.indexOf(currentImage);
         

@@ -40,7 +40,7 @@ public class OpenTabsManager implements IOpenTabsManager {
 
     @Override
     public ArrayList<OpenTabModel> getOpenTabs() {
-        return this.mTabs;
+        return (ArrayList<OpenTabModel>)this.mTabs.clone();
     }
 
     @Override

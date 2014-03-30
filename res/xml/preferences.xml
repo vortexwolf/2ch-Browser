@@ -125,15 +125,10 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_category_cache" >
         <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="@string/pref_file_cache_key"
-            android:summary="@string/pref_file_cache_summary"
-            android:title="@string/pref_file_cache" />
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="@string/pref_file_cache_sdcard_key"
-            android:summary="@string/pref_file_cache_sdcard_summary"
-            android:title="@string/pref_file_cache_sdcard" />
+            android:defaultValue="false"
+            android:key="@string/pref_file_cache_no_limit_key"
+            android:summary="@string/pref_file_cache_no_limit_summary"
+            android:title="@string/pref_file_cache_no_limit" />
 
         <com.vortexwolf.chan.settings.CacheSizePreference
             android:key="@string/pref_clear_cache_key"

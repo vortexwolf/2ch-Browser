@@ -137,6 +137,8 @@
     <string name="pref_cut_posts">Long posts</string>
     <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
+    <string name="pref_file_cache_no_limit">Unlimited cache</string>
+    <string name="pref_file_cache_no_limit_summary">Remove the limit of cache size of 25Mb</string>
 
     <string-array name="pref_text_size_choices">
         <item>Medium</item>
@@ -158,10 +160,6 @@
     <string name="pref_auto_refresh_interval">Interval</string>
     <string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
     <string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
-    <string name="pref_file_cache">Thumbnails cache</string>
-    <string name="pref_file_cache_summary">Enable to cache thumbnails of images</string>
-    <string name="pref_file_cache_sdcard">Use SD Card</string>
-    <string name="pref_file_cache_sdcard_summary">Enable to store files on the sd card instead of the internal storage</string>
     <string name="pref_file_cache_clear">Clear cache</string>
     <string name="pref_display_all_boards">Boards list</string>
     <string name="pref_display_all_boards_summary">Show unmoderated boards</string>

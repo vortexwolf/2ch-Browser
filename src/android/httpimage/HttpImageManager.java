@@ -1,5 +1,6 @@
 package android.httpimage;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -81,7 +82,8 @@ public class HttpImageManager {
     private final Resources mResources;
 
     private final Handler mHandler = new Handler();
-
+    private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
+    
     private final Set<LoadRequest> mActiveRequests = new HashSet<LoadRequest>();
 
     public static class LoadRequest {
@@ -127,7 +129,10 @@ public class HttpImageManager {
             try {
                 MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
                 digest.update(name.getBytes());
-                return Base64.encodeBytes(digest.digest()).replace("/", "_");
+                byte[] hash = digest.digest();
+                BigInteger bi = new BigInteger(1, hash);
+                String hashtext = bi.toString(16);
+                return hashtext;
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
@@ -185,23 +190,7 @@ public class HttpImageManager {
                 r.mListener.beforeLoad(r);
             }
 
-            final Callable<LoadRequest> callable = this.newRequestCall(r);
-
-            // TODO: rewrite by using a real async task
-            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        callable.call();
-                    } catch (Exception e) {
-                        MyLog.e(TAG, e);
-                    }
-
-                    return null;
-                }
-            };
-
-            task.execute();
+            mExecutor.submit(this.newRequestCall(r));
 
             return null;
         }
@@ -238,9 +227,7 @@ public class HttpImageManager {
                     data = HttpImageManager.this.mCache.loadData(key);
                     if (data == null) {
                         // then check the persistent storage
-                        data = HttpImageManager.this.mPersistence.isEnabled()
-                                ? HttpImageManager.this.mPersistence.loadData(key)
-                                : null;
+                        data = HttpImageManager.this.mPersistence.loadData(key);
                         if (data != null) {
                             // load it into memory
                             data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
@@ -255,9 +242,7 @@ public class HttpImageManager {
                             HttpImageManager.this.mCache.storeData(key, data);
 
                             // persist it
-                            if (HttpImageManager.this.mPersistence.isEnabled()) {
-                                HttpImageManager.this.mPersistence.storeData(key, data);
-                            }
+                            HttpImageManager.this.mPersistence.storeData(key, data);
                         }
                     }
 

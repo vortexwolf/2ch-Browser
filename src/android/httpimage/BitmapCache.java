@@ -18,13 +18,6 @@ public interface BitmapCache {
     public boolean exists(String key);
 
     /**
-     * Invalidate a bitmap, release any resource associated.
-     * 
-     * @param key
-     */
-    public void invalidate(String key);
-
-    /**
      * Retrieve the bitmap, return null means cache miss
      * 
      * @param key
@@ -43,6 +36,4 @@ public interface BitmapCache {
      * Clear this bitmap cache, reclaim all resources assigned.
      */
     public void clear();
-
-    public abstract boolean isEnabled();
 }
