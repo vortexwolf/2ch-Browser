@@ -38,6 +38,7 @@ import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
+import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
@@ -501,28 +502,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     break;
                 case Constants.REQUEST_CODE_GALLERY:
 
-                    Uri selectedImage = data.getData();
-                    String filePath = null;
-
-                    String[] columns = { MediaColumns.DATA };
-                    Cursor cursor = this.getContentResolver().query(selectedImage, columns, null, null, null);
-                    if (cursor != null) {
-                        cursor.moveToFirst();
-
-                        int columnIndex = cursor.getColumnIndex(columns[0]);
-                        filePath = cursor.getString(columnIndex);
-
-                        if (!cursor.isClosed()) {
-                            cursor.close();
-                        }
-                    } else {
-                        filePath = selectedImage.getPath();
-                    }
+                    Uri imageUri = data.getData();
+                    File imageFile= IoUtils.getFile(this, imageUri);
 
                     // Почему-то было 2 error reports с NullReferenceException
                     // из-за метода File.fixSlashes, добавлю проверку
-                    if (filePath != null) {
-                        ImageFileModel image = new ImageFileModel(filePath);
+                    if (imageFile != null) {
+                        ImageFileModel image = new ImageFileModel(imageFile);
                         this.setAttachment(image);
                     } else {
                         AppearanceUtils.showToastMessage(this, this.getString(R.string.error_image_cannot_be_attached));

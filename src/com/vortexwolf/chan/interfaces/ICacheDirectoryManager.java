@@ -16,8 +16,6 @@ public interface ICacheDirectoryManager {
 
     public abstract File getThumbnailsCacheDirectory();
 
-    public abstract boolean isCacheEnabled();
-
     public abstract void trimCacheIfNeeded();
 
     public abstract File getImagesCacheDirectory();

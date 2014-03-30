@@ -42,7 +42,7 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
     public File getCurrentCacheDirectory() {
         File currentDirectory;
 
-        if (this.mExternalCacheDir != null && this.mSettings.isFileCacheEnabled() && this.mSettings.isFileCacheSdCard() && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+        if (this.mExternalCacheDir != null && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             currentDirectory = this.mExternalCacheDir;
         } else {
             currentDirectory = this.mInternalCacheDir;
@@ -118,11 +118,6 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         };
         
         task.execute();
-    }
-
-    @Override
-    public boolean isCacheEnabled() {
-        return this.mSettings.isFileCacheEnabled();
     }
 
     private File getReversedCacheDirectory() {

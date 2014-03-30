@@ -163,10 +163,6 @@
     <string name="pref_auto_refresh_interval">Интервал</string>
     <string name="pref_auto_refresh_interval_dialog_title">Интервал автообновления</string>
     <string name="pref_auto_refresh_interval_summary">%1$d секунд</string>
-    <string name="pref_file_cache">Кэширование thumbnails</string>
-    <string name="pref_file_cache_summary">Кэшировать уменьшенные изображения</string>
-    <string name="pref_file_cache_sdcard">Использовать SD карту</string>
-    <string name="pref_file_cache_sdcard_summary">Использовать для кэша sd карту вместо внутренней памяти</string>
     <string name="pref_file_cache_clear">Очистить кэш</string>
     <string name="pref_display_all_boards">Список форумов</string>
     <string name="pref_display_all_boards_summary">Отображать форумы с немодерируемым содержимым</string>
@@ -176,6 +172,8 @@
     <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
     <string name="pref_use_https">Использовать HTTPS</string>
     <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
+    <string name="pref_file_cache_no_limit">Неограниченный кэш</string>
+    <string name="pref_file_cache_no_limit_summary">Отменить ограничение на размер кэша в 25Мб</string>
     
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>

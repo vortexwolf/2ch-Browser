@@ -95,7 +95,9 @@ public class MainApplication extends Application {
         hiddenThreadsDataSource.open();
         
         tracker.startSession(this);
-        cacheManager.trimCacheIfNeeded();
+        if (!settings.isUnlimitedCache()) {
+            cacheManager.trimCacheIfNeeded();
+        }
     }
 
     @Override

@@ -30,8 +30,12 @@ public class ThreadImagesService {
         }
     }
     
-    public ArrayList<ThreadImageModel> getImagesList(String threadUrl){
-        return this.mThreadImages.get(threadUrl);
+    public ArrayList<ThreadImageModel> getImagesList(String threadUrl) {
+        if (!this.mThreadImages.containsKey(threadUrl)){
+            return new ArrayList<ThreadImageModel>();
+        }
+        
+        return (ArrayList<ThreadImageModel>)this.mThreadImages.get(threadUrl).clone();
     }
     
     public boolean hasImage(String threadUrl, String imageUrl) {

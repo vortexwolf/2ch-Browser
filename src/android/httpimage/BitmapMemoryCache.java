@@ -20,11 +20,6 @@ public class BitmapMemoryCache implements BitmapCache {
     }
 
     @Override
-    public synchronized void invalidate(String key) {
-        this.mMap.remove(key);
-    }
-
-    @Override
     public synchronized void clear() {
         this.mMap.clear();
     }
@@ -43,11 +38,6 @@ public class BitmapMemoryCache implements BitmapCache {
         }
         
         this.mMap.put(key, data);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
     }
     
     private class BitmapLruCacheListener implements ILruCacheListener<String, Bitmap> {

@@ -107,14 +107,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_navigation_bar_key), true);
     }
 
-    public boolean isFileCacheEnabled() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_key), true);
-    }
-
-    public boolean isFileCacheSdCard() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_sdcard_key), true);
-    }
-
     public boolean isAutoRefresh() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_auto_refresh_key), false);
     }
@@ -137,6 +129,10 @@ public class ApplicationSettings {
     
     public boolean isLegacyImageViewer() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_legacy_image_viewer_key), false);
+    }
+    
+    public boolean isUnlimitedCache() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_no_limit_key), false);
     }
 
     public int getTheme() {
