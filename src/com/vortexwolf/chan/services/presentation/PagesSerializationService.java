@@ -2,13 +2,14 @@ package com.vortexwolf.chan.services.presentation;
 
 import java.io.File;
 
+import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
+import com.vortexwolf.chan.boards.dvach.models.DvachThreadInfo;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.chan.interfaces.IPagesSerializationService;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.models.domain.ThreadInfo;
+import com.vortexwolf.chan.models.domain.PostModel;
+import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.services.SerializationService;
 
-public class PagesSerializationService implements IPagesSerializationService {
+public class PagesSerializationService {
 
     private static final String sExtension = ".2ch";
 
@@ -20,43 +21,39 @@ public class PagesSerializationService implements IPagesSerializationService {
         this.mSerializationService = serializationService;
     }
 
-    @Override
-    public void serializeThreads(String boardName, int pageNumber, ThreadInfo[] threads) {
+    public void serializeThreads(String boardName, int pageNumber, ThreadModel[] threads) {
         File file = this.getBoardFilePath(boardName, pageNumber);
 
         this.mSerializationService.serializeObject(file, threads);
     }
 
-    @Override
-    public void serializePosts(String boardName, String threadNumber, PostInfo[] posts) {
+    public void serializePosts(String boardName, String threadNumber, PostModel[] posts) {
         File file = this.getThreadFilePath(boardName, threadNumber);
 
         this.mSerializationService.serializeObject(file, posts);
     }
 
-    @Override
-    public ThreadInfo[] deserializeThreads(String boardName, int pageNumber) {
+    public ThreadModel[] deserializeThreads(String boardName, int pageNumber) {
         File file = this.getBoardFilePath(boardName, pageNumber);
 
-        ThreadInfo[] threads = (ThreadInfo[]) this.mSerializationService.deserializeObject(file);
+        ThreadModel[] threads = (ThreadModel[]) this.mSerializationService.deserializeObject(file);
 
         return threads;
     }
-
-    @Override
-    public PostInfo[] deserializePosts(String boardName, String threadNumber) {
+    
+    public PostModel[] deserializePosts(String boardName, String threadNumber) {
         File file = this.getThreadFilePath(boardName, threadNumber);
 
-        PostInfo[] posts = (PostInfo[]) this.mSerializationService.deserializeObject(file);
+        PostModel[] posts = (PostModel[]) this.mSerializationService.deserializeObject(file);
 
         return posts;
     }
-    
-    private File getBoardFilePath(String boardName, int pageNumber){
+
+    private File getBoardFilePath(String boardName, int pageNumber) {
         return this.getFilePath(boardName + "_page" + pageNumber);
     }
-    
-    private File getThreadFilePath(String boardName, String threadNumber){
+
+    private File getThreadFilePath(String boardName, String threadNumber) {
         return this.getFilePath(boardName + "_thread" + threadNumber);
     }
 

@@ -3,6 +3,8 @@ package com.vortexwolf.chan.test;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 
 public class UriUtilsTest extends InstrumentationTestCase {
@@ -13,55 +15,56 @@ public class UriUtilsTest extends InstrumentationTestCase {
     private static final String threadRelativeUriB = "/b/res/1000.html";
     private static final String threadUriB = "http://2-ch.so/b/res/1000.html";
     private static final String postUriPr = "http://2-ch.so/pr/res/2000.html#222";
+    
+    private DvachUriParser mParser = new DvachUriParser();
 
-    public void testGetBoardName() {
-
+    public void testGetBoardName() {        
         Uri uri = Uri.parse(boardUriVg);
-        String boardName = UriUtils.getBoardName(uri);
+        String boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "vg");
 
         uri = Uri.parse(boardUriVg + "/");
-        boardName = UriUtils.getBoardName(uri);
+        boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "vg");
 
         uri = Uri.parse(boardUriBPage1);
-        boardName = UriUtils.getBoardName(uri);
+        boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "b");
 
         uri = Uri.parse(threadUriB);
-        boardName = UriUtils.getBoardName(uri);
+        boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "b");
 
         uri = Uri.parse(threadRelativeUriB);
-        boardName = UriUtils.getBoardName(uri);
+        boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "b");
 
         uri = Uri.parse(postUriPr);
-        boardName = UriUtils.getBoardName(uri);
+        boardName = mParser.getBoardName(uri);
         assertEquals(boardName, "pr");
     }
 
     public void testGetThreadNumber() {
         Uri uri = Uri.parse(threadUriB);
-        String pageName = UriUtils.getThreadNumber(uri);
+        String pageName = mParser.getThreadNumber(uri);
         assertEquals(pageName, "1000");
 
         uri = Uri.parse(threadRelativeUriB);
-        pageName = UriUtils.getThreadNumber(uri);
+        pageName = mParser.getThreadNumber(uri);
         assertEquals(pageName, "1000");
 
         uri = Uri.parse(postUriPr);
-        pageName = UriUtils.getThreadNumber(uri);
+        pageName = mParser.getThreadNumber(uri);
         assertEquals(pageName, "2000");
     }
 
     public void testGetBoardPageNumber() {
         Uri uri = Uri.parse(boardUriBPage1);
-        int pageNumber = UriUtils.getBoardPageNumber(uri);
+        int pageNumber = mParser.getBoardPageNumber(uri);
         assertEquals(pageNumber, 1);
 
         uri = Uri.parse(boardUriVg);
-        pageNumber = UriUtils.getBoardPageNumber(uri);
+        pageNumber = mParser.getBoardPageNumber(uri);
         assertEquals(pageNumber, 0);
     }
 
@@ -80,66 +83,66 @@ public class UriUtilsTest extends InstrumentationTestCase {
 
     public void testGetFileExtension() {
         Uri uri = Uri.parse("/test/1 2 3.pdf");
-        String extension = UriUtils.getFileExtension(uri);
+        String extension = RegexUtils.getFileExtension(uri.toString());
         assertEquals(extension, "pdf");
 
         uri = Uri.parse("src/test.flash.swf");
-        extension = UriUtils.getFileExtension(uri);
+        extension = RegexUtils.getFileExtension(uri.toString());
         assertEquals(extension, "swf");
 
         uri = Uri.parse(imageUri);
-        extension = UriUtils.getFileExtension(uri);
+        extension = RegexUtils.getFileExtension(uri.toString());
         assertEquals(extension, "png");
 
         uri = Uri.parse(threadUriB);
-        extension = UriUtils.getFileExtension(uri);
+        extension = RegexUtils.getFileExtension(uri.toString());
         assertEquals(extension, "html");
 
         uri = Uri.parse(boardUriVg);
-        extension = UriUtils.getFileExtension(uri);
+        extension = RegexUtils.getFileExtension(uri.toString());
         assertEquals(extension, null);
     }
 
     public void testIsThreadUri() {
-        assertEquals(UriUtils.isThreadUri(Uri.parse(threadUriB)), true);
+        assertEquals(mParser.isThreadUri(Uri.parse(threadUriB)), true);
 
-        assertEquals(UriUtils.isThreadUri(Uri.parse(postUriPr)), true);
+        assertEquals(mParser.isThreadUri(Uri.parse(postUriPr)), true);
 
-        assertEquals(UriUtils.isThreadUri(Uri.parse(boardUriVg)), false);
+        assertEquals(mParser.isThreadUri(Uri.parse(boardUriVg)), false);
 
-        assertEquals(UriUtils.isThreadUri(Uri.parse(imageUri)), false);
+        assertEquals(mParser.isThreadUri(Uri.parse(imageUri)), false);
     }
 
     public void testIsBoardUri() {
 
-        assertEquals(UriUtils.isBoardUri(Uri.parse(boardUriVg)), true);
+        assertEquals(mParser.isBoardUri(Uri.parse(boardUriVg)), true);
 
-        assertEquals(UriUtils.isBoardUri(Uri.parse(boardUriBPage1)), true);
+        assertEquals(mParser.isBoardUri(Uri.parse(boardUriBPage1)), true);
 
-        assertEquals(UriUtils.isBoardUri(Uri.parse(threadUriB)), false);
+        assertEquals(mParser.isBoardUri(Uri.parse(threadUriB)), false);
 
-        assertEquals(UriUtils.isBoardUri(Uri.parse(imageUri)), false);
+        assertEquals(mParser.isBoardUri(Uri.parse(imageUri)), false);
     }
 
     public void testGetYoutubeCodeTest() {
         String testHtml = "<a href=\"http://www.youtube.com/v/F4hQ4J4BFOM\"/>";
-        String code = UriUtils.getYouTubeCode(testHtml);
+        String code = RegexUtils.getYouTubeCode(testHtml);
         assertEquals(code, "F4hQ4J4BFOM");
 
         testHtml = "http://youtube.com/watch?v=_-123ZZZzzz";
-        code = UriUtils.getYouTubeCode(testHtml);
+        code = RegexUtils.getYouTubeCode(testHtml);
         assertEquals(code, "_-123ZZZzzz");
 
         testHtml = "https://www.youtube.com/watch?v=1-123ZZZzzz";
-        code = UriUtils.getYouTubeCode(testHtml);
+        code = RegexUtils.getYouTubeCode(testHtml);
         assertEquals(code, "1-123ZZZzzz");
 
         testHtml = "http://m.youtube.com/watch?v=123456789zz";
-        code = UriUtils.getYouTubeCode(testHtml);
+        code = RegexUtils.getYouTubeCode(testHtml);
         assertEquals(code, "123456789zz");
 
         testHtml = "http://m.youtube.com/#/watch?v=123456789xx";
-        code = UriUtils.getYouTubeCode(testHtml);
+        code = RegexUtils.getYouTubeCode(testHtml);
         assertEquals(code, "123456789xx");
 
     }

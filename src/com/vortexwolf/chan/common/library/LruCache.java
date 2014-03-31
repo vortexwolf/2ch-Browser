@@ -8,12 +8,12 @@ import com.vortexwolf.chan.interfaces.ILruCacheListener;
 @SuppressWarnings("serial")
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
     public static final int MAX_CAPACITY = 50;
-    
+
     private final ILruCacheListener<K, V> mListener;
 
     public LruCache(ILruCacheListener<K, V> listener) {
         super(16, 1, true);
-        
+
         this.mListener = listener;
     }
 
@@ -25,7 +25,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
             if (this.mListener != null) {
                 this.mListener.onEntryRemoved(entry.getKey(), entry.getValue());
             }
-            
+
             return true;
         }
     }

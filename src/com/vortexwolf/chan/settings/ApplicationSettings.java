@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -9,7 +7,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
@@ -18,27 +15,25 @@ public class ApplicationSettings {
 
     public static final String TAG = "ApplicationSettings";
 
-    private final Context mContext;
     private final SharedPreferences mSettings;
     private final Resources mResources;
 
     public ApplicationSettings(Context context, Resources resources) {
-        this.mContext = context;
         this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
         this.mResources = resources;
     }
-    
-    public void savePassCodeCookie(String passCodeCookie){
+
+    public void savePassCodeCookie(String passCodeCookie) {
         SharedPreferences.Editor editor = this.mSettings.edit();
         editor.putString(this.mResources.getString(R.string.pref_passcode_cookie_key), passCodeCookie);
         editor.commit();
     }
-    
+
     public String getPassCodeCookie() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
     }
-    
-    public String getPassCode(){
+
+    public String getPassCode() {
         // should be removed after everyone updates their applications
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
     }
@@ -57,28 +52,28 @@ public class ApplicationSettings {
         boolean isHttps = this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_https_key), false);
         String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_domain_key), null);
         domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
-        
+
         Uri uri = UriUtils.getUriForDomain(domain, isHttps);
         return uri;
     }
-    
+
     public int getLongPostsMaxHeight() {
         String maxHeightStr = this.mSettings.getString(this.mResources.getString(R.string.pref_cut_posts_key), null);
         int defaultValue = 400;
-        
+
         if (maxHeightStr == null) {
             return defaultValue;
         }
-        
+
         try {
             int maxHeight = Integer.parseInt(maxHeightStr);
             return maxHeight;
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
-    
-    public String getStartPage(){
+
+    public String getStartPage() {
         String startPage = this.mSettings.getString(this.mResources.getString(R.string.pref_homepage_key), "").toLowerCase();
         return !StringUtils.isEmpty(startPage) ? startPage : null;
     }
@@ -126,11 +121,11 @@ public class ApplicationSettings {
     public boolean isDisplayAllBoards() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_hidden_boards_key), false);
     }
-    
+
     public boolean isLegacyImageViewer() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_legacy_image_viewer_key), false);
     }
-    
+
     public boolean isUnlimitedCache() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_no_limit_key), false);
     }

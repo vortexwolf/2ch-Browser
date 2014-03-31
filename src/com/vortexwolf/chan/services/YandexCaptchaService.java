@@ -1,4 +1,4 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services;
 
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 

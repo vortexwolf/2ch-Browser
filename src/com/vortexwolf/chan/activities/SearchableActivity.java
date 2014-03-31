@@ -1,87 +1,73 @@
 package com.vortexwolf.chan.activities;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.adapters.FoundPostsListAdapter;
-import com.vortexwolf.chan.adapters.PostsListAdapter;
-import com.vortexwolf.chan.asynctasks.DownloadFileTask;
-import com.vortexwolf.chan.asynctasks.SearchPostsTask;
-import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.CompatibilityUtils;
-import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
-import com.vortexwolf.chan.interfaces.IListView;
-import com.vortexwolf.chan.interfaces.IPostsListView;
-import com.vortexwolf.chan.models.domain.FoundPostsList;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.models.domain.PostsList;
-import com.vortexwolf.chan.models.domain.ThreadsList;
-import com.vortexwolf.chan.models.presentation.AttachmentInfo;
-import com.vortexwolf.chan.models.presentation.PostItemViewModel;
-import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
-import com.vortexwolf.chan.services.BrowserLauncher;
-import com.vortexwolf.chan.services.MyTracker;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
-import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
-import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
-import com.vortexwolf.chan.settings.ApplicationSettings;
-
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.ClipboardManager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
+
+import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.adapters.FoundPostsListAdapter;
+import com.vortexwolf.chan.asynctasks.SearchPostsTask;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.interfaces.IBitmapManager;
+import com.vortexwolf.chan.interfaces.IJsonApiReader;
+import com.vortexwolf.chan.interfaces.IListView;
+import com.vortexwolf.chan.models.domain.PostModel;
+import com.vortexwolf.chan.models.domain.SearchPostListModel;
+import com.vortexwolf.chan.models.presentation.PostItemViewModel;
+import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class SearchableActivity extends BaseListActivity {
     private static final String TAG = "SearchableActivity";
-    
+
     private final IJsonApiReader mJsonReader = Factory.getContainer().resolve(IJsonApiReader.class);
     private final IBitmapManager mBitmapManager = Factory.getContainer().resolve(IBitmapManager.class);
     private final ApplicationSettings mApplciationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
     private final FoundPostsListener mFoundPostsListener = new FoundPostsListener();
-    
+
     private FoundPostsListAdapter mAdapter = null;
     private SearchPostsTask mCurrentTask = null;
-    
+
     private String mSearchQuery = null;
     private String mBoardName = null;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         this.resetUI();
-        
+
         this.handleIntent(this.getIntent());
-        
+
         Factory.getContainer().resolve(MyTracker.class).setBoardVar(this.mBoardName);
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
-    
+
     @Override
     protected void onNewIntent(Intent intent) {
         this.setIntent(intent);
         this.handleIntent(intent);
     }
-    
+
     @Override
     protected void resetUI() {
         super.resetUI();
@@ -89,22 +75,22 @@ public class SearchableActivity extends BaseListActivity {
         CompatibilityUtils.setDisplayHomeAsUpEnabled(this);
         this.registerForContextMenu(this.getListView());
     }
-    
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         AppearanceUtils.showToastMessage(this, "Item clicked");
     }
-    
+
     @Override
     public boolean onSearchRequested() {
         Bundle data = new Bundle();
         data.putString(Constants.EXTRA_BOARD_NAME, this.mBoardName);
-        
+
         this.startSearch(this.mSearchQuery, true, data, false);
-        
+
         return true;
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
@@ -112,7 +98,7 @@ public class SearchableActivity extends BaseListActivity {
 
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -129,7 +115,7 @@ public class SearchableActivity extends BaseListActivity {
 
         return true;
     }
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -163,8 +149,8 @@ public class SearchableActivity extends BaseListActivity {
                 this.navigateToAddPostView(info.getNumber(), info.getParentThreadNumber(), info.getSpannedComment().toString());
                 break;
             case Constants.CONTEXT_MENU_COPY_TEXT:
-                ClipboardManager clipboard = (ClipboardManager) this.getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(info.getSpannedComment().toString());
+                String text = info.getSpannedComment().toString();
+                CompatibilityUtils.copyText(this, info.getNumber(), text);
 
                 AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
                 break;
@@ -172,20 +158,20 @@ public class SearchableActivity extends BaseListActivity {
 
         return true;
     }
-    
+
     private void navigateToThreads(String boardName) {
         Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.create2chBoardUri(boardName, 0));
+        i.setData(this.mDvachUriBuilder.createBoardUri(boardName, 0));
         this.startActivity(i);
     }
-    
+
     private void navigateToThread(String threadNumber, String postNumber) {
         Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-        i.setData(Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, threadNumber, postNumber)));
+        i.setData(Uri.parse(this.mDvachUriBuilder.createPostUri(this.mBoardName, threadNumber, postNumber)));
 
         this.startActivity(i);
     }
-    
+
     private void navigateToAddPostView(String postNumber, String threadNumber, String postComment) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
@@ -200,18 +186,18 @@ public class SearchableActivity extends BaseListActivity {
 
         this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
-    
+
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             this.mSearchQuery = intent.getStringExtra(SearchManager.QUERY);
             Bundle b = intent.getBundleExtra(SearchManager.APP_DATA);
             this.mBoardName = b.getString(Constants.EXTRA_BOARD_NAME);
-            
+
             this.setAdapter(this.mBoardName);
             this.searchAndLoadList();
         }
     }
-    
+
     private void setAdapter(String boardName) {
         this.mAdapter = new FoundPostsListAdapter(this, boardName, this.mBitmapManager, this.mApplciationSettings, this.getTheme(), this.mDvachUriBuilder);
         this.setListAdapter(this.mAdapter);
@@ -220,14 +206,14 @@ public class SearchableActivity extends BaseListActivity {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
     }
-    
-    private void searchAndLoadList(){
-        if(this.mCurrentTask != null) {
+
+    private void searchAndLoadList() {
+        if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
-        
+
         this.setTitle(this.getString(R.string.data_search_posts_title, this.mBoardName, this.mSearchQuery));
-        
+
         this.mCurrentTask = new SearchPostsTask(this.mBoardName, this.mSearchQuery, this.mJsonReader, this.mFoundPostsListener);
         this.mCurrentTask.execute();
     }
@@ -236,8 +222,8 @@ public class SearchableActivity extends BaseListActivity {
     protected int getLayoutId() {
         return com.vortexwolf.chan.R.layout.search_posts_list_view;
     }
-    
-    private class FoundPostsListener implements IListView<FoundPostsList> {
+
+    private class FoundPostsListener implements IListView<SearchPostListModel> {
 
         @Override
         public Context getApplicationContext() {
@@ -250,14 +236,14 @@ public class SearchableActivity extends BaseListActivity {
         }
 
         @Override
-        public void setData(FoundPostsList postsList) {
-            if (postsList != null && postsList.getErrorText() == null) {
-                PostInfo[] posts = postsList.getPosts();
+        public void setData(SearchPostListModel postsListModel) {
+            PostModel[] posts = postsListModel.getPosts();
+            if (posts != null) {
                 SearchableActivity.this.mAdapter.setAdapterData(posts);
             } else {
                 SearchableActivity.this.mAdapter.clear();
-                String error = postsList.getErrorText() != null 
-                        ? postsList.getErrorText() 
+                String error = postsListModel.getError() != null
+                        ? postsListModel.getError()
                         : SearchableActivity.this.getString(R.string.error_list_empty);
                 this.showError(error);
             }
@@ -277,7 +263,7 @@ public class SearchableActivity extends BaseListActivity {
         public void hideLoadingScreen() {
             SearchableActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             SearchableActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
-            
+
             SearchableActivity.this.switchToListView();
             SearchableActivity.this.mCurrentTask = null;
         }

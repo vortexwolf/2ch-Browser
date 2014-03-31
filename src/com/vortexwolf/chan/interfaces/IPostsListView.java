@@ -1,8 +1,9 @@
 package com.vortexwolf.chan.interfaces;
 
-import com.vortexwolf.chan.models.domain.PostsList;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
+import com.vortexwolf.chan.models.domain.PostModel;
 
-public interface IPostsListView extends IListView<PostsList> {
+public interface IPostsListView extends IListView<PostModel[]> {
 
     /**
      * Вызывается в случае успешной загрузки данных при частичном обновлении
@@ -12,7 +13,7 @@ public interface IPostsListView extends IListView<PostsList> {
      * @param list
      *            Список ответов
      */
-    void updateData(String from, PostsList list);
+    void updateData(String from, PostModel[] posts);
 
     /**
      * Вызывается в случае ошибки при частичном обновлении

@@ -1,4 +1,4 @@
-package com.vortexwolf.chan.models.domain;
+package com.vortexwolf.chan.services.http;
 
 import java.io.InputStream;
 

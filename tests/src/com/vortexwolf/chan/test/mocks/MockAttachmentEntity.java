@@ -16,22 +16,22 @@ public class MockAttachmentEntity implements IAttachmentEntity {
     }
 
     @Override
-    public String getImage() {
+    public String getImageUrl() {
         return this.mImage;
     }
 
     @Override
-    public String getVideo() {
+    public String getVideoUrl() {
         return this.mVideo;
     }
 
     @Override
-    public int getSize() {
+    public int getImageSize() {
         return this.mSize;
     }
 
     @Override
-    public String getThumbnail() {
+    public String getThumbnailUrl() {
         return this.mThumbnail;
     }
 }

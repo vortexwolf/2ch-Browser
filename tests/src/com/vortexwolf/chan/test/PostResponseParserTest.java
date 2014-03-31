@@ -3,7 +3,7 @@ package com.vortexwolf.chan.test;
 import android.test.InstrumentationTestCase;
 
 import com.vortexwolf.chan.exceptions.SendPostException;
-import com.vortexwolf.chan.services.domain.PostResponseParser;
+import com.vortexwolf.chan.services.PostResponseParser;
 
 public class PostResponseParserTest extends InstrumentationTestCase {
 

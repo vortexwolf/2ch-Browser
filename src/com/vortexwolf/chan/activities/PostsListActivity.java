@@ -4,11 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.ClipboardManager;
-import android.text.Selection;
-import android.text.Spannable;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -22,6 +18,8 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.PostsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadPostsTask;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
@@ -29,14 +27,12 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
+import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
-import com.vortexwolf.chan.interfaces.IPagesSerializationService;
 import com.vortexwolf.chan.interfaces.IPostsListView;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.models.domain.PostsList;
+import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -44,8 +40,8 @@ import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.TimerService;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.services.presentation.PagesSerializationService;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -54,15 +50,16 @@ import com.vortexwolf.chan.settings.SettingsEntity;
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
 
-    private MainApplication mApplication;
-    private ApplicationSettings mSettings;
-    private IJsonApiReader mJsonReader;
-    private MyTracker mTracker;
-    private IPagesSerializationService mSerializationService;
-    private DvachUriBuilder mDvachUriBuilder;
-    private FavoritesDataSource mFavoritesDatasource;
-    private IOpenTabsManager mTabsManager;
-    private ThreadImagesService mThreadImagesService;
+    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
+    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
+    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
+    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
+    private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
+    private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
+    private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
+    private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
+    private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
 
     private PostsListAdapter mAdapter = null;
     private DownloadPostsTask mCurrentDownloadTask = null;
@@ -83,24 +80,15 @@ public class PostsListActivity extends BaseListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mApplication = (MainApplication) this.getApplication();
-        this.mSettings = this.mApplication.getSettings();
-        this.mJsonReader = this.mApplication.getJsonApiReader();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mTracker = this.mApplication.getTracker();
-        this.mSerializationService = this.mApplication.getSerializationService();
-        this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
-        this.mTabsManager = this.mApplication.getOpenTabsManager();
-        this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
-        this.mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
-        
+
         // Парсим код доски и номер страницы
         Uri data = this.getIntent().getData();
         if (data != null) {
-            this.mBoardName = UriUtils.getBoardName(data);
-            this.mThreadNumber = UriUtils.getThreadNumber(data);
+            this.mBoardName = this.mUriParser.getBoardName(data);
+            this.mThreadNumber = this.mUriParser.getThreadNumber(data);
             this.mPostNumber = data.getFragment();
-            this.mUri = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+            this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
         }
 
         // Page title and new tab
@@ -108,9 +96,9 @@ public class PostsListActivity extends BaseListActivity {
                 ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT)
                 : null;
 
-        OpenTabModel tabModel = new OpenTabModel(pageSubject, Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber)));
-        this.mTabModel = this.mTabsManager.add(tabModel);
-        
+        OpenTabModel tabModel = new OpenTabModel(pageSubject, Uri.parse(this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber)));
+        this.mTabModel = this.mOpenTabsManager.add(tabModel);
+
         this.updateTitle(pageSubject);
 
         this.resetUI();
@@ -164,9 +152,7 @@ public class PostsListActivity extends BaseListActivity {
             return;
         }
 
-        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate 
-            || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails
-            || this.mCurrentSettings.isLocalDate != newSettings.isLocalDate) {
+        if (this.mCurrentSettings.isDisplayDate != newSettings.isDisplayDate || this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails || this.mCurrentSettings.isLocalDate != newSettings.isLocalDate) {
             this.mAdapter.notifyDataSetChanged();
         }
 
@@ -193,27 +179,26 @@ public class PostsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService);
+        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService, this.mUriParser);
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
-        if (Integer.valueOf(Build.VERSION.SDK) > 7) {
+        if (Constants.SDK_VERSION > 7) {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
-                                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
-        
+        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+
         LoadPostsTask task = new LoadPostsTask(preferDeserialized);
         task.execute();
     }
-    
-    private void setAdapterData(PostInfo[] posts){
+
+    private void setAdapterData(PostModel[] posts) {
         boolean isFirstTime = this.mAdapter.isEmpty();
-        
+
         this.mAdapter.setAdapterData(posts);
         this.updateTitle(this.mAdapter.getItem(0).getSubjectOrText());
-        
+
         if (isFirstTime) {
             if (this.mPostNumber != null) {
                 this.mAdapter.scrollToPost(this.mPostNumber);
@@ -226,14 +211,14 @@ public class PostsListActivity extends BaseListActivity {
             }
         }
     }
-    
-    private void updateTitle(String title){
+
+    private void updateTitle(String title) {
         String pageTitle = title != null
                 ? String.format(this.getString(R.string.data_thread_withsubject_title), this.mBoardName, title)
                 : String.format(this.getString(R.string.data_thread_title), this.mBoardName, this.mThreadNumber);
 
         this.setTitle(pageTitle);
-        
+
         String tabTitle = title != null ? title : pageTitle;
         this.mTabModel.setTitle(tabTitle);
     }
@@ -267,7 +252,7 @@ public class PostsListActivity extends BaseListActivity {
                 this.startActivity(pickBoardIntent);
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber));
+                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber));
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -339,8 +324,8 @@ public class PostsListActivity extends BaseListActivity {
                 break;
             case Constants.CONTEXT_MENU_COPY_TEXT:
                 View view = AppearanceUtils.getListItemAtPosition(this.getListView(), menuInfo.position);
-                PostItemViewBuilder.ViewBag vb = (PostItemViewBuilder.ViewBag)view.getTag();
-                
+                PostItemViewBuilder.ViewBag vb = (PostItemViewBuilder.ViewBag) view.getTag();
+
                 if (CompatibilityUtils.isTextSelectable(vb.commentView)) {
                     vb.commentView.startSelection();
                 } else {
@@ -403,7 +388,7 @@ public class PostsListActivity extends BaseListActivity {
 
     private void navigateToThreads(String boardName) {
         Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.create2chBoardUri(boardName, 0));
+        i.setData(this.mDvachUriBuilder.createBoardUri(boardName, 0));
         this.startActivity(i);
     }
 
@@ -436,37 +421,37 @@ public class PostsListActivity extends BaseListActivity {
             this.mCurrentDownloadTask.execute();
         }
     }
-    
-    private class LoadPostsTask extends AsyncTask<Void, Long, PostInfo[]> {
+
+    private class LoadPostsTask extends AsyncTask<Void, Long, PostModel[]> {
         private boolean mPreferDeserialized;
-        public LoadPostsTask(boolean preferDeserialized){
+
+        public LoadPostsTask(boolean preferDeserialized) {
             this.mPreferDeserialized = preferDeserialized;
-        }
-        
-        @Override
-        protected PostInfo[] doInBackground(Void... arg0) {
-            // Пробуем десериализовать в любом случае
-            PostInfo[] posts = mSerializationService.deserializePosts(mBoardName, mThreadNumber);
-            return posts;
-        }   
-        
-        @Override
-        public void onPreExecute() {
-            mPostsReaderListener.showLoadingScreen();
         }
 
         @Override
-        public void onPostExecute(PostInfo[] posts) {
-            mPostsReaderListener.hideLoadingScreen();
+        protected PostModel[] doInBackground(Void... arg0) {
+            // Пробуем десериализовать в любом случае
+            PostModel[] posts = PostsListActivity.this.mSerializationService.deserializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber);
+            return posts;
+        }
+
+        @Override
+        public void onPreExecute() {
+            PostsListActivity.this.mPostsReaderListener.showLoadingScreen();
+        }
+
+        @Override
+        public void onPostExecute(PostModel[] posts) {
+            PostsListActivity.this.mPostsReaderListener.hideLoadingScreen();
 
             if (posts != null) {
                 PostsListActivity.this.setAdapterData(posts);
-                
+
                 // Обновляем посты, если не был установлен ограничивающий extra
                 if (this.mPreferDeserialized) {
                     // nothing
-                }
-                else {
+                } else {
                     PostsListActivity.this.refreshPosts();
                 }
             } else {
@@ -488,9 +473,8 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         @Override
-        public void setData(PostsList postsList) {
-            if (postsList != null) {
-                PostInfo[] posts = postsList.getThread();
+        public void setData(PostModel[] posts) {
+            if (posts != null && posts.length > 0) {
                 PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
                 PostsListActivity.this.setAdapterData(posts);
             } else {
@@ -513,19 +497,17 @@ public class PostsListActivity extends BaseListActivity {
         public void hideLoadingScreen() {
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
-            
+
             PostsListActivity.this.switchToListView();
             PostsListActivity.this.mCurrentDownloadTask = null;
         }
 
         @Override
-        public void updateData(String from, PostsList list) {
-            if (list == null) {
+        public void updateData(String from, PostModel[] posts) {
+            if (posts == null) {
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
                 return;
             }
-            
-            PostInfo[] posts = list.getThread();
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
@@ -552,7 +534,7 @@ public class PostsListActivity extends BaseListActivity {
         public void hideUpdateLoading() {
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
-            
+
             PostsListActivity.this.mAdapter.setLoadingMore(false);
             PostsListActivity.this.mCurrentDownloadTask = null;
         }

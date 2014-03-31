@@ -1,30 +1,25 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services;
 
 import java.nio.charset.Charset;
-import java.util.Random;
+import java.util.HashMap;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 
 import android.content.res.Resources;
-import android.webkit.CookieSyncManager;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachSendPostMapper;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
@@ -32,9 +27,8 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.interfaces.IPostSender;
-import com.vortexwolf.chan.models.domain.PostEntity;
-import com.vortexwolf.chan.models.domain.PostFields;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.services.http.HttpStringReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostSender implements IPostSender {
@@ -45,29 +39,32 @@ public class PostSender implements IPostSender {
     private final PostResponseParser mResponseParser;
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
+    private final DvachSendPostMapper mDvachSendPostMapper;
 
-    public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings) {
+    public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings, HttpStringReader httpStringReader) {
         this.mHttpClient = client;
         this.mResources = resources;
         this.mResponseParser = new PostResponseParser();
-        this.mHttpStringReader = new HttpStringReader(this.mHttpClient, resources);
+        this.mHttpStringReader = httpStringReader;
         this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
+        this.mDvachSendPostMapper = new DvachSendPostMapper();
     }
 
     @Override
-    public String sendPost(String boardName, String threadNumber, PostFields fields, PostEntity entity) throws SendPostException {
+    public String sendPost(String boardName, SendPostModel entity) throws SendPostException {
 
-        if (boardName == null || threadNumber == null || fields == null || entity == null) {
+        if (boardName == null || entity == null) {
             throw new SendPostException(this.mResources.getString(R.string.error_incorrect_argument));
         }
 
-        String uri = this.mDvachUriBuilder.create2chBoardUri(boardName, "/wakaba.pl").toString();
+        String uri = this.mDvachUriBuilder.createBoardUri(boardName, "/wakaba.pl").toString();
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
-    	
+
         // 1 - 'ро' на кириллице, 2 - 'р' на кириллице, 3 - 'о' на кириллице, 4
         // - все латинскими буквами,
         String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post", };
+        HashMap<String, String> extraValues = new HashMap<String, String>();
         int statusCode = 502; // Возвращается при неправильном значении
                               // task=post, часто меняется, поэтому неизвестно
                               // какой будет на данный момент
@@ -77,7 +74,8 @@ public class PostSender implements IPostSender {
         try {
             for (int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++) {
                 httpPost = new HttpPost(uri);
-                response = this.executeHttpPost(httpPost, boardName, threadNumber, possibleTasks[i], fields, entity);
+                extraValues.put("task", possibleTasks[i]);
+                response = this.executeHttpPost(httpPost, entity, extraValues);
                 // Проверяем код ответа
                 statusCode = response.getStatusLine().getStatusCode();
 
@@ -111,7 +109,7 @@ public class PostSender implements IPostSender {
             } catch (HttpRequestException e) {
                 throw new SendPostException(e.getMessage());
             }
-            
+
             // Вызываю только для выброса exception
             this.mResponseParser.isPostSuccessful(responseText);
 
@@ -121,7 +119,7 @@ public class PostSender implements IPostSender {
         }
     }
 
-    private HttpResponse executeHttpPost(HttpPost httpPost, String boardName, String threadNumber, String task, PostFields fields, PostEntity entity) throws SendPostException {
+    private HttpResponse executeHttpPost(HttpPost httpPost, SendPostModel postModel, HashMap<String, String> extraValues) throws SendPostException {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
@@ -137,39 +135,9 @@ public class PostSender implements IPostSender {
 
         HttpResponse response = null;
         try {
-            Charset utf = Constants.UTF8_CHARSET;
-            // Заполняем параметры для отправки сообщения
-            MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-            multipartEntity.addPart("task", new StringBody(task, utf));
-            multipartEntity.addPart("parent", new StringBody(threadNumber, utf));
-            multipartEntity.addPart(fields.getComment(), new StringBody(StringUtils.emptyIfNull(entity.getComment()), utf));
-
-            if(!StringUtils.isEmpty(entity.getCaptchaKey())) {
-                multipartEntity.addPart(fields.getCaptchaKey(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaKey()), utf));
-                multipartEntity.addPart(fields.getCaptcha(), new StringBody(StringUtils.emptyIfNull(entity.getCaptchaAnswer()), utf));
-            } 
+            HttpEntity entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
+            httpPost.setEntity(entity);
             
-            if (entity.isSage()) {
-                multipartEntity.addPart(fields.getEmail(), new StringBody(Constants.SAGE_EMAIL, utf));
-            }
-            if (entity.getAttachment() != null) {
-                multipartEntity.addPart(fields.getFile(), new FileBody(entity.getAttachment()));
-            }
-            if (entity.getVideo() != null) {
-                multipartEntity.addPart(fields.getVideo(), new StringBody(entity.getVideo(), utf));
-            }
-            if (entity.getSubject() != null) {
-                multipartEntity.addPart(fields.getSubject(), new StringBody(entity.getSubject(), utf));
-            }
-            if (!StringUtils.isEmpty(entity.getName())) {
-                multipartEntity.addPart(fields.getName(), new StringBody(entity.getName(), utf));
-            }
-            // Only for /po and /test
-            if (entity.getPolitics() != null) {
-                multipartEntity.addPart("anon_icon", new StringBody(entity.getPolitics(), utf));
-            }
-
-            httpPost.setEntity(multipartEntity);
             // post and ignore recvfrom exceptions
             for (int i = 0; i < 3; i++) {
                 try {

@@ -4,21 +4,19 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.os.Bundle;
 
-import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.db.HistoryDataSource;
-import com.vortexwolf.chan.interfaces.INavigationService;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
+import com.vortexwolf.chan.services.NavigationService;
 
 public class OpenTabsManager implements IOpenTabsManager {
     private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
 
     private final HistoryDataSource mDataSource;
-    private final INavigationService mNavigationService;
+    private final NavigationService mNavigationService;
 
-    public OpenTabsManager(HistoryDataSource dataSource, INavigationService navigationService) {
+    public OpenTabsManager(HistoryDataSource dataSource, NavigationService navigationService) {
         this.mDataSource = dataSource;
         this.mNavigationService = navigationService;
     }
@@ -38,35 +36,34 @@ public class OpenTabsManager implements IOpenTabsManager {
         return newTab;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ArrayList<OpenTabModel> getOpenTabs() {
-        return (ArrayList<OpenTabModel>)this.mTabs.clone();
+        return (ArrayList<OpenTabModel>) this.mTabs.clone();
     }
 
     @Override
     public void remove(OpenTabModel tab) {
         this.mTabs.remove(tab);
     }
-    
+
+    @Override
     public void removeAll() {
         this.mTabs.clear();
     }
 
     @Override
     public void navigate(OpenTabModel tab, Activity activity) {
-        Bundle extras = new Bundle();
-        extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
-
-        this.mNavigationService.navigate(tab.getUri(), activity, extras);
+        this.mNavigationService.navigate(tab.getUri(), activity);
     }
-    
+
     public OpenTabModel getByUri(Uri uri) {
         for (OpenTabModel model : this.mTabs) {
             if (model.getUri().equals(uri)) {
                 return model;
             }
         }
-        
+
         return null;
     }
 }

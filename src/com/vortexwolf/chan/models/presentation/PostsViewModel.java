@@ -7,9 +7,10 @@ import java.util.List;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostsViewModel {
@@ -33,26 +34,26 @@ public class PostsViewModel {
         return this.mViewModels.get(postNumber);
     }
 
-    private PostItemViewModel createModel(PostInfo item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
+    private PostItemViewModel createModel(PostModel item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
         PostItemViewModel viewModel = new PostItemViewModel(this.mViewModels.size(), item, theme, settings, listener, uriBuilder);
         this.mLastPostNumber = viewModel.getNumber();
 
         this.processReferences(viewModel);
-        
+
         return viewModel;
     }
-    
-    public List<PostItemViewModel> addModels(List<PostInfo> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder, Resources resources, String boardName, String threadNumber) {
+
+    public List<PostItemViewModel> addModels(List<PostModel> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder, Resources resources, String boardName, String threadNumber) {
         List<PostItemViewModel> result = new ArrayList<PostItemViewModel>();
-        for (PostInfo item : items) {
+        for (PostModel item : items) {
             PostItemViewModel model = this.createModel(item, theme, settings, listener, uriBuilder);
             result.add(model);
         }
-        
+
         for (PostItemViewModel model : result) {
             model.getReferencesFromAsSpannableString(resources, boardName, threadNumber);
         }
-        
+
         return result;
     }
 

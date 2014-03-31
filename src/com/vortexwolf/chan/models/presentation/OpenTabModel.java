@@ -19,7 +19,7 @@ public class OpenTabModel {
     public String getTitle() {
         return this.mTitle;
     }
-    
+
     public void setTitle(String title) {
         this.mTitle = title;
     }

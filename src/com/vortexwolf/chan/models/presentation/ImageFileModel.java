@@ -44,9 +44,9 @@ public class ImageFileModel {
         if (this.mBitmap == null) {
             int scale = 1;
             if (this.imageHeight > maxSize || this.imageWidth > maxSize) {
-                double realScale = Math.max(this.imageHeight, this.imageWidth) / (double)maxSize;
+                double realScale = Math.max(this.imageHeight, this.imageWidth) / maxSize;
                 double roundedScale = Math.pow(2, Math.ceil(Math.log(realScale) / Math.log(2)));
-                scale = (int)roundedScale; // 2, 4, 8, 16
+                scale = (int) roundedScale; // 2, 4, 8, 16
             }
 
             // Decode with inSampleSize

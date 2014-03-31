@@ -1,18 +1,13 @@
 package com.vortexwolf.chan.activities;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
-
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.library.MyLog;
 
 public abstract class BaseListFragment extends ListFragment {
     private enum ViewType {
@@ -26,7 +21,7 @@ public abstract class BaseListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
+
         this.mLoadingView = view.findViewById(R.id.loadingView);
         this.mErrorView = view.findViewById(R.id.error);
         this.switchToView(this.mCurrentView);
@@ -57,7 +52,7 @@ public abstract class BaseListFragment extends ListFragment {
         if (vt == null) {
             return;
         }
-        
+
         ListView listView;
         try {
             listView = this.getListView();
@@ -65,7 +60,7 @@ public abstract class BaseListFragment extends ListFragment {
             MyLog.e("BaseListFragment", e);
             return;
         }
-        
+
         switch (vt) {
             case LIST:
                 listView.setVisibility(View.VISIBLE);

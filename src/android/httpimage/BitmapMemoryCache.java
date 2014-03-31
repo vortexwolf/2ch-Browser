@@ -36,10 +36,10 @@ public class BitmapMemoryCache implements BitmapCache {
         if (this.exists(key)) {
             return;
         }
-        
+
         this.mMap.put(key, data);
     }
-    
+
     private class BitmapLruCacheListener implements ILruCacheListener<String, Bitmap> {
         @Override
         public void onEntryRemoved(String key, Bitmap value) {

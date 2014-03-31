@@ -6,16 +6,17 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
-import com.vortexwolf.chan.services.domain.HtmlCaptchaChecker;
-import com.vortexwolf.chan.services.domain.HttpBitmapReader;
-import com.vortexwolf.chan.services.domain.YandexCaptchaService;
+import com.vortexwolf.chan.services.HtmlCaptchaChecker;
+import com.vortexwolf.chan.services.YandexCaptchaService;
+import com.vortexwolf.chan.services.http.HttpBitmapReader;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
     private static final String TAG = "DownloadCaptchaTask";
@@ -26,6 +27,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final HttpBitmapReader mHttpBitmapReader;
     private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
     private final DefaultHttpClient mHttpClient;
+    private final DvachUriParser mUriParser;
 
     private boolean mCanSkip = false;
     private boolean mSuccessPasscode = false;
@@ -41,6 +43,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mHttpBitmapReader = httpBitmapReader;
         this.mHtmlCaptchaChecker = htmlCaptchaChecker;
         this.mHttpClient = httpClient;
+        this.mUriParser = Factory.resolve(DvachUriParser.class);
     }
 
     @Override
@@ -67,10 +70,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mFailPasscode = result.failPassCode;
         String captchaKey = result.captchaKey;
 
-        if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !UriUtils.isBoardUri(this.mRefererUri)) {
+        if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
             return true;
         }
-        if(captchaKey == null) {
+        if (captchaKey == null) {
             return false;
         }
 

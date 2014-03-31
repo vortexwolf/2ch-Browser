@@ -1,5 +1,17 @@
 package com.vortexwolf.chan.activities;
 
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.OpenTabsAdapter;
 import com.vortexwolf.chan.common.Constants;
@@ -9,27 +21,6 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
-import com.vortexwolf.chan.settings.ApplicationSettings;
-
-import android.app.Activity;
-import android.content.res.TypedArray;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
-import android.text.ClipboardManager;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 public class OpenTabsFragment extends ListFragment {
 
@@ -38,11 +29,11 @@ public class OpenTabsFragment extends ListFragment {
     private FavoritesDataSource mFavoritesDatasource;
 
     private Uri mCurrentUri;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         this.mTabsManager = Factory.getContainer().resolve(IOpenTabsManager.class);
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
 
@@ -50,21 +41,20 @@ public class OpenTabsFragment extends ListFragment {
         if (extras != null && extras.containsKey(Constants.EXTRA_CURRENT_URL)) {
             this.mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
         }
-        
+
         this.setHasOptionsMenu(true);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
         this.mAdapter = new OpenTabsAdapter(this.getActivity(), this.mTabsManager.getOpenTabs(), this.mTabsManager);
         this.setListAdapter(this.mAdapter);
-                
+
         this.registerForContextMenu(this.getListView());
     }
-       
-    
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         OpenTabModel item = this.mAdapter.getItem(position);
@@ -74,14 +64,14 @@ public class OpenTabsFragment extends ListFragment {
             this.mTabsManager.navigate(item, this.getActivity());
         }
     }
-       
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.opentabs, menu);
-        
-        super.onCreateOptionsMenu(menu,inflater);
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -118,7 +108,7 @@ public class OpenTabsFragment extends ListFragment {
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
                 String uri = model.getUri().toString();
-                
+
                 CompatibilityUtils.copyText(this.getActivity(), uri, uri);
                 AppearanceUtils.showToastMessage(this.getActivity(), uri);
                 return true;

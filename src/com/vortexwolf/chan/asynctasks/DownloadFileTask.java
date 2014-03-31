@@ -19,7 +19,7 @@ import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
-import com.vortexwolf.chan.services.domain.DownloadFileService;
+import com.vortexwolf.chan.services.http.DownloadFileService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancelled, IProgressChangeListener {
@@ -142,7 +142,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mContentLength = value;
         this.mProgressView.setMaxProgress((int) value / 1024);
     }
-    
+
     @Override
     public long getContentLength() {
         return this.mContentLength;

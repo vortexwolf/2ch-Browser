@@ -1,28 +1,20 @@
 package com.vortexwolf.chan.common.utils;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.MainApplication;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.MainApplication;
 
 public class AppearanceUtils {
 
@@ -44,15 +36,15 @@ public class AppearanceUtils {
         ListViewPosition position = new ListViewPosition(index, top);
         return position;
     }
-    
-    public static View getListItemAtPosition(ListView listView, int position){
+
+    public static View getListItemAtPosition(ListView listView, int position) {
         int firstPosition = listView.getFirstVisiblePosition() - listView.getHeaderViewsCount(); // This is the same as child #0
         int wantedChild = position - firstPosition;
 
         if (wantedChild < 0 || wantedChild >= listView.getChildCount()) {
             return null;
         }
-        
+
         // Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
         return listView.getChildAt(wantedChild);
     }
@@ -68,54 +60,54 @@ public class AppearanceUtils {
             indeterminateProgressBar.setVisibility(View.GONE);
         }
     }
-    
+
     public static void clearImage(ImageView image) {
         image.setImageResource(android.R.color.transparent);
     }
-    
-    public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap){
+
+    public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        
+
         int oldSize = Math.max(width, height);
         int newSize = resources.getDimensionPixelSize(R.dimen.thumbnail_size);
-        
-        float scale = newSize / (float)oldSize;
 
-        if(scale >= 1.0) {
+        float scale = newSize / (float) oldSize;
+
+        if (scale >= 1.0) {
             return bitmap;
         }
 
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int)(width * scale), (int)(height * scale), true);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int) (width * scale), (int) (height * scale), true);
         bitmap.recycle();
         return resizedBitmap;
     }
-    
+
     public static void prepareWebView(WebView webView, int backgroundColor) {
         webView.setBackgroundColor(backgroundColor);
         webView.setInitialScale(1);
-        
+
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
         settings.setAllowFileAccess(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        
+
         if (Constants.SDK_VERSION >= 8) {
             settings.setBlockNetworkLoads(true);
         }
-        
+
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
             settings.setDisplayZoomControls(false);
         }
     }
-    
+
     public static int getThemeColor(Theme theme, int styleableId) {
         TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
         int color = a.getColor(styleableId, 0);
         a.recycle();
-        
+
         return color;
     }
 

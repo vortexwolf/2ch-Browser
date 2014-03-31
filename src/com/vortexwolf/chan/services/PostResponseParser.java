@@ -1,4 +1,4 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

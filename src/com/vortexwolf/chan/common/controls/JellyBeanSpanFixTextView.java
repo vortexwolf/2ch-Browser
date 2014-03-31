@@ -5,22 +5,14 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
-import android.text.Layout;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.SpannedString;
-import android.text.style.ClickableSpan;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 
 /**
  * <p>

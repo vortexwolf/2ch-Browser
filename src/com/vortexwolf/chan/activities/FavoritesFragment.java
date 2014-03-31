@@ -6,75 +6,73 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.FavoritesAdapter;
-import com.vortexwolf.chan.adapters.HistoryAdapter;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
-import com.vortexwolf.chan.db.HistoryDataSource;
-import com.vortexwolf.chan.interfaces.INavigationService;
+import com.vortexwolf.chan.services.NavigationService;
 
 public class FavoritesFragment extends BaseListFragment {
     private FavoritesDataSource mDatasource;
-    private INavigationService mNavigationService;
+    private NavigationService mNavigationService;
 
     private FavoritesAdapter mAdapter;
     private OpenDataSourceTask mCurrentTask = null;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         this.mDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
-        this.mNavigationService = Factory.getContainer().resolve(INavigationService.class);
+        this.mNavigationService = Factory.getContainer().resolve(NavigationService.class);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.favorites_list_view, container, false);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        this.mAdapter = new FavoritesAdapter(getActivity(), this.mDatasource);
+        this.mAdapter = new FavoritesAdapter(this.getActivity(), this.mDatasource);
         this.setListAdapter(this.mAdapter);
-        
+
         this.registerForContextMenu(this.getListView());
-        
+
         this.mDatasource.resetModifiedState();
         this.mCurrentTask = new OpenDataSourceTask();
         this.mCurrentTask.execute();
     }
-    
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (!this.isAdded()) {
             return;
         }
-        
+
         if (isVisibleToUser && this.mDatasource.isModified()) {
             this.mDatasource.resetModifiedState();
             this.mCurrentTask = new OpenDataSourceTask();
             this.mCurrentTask.execute();
         }
     }
-    
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         FavoritesEntity item = this.mAdapter.getItem(position);
@@ -117,23 +115,23 @@ public class FavoritesFragment extends BaseListFragment {
 
         @Override
         protected List<FavoritesEntity> doInBackground(Void... arg0) {
-            List<FavoritesEntity> favorites = mDatasource.getAllFavorites();
+            List<FavoritesEntity> favorites = FavoritesFragment.this.mDatasource.getAllFavorites();
             return favorites;
         }
 
         @Override
         protected void onPostExecute(List<FavoritesEntity> result) {
-            mAdapter.clear();
+            FavoritesFragment.this.mAdapter.clear();
             for (FavoritesEntity item : result) {
-                mAdapter.add(item);
+                FavoritesFragment.this.mAdapter.add(item);
             }
-            
-            switchToListView();
+
+            FavoritesFragment.this.switchToListView();
         }
 
         @Override
         protected void onPreExecute() {
-            switchToLoadingView();
+            FavoritesFragment.this.switchToLoadingView();
         }
     }
 }

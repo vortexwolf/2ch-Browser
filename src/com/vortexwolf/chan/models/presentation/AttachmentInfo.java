@@ -5,11 +5,12 @@ import java.util.HashMap;
 import android.net.Uri;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.models.domain.IAttachmentEntity;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfo {
@@ -45,7 +46,7 @@ public class AttachmentInfo {
             this.mImageUrl = urls.imageUrl;
             this.mThumbnailUrl = urls.thumbnailUrl;
             this.mSourceExtension = this.mImageUrl != null
-                    ? UriUtils.getFileExtension(Uri.parse(this.mImageUrl))
+                    ? RegexUtils.getFileExtension(this.mImageUrl)
                     : null;
             this.mVideoUrl = urls.videoUrl;
             this.mVideoMobileUrl = urls.videoMobileUrl;
@@ -69,12 +70,12 @@ public class AttachmentInfo {
             return this.mImageUrl;
         }
     }
-    
-    public String getImageUrlIfImage(){
-        if (isImage()) {
+
+    public String getImageUrlIfImage() {
+        if (this.isImage()) {
             return this.mImageUrl;
         }
-        
+
         return null;
     }
 
@@ -105,14 +106,14 @@ public class AttachmentInfo {
     }
 
     public int getSize() {
-        return this.mModel.getSize();
+        return this.mModel.getImageSize();
     }
 
     public String getDescription(String sizeMeasure) {
         String result = "";
 
-        if (this.mModel.getSize() != 0) {
-            result += this.mModel.getSize() + sizeMeasure;
+        if (this.mModel.getImageSize() != 0) {
+            result += this.mModel.getImageSize() + sizeMeasure;
 
             if ("gif".equalsIgnoreCase(this.mSourceExtension)) {
                 result += " gif";
@@ -128,13 +129,13 @@ public class AttachmentInfo {
         SourceWithThumbnailModel model = new SourceWithThumbnailModel();
 
         // Проверяем существование картинки
-        String imageUrl = this.mModel.getImage();
-        String imageThumbnail = this.mModel.getThumbnail();
+        String imageUrl = this.mModel.getImageUrl();
+        String imageThumbnail = this.mModel.getThumbnailUrl();
         if (!StringUtils.isEmpty(imageUrl)) {
-            model.imageUrl = this.mDvachUriBuilder.create2chBoardUri(this.mBoardCode, imageUrl).toString();
+            model.imageUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardCode, imageUrl).toString();
         }
         if (!StringUtils.isEmpty(imageThumbnail)) {
-            model.thumbnailUrl = this.mDvachUriBuilder.create2chBoardUri(this.mBoardCode, imageThumbnail).toString();
+            model.thumbnailUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardCode, imageThumbnail).toString();
         }
         // Если выше вызвался любой из двух if, значт прикреплен какой-то файл,
         // а не видео
@@ -143,13 +144,13 @@ public class AttachmentInfo {
         }
 
         // И видео
-        String videoHtml = this.mModel.getVideo();
-        String videoCode = UriUtils.getYouTubeCode(videoHtml);
+        String videoHtml = this.mModel.getVideoUrl();
+        String videoCode = RegexUtils.getYouTubeCode(videoHtml);
         if (!StringUtils.isEmpty(videoCode)) {
             model.isVideo = true;
-            model.videoMobileUrl = "http://m.youtube.com/#/watch?v=" + videoCode;
-            model.videoUrl = UriUtils.formatYoutubeUriFromCode(videoCode);
-            model.thumbnailUrl = "http://img.youtube.com/vi/" + videoCode + "/default.jpg";
+            model.videoMobileUrl = UriUtils.formatYoutubeMobileUri(videoCode);
+            model.videoUrl = UriUtils.formatYoutubeUri(videoCode);
+            model.thumbnailUrl = UriUtils.formatYoutubeThumbnailUri(videoCode);
             return model;
         }
 

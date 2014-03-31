@@ -7,7 +7,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -18,27 +17,22 @@ import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.UnknownTagsHandler;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 
 public class HtmlUtils {
     private static final Pattern styleColorPattern = Pattern.compile(".*?color: rgb\\((\\d+), (\\d+), (\\d+)\\);.*");
-
-    private static final DefaultHttpClient httpClient = MainApplication.getHttpClient();
     // Картинки со смайликами во время всяких праздников
     public static final MyHtml.ImageGetter sImageGetter = new MyHtml.ImageGetter() {
         @Override
         public Drawable getDrawable(String ref) {
-            Uri uri = Factory.getContainer().resolve(DvachUriBuilder.class).adjust2chRelativeUri(Uri.parse(ref));
-
-            HttpImageManager imageManager = Factory.getContainer().resolve(HttpImageManager.class);
-
-            Bitmap cached = imageManager.loadImage(uri);
+            Uri uri = Factory.resolve(DvachUriBuilder.class).adjustRelativeUri(Uri.parse(ref));
+            Bitmap cached = Factory.resolve(HttpImageManager.class).loadImage(uri);
             if (cached != null) {
                 Bitmap bmp = cached;
                 Drawable d = new BitmapDrawable(bmp);
@@ -46,7 +40,7 @@ public class HtmlUtils {
                 return d;
             }
 
-            return Factory.getContainer().resolve(Resources.class).getDrawable(R.drawable.a_empty);
+            return Factory.resolve(Resources.class).getDrawable(R.drawable.a_empty);
         }
     };
 

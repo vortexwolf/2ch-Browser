@@ -7,8 +7,9 @@ import android.view.Window;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public abstract class BaseListActivity extends ListActivity {
     private enum ViewType {
@@ -32,10 +33,10 @@ public abstract class BaseListActivity extends ListActivity {
     /** Reloads UI on the page */
     protected void resetUI() {
         // setting of the theme goes first
-        this.setTheme(this.getMainApplication().getSettings().getTheme());
+        this.setTheme(Factory.resolve(ApplicationSettings.class).getTheme());
 
         // completely reload the root view, get loading and error views
-        this.setContentView(this.getLayoutId());        
+        this.setContentView(this.getLayoutId());
         this.mLoadingView = this.findViewById(R.id.loadingView);
         this.mErrorView = this.findViewById(R.id.error);
 

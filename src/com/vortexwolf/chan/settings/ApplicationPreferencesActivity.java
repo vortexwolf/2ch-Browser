@@ -1,6 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -18,21 +17,20 @@ import com.vortexwolf.chan.services.MyTracker;
 
 public class ApplicationPreferencesActivity extends PreferenceActivity {
     private static final String TAG = "ApplicationPreferencesActivity";
-    
+
     private ApplicationSettings mSettings;
-    private Resources mResources;
     private SharedPreferences mSharedPreferences;
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MainApplication application = (MainApplication) this.getApplication();
-        this.mSettings = application.getSettings();
-        this.mResources = application.getResources();
+        // set theme before creating
+        this.mSettings = Factory.resolve(ApplicationSettings.class);
+        this.setTheme(this.mSettings.getTheme()); 
         
-        this.setTheme(this.mSettings.getTheme()); // set theme before creating
+        // create
         super.onCreate(savedInstanceState);
-        
+
         this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -43,7 +41,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();
-        
+
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
 
@@ -60,52 +58,52 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 
         this.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this.mSharedPreferenceChangeListener);
     }
-    
+
     private class SharedPreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Resources res = getResources();
-            Preference preference = getPreferenceManager().findPreference(key);
-            
+            Resources res = ApplicationPreferencesActivity.this.getResources();
+            Preference preference = ApplicationPreferencesActivity.this.getPreferenceManager().findPreference(key);
+
             if (preference instanceof ListPreference) {
-                updateListSummary(key);
+                ApplicationPreferencesActivity.this.updateListSummary(key);
             } else if (key.equals(res.getString(R.string.pref_name_key))) {
-                updateNameSummary();
+                ApplicationPreferencesActivity.this.updateNameSummary();
             } else if (key.equals(res.getString(R.string.pref_homepage_key))) {
-                updateStartPageSummary();
+                ApplicationPreferencesActivity.this.updateStartPageSummary();
             } else if (key.equals(res.getString(R.string.pref_download_path_key))) {
-                updateDownloadPathSummary();
+                ApplicationPreferencesActivity.this.updateDownloadPathSummary();
             }
         }
     }
-    
-    private void updateNameSummary(){
+
+    private void updateNameSummary() {
         this.updateEditTextSummary(R.string.pref_name_key, R.string.pref_name_summary);
     }
-    
-    private void updateStartPageSummary(){
+
+    private void updateStartPageSummary() {
         this.updateEditTextSummary(R.string.pref_homepage_key, R.string.pref_homepage_summary);
     }
-    
-    private void updateDownloadPathSummary(){
+
+    private void updateDownloadPathSummary() {
         this.updateEditTextSummary(R.string.pref_download_path_key, R.string.pref_download_path_summary);
     }
-    
-    private void updateListSummary(int prefKeyId){
-        this.updateListSummary(this.mResources.getString(prefKeyId));
+
+    private void updateListSummary(int prefKeyId) {
+        this.updateListSummary(this.getString(prefKeyId));
     }
-    
-    private void updateListSummary(String prefKey){
-        ListPreference preference = (ListPreference)this.getPreferenceManager().findPreference(prefKey);
+
+    private void updateListSummary(String prefKey) {
+        ListPreference preference = (ListPreference) this.getPreferenceManager().findPreference(prefKey);
         preference.setSummary(preference.getEntry());
     }
-    
-    private void updateEditTextSummary(int prefKey, int prefSummary){
-        EditTextPreference preference = (EditTextPreference)this.getPreferenceManager().findPreference(this.mResources.getString(prefKey));
+
+    private void updateEditTextSummary(int prefKey, int prefSummary) {
+        EditTextPreference preference = (EditTextPreference) this.getPreferenceManager().findPreference(this.getString(prefKey));
         if (!StringUtils.isEmpty(preference.getText())) {
             preference.setSummary(preference.getText());
         } else {
-            preference.setSummary(this.mResources.getString(prefSummary));
+            preference.setSummary(this.getString(prefSummary));
         }
     }
 }
