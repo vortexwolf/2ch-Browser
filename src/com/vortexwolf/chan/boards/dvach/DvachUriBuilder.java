@@ -1,4 +1,4 @@
-package com.vortexwolf.chan.services.presentation;
+package com.vortexwolf.chan.boards.dvach;
 
 import android.net.Uri;
 
@@ -19,27 +19,23 @@ public class DvachUriBuilder {
         this.mDvachHostUri = null;
     }
 
-    public String create2chPostUrl(String board, String threadNumber, String postNumber) {
-        return this.create2chThreadUrl(board, threadNumber) + "#" + postNumber;
+    public String createPostUri(String board, String threadNumber, String postNumber) {
+        return this.createThreadUri(board, threadNumber) + "#" + postNumber;
     }
 
-    public String create2chThreadUrl(String board, String threadNumber) {
-        return this.create2chBoardUri(board, "res/" + threadNumber + ".html").toString();
-    }
-    
-    public String create2chThreadUrl(String board, String threadNumber, String postNumber) {
-        return this.create2chThreadUrl(board, threadNumber) + "#" + postNumber;
+    public String createThreadUri(String board, String threadNumber) {
+        return this.createBoardUri(board, "res/" + threadNumber + ".html").toString();
     }
 
-    public Uri create2chBoardUri(String board) {
-        return this.create2chBoardUri(board, 0);
-    }
-    
-    public Uri create2chBoardUri(String board, int pageNumber) {
-        return this.create2chBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
+    public Uri createBoardUri(String board) {
+        return this.createBoardUri(board, 0);
     }
 
-    public Uri create2chBoardUri(String board, String path) {
+    public Uri createBoardUri(String board, int pageNumber) {
+        return this.createBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
+    }
+
+    public Uri createBoardUri(String board, String path) {
         Uri boardUri = this.appendPath(this.getDvachHostUri(), board);
 
         if (!StringUtils.isEmpty(path)) {
@@ -49,13 +45,13 @@ public class DvachUriBuilder {
         return boardUri;
     }
 
-    public Uri create2chUri(String path) {
+    public Uri createUri(String path) {
         Uri uri = this.appendPath(this.getDvachHostUri(), path);
 
         return uri;
     }
 
-    public Uri adjust2chRelativeUri(Uri uri) {
+    public Uri adjustRelativeUri(Uri uri) {
         return uri.isRelative() ? this.appendPath(this.getDvachHostUri(), uri.toString()) : uri;
     }
 

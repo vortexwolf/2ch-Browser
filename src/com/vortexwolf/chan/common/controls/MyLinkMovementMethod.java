@@ -242,7 +242,7 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
 
         return sInstance;
     }
-    
+
     private void removeSelection(Spannable text) {
         Selection.removeSelection(text);
     }

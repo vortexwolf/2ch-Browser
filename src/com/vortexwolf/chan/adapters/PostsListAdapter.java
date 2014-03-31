@@ -18,23 +18,23 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
-import com.vortexwolf.chan.models.domain.PostInfo;
+import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.PostsViewModel;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
-import com.vortexwolf.chan.services.presentation.PostItemViewBuilder.ViewBag;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IURLSpanClickListener, IBusyAdapter {
@@ -54,12 +54,13 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private final DvachUriBuilder mDvachUriBuilder;
     private final Timer mLoadImagesTimer;
     private final ThreadImagesService mThreadImagesService;
+    private final DvachUriParser mUriParser;
 
     private boolean mIsBusy = false;
     private boolean mIsLoadingMore = false;
     private LoadImagesTimerTask mCurrentLoadImagesTask;
 
-    public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService) {
+    public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService, DvachUriParser uriParser) {
         super(context.getApplicationContext(), 0);
 
         this.mBoardName = boardName;
@@ -75,7 +76,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
         this.mLoadImagesTimer = new Timer();
         this.mThreadImagesService = threadImagesService;
-        this.mUri = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+        this.mUriParser = uriParser;
+        this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
     }
 
     @Override
@@ -94,7 +96,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         } else {
             this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight, this.mTheme);
         }
-        
+
         return view;
     }
 
@@ -102,7 +104,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     public void onClick(View v, String url) {
 
         Uri uri = Uri.parse(url);
-        String pageName = UriUtils.getThreadNumber(uri);
+        String pageName = this.mUriParser.getThreadNumber(uri);
 
         // Если ссылка указывает на этот тред - перескакиваем на нужный пост,
         // иначе открываем в браузере
@@ -139,43 +141,35 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     }
 
     /** Обновляет адаптер полностью */
-    public void setAdapterData(PostInfo[] posts) {
+    public void setAdapterData(PostModel[] posts) {
         this.clear();
-        
+
         List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : models) {
             AttachmentInfo attachment = model.getAttachment(this.mBoardName);
             if (attachment != null && attachment.isImage()) {
                 this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
             }
-            
+
             this.add(model);
         }
     }
-    
+
     public void scrollToPost(String postNumber) {
         if (StringUtils.isEmpty(postNumber)) {
             return;
         }
-        
+
         int position = this.findPostByNumber(postNumber);
         if (position == -1) {
             AppearanceUtils.showToastMessage(this.getContext(), this.getContext().getString(R.string.notification_post_not_found));
             return;
         }
-        
+
         this.mListView.setSelection(position);
     }
 
-    /**
-     * Добавляет новые данные в адаптер
-     * 
-     * @param from
-     *            Начиная с какого сообщения добавлять данные
-     * @param posts
-     *            Список сообщений (можно и всех, они потом отфильтруются)
-     */
-    public int updateAdapterData(String from, PostInfo[] posts) {
+    public int updateAdapterData(String from, PostModel[] posts) {
         Integer lastPostNumber;
         try {
             lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
@@ -183,21 +177,21 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             lastPostNumber = 0;
         }
 
-        ArrayList<PostInfo> newPosts = new ArrayList<PostInfo>();
-        for (PostInfo pi : posts) {
-            Integer currentNumber = !StringUtils.isEmpty(pi.getNum()) ? Integer.valueOf(pi.getNum()) : 0;
+        ArrayList<PostModel> newPosts = new ArrayList<PostModel>();
+        for (PostModel pi : posts) {
+            Integer currentNumber = !StringUtils.isEmpty(pi.getNumber()) ? Integer.parseInt(pi.getNumber()) : 0;
             if (currentNumber > lastPostNumber) {
                 newPosts.add(pi);
             }
         }
-        
+
         List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : newModels) {
             AttachmentInfo attachment = model.getAttachment(this.mBoardName);
             if (attachment != null && attachment.isImage()) {
                 this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
             }
-            
+
             this.add(model);
         }
 
@@ -215,7 +209,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         if (this.mCurrentLoadImagesTask != null) {
             this.mCurrentLoadImagesTask.cancel();
         }
-        
+
         if (this.mIsBusy == true && value == false) {
             this.mCurrentLoadImagesTask = new LoadImagesTimerTask();
             this.mLoadImagesTimer.schedule(this.mCurrentLoadImagesTask, 500);
@@ -223,8 +217,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
         this.mIsBusy = value;
     }
-    
-    private void loadListImages(){
+
+    private void loadListImages() {
         int count = this.mListView.getChildCount();
         for (int i = 0; i < count; i++) {
             View v = this.mListView.getChildAt(i);
@@ -275,7 +269,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     public boolean isEnabled(int position) {
         return !this.isStatusView(position);
     }
-    
+
     private class LoadImagesTimerTask extends TimerTask {
         @Override
         public void run() {
@@ -283,7 +277,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             PostsListAdapter.this.mListView.post(new LoadImagesRunnable());
         }
     }
-    
+
     private class LoadImagesRunnable implements Runnable {
         @Override
         public void run() {

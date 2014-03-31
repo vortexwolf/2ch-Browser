@@ -1,20 +1,19 @@
-package com.vortexwolf.chan.models.domain;
+package com.vortexwolf.chan.boards.dvach.models;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class PostsList {
-
+public class DvachPostsList {
     @JsonProperty("thread")
-    private PostInfo[][] thread;
+    private DvachPostInfo[][] thread;
 
     @JsonIgnore
-    public PostInfo[] getThread() {
+    public DvachPostInfo[] getThread() {
         if (this.thread == null) {
-            return new PostInfo[0];
+            return new DvachPostInfo[0];
         }
-        
-        PostInfo[] newThread = new PostInfo[this.thread.length];
+
+        DvachPostInfo[] newThread = new DvachPostInfo[this.thread.length];
         for (int i = 0; i < this.thread.length; i++) {
             newThread[i] = this.thread[i][0];
         }

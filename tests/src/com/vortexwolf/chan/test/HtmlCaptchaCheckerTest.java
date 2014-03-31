@@ -7,10 +7,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
-import com.vortexwolf.chan.services.domain.HtmlCaptchaChecker;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {

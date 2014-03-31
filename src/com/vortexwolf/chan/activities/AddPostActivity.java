@@ -5,15 +5,11 @@ import java.io.File;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore.MediaColumns;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +18,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,13 +27,15 @@ import android.widget.TextView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
@@ -49,30 +46,31 @@ import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
-import com.vortexwolf.chan.models.domain.PostEntity;
+import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.presentation.CaptchaViewType;
 import com.vortexwolf.chan.models.presentation.DraftPostModel;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
+import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.MyTracker;
-import com.vortexwolf.chan.services.domain.HtmlCaptchaChecker;
-import com.vortexwolf.chan.services.domain.HttpBitmapReader;
-import com.vortexwolf.chan.services.domain.HttpStringReader;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.services.http.HttpBitmapReader;
+import com.vortexwolf.chan.services.http.HttpStringReader;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
 
-    private MainApplication mApplication;
-    private IJsonApiReader mJsonReader;
-    private IPostSender mPostSender;
-    private IHtmlCaptchaChecker mHtmlCaptchaChecker;
-    private HttpBitmapReader mHttpBitmapReader;
-    private IDraftPostsStorage mDraftPostsStorage;
-    private MyTracker mTracker;
-
+    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
+    private final IPostSender mPostSender = Factory.resolve(IPostSender.class);
+    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    private final HttpBitmapReader mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
+    private final IDraftPostsStorage mDraftPostsStorage = Factory.resolve(IDraftPostsStorage.class);
+    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
+    private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
+    private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
+    private final IHtmlCaptchaChecker mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
+    
     private ImageFileModel mAttachedFile;
     private String mAttachedVideo;
     private CaptchaEntity mCaptcha;
@@ -107,26 +105,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mApplication = (MainApplication) this.getApplication();
-        this.mJsonReader = this.mApplication.getJsonApiReader();
-        this.mPostSender = this.mApplication.getPostSender();
-        ApplicationSettings settings = this.mApplication.getSettings();
-        DefaultHttpClient httpClient = MainApplication.getHttpClient();
-        this.mHtmlCaptchaChecker = new HtmlCaptchaChecker(new HttpStringReader(httpClient, this.getResources()), Factory.getContainer().resolve(DvachUriBuilder.class), settings);
-        this.mHttpBitmapReader = new HttpBitmapReader(httpClient, this.getResources());
-        this.mDraftPostsStorage = this.mApplication.getDraftPostsStorage();
-        this.mTracker = this.mApplication.getTracker();
-        DvachUriBuilder uriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
-
         // Парсим название борды и номер треда
         Bundle extras = this.getIntent().getExtras();
-
         if (extras != null) {
             this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
             this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
             this.mRefererUri = StringUtils.isEmpty(this.mThreadNumber) || this.mThreadNumber == Constants.ADD_THREAD_PARENT
-                    ? uriBuilder.create2chBoardUri(this.mBoardName, 0)
-                    : Uri.parse(uriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber));
+                    ? mUriBuilder.createBoardUri(this.mBoardName, 0)
+                    : Uri.parse(mUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber));
         }
 
         this.resetUI();
@@ -204,12 +190,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void resetUI() {
-        this.setTheme(this.mApplication.getSettings().getTheme());
+        this.setTheme(this.mSettings.getTheme());
         this.setContentView(R.layout.add_post_view);
 
         this.mCaptchaImageView = (ImageView) this.findViewById(R.id.addpost_captcha_image);
         this.mCaptchaLoadingView = this.findViewById(R.id.addpost_captcha_loading);
-        this.mCaptchaSkipView = (TextView)this.findViewById(R.id.addpost_captcha_skip_text);
+        this.mCaptchaSkipView = (TextView) this.findViewById(R.id.addpost_captcha_skip_text);
         this.mCaptchaAnswerView = (EditText) this.findViewById(R.id.addpost_captcha_input);
         this.mCommentView = (EditText) this.findViewById(R.id.addpost_comment_input);
         this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
@@ -309,15 +295,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                                                          // -1
         }
 
-        String name = this.mApplication.getSettings().getName();
+        String name = this.mSettings.getName();
         String captchaKey = this.mCaptcha != null ? this.mCaptcha.getKey() : null;
-        PostEntity pe = new PostEntity(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name, this.mAttachedVideo);
+        SendPostModel pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name, this.mAttachedVideo);
+        pe.setParentThread(this.mThreadNumber);
 
         // Отправляем
         this.sendPost(pe);
     }
 
-    private void sendPost(PostEntity pe) {
+    private void sendPost(SendPostModel pe) {
 
         if (this.mCurrentPostSendTask != null) {
             this.mCurrentPostSendTask.cancel(true);
@@ -333,7 +320,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         // return back to the list of posts
         String redirectedThreadNumber = null;
         if (redirectedPage != null) {
-            redirectedThreadNumber = UriUtils.getThreadNumber(Uri.parse(redirectedPage));
+            redirectedThreadNumber = this.mUriParser.getThreadNumber(Uri.parse(redirectedPage));
         }
 
         this.mFinishedSuccessfully = true;
@@ -381,14 +368,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     @Override
     public void skipCaptcha(boolean successPasscode, boolean failPasscode) {
-    	if (successPasscode){
-    		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip_passcode));
-    	} else if (failPasscode){
+        if (successPasscode) {
+            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip_passcode));
+        } else if (failPasscode) {
             this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_fail_passcode));
         } else {
-    		this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip));
-    	}
-    	
+            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip));
+        }
+
         this.switchToCaptchaView(CaptchaViewType.SKIP);
         this.mCaptchaPasscodeSuccess = successPasscode;
         this.mCaptchaPasscodeFail = failPasscode;
@@ -411,7 +398,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     @Override
     public void showCaptchaError(String errorMessage) {
         this.mCaptchaImageView.setImageResource(android.R.color.transparent);
-        AppearanceUtils.showToastMessage(this, !StringUtils.isEmpty(errorMessage) ? errorMessage : this.getResources().getString(R.string.error_read_response));
+        AppearanceUtils.showToastMessage(this, !StringUtils.isEmpty(errorMessage)
+                ? errorMessage
+                : this.getResources().getString(R.string.error_read_response));
 
         this.switchToCaptchaView(CaptchaViewType.ERROR);
     }
@@ -467,19 +456,19 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
             case R.id.menu_attach_youtube_id:
-            	final EditTextDialog dialog = new EditTextDialog(this);
-            	dialog.setTitle(this.getString(R.string.attach_youtube_title));
-            	dialog.setHint(this.getString(R.string.attach_youtube_hint));
- 
+                final EditTextDialog dialog = new EditTextDialog(this);
+                dialog.setTitle(this.getString(R.string.attach_youtube_title));
+                dialog.setHint(this.getString(R.string.attach_youtube_hint));
+
                 dialog.setPositiveButtonListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						boolean success = AddPostActivity.this.setVideoAttachment(dialog.getText());
+                    @Override
+                    public void onClick(View v) {
+                        boolean success = AddPostActivity.this.setVideoAttachment(dialog.getText());
                         // don't hide the dialog if there was an error, only if success
                         if (success) {
-                        	dialog.dismiss();
+                            dialog.dismiss();
                         }
-					}
+                    }
                 });
 
                 dialog.show();
@@ -503,7 +492,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 case Constants.REQUEST_CODE_GALLERY:
 
                     Uri imageUri = data.getData();
-                    File imageFile= IoUtils.getFile(this, imageUri);
+                    File imageFile = IoUtils.getFile(this, imageUri);
 
                     // Почему-то было 2 error reports с NullReferenceException
                     // из-за метода File.fixSlashes, добавлю проверку
@@ -529,11 +518,11 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (videoEditText.length() == Constants.YOUTUBE_CODE_LENGTH) {
             code = videoEditText;
         } else if (UriUtils.isYoutubeUri(Uri.parse(videoEditText))) {
-            code = UriUtils.getYouTubeCode(videoEditText);
+            code = RegexUtils.getYouTubeCode(videoEditText);
         }
 
         if (code != null) {
-            this.mAttachedVideo = UriUtils.formatYoutubeUriFromCode(code);
+            this.mAttachedVideo = UriUtils.formatYoutubeUri(code);
             this.mAttachedFile = null;
             this.displayAttachmentView(this.getString(R.string.data_add_post_video_attachment_name, code), "youtube.com");
             return true;
@@ -572,10 +561,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (this.mCurrentDownloadCaptchaTask != null) {
             this.mCurrentDownloadCaptchaTask.cancel(true);
         }
-        
+
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mHttpBitmapReader, this.mHtmlCaptchaChecker, MainApplication.getHttpClient());
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mHttpBitmapReader, this.mHtmlCaptchaChecker, Factory.resolve(DefaultHttpClient.class));
         this.mCurrentDownloadCaptchaTask.execute();
     }
 
@@ -591,7 +580,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (selectionStart < 0 || selectionEnd > text.length() || selectionStart > selectionEnd) {
             return;
         }
-        
+
         String selectedText = text.substring(selectionStart, selectionEnd);
 
         // Проверяем текст на краях выделенной области, на случай если уже была

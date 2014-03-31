@@ -1,4 +1,4 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services.http;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.vortexwolf.chan.common.library.FlushedInputStream;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 
@@ -20,25 +19,25 @@ public class HttpBitmapReader {
 
     private final HttpBytesReader mHttpBytesReader;
 
-    public HttpBitmapReader(DefaultHttpClient httpClient, Resources resources) {
-        this.mHttpBytesReader = new HttpBytesReader(httpClient, resources);
+    public HttpBitmapReader(HttpBytesReader httpBytesReader) {
+        this.mHttpBytesReader = httpBytesReader;
     }
 
     public Bitmap fromUri(String uri) throws HttpRequestException {
         return this.fromUri(uri, null);
     }
-    
+
     public Bitmap fromUri(String uri, Header[] customHeaders) throws HttpRequestException {
         byte[] bytes = this.mHttpBytesReader.fromUri(uri, customHeaders);
         InputStream stream = new FlushedInputStream(new ByteArrayInputStream(bytes));
-        
+
         Bitmap bmp = BitmapFactory.decodeStream(stream);
-        
+
         IoUtils.closeStream(stream);
-        
+
         return bmp;
     }
-    
+
     public void removeIfModifiedForUri(String uri) {
         this.mHttpBytesReader.removeIfModifiedForUri(uri);
     }

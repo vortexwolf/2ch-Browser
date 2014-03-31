@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,7 +33,7 @@ public class FileSystemPersistence implements BitmapCache {
             this.mBaseDir.mkdirs();
         }
     }
-    
+
     @Override
     public void clear() {
         IoUtils.deleteDirectory(this.mBaseDir);
@@ -59,7 +58,7 @@ public class FileSystemPersistence implements BitmapCache {
         } catch (FileNotFoundException e) {
             // ignore
         }
-        
+
         return bitmap;
     }
 
@@ -76,7 +75,7 @@ public class FileSystemPersistence implements BitmapCache {
             MyLog.e(TAG, e);
         }
     }
-    
+
     private boolean writeBitmapToFile(Bitmap bitmap, File file) throws IOException, FileNotFoundException {
         FileOutputStream out = null;
         try {
@@ -86,7 +85,7 @@ public class FileSystemPersistence implements BitmapCache {
             IoUtils.closeStream(out);
         }
     }
-    
+
     private Bitmap readBitmapFromFile(File file) throws FileNotFoundException {
         FileInputStream fis = null;
         Bitmap bitmap = null;
@@ -96,7 +95,7 @@ public class FileSystemPersistence implements BitmapCache {
             if (bitmap == null) {
                 file.delete();
             }
-            
+
             return bitmap;
         } finally {
             IoUtils.closeStream(fis);

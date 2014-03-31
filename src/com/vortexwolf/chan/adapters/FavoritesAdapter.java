@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.adapters;
 
-import java.util.List;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,7 @@ import com.vortexwolf.chan.db.FavoritesEntity;
 public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
     private final LayoutInflater mInflater;
     private final FavoritesDataSource mFavoritesDataSource;
-    
+
     public FavoritesAdapter(Context context, FavoritesDataSource favoritesDataSource) {
         super(context, -1);
         this.mInflater = LayoutInflater.from(context);
@@ -43,10 +41,10 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
                 FavoritesAdapter.this.removeItem(item);
             }
         });
-        
+
         return view;
     }
-    
+
     public void removeItem(FavoritesEntity item) {
         this.mFavoritesDataSource.removeFromFavorites(item.getUrl());
         this.mFavoritesDataSource.resetModifiedState();

@@ -1,6 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -9,15 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
+import android.provider.BaseColumns;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
@@ -35,38 +31,38 @@ public class IoUtils {
 
     public static String convertStreamToString(InputStream stream) throws IOException {
         byte[] bytes = convertStreamToBytes(stream);
-        
+
         String result = convertBytesToString(bytes);
         return result;
     }
-    
+
     public static byte[] convertStreamToBytes(InputStream stream) throws IOException {
         if (stream == null) {
             return null;
         }
-        
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        
+
         copyStream(stream, output);
 
         return output.toByteArray();
     }
-    
+
     public static String convertBytesToString(byte[] bytes) {
         if (bytes == null) {
             return null;
         }
-        
+
         String result;
         try {
             result = new String(bytes, Constants.UTF8_CHARSET.name());
         } catch (UnsupportedEncodingException e) {
             return null;
         }
-        
+
         return result;
     }
-    
+
     public static void copyStream(InputStream from, OutputStream to) throws IOException {
         byte data[] = new byte[8192];
         int count;
@@ -74,17 +70,17 @@ public class IoUtils {
         while ((count = from.read(data)) != -1) {
             to.write(data, 0, count);
         }
-        
+
         from.close();
     }
-    
+
     public static InputStream modifyInputStream(InputStream stream, long contentLength, IProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
         if (listener != null) {
             listener.setContentLength(contentLength);
 
             ProgressInputStream pin = new ProgressInputStream(stream);
             pin.addProgressChangeListener(listener);
-            
+
             stream = pin;
         }
 
@@ -94,7 +90,7 @@ public class IoUtils {
 
         return stream;
     }
-    
+
     public static void closeStream(Closeable stream) {
         try {
             if (stream != null) {
@@ -104,12 +100,12 @@ public class IoUtils {
             MyLog.e(TAG, e);
         }
     }
-    
+
     public static long dirSize(File dir) {
         if (dir == null || !dir.exists()) {
             return 0;
         }
-        
+
         File[] files = dir.listFiles();
         if (files == null) {
             return 0;
@@ -134,7 +130,7 @@ public class IoUtils {
             if (files == null) {
                 return;
             }
-            
+
             for (File file : files) {
                 if (file.isDirectory()) {
                     deleteDirectory(file);
@@ -155,7 +151,7 @@ public class IoUtils {
             if (files == null) {
                 return 0;
             }
-            
+
             for (File file : files) {
                 if (file.isDirectory()) {
                     released += freeSpace(file, bytesToRelease);
@@ -192,7 +188,7 @@ public class IoUtils {
 
         return file;
     }
-    
+
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = MediaColumns.DATA;
@@ -211,9 +207,9 @@ public class IoUtils {
         }
         return null;
     }
-    
+
     public static String getPath(final Context context, final Uri uri) {
-        final boolean isKitKat = Constants.SDK_VERSION >=  19;
+        final boolean isKitKat = Constants.SDK_VERSION >= 19;
 
         // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
@@ -233,8 +229,7 @@ public class IoUtils {
             else if (isDownloadsDocument(uri)) {
 
                 final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }
@@ -252,8 +247,8 @@ public class IoUtils {
                 } else if ("audio".equals(type)) {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
-                
-                final String selection = MediaStore.Images.Media._ID + "=?";
+
+                final String selection = BaseColumns._ID + "=?";
                 final String[] selectionArgs = new String[] { split[1] };
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
@@ -266,7 +261,7 @@ public class IoUtils {
             if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
             }
-                
+
             return getDataColumn(context, uri, null, null);
         }
         // File
@@ -276,30 +271,30 @@ public class IoUtils {
 
         return null;
     }
-    
+
     public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
-    
+
     public static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
-    
+
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
-    
+
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
-    
+
     public static boolean isLocal(String url) {
         if (url != null && !url.startsWith("http://") && !url.startsWith("https://")) {
             return true;
         }
         return false;
     }
-    
+
     public static File getFile(Context context, Uri uri) {
         if (uri != null) {
             String path = getPath(context, uri);

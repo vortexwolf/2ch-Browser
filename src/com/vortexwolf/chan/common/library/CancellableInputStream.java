@@ -22,7 +22,7 @@ public class CancellableInputStream extends FilterInputStream {
             this.closeWithoutExceptions();
             return -1;
         }
-        
+
         return super.read();
     }
 
@@ -32,7 +32,7 @@ public class CancellableInputStream extends FilterInputStream {
             this.closeWithoutExceptions();
             return -1;
         }
-        
+
         return super.read(b);
     }
 
@@ -42,15 +42,15 @@ public class CancellableInputStream extends FilterInputStream {
             this.closeWithoutExceptions();
             return -1;
         }
-        
+
         return super.read(b, off, len);
     }
 
     private boolean checkCancelled() {
         return this.mTask != null && this.mTask.isCancelled();
     }
-    
-    private void closeWithoutExceptions(){
+
+    private void closeWithoutExceptions() {
         try {
             this.close();
         } catch (IOException e) {

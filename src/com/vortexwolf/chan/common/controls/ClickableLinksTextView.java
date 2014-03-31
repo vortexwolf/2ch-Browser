@@ -2,23 +2,19 @@ package com.vortexwolf.chan.common.controls;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.UUID;
-
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.CompatibilityUtils;
-import com.vortexwolf.chan.common.utils.StringUtils;
 
 import android.content.Context;
-import android.graphics.Rect;
-import android.text.Editable;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
-import android.view.ActionMode;
 import android.view.MotionEvent;
 import android.widget.TextView;
+
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 
 /**
  * The TextView that handles correctly clickable spans.
@@ -63,16 +59,16 @@ public class ClickableLinksTextView extends TextView {
 
         return super.onTouchEvent(event);
     }
-    
-    public void startSelection(){
+
+    public void startSelection() {
         if (StringUtils.isEmpty(this.getText())) {
             return;
         }
-        
+
         this.copyBaseEditorIfNecessary();
-        
+
         Selection.setSelection((Spannable) this.getText(), 0, this.getText().length());
-        
+
         try {
             Method performLongClick = this.mBaseEditor.getClass().getMethod("performLongClick", Boolean.TYPE);
             performLongClick.invoke(this.mBaseEditor, false);
@@ -80,7 +76,7 @@ public class ClickableLinksTextView extends TextView {
             MyLog.e(TAG, e);
         }
     }
-    
+
     private boolean checkLinksOnTouch(MotionEvent event) {
         this.copyBaseEditorIfNecessary();
 
@@ -95,7 +91,7 @@ public class ClickableLinksTextView extends TextView {
             return superResult;
         }
 
-        final boolean touchIsFinished = (action == MotionEvent.ACTION_UP) && !this.getIgnoreActionUpEvent() && isFocused();
+        final boolean touchIsFinished = (action == MotionEvent.ACTION_UP) && !this.getIgnoreActionUpEvent() && this.isFocused();
 
         // Copied from the LinkMovementMethod class
         if (touchIsFinished) {

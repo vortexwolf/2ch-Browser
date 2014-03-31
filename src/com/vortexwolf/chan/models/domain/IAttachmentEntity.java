@@ -2,12 +2,12 @@ package com.vortexwolf.chan.models.domain;
 
 public interface IAttachmentEntity {
 
-    String getImage();
+    String getImageUrl();
 
-    String getVideo();
+    String getVideoUrl();
 
-    int getSize();
+    int getImageSize();
 
-    String getThumbnail();
+    String getThumbnailUrl();
 
 }

@@ -109,14 +109,14 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
                 if (cacheSize > maxSize) {
                     long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
                     IoUtils.deleteDirectory(CacheDirectoryManager.this.getReversedCacheDirectory());
-                    deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount); 
+                    deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount);
                     IoUtils.freeSpace(CacheDirectoryManager.this.getCurrentCacheDirectory(), deleteAmount);
                 }
-                
+
                 return null;
             }
         };
-        
+
         task.execute();
     }
 

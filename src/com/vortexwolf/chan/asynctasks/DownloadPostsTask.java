@@ -3,15 +3,12 @@ package com.vortexwolf.chan.asynctasks;
 import android.os.AsyncTask;
 import android.view.Window;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.activities.PostsListActivity;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.interfaces.IPostsListView;
-import com.vortexwolf.chan.interfaces.IProgressChangeListener;
-import com.vortexwolf.chan.models.domain.PostsList;
+import com.vortexwolf.chan.models.domain.PostModel;
 
 public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {
 
@@ -25,7 +22,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     private final boolean mIsCheckModified;
 
     private String mLoadAfterPost = null;
-    private PostsList mPostsList = null;
+    private PostModel[] mPostsList = null;
     private String mUserError = null;
 
     // Progress bar
@@ -102,8 +99,8 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
         if (this.mContentLength > 0) {
-            double relativeProgress = progress[0].longValue() / (double)this.mContentLength;
-            this.mView.setWindowProgress((int)(relativeProgress * 9999));
+            double relativeProgress = progress[0].longValue() / (double) this.mContentLength;
+            this.mView.setWindowProgress((int) (relativeProgress * 9999));
         }
     }
 
@@ -112,8 +109,8 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
         if (this.isCancelled()) {
             return;
         }
-        
-        long absoluteProgress = this.mProgressOffset + (long)(newValue * this.mProgressScale);
+
+        long absoluteProgress = this.mProgressOffset + (long) (newValue * this.mProgressScale);
         this.publishProgress(absoluteProgress);
     }
 

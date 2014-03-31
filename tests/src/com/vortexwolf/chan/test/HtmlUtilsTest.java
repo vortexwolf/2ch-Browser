@@ -58,6 +58,6 @@ public class HtmlUtilsTest extends InstrumentationTestCase {
 
         text = "test<br />3";
         result = HtmlUtils.trimBr(text);
-        assertEquals(result, "test<br/>3");
+        assertEquals(result, text);
     }
 }

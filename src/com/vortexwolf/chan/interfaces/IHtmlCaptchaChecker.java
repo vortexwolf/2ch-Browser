@@ -2,7 +2,7 @@ package com.vortexwolf.chan.interfaces;
 
 import android.net.Uri;
 
-import com.vortexwolf.chan.services.domain.HtmlCaptchaChecker.CaptchaResult;
+import com.vortexwolf.chan.services.HtmlCaptchaChecker.CaptchaResult;
 
 public interface IHtmlCaptchaChecker {
 

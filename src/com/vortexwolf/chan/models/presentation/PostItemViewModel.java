@@ -1,7 +1,6 @@
 package com.vortexwolf.chan.models.presentation;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,18 +9,18 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.text.SpannableStringBuilder;
-import android.text.format.DateFormat;
 import android.text.style.URLSpan;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.services.presentation.FlowTextHelper;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -31,7 +30,7 @@ public class PostItemViewModel {
     private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?title=\"(.+?)\".+?/>");
 
     private final int mPosition;
-    private final PostInfo mModel;
+    private final PostModel mModel;
     private final Theme mTheme;
     private final IURLSpanClickListener mUrlListener;
     private final DvachUriBuilder mDvachUriBuilder;
@@ -52,7 +51,7 @@ public class PostItemViewModel {
     private boolean mHasUrlSpans = false;
     private boolean mIsLongTextExpanded = false;
 
-    public PostItemViewModel(int position, PostInfo model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
+    public PostItemViewModel(int position, PostModel model, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder dvachUriBuilder) {
         this.mModel = model;
         this.mTheme = theme;
         this.mUrlListener = listener;
@@ -62,34 +61,36 @@ public class PostItemViewModel {
 
         this.parseReferences();
         this.mBadge = this.parseBadge();
-        
+
         // temporary assignment for testing
         this.mSpannedComment = this.createSpannedComment();
     }
-    
-    public String getSubjectOrText(){
+
+    public String getSubjectOrText() {
         String subject = this.mModel.getSubject();
         if (!StringUtils.isEmpty(subject)) {
             return subject;
         }
-        
+
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50);
     }
-    
-    private BadgeModel parseBadge(){
+
+    private BadgeModel parseBadge() {
         this.mName = this.mModel.getName();
-        if (this.mName == null) return null;
-        
+        if (this.mName == null) {
+            return null;
+        }
+
         Matcher m = sBadgePattern.matcher(this.mName);
         if (m.find() && m.groupCount() > 0) {
             this.mName = this.mName.replace(m.group(0), "");
-            
+
             BadgeModel model = new BadgeModel();
             model.source = m.group(1);
             model.title = m.group(2);
             return model;
         }
-        
+
         return null;
     }
 
@@ -116,7 +117,7 @@ public class PostItemViewModel {
 
         String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
         SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
-        
+
         URLSpan[] urlSpans = builder.getSpans(0, builder.length(), URLSpan.class);
         if (urlSpans.length > 0) {
             this.mHasUrlSpans = true;
@@ -144,20 +145,20 @@ public class PostItemViewModel {
     }
 
     public String getNumber() {
-        return this.mModel.getNum();
+        return this.mModel.getNumber();
     }
-    
-    public BadgeModel getBadge(){
-        return mBadge;
+
+    public BadgeModel getBadge() {
+        return this.mBadge;
     }
-    
+
     public String getParentThreadNumber() {
-        String parent = this.mModel.getParent();
+        String parent = this.mModel.getParentThread();
         return parent != null && !parent.equals("0") ? parent : this.getNumber();
     }
 
     public String getName() {
-        return this.mName != null ? this.mName : this.mModel.getPostername();
+        return this.mName;
     }
 
     public boolean hasAttachment() {
@@ -182,15 +183,10 @@ public class PostItemViewModel {
 
     public String getPostDate(Context context) {
         if (this.mPostDate == null || this.mIsLocalDateTime != this.mSettings.isLocalDateTime()) {
-            long realTimeStamp = (this.mModel.getTimestamp()) * 1000;
-            if (realTimeStamp == 0) {
-                realTimeStamp = ThreadPostUtils.parseMoscowTextDate(this.mModel.getDate());
-            }
-            
             this.mIsLocalDateTime = this.mSettings.isLocalDateTime();
             String formattedDate = this.mIsLocalDateTime
-                    ? ThreadPostUtils.getLocalDateFromTimestamp(context, realTimeStamp)
-                    : ThreadPostUtils.getMoscowDateFromTimestamp(context, realTimeStamp);
+                    ? ThreadPostUtils.getLocalDateFromTimestamp(context, this.mModel.getTimestamp())
+                    : ThreadPostUtils.getMoscowDateFromTimestamp(context, this.mModel.getTimestamp());
 
             this.mPostDate = formattedDate;
         }
@@ -201,15 +197,15 @@ public class PostItemViewModel {
     public boolean hasUrls() {
         return this.mHasUrlSpans;
     }
-    
+
     public boolean hasReferencesFrom() {
         return !this.referencesFrom.isEmpty();
     }
-    
+
     public boolean isLongTextExpanded() {
         return this.mIsLongTextExpanded;
     }
-    
+
     public void setLongTextExpanded(boolean isExpanded) {
         this.mIsLongTextExpanded = isExpanded;
     }
@@ -219,7 +215,7 @@ public class PostItemViewModel {
             String firstWord = res.getString(R.string.postitem_replies);
             this.mCachedReferencesString = this.createReferencesString(firstWord, this.referencesFrom, boardName, threadNumber);
         }
-        
+
         return this.mCachedReferencesString;
     }
 
@@ -237,7 +233,7 @@ public class PostItemViewModel {
         while (iterator.hasNext()) {
             String refNumber = iterator.next();
 
-            String refUrl = this.mDvachUriBuilder.create2chPostUrl(boardName, threadNumber, refNumber);
+            String refUrl = this.mDvachUriBuilder.createPostUri(boardName, threadNumber, refNumber);
             // String htmlLink = String.format("<a href=\"%s\">%s</a>", refUrl,
             // "&gt;&gt;" + refNumber);
             sb.append("<a href=\"" + refUrl + "\">" + "&gt;&gt;" + refNumber + "</a>");

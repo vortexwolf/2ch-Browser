@@ -3,7 +3,6 @@ package com.vortexwolf.chan.interfaces;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.net.Uri;
 
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 
@@ -15,7 +14,7 @@ public interface IOpenTabsManager {
     public abstract void navigate(OpenTabModel tab, Activity activity);
 
     public abstract OpenTabModel add(OpenTabModel tab);
-    
+
     void removeAll();
 
 }

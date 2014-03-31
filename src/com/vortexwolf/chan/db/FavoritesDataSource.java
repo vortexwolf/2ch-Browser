@@ -9,7 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 
 public class FavoritesDataSource {
     private static final String TABLE = DvachSqlHelper.TABLE_FAVORITES;
@@ -32,12 +32,12 @@ public class FavoritesDataSource {
     public void close() {
         this.mDbHelper.close();
     }
-    
+
     public boolean isModified() {
         return this.mModified;
     }
-    
-    public void resetModifiedState(){
+
+    public void resetModifiedState() {
         this.mModified = false;
     }
 
@@ -73,13 +73,13 @@ public class FavoritesDataSource {
         return favorites;
     }
 
-    public List<FavoritesEntity> getFavoriteBoards() {
+    public List<FavoritesEntity> getFavoriteBoards(DvachUriParser uriParser) {
         List<FavoritesEntity> favorites = this.getAllFavorites();
         List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
             Uri uri = Uri.parse(f.getUrl());
-            if (UriUtils.isBoardUri(uri) && UriUtils.getBoardPageNumber(uri) == 0) {
+            if (uriParser.isBoardUri(uri) && uriParser.getBoardPageNumber(uri) == 0) {
                 boardFavorites.add(f);
             }
         }

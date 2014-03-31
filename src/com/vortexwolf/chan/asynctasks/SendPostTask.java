@@ -4,8 +4,7 @@ import android.os.AsyncTask;
 
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
-import com.vortexwolf.chan.models.domain.PostEntity;
-import com.vortexwolf.chan.models.domain.PostFields;
+import com.vortexwolf.chan.models.domain.SendPostModel;
 
 public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 
@@ -14,12 +13,12 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
 
     private final String mBoardName;
     private final String mThreadNumber;
-    private final PostEntity mEntity;
+    private final SendPostModel mEntity;
 
     private String mRedirectedPage = null;
     private String mUserError;
 
-    public SendPostTask(IPostSender postSender, IPostSendView view, String boardName, String threadNumber, PostEntity entity) {
+    public SendPostTask(IPostSender postSender, IPostSendView view, String boardName, String threadNumber, SendPostModel entity) {
         this.mPostSender = postSender;
         this.mView = view;
 
@@ -31,7 +30,7 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected Boolean doInBackground(Void... args) {
         try {
-            this.mRedirectedPage = this.mPostSender.sendPost(this.mBoardName, this.mThreadNumber, this.getPostFields(), this.mEntity);
+            this.mRedirectedPage = this.mPostSender.sendPost(this.mBoardName, this.mEntity);
             return true;
         } catch (Exception e) {
             this.mUserError = e.getMessage();
@@ -53,9 +52,5 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
         } else {
             this.mView.showError(this.mUserError);
         }
-    }
-
-    private PostFields getPostFields() {
-        return PostFields.getDefault();
     }
 }

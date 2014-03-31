@@ -7,7 +7,7 @@ public class BoardModel {
         this.isVisible = isVisible;
         this.group = group;
     }
-    
+
     public String code;
     public String title;
     public boolean isVisible;

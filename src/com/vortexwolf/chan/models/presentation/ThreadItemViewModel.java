@@ -2,19 +2,20 @@ package com.vortexwolf.chan.models.presentation;
 
 import android.content.res.Resources.Theme;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
+import com.vortexwolf.chan.boards.dvach.models.DvachThreadInfo;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.models.domain.ThreadInfo;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.models.domain.PostModel;
+import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class ThreadItemViewModel {
 
     private final Theme mTheme;
-    private final PostInfo mOpPost;
+    private final PostModel mOpPost;
     private final int mReplyCount;
     private final int mImageCount;
     private final DvachUriBuilder mDvachUriBuilder;
@@ -24,21 +25,21 @@ public class ThreadItemViewModel {
     private boolean mEllipsized = false;
     private boolean mHidden = false;
 
-    public ThreadItemViewModel(ThreadInfo model, Theme theme, DvachUriBuilder dvachUriBuilder) {
+    public ThreadItemViewModel(ThreadModel model, Theme theme, DvachUriBuilder dvachUriBuilder) {
         this.mTheme = theme;
         this.mDvachUriBuilder = dvachUriBuilder;
 
         this.mOpPost = model.getPosts()[0];
         this.mReplyCount = model.getReplyCount();
         this.mImageCount = model.getImageCount();
-        
+
         this.mSpannedComment = this.createSpannedComment();
     }
 
     public SpannableStringBuilder getSpannedComment() {
         return this.mSpannedComment;
     }
-    
+
     private SpannableStringBuilder createSpannedComment() {
         String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
         SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
@@ -48,13 +49,13 @@ public class ThreadItemViewModel {
     public String getSubject() {
         return StringUtils.emptyIfNull(this.mOpPost.getSubject());
     }
-    
-    public String getSubjectOrText(){
+
+    public String getSubjectOrText() {
         String subject = this.mOpPost.getSubject();
         if (!StringUtils.isEmpty(subject)) {
             return subject;
         }
-        
+
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50) + "...";
     }
 
@@ -70,12 +71,12 @@ public class ThreadItemViewModel {
         return this.mAttachment;
     }
 
-    public PostInfo getOpPost() {
+    public PostModel getOpPost() {
         return this.mOpPost;
     }
 
     public String getNumber() {
-        return this.mOpPost.getNum();
+        return this.mOpPost.getNumber();
     }
 
     public int getReplyCount() {

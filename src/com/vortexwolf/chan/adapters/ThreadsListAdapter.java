@@ -8,20 +8,20 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.models.DvachThreadInfo;
 import com.vortexwolf.chan.common.controls.EllipsizingTextView;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
-import com.vortexwolf.chan.models.domain.ThreadInfo;
+import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
@@ -124,14 +124,14 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
                 boundItem.setEllipsized(ellipsized);
             }
         });
-        
+
         // Количество ответов
         String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
         String imagesQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
         String repliesFormat = this.getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
-        
+
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
         ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext(), null);
@@ -139,14 +139,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     }
 
     /** Обновляет адаптер полностью */
-    public void setAdapterData(ThreadInfo[] threads) {
+    public void setAdapterData(ThreadModel[] threads) {
         this.clear();
 
-        if (threads == null) {
-            return;
-        }
-        
-        for (ThreadInfo ti : threads) {
+        for (ThreadModel ti : threads) {
             ThreadItemViewModel model = new ThreadItemViewModel(ti, this.mTheme, this.mDvachUriBuilder);
             boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mBoardName, model.getNumber());
             model.setHidden(isHidden);

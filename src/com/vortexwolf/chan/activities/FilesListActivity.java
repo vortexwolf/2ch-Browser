@@ -24,11 +24,12 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
+import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class FilesListActivity extends ListActivity {
@@ -62,9 +63,7 @@ public class FilesListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MainApplication application = (MainApplication) this.getApplication();
-        application.getTracker().trackActivityView(TAG);
-        ApplicationSettings settings = application.getSettings();
+        ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
 
         this.setTheme(settings.getTheme());
         this.setContentView(R.layout.files_list_view);
@@ -94,6 +93,8 @@ public class FilesListActivity extends ListActivity {
             ArrayList<String> collection = this.getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
             this.acceptedFileExtensions = collection.toArray(new String[collection.size()]);
         }
+        
+        Factory.resolve(MyTracker.class).trackActivityView(TAG);
     }
 
     @Override
@@ -228,7 +229,7 @@ public class FilesListActivity extends ListActivity {
                 ImageFileModel bitmapModel = new ImageFileModel(object.file);
                 int maxSize = 70;
                 Bitmap b = bitmapModel.getBitmap(maxSize);
-                
+
                 if (b != null) {
                     imageView.setImageBitmap(b);
                     frame.setVisibility(View.VISIBLE);

@@ -22,7 +22,7 @@ public class Constants {
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));
     public static final String GIF_IMAGE = "gif";
-    
+
     public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
     public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);
 

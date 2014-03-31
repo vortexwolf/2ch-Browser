@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.controls.MyLeadingMarginSpan2;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 
@@ -22,7 +23,7 @@ public class FlowTextHelper {
     }
 
     static {
-        if (Integer.valueOf(Build.VERSION.SDK) >= 8) { // Froyo
+        if (Constants.SDK_VERSION >= 8) { // Froyo
             sNewClassAvailable = true;
         }
     }

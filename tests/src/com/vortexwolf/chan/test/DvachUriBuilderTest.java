@@ -3,7 +3,7 @@ package com.vortexwolf.chan.test;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 
 public class DvachUriBuilderTest extends InstrumentationTestCase {
 
@@ -14,43 +14,43 @@ public class DvachUriBuilderTest extends InstrumentationTestCase {
 
     public void testCreate2chUrl() {
 
-        String resultUrl = sUriBuilder.create2chBoardUri("b", 0).toString();
+        String resultUrl = sUriBuilder.createBoardUri("b", 0).toString();
         assertEquals(resultUrl, "http://2ch.hk/b");
 
-        resultUrl = sUriBuilder.create2chBoardUri("b", 1).toString();
+        resultUrl = sUriBuilder.createBoardUri("b", 1).toString();
         assertEquals(resultUrl, "http://2ch.hk/b/1.html");
 
-        resultUrl = sUriBuilder.create2chThreadUrl("b", "123");
+        resultUrl = sUriBuilder.createThreadUri("b", "123");
         assertEquals(resultUrl, "http://2ch.hk/b/res/123.html");
 
-        resultUrl = sUriBuilder.create2chPostUrl("b", "123", "456");
+        resultUrl = sUriBuilder.createPostUri("b", "123", "456");
         assertEquals(resultUrl, "http://2ch.hk/b/res/123.html#456");
 
-        resultUrl = sUriBuilder.create2chBoardUri("b", "thumb/12345.jpg").toString();
+        resultUrl = sUriBuilder.createBoardUri("b", "thumb/12345.jpg").toString();
         assertEquals(resultUrl, "http://2ch.hk/b/thumb/12345.jpg");
 
-        resultUrl = sUriBuilder.create2chBoardUri("b", "/thumb/12345.jpg").toString();
+        resultUrl = sUriBuilder.createBoardUri("b", "/thumb/12345.jpg").toString();
         assertEquals(resultUrl, "http://2ch.hk/b/thumb/12345.jpg");
 
-        resultUrl = sUriBuilder.create2chUri("/wakaba").toString();
+        resultUrl = sUriBuilder.createUri("/wakaba").toString();
         assertEquals(resultUrl, "http://2ch.hk/wakaba");
     }
 
     public void testAdjust2chRelativeUri() {
         Uri uri = Uri.parse(threadRelativeUriB);
-        String resultUri = sUriBuilder.adjust2chRelativeUri(uri).toString();
+        String resultUri = sUriBuilder.adjustRelativeUri(uri).toString();
         assertEquals(resultUri, threadUriB);
 
         uri = Uri.parse("/test/res/52916.html#52916");
-        resultUri = sUriBuilder.adjust2chRelativeUri(uri).toString();
+        resultUri = sUriBuilder.adjustRelativeUri(uri).toString();
         assertEquals(resultUri, "http://2ch.hk/test/res/52916.html#52916");
 
         uri = Uri.parse("test");
-        resultUri = sUriBuilder.adjust2chRelativeUri(uri).toString();
+        resultUri = sUriBuilder.adjustRelativeUri(uri).toString();
         assertEquals(resultUri, "http://2ch.hk/test");
 
         uri = Uri.parse("///test");
-        resultUri = sUriBuilder.adjust2chRelativeUri(uri).toString();
+        resultUri = sUriBuilder.adjustRelativeUri(uri).toString();
         assertEquals(resultUri, "http://2ch.hk/test");
     }
 }

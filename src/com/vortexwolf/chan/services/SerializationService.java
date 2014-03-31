@@ -3,11 +3,8 @@ package com.vortexwolf.chan.services;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import android.os.AsyncTask;
 
@@ -44,16 +41,16 @@ public class SerializationService {
 
         return null;
     }
-    
+
     private static class SerializeTask extends AsyncTask<Void, Void, Void> {
         private final File mFile;
         private final Object mObject;
-        
+
         public SerializeTask(File file, Object object) {
             this.mFile = file;
             this.mObject = object;
         }
-        
+
         @Override
         protected Void doInBackground(Void... arg0) {
             ObjectOutputStream os = null;
@@ -65,7 +62,7 @@ public class SerializationService {
             } finally {
                 IoUtils.closeStream(os);
             }
-            
+
             return null;
         }
     }

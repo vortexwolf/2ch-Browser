@@ -28,7 +28,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final Context mContext;
     private final ApplicationSettings mSettings;
     private final String mPasscode;
-    
+
     private String mUserCodeCookie = null;
 
     public CheckPasscodeTask(Context context, ApplicationSettings settings, String passcode) {
@@ -57,7 +57,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
             response = client.execute(post);
 
             String location = ExtendedHttpClient.getLocationHeader(response);
-            
+
             List<Cookie> cookies = client.getCookieStore().getCookies();
             for (Cookie c : cookies) {
                 if (c.getName().equals("usercode")) {
@@ -65,7 +65,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
                     break;
                 }
             }
-            
+
             return location;
         } catch (Exception e) {
             MyLog.e("CheckPasscodeTask", e);
@@ -80,7 +80,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String result) {
         // update settings anyway
         this.mSettings.savePassCodeCookie(this.mUserCodeCookie);
-        
+
         if (StringUtils.isEmpty(this.mPasscode)) {
             return;
         }

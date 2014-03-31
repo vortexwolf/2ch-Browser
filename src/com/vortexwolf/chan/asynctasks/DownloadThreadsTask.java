@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.Window;
 
-import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.interfaces.IListView;
-import com.vortexwolf.chan.interfaces.IProgressChangeListener;
-import com.vortexwolf.chan.models.domain.ThreadsList;
+import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {
 
@@ -19,19 +17,19 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 
     private final Activity mActivity;
     private final IJsonApiReader mJsonReader;
-    private final IListView<ThreadsList> mView;
+    private final IListView<ThreadModel[]> mView;
     private final String mBoard;
     private final int mPageNumber;
     private final boolean mIsCheckModified;
 
-    private ThreadsList mThreadsList = null;
+    private ThreadModel[] mThreadsList = null;
     private String mUserError = null;
     // Progress bar
     private long mContentLength = 0;
     private long mProgressOffset = 0;
     private double mProgressScale = 1;
-    
-    public DownloadThreadsTask(Activity activity, IListView<ThreadsList> view, String board, int pageNumber, boolean checkModified, IJsonApiReader jsonReader) {
+
+    public DownloadThreadsTask(Activity activity, IListView<ThreadModel[]> view, String board, int pageNumber, boolean checkModified, IJsonApiReader jsonReader) {
         this.mActivity = activity;
         this.mJsonReader = jsonReader;
         this.mView = view;
@@ -76,8 +74,8 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     public void onProgressUpdate(Long... progress) {
         // 0-9999 is ok, 10000 means it's finished
         if (this.mContentLength > 0) {
-            double relativeProgress = progress[0].longValue() / (double)this.mContentLength;
-            this.mView.setWindowProgress((int)(relativeProgress * 9999));
+            double relativeProgress = progress[0].longValue() / (double) this.mContentLength;
+            this.mView.setWindowProgress((int) (relativeProgress * 9999));
         }
     }
 
@@ -87,7 +85,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
             return;
         }
 
-        long absoluteProgress = this.mProgressOffset + (long)(newValue * this.mProgressScale);
+        long absoluteProgress = this.mProgressOffset + (long) (newValue * this.mProgressScale);
         this.publishProgress(absoluteProgress);
     }
 
@@ -100,7 +98,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     public void setContentLength(long value) {
         this.mContentLength = value;
     }
-    
+
     @Override
     public long getContentLength() {
         return this.mContentLength;

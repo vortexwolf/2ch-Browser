@@ -1,18 +1,14 @@
 package com.vortexwolf.chan.services;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
-
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.httpimage.HttpImageManager;
 import android.httpimage.HttpImageManager.LoadRequest;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.interfaces.IBitmapManager;
 
 public class BitmapManager implements IBitmapManager {
     private final HttpImageManager mImageManager;
@@ -30,10 +26,9 @@ public class BitmapManager implements IBitmapManager {
     public void fetchBitmapOnThread(final String uriString, final ImageView imageView, final View indeterminateProgressBar, final Integer errorImageId) {
 
         Uri uri = Uri.parse(uriString);
-        /*if (imageView.getTag() == uri) {
-            return;
-        }*/
-        
+        /*
+         * if (imageView.getTag() == uri) { return; } */
+
         imageView.setTag(uri);
 
         LoadRequest r = new LoadRequest(uri, new HttpImageManager.OnLoadResponseListener() {

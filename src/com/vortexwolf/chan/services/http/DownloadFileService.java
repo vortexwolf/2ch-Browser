@@ -1,6 +1,5 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services.http;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,10 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.res.Resources;
@@ -26,28 +21,25 @@ import com.vortexwolf.chan.exceptions.DownloadFileException;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
-import com.vortexwolf.chan.models.domain.HttpStreamModel;
 
 public class DownloadFileService {
     private static final String TAG = "DownloadFileService";
 
     private final Resources mResources;
-    private final DefaultHttpClient mHttpClient;
     private final HttpStreamReader mHttpStreamReader;
 
-    public DownloadFileService(Resources resources, DefaultHttpClient httpClient) {
+    public DownloadFileService(Resources resources, HttpStreamReader httpStreamReader) {
         this.mResources = resources;
-        this.mHttpClient = httpClient;
-        this.mHttpStreamReader = new HttpStreamReader(httpClient, resources);
+        this.mHttpStreamReader = httpStreamReader;
     }
 
     public void downloadFile(Uri uri, File to, IProgressChangeListener listener, ICancelled task) throws DownloadFileException {
         if (to.exists()) {
             throw new DownloadFileException(this.mResources.getString(R.string.error_file_exist));
         }
-        
+
         boolean wasCancelled = false;
-        
+
         try {
             // check if the uri is a file uri
             File fromFile = new File(uri.getPath());
@@ -57,17 +49,15 @@ public class DownloadFileService {
             } else {
                 this.saveFromUri(uri, to, listener, task);
             }
-            
+
             if (task != null && task.isCancelled()) {
                 wasCancelled = true;
             }
-        } 
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             MyLog.e(TAG, e);
             wasCancelled = true;
             throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             MyLog.e(TAG, e);
             wasCancelled = true;
             throw new DownloadFileException(this.mResources.getString(R.string.error_save_file));
@@ -77,13 +67,13 @@ public class DownloadFileService {
             }
         }
     }
-    
-    private void saveFromUri(Uri uri, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException{
+
+    private void saveFromUri(Uri uri, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException {
         HttpStreamModel streamModel = null;
         try {
             this.mHttpStreamReader.removeIfModifiedForUri(uri.toString());
             streamModel = this.mHttpStreamReader.fromUri(uri.toString(), null, listener, task);
-        
+
             this.saveStream(streamModel.stream, to);
         } finally {
             if (streamModel != null) {
@@ -91,12 +81,12 @@ public class DownloadFileService {
             }
         }
     }
-    
-    private void saveFromFile(File from, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException{
+
+    private void saveFromFile(File from, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException {
         InputStream input = null;
         try {
             input = IoUtils.modifyInputStream(new FileInputStream(from), from.length(), listener, task);
-            
+
             this.saveStream(input, to);
         } finally {
             IoUtils.closeStream(input);

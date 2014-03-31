@@ -1,40 +1,27 @@
 package com.vortexwolf.chan.services.presentation;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources.Theme;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.method.ArrowKeyMovementMethod;
-import android.text.util.Linkify;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
@@ -85,14 +72,14 @@ public class PostItemViewBuilder {
             vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
             vb.imageView = (ImageView) view.findViewById(R.id.thumbnail);
             vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
-            vb.badgeView = (View) view.findViewById(R.id.badge_view);
+            vb.badgeView = view.findViewById(R.id.badge_view);
             vb.badgeImage = (ImageView) view.findViewById(R.id.badge_image);
             vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
             view.setTag(vb);
         }
-        
+
         vb.currentModel = item;
-        
+
         if (item.canMakeCommentFloat() || item.isCommentFloat()) {
             FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView, vb.commentView);
         } else {
@@ -132,7 +119,7 @@ public class PostItemViewBuilder {
 
         // Обрабатываем прикрепленный файл
         AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        String threadUrl = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+        String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
         ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
         ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView);
 
@@ -143,7 +130,7 @@ public class PostItemViewBuilder {
         }
 
         vb.commentView.setText(item.getSpannedComment());
-        if(item.hasUrls() && !CompatibilityUtils.isTextSelectable(vb.commentView)) {
+        if (item.hasUrls() && !CompatibilityUtils.isTextSelectable(vb.commentView)) {
             vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
         }
 
@@ -156,14 +143,14 @@ public class PostItemViewBuilder {
         } else {
             vb.postRepliesView.setVisibility(View.GONE);
         }
-        
+
         // badge
         BadgeModel badge = item.getBadge();
         if (badge != null) {
             vb.badgeView.setVisibility(View.VISIBLE);
             vb.badgeTitle.setText(badge.title);
-            
-            Uri uri = this.mDvachUriBuilder.adjust2chRelativeUri(Uri.parse(badge.source));
+
+            Uri uri = this.mDvachUriBuilder.adjustRelativeUri(Uri.parse(badge.source));
             this.mBitmapManager.fetchBitmapOnThread(uri.toString(), vb.badgeImage, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
@@ -175,27 +162,27 @@ public class PostItemViewBuilder {
 
         return view;
     }
-    
-    public void setMaxHeight(final View view, final int maxHeight, final Theme theme){
+
+    public void setMaxHeight(final View view, final int maxHeight, final Theme theme) {
         final ViewBag vb = (ViewBag) view.getTag();
 
         // set max height anyway, it will not affect views with small height
         vb.commentView.setMaxHeight(maxHeight);
         vb.showFullTextView.setVisibility(View.GONE);
-        
+
         SpannableStringBuilder builder = new SpannableStringBuilder(vb.showFullTextView.getText());
         HtmlUtils.replaceUrls(builder, null, theme);
         vb.showFullTextView.setText(builder);
-        
+
         // wait until the text is drawn
         view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
                 view.getViewTreeObserver().removeOnPreDrawListener(this);
-                
+
                 int textHeight = vb.commentView.getHeight();
                 //MyLog.v("PostItemViewBuilder", "onPreDraw Text height: " + textHeight);
-                if (textHeight >= maxHeight) { 
+                if (textHeight >= maxHeight) {
                     vb.showFullTextView.setVisibility(View.VISIBLE);
                     vb.showFullTextView.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -203,15 +190,15 @@ public class PostItemViewBuilder {
                             vb.currentModel.setLongTextExpanded(true);
                             PostItemViewBuilder.this.removeMaxHeight(view);
                         }
-                    });  
+                    });
                     return false;
                 }
-                
+
                 return true;
             }
         });
     }
-    
+
     public void removeMaxHeight(View view) {
         ViewBag vb = (ViewBag) view.getTag();
         vb.commentView.setMaxHeight(Integer.MAX_VALUE);
@@ -247,7 +234,7 @@ public class PostItemViewBuilder {
             AttachmentInfo attachment = item.getAttachment(this.mBoardName);
 
             if (vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                String threadUrl = this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, this.mThreadNumber);
+                String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
                 ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
             }
         }
@@ -255,7 +242,7 @@ public class PostItemViewBuilder {
 
     public static class ViewBag {
         public PostItemViewModel currentModel;
-        
+
         public TextView postIdView;
         public TextView postNameView;
         public TextView postIndexView;

@@ -1,11 +1,8 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.text.DateFormatSymbols;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.activities.BrowserActivity;
 import com.vortexwolf.chan.activities.ImageGalleryActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
@@ -31,23 +27,23 @@ import com.vortexwolf.chan.models.domain.IAttachmentEntity;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
-import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class ThreadPostUtils {
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
-    private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" };
+    private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг",
+            "Сен", "Окт", "Ноя", "Дек" };
 
     private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
     private static long sHeapPad = 1024;
-    
+
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
-        
+
         java.text.DateFormat timeFormat = DateFormat.getTimeFormat(context);
         timeFormat.setTimeZone(timeZone);
-        
+
         Date date = new Date(timeInMiliseconds);
         return dateFormat.format(date) + ", " + timeFormat.format(date);
     }
@@ -59,18 +55,18 @@ public class ThreadPostUtils {
     public static String getLocalDateFromTimestamp(Context context, long timeInMiliseconds) {
         return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getDefault());
     }
-    
+
     //text = "Птн 12 Апр 2013 12:37:12";
     public static long parseMoscowTextDate(String text) {
-        if(StringUtils.isEmpty(text)) {
+        if (StringUtils.isEmpty(text)) {
             return 0;
         }
-        
+
         Matcher m = dateTextPattern.matcher(text);
-        if(!m.find()) {
+        if (!m.find()) {
             return 0;
         }
-        
+
         int day = Integer.valueOf(m.group(1));
         String monthStr = m.group(2);
         int monthIndex = Arrays.asList(sMonthNames).indexOf(monthStr);
@@ -80,12 +76,12 @@ public class ThreadPostUtils {
         int minute = Integer.valueOf(m.group(5));
         int second = Integer.valueOf(m.group(6));
 
-        Date date  = new Date(year - 1900, month, day, hour, minute, second);
-        
+        Date date = new Date(year - 1900, month, day, hour, minute, second);
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.HOUR, -4); // from GMT+4 to UTC
-        
+
         long result = cal.getTimeInMillis();
         return result;
     }
@@ -102,14 +98,14 @@ public class ThreadPostUtils {
 
     /** Проверяет, прикреплен ли к посту какой-либо файл */
     public static boolean hasAttachment(IAttachmentEntity item) {
-        return !StringUtils.isEmpty(item.getImage()) || !StringUtils.isEmpty(item.getVideo());
+        return !StringUtils.isEmpty(item.getImageUrl()) || !StringUtils.isEmpty(item.getImageUrl());
     }
 
     public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings, final String threadUrl) {
         if (attachment == null) {
             return;
         }
-        
+
         int imageSize = attachment.getSize();
         String url = attachment.getSourceUrl(settings);
 
@@ -152,6 +148,7 @@ public class ThreadPostUtils {
     /**
      * Разбирается с прикрепленным файлом для треда или поста; перенес сюда,
      * чтобы не повторять код
+     * 
      * @param attachment
      *            Модель прикрепленного к треду или посту файла
      * @param imageView

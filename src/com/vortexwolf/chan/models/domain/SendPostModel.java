@@ -2,7 +2,7 @@ package com.vortexwolf.chan.models.domain;
 
 import java.io.File;
 
-public class PostEntity {
+public class SendPostModel {
     private String mCaptchaKey;
     private String mCaptchaAnswer;
     private String mComment;
@@ -12,8 +12,9 @@ public class PostEntity {
     private String mPolitics;
     private String mName;
     private String mVideo;
+    private String mParentThread;
 
-    public PostEntity(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject, String politics, String name, String video) {
+    public SendPostModel(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject, String politics, String name, String video) {
         this.mCaptchaKey = captchaKey;
         this.mCaptchaAnswer = captchaAnswer;
         this.mComment = comment;
@@ -95,5 +96,13 @@ public class PostEntity {
 
     public void setVideo(String video) {
         this.mVideo = video;
+    }
+
+    public String getParentThread() {
+        return mParentThread;
+    }
+
+    public void setParentThread(String parentThread) {
+        this.mParentThread = parentThread;
     }
 }

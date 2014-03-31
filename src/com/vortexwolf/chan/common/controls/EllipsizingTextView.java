@@ -44,7 +44,7 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
         TypedArray a = context.obtainStyledAttributes(attrs, new int[] { android.R.attr.maxLines });
         int maxLines = a.getInt(0, this.maxLines);
         a.recycle();
-        
+
         this.setMaxLines(maxLines);
     }
 

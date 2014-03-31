@@ -1,16 +1,14 @@
-package com.vortexwolf.chan.services.domain;
+package com.vortexwolf.chan.services;
 
 import org.apache.http.Header;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.message.BasicHeader;
 
 import android.net.Uri;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
@@ -24,22 +22,22 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(Uri refererUri){
+    public CaptchaResult canSkipCaptcha(Uri refererUri) {
         return this.canSkipCaptcha(refererUri, true);
     }
-    
+
     @Override
     public CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode) {
         String checkUri = "makaba/captcha.fcgi";
         if (usePasscode && (!StringUtils.isEmpty(this.mApplicationSettings.getPassCodeCookie()) || !StringUtils.isEmpty(this.mApplicationSettings.getPassCode()))) {
             checkUri += "?usercode=" + this.mApplicationSettings.getPassCodeCookie();
         }
-        
-        Uri uri = this.mDvachUriBuilder.create2chUri(checkUri);
+
+        Uri uri = this.mDvachUriBuilder.createUri(checkUri);
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it
         Header[] extraHeaders = new Header[] { new BasicHeader("Referer", refererUri.toString()) };
-        
+
         CaptchaResult result;
         try {
             String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
@@ -47,15 +45,15 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         } catch (Exception e) {
             result = this.createEmptyResult();
         }
-        
+
         return result;
     }
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
-        if(captchaBlock == null){
+        if (captchaBlock == null) {
             return this.createEmptyResult();
         }
-        
+
         CaptchaResult result = new CaptchaResult();
         if (captchaBlock.equals("OK")) {
             result.canSkip = true;
@@ -72,8 +70,8 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
 
         return result;
     }
-    
-    private CaptchaResult createEmptyResult(){
+
+    private CaptchaResult createEmptyResult() {
         return new CaptchaResult();
     }
 

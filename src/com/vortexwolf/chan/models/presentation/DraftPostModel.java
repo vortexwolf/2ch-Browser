@@ -48,7 +48,7 @@ public class DraftPostModel {
     public Bitmap getCaptchaImage() {
         return this.mCaptchaImage;
     }
-    
+
     public boolean isCaptchaPasscodeSuccess() {
         return this.mCaptchaPasscodeSuccess;
     }

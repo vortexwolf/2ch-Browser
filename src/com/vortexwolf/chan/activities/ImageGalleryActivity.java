@@ -3,111 +3,97 @@ package com.vortexwolf.chan.activities;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.asynctasks.DownloadFileTask;
-import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.controls.EllipsizingTextView;
-import com.vortexwolf.chan.common.controls.ExtendedViewPager;
-import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.chan.interfaces.IDownloadFileView;
-import com.vortexwolf.chan.models.presentation.ImageFileModel;
-import com.vortexwolf.chan.models.presentation.ThreadImageModel;
-import com.vortexwolf.chan.services.BrowserLauncher;
-import com.vortexwolf.chan.services.MyTracker;
-import com.vortexwolf.chan.services.ThreadImagesService;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
-import com.vortexwolf.chan.settings.ApplicationSettings;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
+
+import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.asynctasks.DownloadFileTask;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.controls.ExtendedViewPager;
+import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.chan.interfaces.IDownloadFileView;
+import com.vortexwolf.chan.models.presentation.ThreadImageModel;
+import com.vortexwolf.chan.services.BrowserLauncher;
+import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.ThreadImagesService;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class ImageGalleryActivity extends Activity {
     public static final String TAG = "ImageGalleryActivity";
-    
+
     private ThreadImagesService mThreadImagesService;
-    private DvachUriBuilder mDvachUriBuilder;    
     private ICacheDirectoryManager mCacheDirectoryManager;
     private ApplicationSettings mApplicationSettings;
-    
+
     private String mThreadUri;
     private ThreadImageModel mCurrentImageModel;
     private ImageItemViewBag mCurrentImageViewBag;
     private boolean mImageLoaded;
     private File mImageLoadedFile;
-    
+
     private DownloadFileTask mCurrentTask = null;
-    
+
     private Menu mMenu;
     private TextView mImageText;
     private int mBackgroundColor;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
-        
+
         this.mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
-        this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
         this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
         this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        
+        DvachUriParser uriParser = Factory.resolve(DvachUriParser.class);
+
         String imageUrl = this.getIntent().getData().toString();
         this.mThreadUri = this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_URL);
-        
+
         // get the current image
         ArrayList<ThreadImageModel> images = this.mThreadImagesService.getImagesList(this.mThreadUri);
         ThreadImageModel currentImage = this.mThreadImagesService.getImageByUrl(images, imageUrl);
         int imagePosition = images.indexOf(currentImage);
-        
+
         this.setTheme(this.mApplicationSettings.getTheme());
         this.setContentView(R.layout.image_gallery_view);
-        this.mImageText = (TextView)this.findViewById(R.id.image_gallery_text);
+        this.mImageText = (TextView) this.findViewById(R.id.image_gallery_text);
         this.mBackgroundColor = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-        
+
         // view pager
         final ImageGalleryAdapter adapter = new ImageGalleryAdapter(this, images);
-        final ExtendedViewPager viewPager = (ExtendedViewPager)this.findViewById(R.id.view_pager);
+        final ExtendedViewPager viewPager = (ExtendedViewPager) this.findViewById(R.id.view_pager);
         viewPager.setAdapter(adapter);
         adapter.subscribeToPageChangeEvent(viewPager);
         viewPager.setCurrentItem(imagePosition);
-                
-        ImageButton prevImageButton = (ImageButton)this.findViewById(R.id.image_gallery_prev);
+
+        ImageButton prevImageButton = (ImageButton) this.findViewById(R.id.image_gallery_prev);
         prevImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 viewPager.movePrevious();
             }
         });
-        
-        ImageButton nextImageButton = (ImageButton)this.findViewById(R.id.image_gallery_next);
+
+        ImageButton nextImageButton = (ImageButton) this.findViewById(R.id.image_gallery_next);
         nextImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -115,10 +101,10 @@ public class ImageGalleryActivity extends Activity {
             }
         });
 
-        Factory.resolve(MyTracker.class).setBoardVar(UriUtils.getBoardName(Uri.parse(imageUrl)));
+        Factory.resolve(MyTracker.class).setBoardVar(uriParser.getBoardName(Uri.parse(imageUrl)));
         Factory.resolve(MyTracker.class).trackActivityView(TAG);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
@@ -129,7 +115,7 @@ public class ImageGalleryActivity extends Activity {
 
         return true;
     }
-    
+
     private void updateOptionsMenu() {
         if (this.mMenu == null) {
             return;
@@ -143,7 +129,7 @@ public class ImageGalleryActivity extends Activity {
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(!this.mImageLoaded);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -188,25 +174,25 @@ public class ImageGalleryActivity extends Activity {
 
         return true;
     }
-        
-    private void loadImage(ThreadImageModel model, ImageItemViewBag viewBag){
+
+    private void loadImage(ThreadImageModel model, ImageItemViewBag viewBag) {
         if (this.mCurrentTask != null) {
             // only 1 image per time
             this.mCurrentTask.cancel(true);
         }
-                
+
         this.mImageLoaded = false;
         this.mImageLoadedFile = null;
         this.mCurrentImageModel = model;
         this.mCurrentImageViewBag = viewBag;
         this.updateOptionsMenu();
-        
+
         Uri uri = Uri.parse(model.url);
-        
+
         File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(uri);
         if (cachedFile.exists()) {
             // show from cache
-            setProgress(Window.PROGRESS_END);
+            this.setProgress(Window.PROGRESS_END);
             this.setImage(cachedFile, viewBag);
         } else {
             // download image and cache it
@@ -215,62 +201,62 @@ public class ImageGalleryActivity extends Activity {
             this.mCurrentTask.execute();
         }
     }
-    
-    private void setImage(File file, ImageItemViewBag viewBag){
+
+    private void setImage(File file, ImageItemViewBag viewBag) {
         viewBag.webView.loadUrl(Uri.fromFile(file).toString());
-        
+
         this.mImageLoaded = true;
         this.mImageLoadedFile = file;
         this.updateOptionsMenu();
     }
-    
+
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
         private final LayoutInflater mInflater;
-        
-        public ImageGalleryAdapter(Context context, ArrayList<ThreadImageModel> images){
+
+        public ImageGalleryAdapter(Context context, ArrayList<ThreadImageModel> images) {
             super(context, images);
             this.mInflater = LayoutInflater.from(context);
         }
-        
+
         @Override
         protected View createView(int position) {
             View view = this.mInflater.inflate(R.layout.browser, null);
-            
+
             ImageItemViewBag vb = new ImageItemViewBag();
-            vb.webView = (WebView)view.findViewById(R.id.webview);
+            vb.webView = (WebView) view.findViewById(R.id.webview);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
-            
-            AppearanceUtils.prepareWebView(vb.webView, mBackgroundColor);
-            
+
+            AppearanceUtils.prepareWebView(vb.webView, ImageGalleryActivity.this.mBackgroundColor);
+
             return view;
         }
-        
+
         @Override
         public void onViewUnselected(int position, View view) {
-            ImageItemViewBag vb = (ImageItemViewBag)view.getTag();
+            ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
             vb.webView.loadUrl("about:blank");
         }
 
         @Override
         public void onViewSelected(int position, View view) {
             ThreadImageModel imageModel = this.getItem(position);
-            ImageItemViewBag vb = (ImageItemViewBag)view.getTag();
-            loadImage(imageModel, vb);
-            
-            mImageText.setText((position + 1) + "/" + this.getCount() + " (" + imageModel.size + getResources().getString(R.string.data_file_size_measure) + ")");
+            ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
+            ImageGalleryActivity.this.loadImage(imageModel, vb);
+
+            ImageGalleryActivity.this.mImageText.setText((position + 1) + "/" + this.getCount() + " (" + imageModel.size + ImageGalleryActivity.this.getResources().getString(R.string.data_file_size_measure) + ")");
         }
     }
-    
+
     private class ImageDownloadView implements IDownloadFileView {
         private final ImageItemViewBag mViewBag;
         private double mMaxValue = -1;
 
-        public ImageDownloadView(ImageItemViewBag viewBag){
-            mViewBag = viewBag;
+        public ImageDownloadView(ImageItemViewBag viewBag) {
+            this.mViewBag = viewBag;
         }
-        
+
         @Override
         public void setCurrentProgress(int value) {
             if (this.mMaxValue > 0) {
@@ -307,7 +293,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showSuccess(File file) {
-            setImage(file, this.mViewBag);
+            ImageGalleryActivity.this.setImage(file, this.mViewBag);
         }
 
         @Override
@@ -315,17 +301,17 @@ public class ImageGalleryActivity extends Activity {
             this.mViewBag.webView.setVisibility(View.GONE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.VISIBLE);
-            
+
             TextView errorTextView = (TextView) this.mViewBag.error.findViewById(R.id.error_text);
             errorTextView.setText(error != null ? error : ImageGalleryActivity.this.getString(R.string.error_unknown));
         }
 
         @Override
         public void showFileExists(File file) {
-            setImage(file, this.mViewBag);
+            ImageGalleryActivity.this.setImage(file, this.mViewBag);
         }
     }
-    
+
     private static class ImageItemViewBag {
         WebView webView;
         View loading;

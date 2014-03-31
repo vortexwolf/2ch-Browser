@@ -4,7 +4,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 
 import android.content.Context;
 
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.ExceptionReporter;
 import com.google.analytics.tracking.android.GAServiceManager;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -18,18 +17,12 @@ public class MyTracker {
     public MyTracker(Context context) {
         GoogleAnalytics instance = GoogleAnalytics.getInstance(context);
         this.mTracker = instance.getTracker(Constants.ANALYTICS_KEY);
-        
+
         instance.setDefaultTracker(this.mTracker);
         instance.setDebug(Constants.DEBUG);
-        
-        UncaughtExceptionHandler myHandler = new ExceptionReporter(this.mTracker, GAServiceManager.getInstance(), Thread.getDefaultUncaughtExceptionHandler(), context); 
+
+        UncaughtExceptionHandler myHandler = new ExceptionReporter(this.mTracker, GAServiceManager.getInstance(), Thread.getDefaultUncaughtExceptionHandler(), context);
         Thread.setDefaultUncaughtExceptionHandler(myHandler);
-    }
-
-    public void startSession(Context context) {
-    }
-
-    public void stopSession() {
     }
 
     public Tracker getInnerTracker() {

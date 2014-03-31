@@ -14,14 +14,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.widget.ImageView;
 
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.services.domain.HttpBitmapReader;
+import com.vortexwolf.chan.services.http.HttpBitmapReader;
 
 /**
  * HttpImageManager uses 3-level caching to download and store network images.
@@ -83,7 +81,7 @@ public class HttpImageManager {
 
     private final Handler mHandler = new Handler();
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(4);
-    
+
     private final Set<LoadRequest> mActiveRequests = new HashSet<LoadRequest>();
 
     public static class LoadRequest {
@@ -152,10 +150,10 @@ public class HttpImageManager {
         public void onLoadError(LoadRequest r, Throwable e);
     }
 
-    public HttpImageManager(BitmapMemoryCache cache, FileSystemPersistence persistence, DefaultHttpClient httpClient, Resources resources) {
+    public HttpImageManager(BitmapMemoryCache cache, FileSystemPersistence persistence, Resources resources, HttpBitmapReader httpBitmapReader) {
         this.mCache = cache;
         this.mPersistence = persistence;
-        this.mNetworkResourceLoader = new HttpBitmapReader(httpClient, resources);
+        this.mNetworkResourceLoader = httpBitmapReader;
         this.mResources = resources;
     }
 
@@ -190,7 +188,7 @@ public class HttpImageManager {
                 r.mListener.beforeLoad(r);
             }
 
-            mExecutor.submit(this.newRequestCall(r));
+            this.mExecutor.submit(this.newRequestCall(r));
 
             return null;
         }

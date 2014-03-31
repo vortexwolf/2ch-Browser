@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -23,21 +22,19 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.ThreadsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadThreadsTask;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
-import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
+import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
-import com.vortexwolf.chan.interfaces.IPagesSerializationService;
-import com.vortexwolf.chan.models.domain.PostInfo;
-import com.vortexwolf.chan.models.domain.ThreadInfo;
-import com.vortexwolf.chan.models.domain.ThreadsList;
+import com.vortexwolf.chan.interfaces.IOpenTabsManager;
+import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -45,8 +42,8 @@ import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.services.presentation.PagesSerializationService;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -55,14 +52,16 @@ import com.vortexwolf.chan.settings.SettingsEntity;
 public class ThreadsListActivity extends BaseListActivity {
     private static final String TAG = "ThreadsListActivity";
 
-    private MainApplication mApplication;
-    private IJsonApiReader mJsonReader;
-    private MyTracker mTracker;
-    private ApplicationSettings mSettings;
-    private IPagesSerializationService mSerializationService;
+    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
+    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
+    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
+    private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
+    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
+    private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
+    private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
+    private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
     private PostItemViewBuilder mPostItemViewBuilder;
-    private HiddenThreadsDataSource mHiddenThreadsDataSource;
-    private DvachUriBuilder mDvachUriBuilder;
 
     private DownloadThreadsTask mCurrentDownloadTask = null;
     private ThreadsListAdapter mAdapter = null;
@@ -79,24 +78,16 @@ public class ThreadsListActivity extends BaseListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.mApplication = this.getMainApplication();
-
+        
         // Парсим код доски и номер страницы
         Uri data = this.getIntent().getData();
         if (data != null) {
-            this.mBoardName = UriUtils.getBoardName(data);
-            this.mPageNumber = UriUtils.getBoardPageNumber(data);
+            this.mBoardName = mDvachUriParser.getBoardName(data);
+            this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
         }
 
-        this.mJsonReader = this.mApplication.getJsonApiReader();
-        this.mSettings = this.mApplication.getSettings();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mTracker = this.mApplication.getTracker();
-        this.mSerializationService = this.mApplication.getSerializationService();
-        this.mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mApplication.getBitmapManager(), this.mSettings, this.mDvachUriBuilder);
-        this.mHiddenThreadsDataSource = Factory.getContainer().resolve(HiddenThreadsDataSource.class);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
 
         // Заголовок страницы
         String pageTitle = this.mPageNumber != 0
@@ -105,8 +96,8 @@ public class ThreadsListActivity extends BaseListActivity {
         this.setTitle(pageTitle);
 
         // Сохраняем во вкладках
-        OpenTabModel tabModel = new OpenTabModel(this.mBoardName, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber));
-        this.mTabModel = this.mApplication.getOpenTabsManager().add(tabModel);
+        OpenTabModel tabModel = new OpenTabModel(this.mBoardName, this.mDvachUriBuilder.createBoardUri(this.mBoardName, this.mPageNumber));
+        this.mTabModel = this.mOpenTabsManager.add(tabModel);
 
         this.resetUI();
 
@@ -197,25 +188,24 @@ public class ThreadsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mApplication.getBitmapManager(), this.mApplication.getSettings(), this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
+        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mBitmapManager, this.mSettings, this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
-        if (Integer.valueOf(Build.VERSION.SDK) > 7) {
+        if (Constants.SDK_VERSION > 7) {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED)
-                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
-        
+        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+
         if (preferDeserialized) {
             new LoadThreadsTask().execute();
         } else {
             this.refreshThreads(false);
         }
     }
-    
-    private void setAdapterData(ThreadInfo[] threads){
+
+    private void setAdapterData(ThreadModel[] threads) {
         this.mAdapter.setAdapterData(threads);
         // Устанавливаем позицию, если открываем как уже открытую вкладку
         AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
@@ -223,14 +213,14 @@ public class ThreadsListActivity extends BaseListActivity {
             this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
         }
     }
-    
+
     @Override
     public boolean onSearchRequested() {
         Bundle data = new Bundle();
         data.putString(Constants.EXTRA_BOARD_NAME, this.mBoardName);
-        
+
         this.startSearch(null, false, data, false);
-        
+
         return true;
     }
 
@@ -260,7 +250,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.refreshThreads();
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.create2chBoardUri(this.mBoardName, this.mPageNumber).toString());
+                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.createBoardUri(this.mBoardName, this.mPageNumber).toString());
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -387,7 +377,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToThread(String threadNumber, String threadSubject) {
         Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-        i.setData(Uri.parse(this.mDvachUriBuilder.create2chThreadUrl(this.mBoardName, threadNumber)));
+        i.setData(Uri.parse(this.mDvachUriBuilder.createThreadUri(this.mBoardName, threadNumber)));
         if (threadSubject != null) {
             i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
         }
@@ -397,7 +387,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToBoardPageNumber(String boardCode, int pageNumber) {
         Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.create2chBoardUri(boardCode, pageNumber));
+        i.setData(this.mDvachUriBuilder.createBoardUri(boardCode, pageNumber));
 
         this.startActivity(i);
     }
@@ -416,21 +406,21 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mCurrentDownloadTask.execute();
         }
     }
-    
-    private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadInfo[]> {
+
+    private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadModel[]> {
         @Override
-        protected ThreadInfo[] doInBackground(Void... arg0) {
-            ThreadInfo[] threads = mSerializationService.deserializeThreads(mBoardName, mPageNumber);
+        protected ThreadModel[] doInBackground(Void... arg0) {
+            ThreadModel[] threads = mSerializationService.deserializeThreads(mBoardName, mPageNumber);
             return threads;
-        }   
-        
+        }
+
         @Override
         public void onPreExecute() {
             mThreadsReaderListener.showLoadingScreen();
         }
 
         @Override
-        public void onPostExecute(ThreadInfo[] threads) {
+        public void onPostExecute(ThreadModel[] threads) {
             mThreadsReaderListener.hideLoadingScreen();
 
             if (threads == null) {
@@ -441,7 +431,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
     }
 
-    private class ThreadsReaderListener implements IListView<ThreadsList> {
+    private class ThreadsReaderListener implements IListView<ThreadModel[]> {
 
         @Override
         public Context getApplicationContext() {
@@ -454,9 +444,8 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         @Override
-        public void setData(ThreadsList threadsList) {
-            if (threadsList != null) {
-                ThreadInfo[] threads = threadsList.getThreads();
+        public void setData(ThreadModel[] threads) {
+            if (threads != null && threads.length > 0) {
                 ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
                 ThreadsListActivity.this.setAdapterData(threads);
             } else {
@@ -479,7 +468,7 @@ public class ThreadsListActivity extends BaseListActivity {
         public void hideLoadingScreen() {
             ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             ThreadsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
-            
+
             ThreadsListActivity.this.switchToListView();
             ThreadsListActivity.this.mCurrentDownloadTask = null;
         }

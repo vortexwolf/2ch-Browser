@@ -6,9 +6,9 @@ import android.test.InstrumentationTestCase;
 
 import com.vortexwolf.chan.test.R;
 import com.vortexwolf.chan.test.mocks.MockAttachmentEntity;
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.models.domain.IAttachmentEntity;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
-import com.vortexwolf.chan.services.presentation.DvachUriBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfoTest extends InstrumentationTestCase {
@@ -43,7 +43,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase {
 
         assertFalse(info.isEmpty());
         assertEquals(info.getDescription(""), "YouTube");
-        assertEquals(info.getSourceUrl(this.mSettings), "http://www.youtube.com/v/dQw4w9WgXcQ");
+        assertEquals(info.getSourceUrl(this.mSettings), "http://www.youtube.com/watch?v=dQw4w9WgXcQ");
         assertEquals(info.getThumbnailUrl(), "http://img.youtube.com/vi/dQw4w9WgXcQ/default.jpg");
         //Проверю и те поля, которые не должны вызываться
         assertEquals(info.getSourceExtension(), null);
