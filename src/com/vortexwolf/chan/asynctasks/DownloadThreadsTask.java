@@ -5,11 +5,14 @@ import android.os.AsyncTask;
 import android.view.Window;
 
 import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
+import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.interfaces.IListView;
+import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.ThreadModel;
+import com.vortexwolf.chan.services.RecaptchaService;
 
 public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {
 
@@ -24,6 +27,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
 
     private ThreadModel[] mThreadsList = null;
     private String mUserError = null;
+    private CaptchaEntity mRecaptcha = null;
     // Progress bar
     private long mContentLength = 0;
     private long mProgressOffset = 0;
@@ -44,6 +48,13 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         try {
             this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this.mIsCheckModified, this, this);
             return true;
+        } catch (HtmlNotJsonException he) {
+            if (RecaptchaService.isRecaptchaPage(he.getHtml())) {
+                this.mRecaptcha = RecaptchaService.loadCaptcha();
+            }
+            if (this.mRecaptcha == null) {
+                this.mUserError = he.getMessage();
+            }
         } catch (Exception e) {
             this.mUserError = e.getMessage();
         }
@@ -63,10 +74,14 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         this.mView.hideLoadingScreen();
 
         // Обновляем список или отображаем ошибку
-        if (success && this.mThreadsList != null) {
+        if (success) {
             this.mView.setData(this.mThreadsList);
         } else if (!success) {
-            this.mView.showError(this.mUserError);
+            if (this.mRecaptcha != null) {
+                this.mView.showCaptcha(this.mRecaptcha);
+            } else {
+                this.mView.showError(this.mUserError);
+            }
         }
     }
 

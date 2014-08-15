@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
@@ -28,8 +29,9 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final Context mContext;
     private final ApplicationSettings mSettings;
     private final String mPasscode;
+    private final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
 
-    private String mUserCodeCookie = null;
+    private Cookie mUserCodeCookie = null;
 
     public CheckPasscodeTask(Context context, ApplicationSettings settings, String passcode) {
         this.mContext = context;
@@ -42,8 +44,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpPost post = null;
         HttpResponse response = null;
         try {
-            DefaultHttpClient client = new DefaultHttpClient();
-            Uri uri = Uri.parse("http://" + Constants.DEFAULT_DOMAIN + "/makaba/makaba.fcgi"); // only .hk domain
+            Uri uri = Uri.parse("https://" + Constants.DEFAULT_DOMAIN + "/makaba/makaba.fcgi"); // only .hk domain
             post = new HttpPost(uri.toString());
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -54,14 +55,14 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             HttpClientParams.setRedirecting(post.getParams(), false);
 
-            response = client.execute(post);
+            response = this.mHttpClient.execute(post);
 
             String location = ExtendedHttpClient.getLocationHeader(response);
 
-            List<Cookie> cookies = client.getCookieStore().getCookies();
+            List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
             for (Cookie c : cookies) {
-                if (c.getName().equals("usercode")) {
-                    this.mUserCodeCookie = c.getValue();
+                if (c.getName().equals(Constants.USERCODE_COOKIE)) {
+                    this.mUserCodeCookie = c;
                     break;
                 }
             }
@@ -78,11 +79,13 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        // update settings anyway
-        this.mSettings.savePassCodeCookie(this.mUserCodeCookie);
-
         if (StringUtils.isEmpty(this.mPasscode)) {
+            this.mSettings.clearPassCodeCookie();
             return;
+        }
+        
+        if (this.mUserCodeCookie != null) {
+            this.mSettings.savePassCodeCookie(this.mUserCodeCookie);
         }
 
         if (StringUtils.emptyIfNull(result).equals("/b/")) {

@@ -38,16 +38,19 @@
     <plurals name="data_posts_quantity">
         <item quantity="one">%d сообщение</item>
         <item quantity="few">%d сообщения</item>
+        <item quantity="many">%d сообщений</item>
         <item quantity="other">%d сообщений</item>
     </plurals>
     <plurals name="data_files_quantity">
         <item quantity="one">%d файл</item>
         <item quantity="few">%d файла</item>
+        <item quantity="many">%d файлов</item>
         <item quantity="other">%d файлов</item>
     </plurals>
     <plurals name="data_new_posts_quantity">
         <item quantity="one">%d новое сообщение</item>
         <item quantity="few">%d новых сообщения</item>
+        <item quantity="many">%d новых сообщений</item>
         <item quantity="other">%d новых сообщений</item>
     </plurals>
 
@@ -170,8 +173,6 @@
     <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
     <string name="pref_legacy_image_viewer">Просмотр изображений</string>
     <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
-    <string name="pref_use_https">Использовать HTTPS</string>
-    <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
     <string name="pref_file_cache_no_limit">Неограниченный кэш</string>
     <string name="pref_file_cache_no_limit_summary">Отменить ограничение на размер кэша в 25Мб</string>
     

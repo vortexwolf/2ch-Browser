@@ -2,6 +2,7 @@ package com.vortexwolf.chan.common.library;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -11,14 +12,20 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -40,8 +47,11 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 
         // Client parameters
         BasicHttpParams params = new BasicHttpParams();
-        params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_OPERATION_TIMEOUT).setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, SOCKET_OPERATION_TIMEOUT).setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024).setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-
+        params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_OPERATION_TIMEOUT)
+        .setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, SOCKET_OPERATION_TIMEOUT)
+        .setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 8 * 1024)
+        .setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
+        
         ConnManagerParams.setTimeout(params, SOCKET_OPERATION_TIMEOUT);
         HttpProtocolParams.setUserAgent(params, Constants.USER_AGENT_STRING);
 
@@ -60,17 +70,20 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 
     public ExtendedHttpClient() {
         super(sConnectionManager, sParams);
-
-        //System.setProperty("http.KeepAlive","false");
-
+                
         this.addRequestInterceptor(new DefaultRequestInterceptor());
         this.addResponseInterceptor(new GzipResponseInterceptor());
     }
-
+    
+    public void setCookie(Cookie cookie) {
+        if (cookie != null) {
+            this.getCookieStore().addCookie(cookie);
+        }
+    }
+    
     /** Releases all resources of the request and response objects */
     public static void releaseRequestResponse(HttpRequestBase request, HttpResponse response) {
         releaseResponse(response);
-
         releaseRequest(request);
     }
 
@@ -154,7 +167,7 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         @Override
         public long getContentLength() {
             // length of ungzipped content is not known
-            return -1;
+            return this.wrappedEntity.getContentLength();
         }
     }
 

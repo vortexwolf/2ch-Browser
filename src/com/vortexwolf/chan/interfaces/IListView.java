@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.interfaces;
 
+import com.vortexwolf.chan.models.domain.CaptchaEntity;
+
 import android.content.Context;
 
 public interface IListView<T> {
@@ -32,6 +34,8 @@ public interface IListView<T> {
      *            Текст ошибки
      */
     void showError(String error);
+    
+    void showCaptcha(CaptchaEntity captcha);
 
     /**
      * Показывает индикатор загрузки

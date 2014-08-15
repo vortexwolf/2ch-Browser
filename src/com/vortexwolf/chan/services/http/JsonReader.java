@@ -6,7 +6,11 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.apache.http.Header;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -21,11 +25,14 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class JsonReader {
     static final String TAG = "JsonReader";
@@ -39,7 +46,7 @@ public class JsonReader {
         this.mHttpStreamReader = httpStreamReader;
     }
 
-    public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+    public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         T result = null;
         boolean parseSuccess = false;
         boolean wasCancelled = false;
@@ -51,8 +58,8 @@ public class JsonReader {
                 break;
             } catch (HttpRequestException e) {
                 throw new JsonApiReaderException(e.getMessage());
-            } catch (NotJsonException e) {
-                throw new JsonApiReaderException(this.mResources.getString(R.string.error_not_json));
+            } catch (HtmlNotJsonException e) {
+                throw e;
             } catch (CancelTaskException e) {
                 wasCancelled = true;
                 break;
@@ -76,7 +83,7 @@ public class JsonReader {
         return result;
     }
 
-    private <T> T tryReadAndParse(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws HttpRequestException, CancelTaskException, IOException, NotJsonException {
+    private <T> T tryReadAndParse(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws HttpRequestException, CancelTaskException, IOException, HtmlNotJsonException {
         HttpStreamModel streamModel = null;
         try {
             streamModel = this.mHttpStreamReader.fromUri(url, null, listener, task);
@@ -95,7 +102,8 @@ public class JsonReader {
                 String firstLetters = new String(bytes, 0, 20, Constants.UTF8_CHARSET.name());
                 // check if it is an html page instead of a json page
                 if (firstLetters != null && firstLetters.toLowerCase().startsWith("<!doctype")) {
-                    throw new NotJsonException();
+                    String html = new String(bytes, 0, bytes.length, Constants.UTF8_CHARSET.name());
+                    throw new HtmlNotJsonException(html, this.mResources.getString(R.string.error_not_json));
                 }
             }
 
@@ -149,10 +157,6 @@ public class JsonReader {
     }
 
     private static class CancelTaskException extends Exception {
-        private static final long serialVersionUID = -4423318670475901875L;
-    }
-
-    private static class NotJsonException extends Exception {
         private static final long serialVersionUID = -4423318670475901875L;
     }
 }

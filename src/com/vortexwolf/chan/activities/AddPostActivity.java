@@ -1,9 +1,8 @@
 package com.vortexwolf.chan.activities;
 
 import java.io.File;
-
 import org.apache.http.impl.client.DefaultHttpClient;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -23,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
@@ -41,7 +39,6 @@ import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
-import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
@@ -69,7 +66,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
-    private final IHtmlCaptchaChecker mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
+    private final HtmlCaptchaChecker mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
     
     private ImageFileModel mAttachedFile;
     private String mAttachedVideo;
@@ -451,9 +448,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.startActivityForResult(intent, Constants.REQUEST_CODE_FILE_LIST_ACTIVITY);
                 break;
             case R.id.menu_gallery_id:
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.setType("image/*");
-                this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
+                if (Constants.SDK_VERSION < 19) {
+                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                    i.setType("image/*");
+                    this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
+                } else {
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("image/*");
+                    this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
+                }
                 break;
             case R.id.menu_attach_youtube_id:
                 final EditTextDialog dialog = new EditTextDialog(this);
@@ -478,6 +482,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         return true;
     }
 
+    @SuppressLint("NewApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -490,7 +495,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
                     break;
                 case Constants.REQUEST_CODE_GALLERY:
-
                     Uri imageUri = data.getData();
                     File imageFile = IoUtils.getFile(this, imageUri);
 

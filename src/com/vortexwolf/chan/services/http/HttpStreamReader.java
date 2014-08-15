@@ -1,24 +1,34 @@
 package com.vortexwolf.chan.services.http;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 
 import android.content.res.Resources;
+import android.net.Uri;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HttpStreamReader {
     public static final String TAG = "HttpStreamReader";
@@ -45,16 +55,15 @@ public class HttpStreamReader {
         HttpResponse response = null;
         InputStream stream = null;
         boolean wasNotModified = false;
-        ;
 
         try {
-            request = this.createRequest(uri, customHeaders);
-            response = this.getResponse(request);
+            request = this.createPrivateRequest(uri, customHeaders);
+            response = this.getPrivateResponse(request);
 
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() == 304) {
                 wasNotModified = true;
-            } else if (status.getStatusCode() != 200) {
+            } else if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
                 throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
             } else {
                 stream = this.fromResponse(response, listener, task);
@@ -96,48 +105,37 @@ public class HttpStreamReader {
         this.mIfModifiedMap.remove(uri);
     }
 
-    private HttpGet createRequest(String uri, Header[] customHeaders) throws HttpRequestException {
+    public HttpGet createRequest(String uri, List<Header> customHeaders) throws IllegalArgumentException {
         HttpGet request = null;
         try {
             request = new HttpGet(uri);
 
-            if (this.mIfModifiedMap.containsKey(uri)) {
-                request.setHeader("If-Modified-Since", this.mIfModifiedMap.get(uri));
-            }
-
             if (customHeaders != null) {
-                request.setHeaders(customHeaders);
+                for (Header header : customHeaders) {
+                    request.addHeader(header);
+                }
             }
-
-            return request;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             MyLog.e(TAG, e);
             ExtendedHttpClient.releaseRequest(request);
-            throw new HttpRequestException(this.mResources.getString(R.string.error_create_request), e);
+            throw e;
         }
+
+        return request;
     }
 
-    private HttpResponse getResponse(HttpGet request) throws HttpRequestException {
+    public HttpResponse getResponse(HttpGet request) throws IOException {
         HttpResponse response = null;
-        Exception responseException = null;
+        IOException responseException = null;
 
         // try several times if exception, break the loop after a successful read
         for (int i = 0; i < 3; i++) {
             try {
-                //this.mHttpClient.getCookieStore().addCookie(new BasicClientCookie("key", Math.random() + ""));
                 response = this.mHttpClient.execute(request);
-
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    // save the last modified date
-                    Header header = response.getFirstHeader("Last-Modified");
-                    if (header != null) {
-                        this.mIfModifiedMap.put(request.getURI().toString(), header.getValue());
-                    }
-                }
 
                 responseException = null;
                 break;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 MyLog.e(TAG, e);
                 responseException = e;
 
@@ -152,7 +150,41 @@ public class HttpStreamReader {
 
         if (responseException != null) {
             ExtendedHttpClient.releaseRequestResponse(request, response);
-            throw new HttpRequestException(this.mResources.getString(R.string.error_download_data), responseException);
+            throw responseException;
+        }
+
+        return response;
+    }
+
+    private HttpGet createPrivateRequest(String uri, Header[] customHeaders) throws HttpRequestException {
+        List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
+
+        if (this.mIfModifiedMap.containsKey(uri)) {
+            headersList.add(new BasicHeader("If-Modified-Since", this.mIfModifiedMap.get(uri)));
+        }
+
+        HttpGet request = this.createRequest(uri, headersList);
+        if (request == null) {
+            throw new HttpRequestException(this.mResources.getString(R.string.error_create_request));
+        }
+
+        return request;
+    }
+
+    private HttpResponse getPrivateResponse(HttpGet request) throws HttpRequestException {
+        HttpResponse response = null;
+        try {
+            response = this.getResponse(request);
+        } catch (Exception e) {
+            throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
+        }
+
+        if (response.getStatusLine().getStatusCode() == 200) {
+            // save the last modified date
+            Header header = response.getFirstHeader("Last-Modified");
+            if (header != null) {
+                this.mIfModifiedMap.put(request.getURI().toString(), header.getValue());
+            }
         }
 
         return response;

@@ -7,11 +7,10 @@ import android.net.Uri;
 
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
+public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
@@ -26,11 +25,10 @@ public class HtmlCaptchaChecker implements IHtmlCaptchaChecker {
         return this.canSkipCaptcha(refererUri, true);
     }
 
-    @Override
     public CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode) {
         String checkUri = "makaba/captcha.fcgi";
-        if (usePasscode && (!StringUtils.isEmpty(this.mApplicationSettings.getPassCodeCookie()) || !StringUtils.isEmpty(this.mApplicationSettings.getPassCode()))) {
-            checkUri += "?usercode=" + this.mApplicationSettings.getPassCodeCookie();
+        if (usePasscode && !StringUtils.isEmpty(this.mApplicationSettings.getPassCodeValue())) {
+            checkUri += "?usercode=" + this.mApplicationSettings.getPassCodeValue();
         }
 
         Uri uri = this.mDvachUriBuilder.createUri(checkUri);

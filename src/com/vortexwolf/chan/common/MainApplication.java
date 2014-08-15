@@ -1,16 +1,14 @@
 package com.vortexwolf.chan.common;
 
 import java.io.File;
-
 import org.apache.http.impl.client.DefaultHttpClient;
-
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
-
 import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachModelsMapper;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -24,12 +22,12 @@ import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
-import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
+import com.vortexwolf.chan.services.CloudflarePageParser;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
@@ -51,7 +49,8 @@ public class MainApplication extends Application {
 
     public static boolean MULTITOUCH_SUPPORT = false;
 
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     public void onCreate() {
         super.onCreate();
 
@@ -60,8 +59,8 @@ public class MainApplication extends Application {
         }
 
         MyTracker tracker = new MyTracker(this);
-        DefaultHttpClient httpClient = new ExtendedHttpClient();
-        ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
+        ExtendedHttpClient httpClient = new ExtendedHttpClient();
+        ApplicationSettings settings = new ApplicationSettings(this, this.getResources());        
         DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
         DvachUriParser uriParser = new DvachUriParser();
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
@@ -108,7 +107,7 @@ public class MainApplication extends Application {
         container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
         container.register(DownloadFileService.class, downloadFileService);
         container.register(ThreadImagesService.class, new ThreadImagesService());
-        container.register(IHtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, dvachUriBuilder, settings));
+        container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, dvachUriBuilder, settings));
 
         historyDataSource.open();
         favoritesDataSource.open();
@@ -117,6 +116,9 @@ public class MainApplication extends Application {
         if (!settings.isUnlimitedCache()) {
             cacheManager.trimCacheIfNeeded();
         }
+        
+        httpClient.setCookie(settings.getCloudflareClearanceCookie());
+        httpClient.setCookie(settings.getPassCodeCookie());
     }
 
     @Override

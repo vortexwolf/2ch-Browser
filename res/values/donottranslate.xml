@@ -27,11 +27,13 @@
     <string name="pref_convert_post_date_key">pref_convert_post_date_key</string>
     <string name="pref_display_hidden_boards_key">pref_display_hidden_boards_key</string>
     <string name="pref_passcode_key">pref_passcode_key</string>
-    <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
     <string name="pref_cut_posts_key">pref_cut_posts_key</string>
     <string name="pref_legacy_image_viewer_key">pref_legacy_image_viewer_key</string>
-    <string name="pref_use_https_key">pref_use_https_key</string>
     <string name="pref_file_cache_no_limit_key">pref_file_cache_no_limit_key</string>
+    <string name="pref_cf_clearance_cookie_key">pref_cf_clearance_cookie_key</string>
+    <string name="pref_cf_clearance_cookie_domain_key">pref_cf_clearance_cookie_domain_key</string>
+    <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
+    <string name="pref_passcode_cookie_domain_key">pref_passcode_cookie_domain_key</string>
     
     <string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>

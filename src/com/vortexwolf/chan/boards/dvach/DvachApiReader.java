@@ -8,6 +8,7 @@ import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
 import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -34,7 +35,7 @@ public class DvachApiReader implements IJsonApiReader {
     }
 
     @Override
-    public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+    public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         try {
             searchQuery = URLEncoder.encode(searchQuery, Constants.UTF8_CHARSET.name());
         } catch (UnsupportedEncodingException e) {
@@ -45,12 +46,16 @@ public class DvachApiReader implements IJsonApiReader {
         String uri = String.format("http://91.227.18.102/%s/search?q=%s&out=json&nocheck", boardName, searchQuery);
 
         DvachFoundPostsList result = this.mJsonReader.readData(uri, DvachFoundPostsList.class, listener, task);
+        if (result == null) {
+            return null;
+        }
+        
         SearchPostListModel model = this.mDvachModelsMapper.mapSearchPostListModel(result);
         return model;
     }
 
     @Override
-    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.formatThreadsUri(boardName, page);
 
         if (checkModified == false) {
@@ -58,12 +63,16 @@ public class DvachApiReader implements IJsonApiReader {
         }
 
         DvachThreadsList result = this.mJsonReader.readData(uri, DvachThreadsList.class, listener, task);
+        if (result == null) {
+            return null;
+        }
+        
         ThreadModel[] models = this.mDvachModelsMapper.mapThreadModels(result);
         return models;
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException {
+    public PostModel[] readPostsList(String boardName, String threadNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.formatPostsUri(boardName, threadNumber);
 
         if (checkModified == false) {
@@ -71,6 +80,10 @@ public class DvachApiReader implements IJsonApiReader {
         }
 
         DvachPostsList result = this.mJsonReader.readData(uri, DvachPostsList.class, listener, task);
+        if (result == null) {
+            return null;
+        }
+        
         PostModel[] models = this.mDvachModelsMapper.mapPostModels(result.getThread());
         return models;
     }
