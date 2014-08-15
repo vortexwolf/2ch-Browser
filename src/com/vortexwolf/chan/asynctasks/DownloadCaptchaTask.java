@@ -11,7 +11,6 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
-import com.vortexwolf.chan.interfaces.IHtmlCaptchaChecker;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
@@ -25,7 +24,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final IJsonApiReader mJsonReader;
     private final Uri mRefererUri;
     private final HttpBitmapReader mHttpBitmapReader;
-    private final IHtmlCaptchaChecker mHtmlCaptchaChecker;
+    private final HtmlCaptchaChecker mHtmlCaptchaChecker;
     private final DefaultHttpClient mHttpClient;
     private final DvachUriParser mUriParser;
 
@@ -36,7 +35,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, HttpBitmapReader httpBitmapReader, IHtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
+    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, HttpBitmapReader httpBitmapReader, HtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
         this.mView = view;
         this.mJsonReader = jsonReader;
         this.mRefererUri = refererUri;

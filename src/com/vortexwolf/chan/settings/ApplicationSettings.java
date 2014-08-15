@@ -1,5 +1,8 @@
 package com.vortexwolf.chan.settings;
 
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookie;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -23,21 +26,55 @@ public class ApplicationSettings {
         this.mResources = resources;
     }
 
-    public void savePassCodeCookie(String passCodeCookie) {
+    public void savePassCodeCookie(Cookie cookie) {
         SharedPreferences.Editor editor = this.mSettings.edit();
-        editor.putString(this.mResources.getString(R.string.pref_passcode_cookie_key), passCodeCookie);
+        editor.putString(this.mResources.getString(R.string.pref_passcode_cookie_key), cookie.getValue());
+        editor.putString(this.mResources.getString(R.string.pref_passcode_cookie_domain_key), cookie.getDomain());
+        editor.commit();
+    }
+    
+    public void clearPassCodeCookie() {
+        SharedPreferences.Editor editor = this.mSettings.edit();
+        editor.remove(this.mResources.getString(R.string.pref_passcode_cookie_key));
+        editor.remove(this.mResources.getString(R.string.pref_passcode_cookie_domain_key));
         editor.commit();
     }
 
-    public String getPassCodeCookie() {
+    public void saveCloudflareClearanceCookie(Cookie cookie) {
+        SharedPreferences.Editor editor = this.mSettings.edit();
+        editor.putString(this.mResources.getString(R.string.pref_cf_clearance_cookie_key), cookie.getValue());
+        editor.putString(this.mResources.getString(R.string.pref_cf_clearance_cookie_domain_key), cookie.getDomain());
+        editor.commit();
+    }
+
+    public String getPassCodeValue() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
     }
-
-    public String getPassCode() {
-        // should be removed after everyone updates their applications
-        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
+    
+    public BasicClientCookie getPassCodeCookie() {
+        String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_domain_key), null);
+        String value = this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
+        if (StringUtils.isEmpty(value)) {
+            return null;
+        }
+        
+        BasicClientCookie c = new BasicClientCookie(Constants.USERCODE_COOKIE, value);
+        c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
+        return c;
     }
 
+    public BasicClientCookie getCloudflareClearanceCookie() {
+        String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_cf_clearance_cookie_domain_key), null);
+        String value = this.mSettings.getString(this.mResources.getString(R.string.pref_cf_clearance_cookie_key), null);
+        if (StringUtils.isEmpty(value)) {
+            return null;
+        }
+
+        BasicClientCookie c = new BasicClientCookie(Constants.CF_CLEARANCE_COOKIE, value);
+        c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
+        return c;
+    }
+    
     public String getDownloadPath() {
         String path = this.mSettings.getString(this.mResources.getString(R.string.pref_download_path_key), null);
 
@@ -49,7 +86,7 @@ public class ApplicationSettings {
     }
 
     public Uri getDomainUri() {
-        boolean isHttps = this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_https_key), false);
+        boolean isHttps = true; // always https
         String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_domain_key), null);
         domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
 

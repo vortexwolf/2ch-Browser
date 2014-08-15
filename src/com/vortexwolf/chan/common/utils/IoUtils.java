@@ -7,17 +7,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-
+import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
-
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.CancellableInputStream;
 import com.vortexwolf.chan.common.library.MyLog;
@@ -208,11 +208,10 @@ public class IoUtils {
         return null;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getPath(final Context context, final Uri uri) {
-        final boolean isKitKat = Constants.SDK_VERSION >= 19;
-
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (isKitKatDocument(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -272,6 +271,15 @@ public class IoUtils {
         return null;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static boolean isKitKatDocument(Context context, Uri uri) {
+        if (Constants.SDK_VERSION < 19) {
+            return false;
+        }
+        
+        return DocumentsContract.isDocumentUri(context, uri);
+    }
+    
     public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }

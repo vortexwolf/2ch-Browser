@@ -28,6 +28,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
+import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -109,7 +110,7 @@ public class SearchableActivity extends BaseListActivity {
                 this.onSearchRequested();
                 break;
             case R.id.refresh_menu_id:
-                this.searchAndLoadList();
+                this.refresh();
                 break;
         }
 
@@ -194,7 +195,7 @@ public class SearchableActivity extends BaseListActivity {
             this.mBoardName = b.getString(Constants.EXTRA_BOARD_NAME);
 
             this.setAdapter(this.mBoardName);
-            this.searchAndLoadList();
+            this.refresh();
         }
     }
 
@@ -207,7 +208,7 @@ public class SearchableActivity extends BaseListActivity {
         }
     }
 
-    private void searchAndLoadList() {
+    protected void refresh() {
         if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
@@ -237,6 +238,10 @@ public class SearchableActivity extends BaseListActivity {
 
         @Override
         public void setData(SearchPostListModel postsListModel) {
+            if (postsListModel == null) {
+                return;
+            }
+            
             PostModel[] posts = postsListModel.getPosts();
             if (posts != null) {
                 SearchableActivity.this.mAdapter.setAdapterData(posts);
@@ -252,6 +257,12 @@ public class SearchableActivity extends BaseListActivity {
         @Override
         public void showError(String error) {
             SearchableActivity.this.switchToErrorView(error);
+        }
+        
+        @Override
+        public void showCaptcha(CaptchaEntity captcha) {
+        	// TODO: replace by captcha view
+        	this.showError("Cloudflare captcha, open any board first.");
         }
 
         @Override

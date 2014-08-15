@@ -123,16 +123,6 @@ public class PostSender implements IPostSender {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
-
-        // It seems that without this policy the website doesn't accept cookies
-        httpPost.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
-
-        // passcode as a cookie
-        String passCodeCookie = this.mApplicationSettings.getPassCodeCookie();
-        if (!StringUtils.isEmpty(passCodeCookie)) {
-            httpPost.addHeader("Cookie", "usercode=" + passCodeCookie);
-        }
-
         HttpResponse response = null;
         try {
             HttpEntity entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
@@ -146,6 +136,7 @@ public class PostSender implements IPostSender {
                 } catch (Exception e) {
                     if ("recvfrom failed: ECONNRESET (Connection reset by peer)".equals(e.getMessage())) {
                         // a stupid error, I have no idea how to solve it so I just try again
+                        ExtendedHttpClient.releaseResponse(response);
                         continue;
                     } else {
                         throw e;

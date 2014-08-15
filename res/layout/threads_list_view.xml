@@ -33,6 +33,13 @@
             android:layout_gravity="center"
             layout="@layout/error"
             android:visibility="gone" />
+        <include
+            android:id="@+id/captchaView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/cloudflare_captcha"
+            android:visibility="gone" />
     </FrameLayout>
 
     <RelativeLayout

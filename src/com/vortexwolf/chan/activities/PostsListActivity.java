@@ -32,6 +32,7 @@ import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
+import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
@@ -110,7 +111,7 @@ public class PostsListActivity extends BaseListActivity {
             public void run() {
                 MyLog.v(TAG, "Attempted to refresh");
                 if (PostsListActivity.this.mCurrentDownloadTask == null) {
-                    PostsListActivity.this.refreshPosts();
+                    PostsListActivity.this.refresh();
                 }
             }
         };
@@ -243,7 +244,7 @@ public class PostsListActivity extends BaseListActivity {
                 this.startActivity(openTabsIntent);
                 break;
             case R.id.refresh_menu_id:
-                this.refreshPosts();
+                this.refresh();
                 break;
             case R.id.pick_board_menu_id:
                 // Start new activity
@@ -397,13 +398,13 @@ public class PostsListActivity extends BaseListActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case Constants.REQUEST_CODE_ADD_POST_ACTIVITY:
-                    this.refreshPosts();
+                    this.refresh();
                     break;
             }
         }
     }
 
-    private void refreshPosts() {
+    protected void refresh() {
         this.refreshPosts(true);
     }
 
@@ -452,7 +453,7 @@ public class PostsListActivity extends BaseListActivity {
                 if (this.mPreferDeserialized) {
                     // nothing
                 } else {
-                    PostsListActivity.this.refreshPosts();
+                    PostsListActivity.this.refresh();
                 }
             } else {
                 PostsListActivity.this.refreshPosts(false);
@@ -486,6 +487,12 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         public void showError(String error) {
             PostsListActivity.this.switchToErrorView(error);
+        }
+        
+        @Override
+        public void showCaptcha(CaptchaEntity captcha) {
+        	// TODO: replace by captcha view
+        	this.showError("Cloudflare captcha, open any board first.");
         }
 
         @Override

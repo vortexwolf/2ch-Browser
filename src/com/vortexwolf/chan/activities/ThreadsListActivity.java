@@ -34,12 +34,15 @@ import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
+import com.vortexwolf.chan.models.domain.CaptchaEntity;
+import com.vortexwolf.chan.models.domain.CloudflareCaptchaModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
+import com.vortexwolf.chan.services.CloudflarePageParser;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
@@ -61,6 +64,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
     private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
+    private final CloudflarePageParser mCloudflarePageParser = Factory.resolve(CloudflarePageParser.class);
     private PostItemViewBuilder mPostItemViewBuilder;
 
     private DownloadThreadsTask mCurrentDownloadTask = null;
@@ -247,7 +251,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.startActivity(pickBoardIntent);
                 break;
             case R.id.refresh_menu_id:
-                this.refreshThreads();
+                this.refresh();
                 break;
             case R.id.open_browser_menu_id:
                 BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.createBoardUri(this.mBoardName, this.mPageNumber).toString());
@@ -280,7 +284,7 @@ public class ThreadsListActivity extends BaseListActivity {
                     if (redirectedThreadNumber != null) {
                         this.navigateToThread(redirectedThreadNumber);
                     } else {
-                        this.refreshThreads();
+                        this.refresh();
                     }
                     break;
             }
@@ -392,7 +396,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.startActivity(i);
     }
 
-    private void refreshThreads() {
+    protected void refresh() {
         this.refreshThreads(true);
     }
 
@@ -449,14 +453,23 @@ public class ThreadsListActivity extends BaseListActivity {
                 ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
                 ThreadsListActivity.this.setAdapterData(threads);
             } else {
-                ThreadsListActivity.this.mAdapter.clear();
-                this.showError(ThreadsListActivity.this.getString(R.string.error_list_empty));
+                String error = ThreadsListActivity.this.getString(R.string.error_list_empty);
+                if (ThreadsListActivity.this.mAdapter.getCount() == 0) {
+                    this.showError(error);
+                } else {
+                    AppearanceUtils.showToastMessage(ThreadsListActivity.this, error);
+                }
             }
         }
 
         @Override
         public void showError(String error) {
             ThreadsListActivity.this.switchToErrorView(error);
+        }
+        
+        @Override
+        public void showCaptcha(CaptchaEntity captcha) {
+        	ThreadsListActivity.this.switchToCaptchaView(captcha);
         }
 
         @Override

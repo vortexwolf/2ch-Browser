@@ -33,7 +33,7 @@ public class HttpStringReader implements IHttpStringReader {
         return result;
     }
 
-    public String fromResponse(HttpResponse response) throws NotFoundException, HttpRequestException {
+    public String fromResponse(HttpResponse response) throws HttpRequestException {
         byte[] bytes = this.mHttpBytesReader.fromResponse(response);
 
         String result = IoUtils.convertBytesToString(bytes);

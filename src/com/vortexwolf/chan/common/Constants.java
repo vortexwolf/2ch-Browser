@@ -37,6 +37,9 @@ public class Constants {
     public static final String USER_AGENT_STRING = "2ch browser (Android)";
     public static final String SAGE_EMAIL = "sage";
     public static final Charset UTF8_CHARSET = Charset.forName(HTTP.UTF_8);
+    
+    public static final String CF_CLEARANCE_COOKIE = "cf_clearance";
+    public static final String USERCODE_COOKIE = "usercode";
 
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;
