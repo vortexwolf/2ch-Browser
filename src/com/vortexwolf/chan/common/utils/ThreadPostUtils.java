@@ -3,6 +3,7 @@ package com.vortexwolf.chan.common.utils;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +37,11 @@ public class ThreadPostUtils {
 
     private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
     private static long sHeapPad = 1024;
+    
+    private static final List<String> sMakabaBoards = Arrays.asList(new String[] { 
+        "fag", "fg", "fur", "g", "ga", "h", "ho", "sex", "fet", "e", "hc", "mmo", "tes", "vg", 
+        "moba", "b", "soc", "ftb", "po", "re", "tr", "wm", "au"
+    });
 
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
@@ -143,6 +149,10 @@ public class ThreadPostUtils {
         }
 
         return 500;
+    }
+    
+    public static boolean isMakabaBoard(String boardName) {
+        return sMakabaBoards.indexOf(boardName) != -1;
     }
 
     /**

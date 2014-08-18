@@ -21,11 +21,9 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private static final String TAG = "DownloadCaptchaTask";
 
     private final ICaptchaView mView;
-    private final IJsonApiReader mJsonReader;
     private final Uri mRefererUri;
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
-    private final DefaultHttpClient mHttpClient;
     private final DvachUriParser mUriParser;
 
     private boolean mCanSkip = false;
@@ -35,13 +33,11 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, IJsonApiReader jsonReader, HttpBitmapReader httpBitmapReader, HtmlCaptchaChecker htmlCaptchaChecker, DefaultHttpClient httpClient) {
+    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri) {
         this.mView = view;
-        this.mJsonReader = jsonReader;
         this.mRefererUri = refererUri;
-        this.mHttpBitmapReader = httpBitmapReader;
-        this.mHtmlCaptchaChecker = htmlCaptchaChecker;
-        this.mHttpClient = httpClient;
+        this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
+        this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
         this.mUriParser = Factory.resolve(DvachUriParser.class);
     }
 
