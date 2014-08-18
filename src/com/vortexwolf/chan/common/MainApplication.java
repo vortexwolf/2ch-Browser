@@ -1,7 +1,9 @@
 package com.vortexwolf.chan.common;
 
 import java.io.File;
+
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.pm.PackageManager;
@@ -9,10 +11,13 @@ import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
+
 import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachModelsMapper;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
+import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.ExtendedObjectMapper;
 import com.vortexwolf.chan.db.DvachSqlHelper;
@@ -71,6 +76,7 @@ public class MainApplication extends Application {
         DvachModelsMapper dvachModelsMapper = new DvachModelsMapper();
         DvachApiReader dvachApiReader = new DvachApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, dvachModelsMapper);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
+        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, new MakabaModelsMapper());
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
@@ -91,7 +97,8 @@ public class MainApplication extends Application {
         container.register(HttpStringReader.class, httpStringReader);
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonReader.class, jsonApiReader);
-        container.register(IJsonApiReader.class, dvachApiReader);
+        container.register(DvachApiReader.class, dvachApiReader);
+        container.register(MakabaApiReader.class, makabaApiReader);
         container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings, httpStringReader));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());
         container.register(NavigationService.class, navigationService);

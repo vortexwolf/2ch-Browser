@@ -58,15 +58,12 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
 
-    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
     private final IPostSender mPostSender = Factory.resolve(IPostSender.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    private final HttpBitmapReader mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
     private final IDraftPostsStorage mDraftPostsStorage = Factory.resolve(IDraftPostsStorage.class);
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
-    private final HtmlCaptchaChecker mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
     
     private ImageFileModel mAttachedFile;
     private String mAttachedVideo;
@@ -568,7 +565,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mJsonReader, this.mHttpBitmapReader, this.mHtmlCaptchaChecker, Factory.resolve(DefaultHttpClient.class));
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri);
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

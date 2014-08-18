@@ -22,13 +22,16 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.ThreadsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadThreadsTask;
+import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -55,7 +58,7 @@ import com.vortexwolf.chan.settings.SettingsEntity;
 public class ThreadsListActivity extends BaseListActivity {
     private static final String TAG = "ThreadsListActivity";
 
-    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
+    private IJsonApiReader mJsonReader;
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
@@ -88,6 +91,12 @@ public class ThreadsListActivity extends BaseListActivity {
         if (data != null) {
             this.mBoardName = mDvachUriParser.getBoardName(data);
             this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
+        }
+        
+        if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
+            this.mJsonReader = Factory.resolve(MakabaApiReader.class);
+        } else {
+            this.mJsonReader = Factory.resolve(DvachApiReader.class);
         }
 
         this.mCurrentSettings = this.mSettings.getCurrentSettings();

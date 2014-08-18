@@ -19,6 +19,7 @@ import android.widget.ListView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.FoundPostsListAdapter;
 import com.vortexwolf.chan.asynctasks.SearchPostsTask;
+import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
@@ -39,7 +40,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class SearchableActivity extends BaseListActivity {
     private static final String TAG = "SearchableActivity";
 
-    private final IJsonApiReader mJsonReader = Factory.getContainer().resolve(IJsonApiReader.class);
+    private final IJsonApiReader mJsonReader = Factory.getContainer().resolve(DvachApiReader.class);
     private final IBitmapManager mBitmapManager = Factory.getContainer().resolve(IBitmapManager.class);
     private final ApplicationSettings mApplciationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);

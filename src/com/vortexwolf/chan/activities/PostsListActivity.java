@@ -18,8 +18,10 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.PostsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadPostsTask;
+import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
@@ -27,6 +29,7 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -51,7 +54,7 @@ import com.vortexwolf.chan.settings.SettingsEntity;
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
 
-    private final IJsonApiReader mJsonReader = Factory.resolve(IJsonApiReader.class);
+    private IJsonApiReader mJsonReader;
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
@@ -90,6 +93,12 @@ public class PostsListActivity extends BaseListActivity {
             this.mThreadNumber = this.mUriParser.getThreadNumber(data);
             this.mPostNumber = data.getFragment();
             this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
+        }
+        
+        if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
+            this.mJsonReader = Factory.resolve(MakabaApiReader.class);
+        } else {
+            this.mJsonReader = Factory.resolve(DvachApiReader.class);
         }
 
         // Page title and new tab
