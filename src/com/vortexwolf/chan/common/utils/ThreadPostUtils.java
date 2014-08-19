@@ -24,7 +24,7 @@ import com.vortexwolf.chan.activities.ImageGalleryActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
-import com.vortexwolf.chan.models.domain.IAttachmentEntity;
+import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
@@ -103,8 +103,8 @@ public class ThreadPostUtils {
     }
 
     /** Проверяет, прикреплен ли к посту какой-либо файл */
-    public static boolean hasAttachment(IAttachmentEntity item) {
-        return !StringUtils.isEmpty(item.getImageUrl()) || !StringUtils.isEmpty(item.getImageUrl());
+    public static boolean hasAttachment(PostModel item) {
+        return item.getAttachments().size() > 0;
     }
 
     public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings, final String threadUrl) {

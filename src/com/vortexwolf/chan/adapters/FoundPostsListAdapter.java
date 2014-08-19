@@ -12,6 +12,7 @@ import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
+import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
@@ -69,14 +70,19 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
         this.clear();
 
         for (PostModel item : posts) {
-            String thumbnail = item.getThumbnailUrl();
+            if (item.getAttachments().size() == 0) {
+                continue;
+            }
+            
+            AttachmentModel attachment = item.getAttachments().get(0);
+            String thumbnail = attachment.getThumbnailUrl();
             if (thumbnail != null && thumbnail.startsWith(this.mBoardName + "/")) {
-                item.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
+                attachment.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
             }
 
-            String image = item.getImageUrl();
+            String image = attachment.getPath();
             if (image != null && image.startsWith(this.mBoardName + "/")) {
-                item.setImageUrl(image.substring(image.indexOf("/") + 1, image.length()));
+                attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
             }
 
             PostItemViewModel viewModel = new PostItemViewModel(this.getCount(), item, this.mTheme, this.mSettings, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder), this.mDvachUriBuilder);

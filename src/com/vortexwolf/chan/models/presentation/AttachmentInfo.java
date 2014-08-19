@@ -10,12 +10,12 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.models.domain.IAttachmentEntity;
+import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfo {
 
-    private final IAttachmentEntity mModel;
+    private final AttachmentModel mModel;
     private final String mBoardCode;
     private final boolean mIsEmpty;
     private final boolean mIsVideo;
@@ -34,7 +34,7 @@ public class AttachmentInfo {
         sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
     }
 
-    public AttachmentInfo(IAttachmentEntity item, String boardCode, DvachUriBuilder dvachUriBuilder) {
+    public AttachmentInfo(AttachmentModel item, String boardCode, DvachUriBuilder dvachUriBuilder) {
         this.mModel = item;
         this.mBoardCode = boardCode;
         this.mDvachUriBuilder = dvachUriBuilder;
@@ -129,7 +129,7 @@ public class AttachmentInfo {
         SourceWithThumbnailModel model = new SourceWithThumbnailModel();
 
         // Проверяем существование картинки
-        String imageUrl = this.mModel.getImageUrl();
+        String imageUrl = this.mModel.getPath();
         String imageThumbnail = this.mModel.getThumbnailUrl();
         if (!StringUtils.isEmpty(imageUrl)) {
             model.imageUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardCode, imageUrl).toString();
@@ -144,7 +144,7 @@ public class AttachmentInfo {
         }
 
         // И видео
-        String videoHtml = this.mModel.getVideoUrl();
+        String videoHtml = this.mModel.getVideoHtml();
         String videoCode = RegexUtils.getYouTubeCode(videoHtml);
         if (!StringUtils.isEmpty(videoCode)) {
             model.isVideo = true;

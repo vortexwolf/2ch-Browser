@@ -66,6 +66,7 @@ public class PostItemViewBuilder {
             vb.postNameView = (TextView) view.findViewById(R.id.post_name);
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
+            vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
             vb.commentView = (ClickableLinksTextView) view.findViewById(R.id.comment);
             vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
@@ -107,6 +108,12 @@ public class PostItemViewBuilder {
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
             vb.postNameView.setVisibility(View.GONE);
+        }
+        
+        if (item.isSage()) {
+            vb.postSageView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postSageView.setVisibility(View.GONE);
         }
 
         // Дата поста
@@ -247,6 +254,7 @@ public class PostItemViewBuilder {
         public TextView postNameView;
         public TextView postIndexView;
         public TextView postDateView;
+        public TextView postSageView;
         public ClickableLinksTextView commentView;
         public TextView attachmentInfoView;
         public TextView postRepliesView;

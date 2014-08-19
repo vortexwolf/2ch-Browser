@@ -1,11 +1,13 @@
 package com.vortexwolf.chan.boards.makaba;
 
+import com.vortexwolf.chan.boards.makaba.models.MakabaFileInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
+import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
@@ -44,15 +46,25 @@ public class MakabaModelsMapper {
         model.setName(source.name);
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
-        if (source.files != null && source.files.length > 0) {
-            model.setThumbnailUrl(source.files[0].thumbnail);
-            model.setImageUrl(source.files[0].path);
-            model.setImageSize(source.files[0].size);
-            model.setImageWidth(source.files[0].width);
-            model.setImageHeight(source.files[0].height);
+        model.setEmail(source.email);
+        if (source.files != null) {
+            for (MakabaFileInfo file : source.files) {
+                model.addAttachment(this.mapAttachmentModel(file));
+            }
         }
         model.setTimestamp(source.timestamp != 0 ? source.timestamp * 1000 : ThreadPostUtils.parseMoscowTextDate(source.date));
         model.setParentThread(source.parent);
+        
+        return model;
+    }
+    
+    public AttachmentModel mapAttachmentModel(MakabaFileInfo file) {
+        AttachmentModel model = new AttachmentModel();
+        model.setThumbnailUrl(file.thumbnail);
+        model.setPath(file.path);
+        model.setImageSize(file.size);
+        model.setImageWidth(file.width);
+        model.setImageHeight(file.height);
         
         return model;
     }

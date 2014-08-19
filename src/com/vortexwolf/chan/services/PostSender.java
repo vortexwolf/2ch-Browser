@@ -20,10 +20,12 @@ import android.content.res.Resources;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachSendPostMapper;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.makaba.MakabaSendPostMapper;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.interfaces.IPostSender;
@@ -40,6 +42,7 @@ public class PostSender implements IPostSender {
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
     private final DvachSendPostMapper mDvachSendPostMapper;
+    private final MakabaSendPostMapper mMakabaSendPostMapper;
 
     public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings, HttpStringReader httpStringReader) {
         this.mHttpClient = client;
@@ -49,6 +52,7 @@ public class PostSender implements IPostSender {
         this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
         this.mDvachSendPostMapper = new DvachSendPostMapper();
+        this.mMakabaSendPostMapper = new MakabaSendPostMapper();
     }
 
     @Override
@@ -57,8 +61,14 @@ public class PostSender implements IPostSender {
         if (boardName == null || entity == null) {
             throw new SendPostException(this.mResources.getString(R.string.error_incorrect_argument));
         }
-
-        String uri = this.mDvachUriBuilder.createBoardUri(boardName, "/wakaba.pl").toString();
+        
+        String uri;
+        if (ThreadPostUtils.isMakabaBoard(boardName)) {
+            uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
+        } else {
+            uri = this.mDvachUriBuilder.createBoardUri(boardName, "/wakaba.pl").toString();
+        }
+        
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
 
         // 1 - 'ро' на кириллице, 2 - 'р' на кириллице, 3 - 'о' на кириллице, 4
@@ -75,7 +85,7 @@ public class PostSender implements IPostSender {
             for (int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++) {
                 httpPost = new HttpPost(uri);
                 extraValues.put("task", possibleTasks[i]);
-                response = this.executeHttpPost(httpPost, entity, extraValues);
+                response = this.executeHttpPost(boardName, httpPost, entity, extraValues);
                 // Проверяем код ответа
                 statusCode = response.getStatusLine().getStatusCode();
 
@@ -111,7 +121,7 @@ public class PostSender implements IPostSender {
             }
 
             // Вызываю только для выброса exception
-            this.mResponseParser.isPostSuccessful(responseText);
+            this.mResponseParser.isPostSuccessful(boardName, responseText);
 
             return null;
         } finally {
@@ -119,13 +129,20 @@ public class PostSender implements IPostSender {
         }
     }
 
-    private HttpResponse executeHttpPost(HttpPost httpPost, SendPostModel postModel, HashMap<String, String> extraValues) throws SendPostException {
+    private HttpResponse executeHttpPost(String boardName, HttpPost httpPost, SendPostModel postModel, HashMap<String, String> extraValues) throws SendPostException {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
         HttpResponse response = null;
         try {
-            HttpEntity entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
+            HttpEntity entity;
+            if (ThreadPostUtils.isMakabaBoard(boardName)) {
+                String usercode = this.mApplicationSettings.getPassCodeValue();
+                entity = this.mMakabaSendPostMapper.mapModelToHttpEntity(boardName, usercode, postModel, extraValues);
+            } else {
+                entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
+            }
+            
             httpPost.setEntity(entity);
             
             // post and ignore recvfrom exceptions

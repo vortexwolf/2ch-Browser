@@ -1,22 +1,20 @@
 package com.vortexwolf.chan.models.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PostModel implements IAttachmentEntity, Serializable {
+public class PostModel implements Serializable {
     private static final long serialVersionUID = 3897934462057089443L;
     
     private String number;
     private String name;
     private String subject;
     private String comment;
-    private String thumbnailUrl;
-    private String videoUrl;
-    private String imageUrl;
-    private int imageSize;
-    private int imageWidth;
-    private int imageHeight;
+    private String email;
     private long timestamp;
     private String parentThread;
+    private ArrayList<AttachmentModel> attachments = new ArrayList<AttachmentModel>();
     
     public String getNumber() {
         return number;
@@ -42,41 +40,11 @@ public class PostModel implements IAttachmentEntity, Serializable {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
+    public String getEmail() {
+        return email;
     }
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
-    }
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
-    public String getImageUrl() {
-        return imageUrl;
-    }
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-    public int getImageSize() {
-        return imageSize;
-    }
-    public void setImageSize(int imageSize) {
-        this.imageSize = imageSize;
-    }
-    public int getImageWidth() {
-        return imageWidth;
-    }
-    public void setImageWidth(int imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-    public int getImageHeight() {
-        return imageHeight;
-    }
-    public void setImageHeight(int imageHeight) {
-        this.imageHeight = imageHeight;
+    public void setEmail(String email) {
+        this.email = email;
     }
     public long getTimestamp() {
         return timestamp;
@@ -89,5 +57,12 @@ public class PostModel implements IAttachmentEntity, Serializable {
     }
     public void setParentThread(String parentThread) {
         this.parentThread = parentThread;
+    }
+    
+    public void addAttachment(AttachmentModel model) {
+        this.attachments.add(model);
+    }
+    public List<AttachmentModel> getAttachments(){
+        return attachments;
     }
 }
