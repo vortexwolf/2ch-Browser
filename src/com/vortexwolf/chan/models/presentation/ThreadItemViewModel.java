@@ -65,7 +65,7 @@ public class ThreadItemViewModel {
 
     public AttachmentInfo getAttachment(String boardCode) {
         if (this.mAttachment == null && this.hasAttachment()) {
-            this.mAttachment = new AttachmentInfo(this.mOpPost, boardCode, this.mDvachUriBuilder);
+            this.mAttachment = new AttachmentInfo(this.mOpPost.getAttachments().get(0), boardCode, this.mDvachUriBuilder);
         }
 
         return this.mAttachment;

@@ -17,6 +17,7 @@ import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
@@ -25,8 +26,7 @@ import com.vortexwolf.chan.services.presentation.FlowTextHelper;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewModel {
-
-    private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>&gt;&gt;(\\d+)</a>");
+    private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
     private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?title=\"(.+?)\".+?/>");
 
     private final int mPosition;
@@ -160,6 +160,10 @@ public class PostItemViewModel {
     public String getName() {
         return this.mName;
     }
+    
+    public boolean isSage() {
+        return "mailto:sage".equals(this.mModel.getEmail());
+    }
 
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mModel);
@@ -167,7 +171,7 @@ public class PostItemViewModel {
 
     public AttachmentInfo getAttachment(String boardCode) {
         if (this.mAttachment == null && this.hasAttachment()) {
-            this.mAttachment = new AttachmentInfo(this.mModel, boardCode, this.mDvachUriBuilder);
+            this.mAttachment = new AttachmentInfo(this.mModel.getAttachments().get(0), boardCode, this.mDvachUriBuilder);
         }
 
         return this.mAttachment;

@@ -7,6 +7,7 @@ import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
+import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
@@ -46,12 +47,10 @@ public class DvachModelsMapper {
         model.setName(source.name != null ? source.name : source.postername);
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
-        model.setThumbnailUrl(source.thumbnail);
-        model.setVideoUrl(source.video);
-        model.setImageUrl(source.image);
-        model.setImageSize(source.size);
-        model.setImageWidth(source.width);
-        model.setImageHeight(source.height);
+        model.setEmail(null);
+        if (!StringUtils.isEmpty(source.image) || !StringUtils.isEmpty(source.video)) {
+            model.addAttachment(this.mapAttachmentModel(source));
+        }
         model.setTimestamp(source.timestamp != 0 ? source.timestamp * 1000 : ThreadPostUtils.parseMoscowTextDate(source.date));
         model.setParentThread(source.parent);
         
@@ -62,6 +61,18 @@ public class DvachModelsMapper {
         SearchPostListModel model = new SearchPostListModel();
         model.setPosts(this.mapPostModels(source.posts));
         model.setError(source.errorText);
+        
+        return model;
+    }
+    
+    public AttachmentModel mapAttachmentModel(DvachPostInfo source) {
+        AttachmentModel model = new AttachmentModel();
+        model.setThumbnailUrl(source.thumbnail);
+        model.setVideoHtml(source.video);
+        model.setPath(source.image);
+        model.setImageSize(source.size);
+        model.setImageWidth(source.width);
+        model.setImageHeight(source.height);
         
         return model;
     }

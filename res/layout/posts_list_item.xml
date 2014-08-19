@@ -26,7 +26,7 @@
             android:layout_marginRight="4dip"
             android:text="666"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#4F7942"
+            android:textColor="?postIndexForeground"
             android:textStyle="bold" />
 
         <TextView
@@ -36,9 +36,21 @@
             android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
             android:layout_toRightOf="@id/post_index"
-            android:text="testtesttest"
+            android:text="1234567"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?postNumberForeground" />
+        
+        <TextView
+            android:id="@+id/post_sage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toRightOf="@id/post_id"
+            android:text="SAGE"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?postSageForeground"
+            />
 
         <TextView
             android:id="@+id/post_item_date_id"
@@ -57,7 +69,7 @@
             android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
             android:layout_toLeftOf="@id/post_item_date_id"
-            android:layout_toRightOf="@id/post_id"
+            android:layout_toRightOf="@id/post_sage"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="anon anonanonanonanon"
