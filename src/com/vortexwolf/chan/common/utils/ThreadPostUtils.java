@@ -38,9 +38,8 @@ public class ThreadPostUtils {
     private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
     private static long sHeapPad = 1024;
     
-    private static final List<String> sMakabaBoards = Arrays.asList(new String[] { 
-        "fag", "fg", "fur", "g", "ga", "h", "ho", "sex", "fet", "e", "hc", "mmo", "tes", "vg", 
-        "moba", "b", "soc", "ftb", "po", "re", "tr", "wm", "au"
+    private static final List<String> sWakabaBoards = Arrays.asList(new String[] { 
+        "abu", "bo", "f", "hh", "i", "int", "mu", "mus", "sci", "o"
     });
 
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
@@ -152,7 +151,7 @@ public class ThreadPostUtils {
     }
     
     public static boolean isMakabaBoard(String boardName) {
-        return sMakabaBoards.indexOf(boardName) != -1;
+        return sWakabaBoards.indexOf(boardName) == -1;
     }
 
     /**
