@@ -24,8 +24,15 @@ public class MakabaModelsMapper {
     
     public ThreadModel mapThreadModel(MakabaThreadInfo source){
         ThreadModel model = new ThreadModel();
-        model.setReplyCount(source.postsCount);
-        model.setImageCount(source.filesCount);
+        model.setReplyCount(source.posts.length + source.postsCount);
+        int filesCount = 0;
+        for (int i=0; i<source.posts.length; ++i) {
+            if (source.posts[i].files != null) {
+                filesCount += source.posts[i].files.length;
+            }
+        }
+        filesCount += source.filesCount;
+        model.setImageCount(filesCount);
         model.setPosts(this.mapPostModels(source.posts));
         
         return model;

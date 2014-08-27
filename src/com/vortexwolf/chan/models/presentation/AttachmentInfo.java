@@ -118,6 +118,9 @@ public class AttachmentInfo {
             if ("gif".equalsIgnoreCase(this.mSourceExtension)) {
                 result += " gif";
             }
+            if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
+                result += " webm";
+            }
         } else if (this.mIsVideo) {
             result = "YouTube";
         }
