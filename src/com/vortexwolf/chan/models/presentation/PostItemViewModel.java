@@ -161,8 +161,20 @@ public class PostItemViewModel {
         return this.mName;
     }
     
+    public String getTrip() {
+        return this.mModel.getTrip();
+    }
+    
+    public String getSubject() {
+        return StringUtils.emptyIfNull(this.mModel.getSubject());
+    }
+    
     public boolean isSage() {
         return "mailto:sage".equals(this.mModel.getEmail());
+    }
+    
+    public boolean isOp() {
+        return this.mModel.isOp();
     }
 
     public boolean hasAttachment() {

@@ -16,6 +16,8 @@
         <attr name="tabCloseButtonBackground" format="color|reference" />
         <attr name="postDivider" format="color|reference" />
         <attr name="postSageForeground" format="color|reference" />
+        <attr name="postOpForeground" format="color|reference" />
+        <attr name="postTripForeground" format="color|reference" />
         <attr name="postIndexForeground" format="color|reference" />
         <attr name="iconRefresh" format="integer|reference" />
         <attr name="iconSave" format="integer|reference" />

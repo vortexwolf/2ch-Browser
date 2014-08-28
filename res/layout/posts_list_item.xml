@@ -39,6 +39,19 @@
             android:text="1234567"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?postNumberForeground" />
+
+        <TextView
+            android:id="@+id/post_op"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toRightOf="@id/post_id"
+            android:layout_alignWithParentIfMissing="true"
+            android:singleLine="true"
+            android:text="#OP"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?postOpForeground" />
         
         <TextView
             android:id="@+id/post_sage"
@@ -46,11 +59,23 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_id"
+            android:layout_toRightOf="@id/post_op"
             android:text="SAGE"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?postSageForeground"
-            />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?postSageForeground" />
+
+        <TextView
+            android:id="@+id/post_trip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toRightOf="@id/post_sage"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="!7qYk/yEq0Y"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?postTripForeground" />
 
         <TextView
             android:id="@+id/post_item_date_id"
@@ -63,13 +88,27 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
+            android:id="@+id/post_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toLeftOf="@id/post_item_date_id"
+            android:layout_toRightOf="@id/post_trip"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="SUBJ"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
             android:id="@+id/post_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
             android:layout_toLeftOf="@id/post_item_date_id"
-            android:layout_toRightOf="@id/post_sage"
+            android:layout_toRightOf="@id/post_subject"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="anon anonanonanonanon"
