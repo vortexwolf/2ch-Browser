@@ -312,8 +312,8 @@ public class PostsListActivity extends BaseListActivity {
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
         }
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(R.string.cmenu_download_file));
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName, 0).isFile()) {
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(item.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
         }
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 4, this.getString(R.string.cmenu_share));
@@ -345,9 +345,11 @@ public class PostsListActivity extends BaseListActivity {
                 }
                 break;
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
-                AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-                Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
-                new DownloadFileTask(this, fileUri).execute();
+                for (int i = 0; i < info.getAttachmentsNumber(); ++i) {
+                    AttachmentInfo attachment = info.getAttachment(this.mBoardName, i);
+                    Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
+                    new DownloadFileTask(this, fileUri).execute();
+                }
                 break;
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);

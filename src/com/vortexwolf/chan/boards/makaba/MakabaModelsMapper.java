@@ -24,8 +24,15 @@ public class MakabaModelsMapper {
     
     public ThreadModel mapThreadModel(MakabaThreadInfo source){
         ThreadModel model = new ThreadModel();
-        model.setReplyCount(source.postsCount);
-        model.setImageCount(source.filesCount);
+        model.setReplyCount(source.posts.length + source.postsCount);
+        int filesCount = 0;
+        for (int i=0; i<source.posts.length; ++i) {
+            if (source.posts[i].files != null) {
+                filesCount += source.posts[i].files.length;
+            }
+        }
+        filesCount += source.filesCount;
+        model.setImageCount(filesCount);
         model.setPosts(this.mapPostModels(source.posts));
         
         return model;
@@ -47,6 +54,8 @@ public class MakabaModelsMapper {
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
         model.setEmail(source.email);
+        model.setTrip(source.trip);
+        model.setOp(source.op == 1);
         if (source.files != null) {
             for (MakabaFileInfo file : source.files) {
                 model.addAttachment(this.mapAttachmentModel(file));

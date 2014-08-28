@@ -21,7 +21,7 @@ public class ThreadItemViewModel {
     private final DvachUriBuilder mDvachUriBuilder;
 
     private final SpannableStringBuilder mSpannedComment;
-    private AttachmentInfo mAttachment = null;
+    private AttachmentInfo[] mAttachments = new AttachmentInfo[4];  //4 - максимальное число аттачей к посту на макабе
     private boolean mEllipsized = false;
     private boolean mHidden = false;
 
@@ -62,13 +62,17 @@ public class ThreadItemViewModel {
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mOpPost);
     }
+  
+    public int getAttachmentsNumber() {
+        return this.mOpPost.getAttachments().size();
+    }
 
-    public AttachmentInfo getAttachment(String boardCode) {
-        if (this.mAttachment == null && this.hasAttachment()) {
-            this.mAttachment = new AttachmentInfo(this.mOpPost.getAttachments().get(0), boardCode, this.mDvachUriBuilder);
+    public AttachmentInfo getAttachment(String boardCode, int attachmentNumber) {
+        if (this.mAttachments[attachmentNumber] == null && this.getAttachmentsNumber() > attachmentNumber) {
+            this.mAttachments[attachmentNumber] = new AttachmentInfo(this.mOpPost.getAttachments().get(attachmentNumber), boardCode, this.mDvachUriBuilder);
         }
 
-        return this.mAttachment;
+        return this.mAttachments[attachmentNumber];
     }
 
     public PostModel getOpPost() {

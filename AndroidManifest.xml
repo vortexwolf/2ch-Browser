@@ -34,8 +34,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="2ch.pm" android:pathPattern="/.*" />
-                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*" />
+                <data android:scheme="https" android:host="2ch.pm" android:pathPattern="/.*" />
+                <data android:scheme="https" android:host="2ch.hk" android:pathPattern="/.*" />
             </intent-filter>
 	    </activity>
         <activity android:name="com.vortexwolf.chan.activities.ImageGalleryActivity" android:configChanges="keyboardHidden|orientation" android:hardwareAccelerated="true"></activity>
