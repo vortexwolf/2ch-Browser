@@ -41,6 +41,8 @@ Light theme
         <item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
         <item name="postDivider">@color/white_post_divider</item>
         <item name="postSageForeground">@color/white_sage_text</item>
+        <item name="postTripForeground">@color/white_trip_text</item>
+        <item name="postOpForeground">@color/white_op_text</item>
         <item name="postIndexForeground">@color/white_post_index_text</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/white_post_quote</item>
@@ -75,6 +77,8 @@ Dark theme
         <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
         <item name="postDivider">@color/neutron_post_divider</item>
         <item name="postSageForeground">@color/neutron_sage_text</item>
+        <item name="postTripForeground">@color/neutron_trip_text</item>
+        <item name="postOpForeground">@color/neutron_op_text</item>
         <item name="postIndexForeground">@color/neutron_post_index_text</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/neutron_post_quote</item>
@@ -109,6 +113,8 @@ Photon theme
         <item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
         <item name="postDivider">@color/photon_post_divider</item>
         <item name="postSageForeground">@color/photon_sage_text</item>
+        <item name="postTripForeground">@color/photon_trip_text</item>
+        <item name="postOpForeground">@color/photon_op_text</item>
         <item name="postIndexForeground">@color/photon_post_index_text</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/photon_post_quote</item>

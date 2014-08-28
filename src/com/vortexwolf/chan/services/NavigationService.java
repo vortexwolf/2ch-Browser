@@ -45,7 +45,9 @@ public class NavigationService {
     private void navigateActivity(Context context, Class<?> activityClass, Uri uri, Bundle extras, Integer flags) {
         Intent i = new Intent(context.getApplicationContext(), activityClass);
         i.setData(uri);
-        i.putExtras(extras);
+        if (extras != null) {
+            i.putExtras(extras);
+        }
         if (flags != null) {
             i.addFlags(flags);
         }

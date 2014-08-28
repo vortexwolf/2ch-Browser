@@ -12,6 +12,8 @@ public class PostModel implements Serializable {
     private String subject;
     private String comment;
     private String email;
+    private String trip;
+    private boolean op;
     private long timestamp;
     private String parentThread;
     private ArrayList<AttachmentModel> attachments = new ArrayList<AttachmentModel>();
@@ -45,6 +47,18 @@ public class PostModel implements Serializable {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+    public String getTrip() {
+        return trip;
+    }
+    public void setTrip(String trip) {
+        this.trip = trip;
+    }
+    public boolean isOp() {
+        return op;
+    }
+    public void setOp(boolean op) {
+        this.op = op;
     }
     public long getTimestamp() {
         return timestamp;

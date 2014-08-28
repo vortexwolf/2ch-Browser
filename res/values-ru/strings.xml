@@ -96,6 +96,7 @@
     <string name="cmenu_reply_post">Ответить</string>
     <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
     <string name="cmenu_download_file">Загрузить файл</string>
+    <string name="cmenu_download_files">Загрузить файлы</string>
     <string name="cmenu_copy_post">Выделить/копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
     <string name="cmenu_view_op_post">Показать ОП-пост полностью</string>
@@ -127,8 +128,8 @@
     <string name="pref_name_summary">Оставьте пустым</string>
     <string name="pref_name_hint">Аноним</string>
     <string name="pref_domain">Домен</string>
-    <string name="pref_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
-    <string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
+    <string name="pref_domain_summary">Резервные адреса: 2ch.pm, 2ch.hk, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    <string name="pref_domain_hint">2ch.pm или 85.17.28.149</string>
     <string name="pref_display_post_date">Время сообщений</string>
     <string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
     <string name="pref_convert_post_date">Локальное время</string>

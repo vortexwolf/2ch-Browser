@@ -152,7 +152,7 @@ public class ApplicationSettings {
     }
 
     public boolean isDisplayNames() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_name_key), false);
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_name_key), true);
     }
 
     public boolean isDisplayAllBoards() {

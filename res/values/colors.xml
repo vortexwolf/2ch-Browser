@@ -44,6 +44,12 @@
     <color name="white_sage_text">#993333</color>
     <color name="neutron_sage_text">#993333</color>
     <color name="photon_sage_text">#993333</color>
+    <color name="white_trip_text">#228854</color>
+    <color name="neutron_trip_text">#228854</color>
+    <color name="photon_trip_text">#228854</color>
+    <color name="white_op_text">#008000</color>
+    <color name="neutron_op_text">#008000</color>
+    <color name="photon_op_text">#008000</color>
     <color name="white_post_index_text">#4F7942</color>
     <color name="neutron_post_index_text">#789922</color>
     <color name="photon_post_index_text">#4F7942</color>

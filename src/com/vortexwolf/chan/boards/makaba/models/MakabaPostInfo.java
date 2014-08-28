@@ -29,4 +29,10 @@ public class MakabaPostInfo {
     
     @JsonProperty("files")
     public MakabaFileInfo[] files;
+    
+    @JsonProperty("trip")
+    public String trip;
+    
+    @JsonProperty("op")
+    public int op;
 }

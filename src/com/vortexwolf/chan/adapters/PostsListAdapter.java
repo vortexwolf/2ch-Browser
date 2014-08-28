@@ -146,9 +146,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
         List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : models) {
-            AttachmentInfo attachment = model.getAttachment(this.mBoardName);
-            if (attachment != null && attachment.isImage()) {
-                this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+            for (int i=0; i<4; ++i) {
+                AttachmentInfo attachment = model.getAttachment(this.mBoardName, i);
+                if (attachment != null && attachment.isImage()) {
+                    this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                }
             }
 
             this.add(model);
@@ -187,9 +189,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
         List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
         for (PostItemViewModel model : newModels) {
-            AttachmentInfo attachment = model.getAttachment(this.mBoardName);
-            if (attachment != null && attachment.isImage()) {
-                this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+            for (int i=0; i<4; ++i) {
+                AttachmentInfo attachment = model.getAttachment(this.mBoardName, i);
+                if (attachment != null && attachment.isImage()) {
+                    this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                }
             }
 
             this.add(model);

@@ -9,6 +9,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -98,9 +99,18 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
             vb.titleView = (TextView) view.findViewById(R.id.title);
             vb.commentView = (EllipsizingTextView) view.findViewById(R.id.comment);
             vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
-            vb.attachmentInfoView = (TextView) view.findViewById(R.id.attachment_info);
-            vb.fullThumbnailView = view.findViewById(R.id.thumbnail_view);
-            vb.thumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
+            vb.attachmentInfoView[0] = (TextView) view.findViewById(R.id.attachment_info_1);
+            vb.attachmentInfoView[1] = (TextView) view.findViewById(R.id.attachment_info_2);
+            vb.attachmentInfoView[2] = (TextView) view.findViewById(R.id.attachment_info_3);
+            vb.attachmentInfoView[3] = (TextView) view.findViewById(R.id.attachment_info_4);
+            vb.fullThumbnailView[0] = view.findViewById(R.id.thumbnail_view_1);
+            vb.fullThumbnailView[1] = view.findViewById(R.id.thumbnail_view_2);
+            vb.fullThumbnailView[2] = view.findViewById(R.id.thumbnail_view_3);
+            vb.fullThumbnailView[3] = view.findViewById(R.id.thumbnail_view_4);
+            vb.thumbnailView[0] = (ImageView) view.findViewById(R.id.thumbnail_1);
+            vb.thumbnailView[1] = (ImageView) view.findViewById(R.id.thumbnail_2);
+            vb.thumbnailView[2] = (ImageView) view.findViewById(R.id.thumbnail_3);
+            vb.thumbnailView[3] = (ImageView) view.findViewById(R.id.thumbnail_4);
 
             view.setTag(vb);
         }
@@ -132,10 +142,41 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
 
-        // Обрабатываем прикрепленный файл
-        AttachmentInfo attachment = item.getAttachment(this.mBoardName);
-        ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext(), null);
-        ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView);
+        // Обрабатываем прикрепленные файлы
+        for (int i=0; i<4; ++i) {
+            AttachmentInfo attachment = item.getAttachment(this.mBoardName, i);
+            ThreadPostUtils.handleAttachmentImage(this.mIsBusy, attachment, vb.thumbnailView[i], vb.fullThumbnailView[i], this.mBitmapManager, this.mSettings, this.getContext(), null);
+            ThreadPostUtils.handleAttachmentDescription(attachment, this.getContext().getResources(), vb.attachmentInfoView[i]);
+        }
+        
+        // изменение расположения текста оп-поста относительно картинок, если их больше 1
+        if (item.getAttachmentsNumber()>1) {
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) vb.titleView.getLayoutParams();
+            int[] rules = layoutParams.getRules();
+            rules[RelativeLayout.BELOW] = R.id.thumbnail_view_1;
+            rules[RelativeLayout.RIGHT_OF] = 0;
+            
+            layoutParams = (RelativeLayout.LayoutParams) vb.commentView.getLayoutParams();
+            rules = layoutParams.getRules();
+            rules[RelativeLayout.RIGHT_OF] = 0;
+            
+            layoutParams = (RelativeLayout.LayoutParams) vb.repliesNumberView.getLayoutParams();
+            rules = layoutParams.getRules();
+            rules[RelativeLayout.RIGHT_OF] = 0;
+        } else { // без этого разметка почему-то ломается
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) vb.titleView.getLayoutParams();
+            int[] rules = layoutParams.getRules();
+            rules[RelativeLayout.BELOW] = 0;
+            rules[RelativeLayout.RIGHT_OF] = R.id.thumbnail_view_1;
+            
+            layoutParams = (RelativeLayout.LayoutParams) vb.commentView.getLayoutParams();
+            rules = layoutParams.getRules();
+            rules[RelativeLayout.RIGHT_OF] = R.id.thumbnail_view_1;
+            
+            layoutParams = (RelativeLayout.LayoutParams) vb.repliesNumberView.getLayoutParams();
+            rules = layoutParams.getRules();
+            rules[RelativeLayout.RIGHT_OF] = R.id.thumbnail_view_1;
+        }
     }
 
     /** Обновляет адаптер полностью */
@@ -168,9 +209,11 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
                 ViewBag vb = (ViewBag) v.getTag();
 
-                AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName);
-                if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                    ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView, vb.fullThumbnailView, this.mBitmapManager, this.mSettings, this.getContext(), null);
+                for (int j=0; j<4; ++j) {
+                    AttachmentInfo attachment = this.getItem(position).getAttachment(this.mBoardName, j);
+                    if (!ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
+                        ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.thumbnailView[j], vb.fullThumbnailView[j], this.mBitmapManager, this.mSettings, this.getContext(), null);
+                    }
                 }
             }
         }
@@ -180,8 +223,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         TextView titleView;
         EllipsizingTextView commentView;
         TextView repliesNumberView;
-        TextView attachmentInfoView;
-        ImageView thumbnailView;
-        View fullThumbnailView;
+        TextView[] attachmentInfoView = new TextView[4];
+        ImageView[] thumbnailView = new ImageView[4];
+        View[] fullThumbnailView = new View[4];
     }
 }
