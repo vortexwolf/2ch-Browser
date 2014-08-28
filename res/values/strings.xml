@@ -88,6 +88,7 @@
     <string name="cmenu_reply_post">Reply to this post</string>
     <string name="cmenu_reply_post_quote">Reply with quote</string>
     <string name="cmenu_download_file">Download file</string>
+    <string name="cmenu_download_files">Download files</string>
     <string name="cmenu_copy_post">Select/copy text</string>
     <string name="cmenu_copy_url">Copy the link</string>
     <string name="cmenu_view_op_post">View OP post</string>

@@ -323,8 +323,8 @@ public class ThreadsListActivity extends BaseListActivity {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_ANSWER, 0, this.getString(R.string.cmenu_answer_without_reading));
 
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName).isFile()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(R.string.cmenu_download_file));
+        if (item.hasAttachment() && item.getAttachment(this.mBoardName, 0).isFile()) {
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(item.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
         }
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
@@ -348,9 +348,11 @@ public class ThreadsListActivity extends BaseListActivity {
                 return true;
             }
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
-                AttachmentInfo attachment = info.getAttachment(this.mBoardName);
-                Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
-                new DownloadFileTask(this, fileUri).execute();
+                for (int i = 0; i < info.getAttachmentsNumber(); ++i) {
+                    AttachmentInfo attachment = info.getAttachment(this.mBoardName, i);
+                    Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
+                    new DownloadFileTask(this, fileUri).execute();
+                }
                 return true;
             }
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {

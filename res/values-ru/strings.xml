@@ -96,6 +96,7 @@
     <string name="cmenu_reply_post">Ответить</string>
     <string name="cmenu_reply_post_quote">Ответить с цитатой</string>
     <string name="cmenu_download_file">Загрузить файл</string>
+    <string name="cmenu_download_files">Загрузить файлы</string>
     <string name="cmenu_copy_post">Выделить/копировать текст</string>
     <string name="cmenu_copy_url">Копировать ссылку</string>
     <string name="cmenu_view_op_post">Показать ОП-пост полностью</string>

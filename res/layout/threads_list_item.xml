@@ -6,7 +6,7 @@
     android:padding="5dip" >
 
     <LinearLayout
-        android:id="@+id/thumbnail_view"
+        android:id="@+id/thumbnail_view_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -14,7 +14,7 @@
         android:orientation="vertical" >
 
         <com.vortexwolf.chan.common.controls.ExtendedImageView
-            android:id="@+id/thumbnail"
+            android:id="@+id/thumbnail_1"
             android:layout_width="@dimen/thumbnail_size"
             android:layout_height="@dimen/thumbnail_size"
             android:layout_gravity="center"
@@ -22,7 +22,79 @@
             android:scaleType="centerInside" />
 
         <TextView
-            android:id="@+id/attachment_info"
+            android:id="@+id/attachment_info_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?itemInfoForeground" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/thumbnail_view_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail_view_1"
+        android:layout_marginRight="3dip"
+        android:orientation="vertical" >
+
+        <com.vortexwolf.chan.common.controls.ExtendedImageView
+            android:id="@+id/thumbnail_2"
+            android:layout_width="@dimen/thumbnail_size"
+            android:layout_height="@dimen/thumbnail_size"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/attachment_info_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?itemInfoForeground" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/thumbnail_view_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail_view_1"
+        android:layout_marginRight="3dip"
+        android:orientation="vertical" >
+
+        <com.vortexwolf.chan.common.controls.ExtendedImageView
+            android:id="@+id/thumbnail_3"
+            android:layout_width="@dimen/thumbnail_size"
+            android:layout_height="@dimen/thumbnail_size"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/attachment_info_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?itemInfoForeground" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/thumbnail_view_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail_view_1"
+        android:layout_marginRight="3dip"
+        android:orientation="vertical" >
+
+        <com.vortexwolf.chan.common.controls.ExtendedImageView
+            android:id="@+id/thumbnail_4"
+            android:layout_width="@dimen/thumbnail_size"
+            android:layout_height="@dimen/thumbnail_size"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/attachment_info_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -36,7 +108,7 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginBottom="1dip"
-        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_toRightOf="@id/thumbnail_view_1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="?threadTitleForeground" />
  
@@ -47,7 +119,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/title"
         android:layout_marginBottom="1dip"
-        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_toRightOf="@id/thumbnail_view_1"
         android:maxLines="@integer/opPostMaxLines"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -59,7 +131,7 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/comment"
-        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_toRightOf="@id/thumbnail_view_1"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?itemInfoForeground" />
  
