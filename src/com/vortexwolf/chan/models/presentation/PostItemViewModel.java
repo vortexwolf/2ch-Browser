@@ -38,7 +38,7 @@ public class PostItemViewModel {
 
     private final SpannableStringBuilder mSpannedComment;
     private SpannableStringBuilder mCachedReferencesString = null;
-    private AttachmentInfo mAttachment;
+    private AttachmentInfo[] mAttachments = new AttachmentInfo[4]; //4 - максимальное число аттачей к посту на макабе
     private String mPostDate = null;
     private final BadgeModel mBadge;
     private String mName = null;
@@ -168,13 +168,17 @@ public class PostItemViewModel {
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mModel);
     }
+    
+    public int getAttachmentsNumber() {
+        return this.mModel.getAttachments().size();
+    }
 
-    public AttachmentInfo getAttachment(String boardCode) {
-        if (this.mAttachment == null && this.hasAttachment()) {
-            this.mAttachment = new AttachmentInfo(this.mModel.getAttachments().get(0), boardCode, this.mDvachUriBuilder);
+    public AttachmentInfo getAttachment(String boardCode, int attachmentNumber) {
+        if (this.mAttachments[attachmentNumber] == null && this.getAttachmentsNumber() > attachmentNumber) {
+            this.mAttachments[attachmentNumber] = new AttachmentInfo(this.mModel.getAttachments().get(attachmentNumber), boardCode, this.mDvachUriBuilder);
         }
 
-        return this.mAttachment;
+        return this.mAttachments[attachmentNumber];
     }
 
     public SpannableStringBuilder getSpannedComment() {
@@ -259,7 +263,7 @@ public class PostItemViewModel {
      * изображение
      */
     public boolean canMakeCommentFloat() {
-        return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment && this.hasAttachment();
+        return FlowTextHelper.sNewClassAvailable && !this.isFloatImageComment && (this.getAttachmentsNumber() == 1);
     }
 
     public boolean isCommentFloat() {
