@@ -54,6 +54,8 @@ public class MakabaModelsMapper {
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
         model.setEmail(source.email);
+        model.setTrip(source.trip);
+        model.setOp(source.op == 1);
         if (source.files != null) {
             for (MakabaFileInfo file : source.files) {
                 model.addAttachment(this.mapAttachmentModel(file));

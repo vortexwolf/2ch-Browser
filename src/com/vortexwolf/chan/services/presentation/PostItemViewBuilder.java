@@ -67,6 +67,9 @@ public class PostItemViewBuilder {
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
             vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
+            vb.postOpView = (TextView) view.findViewById(R.id.post_op);
+            vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
+            vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
             vb.commentView = (ClickableLinksTextView) view.findViewById(R.id.comment);
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
             vb.attachmentInfoView[0] = (TextView) view.findViewById(R.id.attachment_info_1);
@@ -110,19 +113,40 @@ public class PostItemViewBuilder {
             vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
         }
 
-        // Имя
+        // Имя, трип и тема поста
         String name = item.getName();
+        String trip = item.getTrip();
+        String subject = item.getSubject();
+        
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")) {
             vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
             vb.postNameView.setVisibility(View.GONE);
         }
+        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(trip)) {
+            vb.postTripView.setText(MyHtml.fromHtml(trip, HtmlUtils.sImageGetter, null));
+            vb.postTripView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postTripView.setVisibility(View.GONE);
+        }
+        if (!StringUtils.isEmptyOrWhiteSpace(subject)) {
+            vb.postSubjectView.setText(MyHtml.fromHtml(subject, HtmlUtils.sImageGetter, null));
+            vb.postSubjectView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postSubjectView.setVisibility(View.GONE);
+        }
         
         if (item.isSage()) {
             vb.postSageView.setVisibility(View.VISIBLE);
         } else {
             vb.postSageView.setVisibility(View.GONE);
+        }
+        
+        if (item.isOp()) {
+            vb.postOpView.setVisibility(View.VISIBLE);
+        } else {
+            vb.postOpView.setVisibility(View.GONE);
         }
 
         // Дата поста
@@ -279,6 +303,9 @@ public class PostItemViewBuilder {
         public TextView postIndexView;
         public TextView postDateView;
         public TextView postSageView;
+        public TextView postOpView;
+        public TextView postTripView;
+        public TextView postSubjectView;
         public ClickableLinksTextView commentView;
         public TextView[] attachmentInfoView = new TextView[4];
         public TextView postRepliesView;
