@@ -4,6 +4,45 @@
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:padding="5dip" >
+    <LinearLayout
+        android:id="@+id/multi_thumbnails_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+        <include
+	    android:id="@+id/thumbnail_view_1"
+	    layout="@layout/thumbnail_view"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginRight="5dip"
+	    android:visibility="gone"
+	/>
+        <include
+	    android:id="@+id/thumbnail_view_2"
+	    layout="@layout/thumbnail_view"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginRight="5dip"
+	    android:visibility="gone"
+        />
+        <include
+	    android:id="@+id/thumbnail_view_3"
+	    layout="@layout/thumbnail_view"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginRight="5dip"
+	    android:visibility="gone"
+        />
+        <include
+	    android:id="@+id/thumbnail_view_4"
+	    layout="@layout/thumbnail_view"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginRight="5dip"
+	    android:visibility="gone"
+        />
+    </LinearLayout>
     <include
         android:id="@+id/thumbnail_view"
         layout="@layout/thumbnail_view"
@@ -17,6 +56,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/multi_thumbnails_view"
         android:layout_toRightOf="@id/thumbnail_view"
         android:layout_marginBottom="1dip"
         android:textAppearance="?android:attr/textAppearanceLarge"

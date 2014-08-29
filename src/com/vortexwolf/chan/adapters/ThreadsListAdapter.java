@@ -100,7 +100,14 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
             vb.titleView = (TextView) view.findViewById(R.id.title);
             vb.commentView = (EllipsizingTextView) view.findViewById(R.id.comment);
             vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
-            vb.thumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
+            vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
+            
+            vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
+            vb.thumbnailViews = new ThumbnailViewBag[4];
+            vb.thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
+            vb.thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
+            vb.thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
+            vb.thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
             
             view.setTag(vb);
         }
@@ -132,9 +139,20 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
 
-        // Обрабатываем прикрепленный файл
-        AttachmentInfo attachment = item.getAttachment();
-        ThreadPostUtils.refreshAttachmentView(this.mIsBusy, attachment, vb.thumbnailView);
+        // Обрабатываем прикрепленные файлы
+        if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
+            vb.multiThumbnailsView.setVisibility(View.VISIBLE);
+            vb.singleThumbnailView.hide();
+            for (int i = 0; i < 4; ++i) {
+                ThreadPostUtils.refreshAttachmentView(this.mIsBusy, item.getAttachment(i), vb.thumbnailViews[i]);
+            }
+        } else if (item.getAttachmentsNumber() >= 1) {
+            vb.multiThumbnailsView.setVisibility(View.GONE);
+            ThreadPostUtils.refreshAttachmentView(this.mIsBusy, item.getAttachment(0), vb.singleThumbnailView);
+        } else {
+            vb.multiThumbnailsView.setVisibility(View.GONE);
+            vb.singleThumbnailView.hide();
+        }
     }
 
     /** Обновляет адаптер полностью */
@@ -166,9 +184,16 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
                 }
 
                 ViewBag vb = (ViewBag) v.getTag();
-                AttachmentInfo attachment = this.getItem(position).getAttachment();
-                ThreadPostUtils.setNonBusyAttachment(attachment, vb.thumbnailView.image);
-            }
+                
+                        
+		if (mSettings.isMultiThumbnailsInThreads() && this.getItem(position).getAttachmentsNumber() > 1) {
+		    for (int j = 0; j < 4; ++j) {
+			ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(j), vb.thumbnailViews[j].image);
+		    }
+		} else if (this.getItem(position).getAttachmentsNumber() >= 1) {
+		    ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(0), vb.singleThumbnailView.image);
+		}
+	    }
         }
     }
 
@@ -176,6 +201,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         TextView titleView;
         EllipsizingTextView commentView;
         TextView repliesNumberView;
-        ThumbnailViewBag thumbnailView;
+        ThumbnailViewBag singleThumbnailView;
+        View multiThumbnailsView;
+        ThumbnailViewBag[] thumbnailViews;
     }
 }
