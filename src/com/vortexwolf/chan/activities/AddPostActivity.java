@@ -445,7 +445,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.startActivityForResult(intent, Constants.REQUEST_CODE_FILE_LIST_ACTIVITY);
                 break;
             case R.id.menu_gallery_id:
-                if (Constants.SDK_VERSION < 19) {
+                if (Constants.SDK_VERSION < 19 || !mSettings.isKitKatFix()) {
                     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                     i.setType("image/*");
                     this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);

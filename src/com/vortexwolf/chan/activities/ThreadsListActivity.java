@@ -393,7 +393,7 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     protected void refresh() {
-        this.refreshThreads(true);
+        this.refreshThreads(false); // поставил здесь пока false, т.к. иначе, если треды остались те же самые, обновление возвращает null и ошибка error_list_empty
     }
 
     private void refreshThreads(boolean checkModified) {

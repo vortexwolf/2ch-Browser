@@ -20,7 +20,7 @@ public class ThreadItemViewModel {
     private final int mImageCount;
 
     private final SpannableStringBuilder mSpannedComment;
-    private AttachmentInfo mAttachment = null;
+    private AttachmentInfo[] mAttachments = new AttachmentInfo[4];
     private boolean mEllipsized = false;
     private boolean mHidden = false;
 
@@ -62,12 +62,20 @@ public class ThreadItemViewModel {
         return ThreadPostUtils.hasAttachment(this.mOpPost);
     }
     
-    public AttachmentInfo getAttachment() {
-        if (this.mAttachment == null && this.hasAttachment()) {
-            this.mAttachment = new AttachmentInfo(this.mOpPost.getAttachments().get(0), this.mBoardName, this.mOpPost.getParentThread());
+    public int getAttachmentsNumber() {
+        return ThreadPostUtils.getAttachmentsNumber(this.mOpPost);
+    }
+    
+    public AttachmentInfo getAttachment(int index) {
+        if(index >= this.getAttachmentsNumber()) {
+            return null;
+        }
+        
+        if (this.mAttachments[index] == null) {
+            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mBoardName, this.mOpPost.getParentThread());
         }
 
-        return this.mAttachment;
+        return this.mAttachments[index];
     }
 
     public PostModel getOpPost() {

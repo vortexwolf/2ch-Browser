@@ -179,6 +179,14 @@ public class ApplicationSettings {
     public boolean isUnlimitedCache() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_no_limit_key), false);
     }
+    
+    public boolean isKitKatFix() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_kitkat_fix_key), true);
+    }
+    
+    public boolean isMultiThumbnailsInThreads() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
+    }
 
     public int getTheme() {
         final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_default_value);

@@ -140,6 +140,10 @@
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
     <string name="pref_file_cache_no_limit">Unlimited cache</string>
     <string name="pref_file_cache_no_limit_summary">Remove the limit of cache size of 25Mb</string>
+    <string name="pref_kitkat_fix">Android KitKat Fix</string>
+    <string name="pref_kitkat_fix_summary">Force to use the system gallery in Android 4.4 or newer</string>
+    <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
+    <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in thread previews</string>
 
     <string-array name="pref_text_size_choices">
         <item>Medium</item>
