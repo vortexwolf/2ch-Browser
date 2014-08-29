@@ -17,6 +17,14 @@ public class PostsViewModel {
 
     private final HashMap<String, PostItemViewModel> mViewModels = new HashMap<String, PostItemViewModel>();
     private String mLastPostNumber = null;
+    
+    private final String mBoardName;
+    private final String mThreadNumber;
+    
+    public PostsViewModel(String boardName, String threadNumber) {
+        this.mBoardName = boardName;
+        this.mThreadNumber = threadNumber;
+    }
 
     // Обновляет ссылки у других постов и добавляет модель в список
     private void processReferences(PostItemViewModel viewModel) {
@@ -34,8 +42,8 @@ public class PostsViewModel {
         return this.mViewModels.get(postNumber);
     }
 
-    private PostItemViewModel createModel(PostModel item, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder) {
-        PostItemViewModel viewModel = new PostItemViewModel(this.mViewModels.size(), item, theme, settings, listener, uriBuilder);
+    private PostItemViewModel mapModel(PostModel item, Theme theme, IURLSpanClickListener listener) {
+        PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, this.mThreadNumber, this.mViewModels.size(), item, theme, listener);
         this.mLastPostNumber = viewModel.getNumber();
 
         this.processReferences(viewModel);
@@ -43,17 +51,13 @@ public class PostsViewModel {
         return viewModel;
     }
 
-    public List<PostItemViewModel> addModels(List<PostModel> items, Theme theme, ApplicationSettings settings, IURLSpanClickListener listener, DvachUriBuilder uriBuilder, Resources resources, String boardName, String threadNumber) {
+    public List<PostItemViewModel> addModels(List<PostModel> items, Theme theme, IURLSpanClickListener listener, Resources resources) {
         List<PostItemViewModel> result = new ArrayList<PostItemViewModel>();
         for (PostModel item : items) {
-            PostItemViewModel model = this.createModel(item, theme, settings, listener, uriBuilder);
+            PostItemViewModel model = this.mapModel(item, theme, listener);
             result.add(model);
         }
-
-        for (PostItemViewModel model : result) {
-            model.getReferencesFromAsSpannableString(resources, boardName, threadNumber);
-        }
-
+        
         return result;
     }
 

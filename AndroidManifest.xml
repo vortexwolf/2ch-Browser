@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.vortexwolf.chan"
-      android:versionCode="60"
-      android:versionName="1.4.3"
+      android:versionCode="62"
+      android:versionName="1.5.1"
       android:installLocation="auto"
       >
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11"/>
@@ -36,6 +36,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="2ch.pm" android:pathPattern="/.*" />
                 <data android:scheme="https" android:host="2ch.hk" android:pathPattern="/.*" />
+                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*" />
             </intent-filter>
 	    </activity>
         <activity android:name="com.vortexwolf.chan.activities.ImageGalleryActivity" android:configChanges="keyboardHidden|orientation" android:hardwareAccelerated="true"></activity>

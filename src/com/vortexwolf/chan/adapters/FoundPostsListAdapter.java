@@ -85,7 +85,7 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
                 attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
             }
 
-            PostItemViewModel viewModel = new PostItemViewModel(this.getCount(), item, this.mTheme, this.mSettings, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder), this.mDvachUriBuilder);
+            PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, item.getParentThread(), this.getCount(), item, this.mTheme, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
             this.add(viewModel);
         }
     }

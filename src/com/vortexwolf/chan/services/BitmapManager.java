@@ -24,11 +24,7 @@ public class BitmapManager implements IBitmapManager {
 
     @Override
     public void fetchBitmapOnThread(final String uriString, final ImageView imageView, final View indeterminateProgressBar, final Integer errorImageId) {
-
         Uri uri = Uri.parse(uriString);
-        /*
-         * if (imageView.getTag() == uri) { return; } */
-
         imageView.setTag(uri);
 
         LoadRequest r = new LoadRequest(uri, new HttpImageManager.OnLoadResponseListener() {

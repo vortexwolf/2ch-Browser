@@ -13,36 +13,41 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class TabsHistoryBookmarksActivity extends FragmentActivity {
     private static final String TAG = "TabsHistoryBookmarksActivity";
-
-    public static final String FAVORITES_TAB_ID = "FavoritesTab";
-
+    
+    private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
+    
     private TabsPagerAdapter mAdapter;
+    private ViewPager mViewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        this.requestWindowFeature(Window.FEATURE_PROGRESS);
-
-        this.setTheme(Factory.resolve(ApplicationSettings.class).getTheme());
+        this.setTheme(mApplicationSettings.getTheme());
         this.setContentView(R.layout.tabs_favorites_history_view);
 
         this.mAdapter = new TabsPagerAdapter(this.getSupportFragmentManager(), this.getResources());
-        ViewPager viewPager = (ViewPager) this.findViewById(R.id.tabs_pager);
-        viewPager.setAdapter(this.mAdapter);
-
-        Bundle extras = this.getIntent().getExtras();
-        if (extras.containsKey(Constants.EXTRA_SELECT_TAB) && extras.getString(Constants.EXTRA_SELECT_TAB).equals(FAVORITES_TAB_ID)) {
-            viewPager.setCurrentItem(1);
-        }
+        this.mViewPager = (ViewPager) this.findViewById(R.id.tabs_pager);
+        this.mViewPager.setAdapter(this.mAdapter);
+        
+        if (mApplicationSettings.getRecentHistoryTab() != -1) {
+            this.mViewPager.setCurrentItem(mApplicationSettings.getRecentHistoryTab());
+        }        
 
         MyTracker tracker = Factory.getContainer().resolve(MyTracker.class);
         tracker.trackActivityView(TAG);
+    }
+    
+    @Override
+    protected void onPause() {
+        this.mApplicationSettings.saveRecentHistoryTab(this.mViewPager.getCurrentItem());
+        super.onPause();
     }
 
     public class TabsPagerAdapter extends FragmentStatePagerAdapter {
@@ -68,7 +73,7 @@ public class TabsHistoryBookmarksActivity extends FragmentActivity {
                     fragment = new HistoryFragment();
                     break;
             }
-
+            
             return fragment;
         }
 

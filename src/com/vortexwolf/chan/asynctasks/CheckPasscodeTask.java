@@ -23,6 +23,7 @@ import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
@@ -30,6 +31,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final ApplicationSettings mSettings;
     private final String mPasscode;
     private final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
+    private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
 
     private Cookie mUserCodeCookie = null;
 
@@ -61,7 +63,8 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
             for (Cookie c : cookies) {
-                if (c.getName().equals(Constants.USERCODE_COOKIE)) {
+                if (c.getName().equals(Constants.USERCODE_COOKIE) && 
+                    UriUtils.areCookieDomainsEqual(c.getDomain(), mApplicationSettings.getDomainUri().getHost())) {
                     this.mUserCodeCookie = c;
                     break;
                 }

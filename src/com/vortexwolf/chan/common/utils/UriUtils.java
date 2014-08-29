@@ -44,4 +44,15 @@ public class UriUtils {
     public static String formatYoutubeThumbnailUri(String code) {
         return "http://img.youtube.com/vi/" + code + "/default.jpg";
     }
+    
+    public static boolean areCookieDomainsEqual(String cookieDomain, String siteDomain) {
+        if (!cookieDomain.startsWith(".")) {
+            cookieDomain = "." + cookieDomain;
+        }
+        if (!siteDomain.startsWith(".")) {
+            siteDomain = "." + siteDomain;
+        }
+        
+        return cookieDomain.equalsIgnoreCase(siteDomain);
+    }
 }

@@ -45,7 +45,6 @@ import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
-import com.vortexwolf.chan.services.CloudflarePageParser;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
@@ -67,7 +66,6 @@ public class ThreadsListActivity extends BaseListActivity {
     private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
     private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
-    private final CloudflarePageParser mCloudflarePageParser = Factory.resolve(CloudflarePageParser.class);
     private PostItemViewBuilder mPostItemViewBuilder;
 
     private DownloadThreadsTask mCurrentDownloadTask = null;
@@ -322,11 +320,6 @@ public class ThreadsListActivity extends BaseListActivity {
         ThreadItemViewModel item = this.mAdapter.getItem(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_ANSWER, 0, this.getString(R.string.cmenu_answer_without_reading));
-
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName, 0).isFile()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 1, this.getString(item.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
-        }
-
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, this.getString(R.string.cmenu_view_op_post));
 
         if (!item.isHidden()) {
@@ -347,16 +340,8 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.startActivity(addPostIntent);
                 return true;
             }
-            case Constants.CONTEXT_MENU_DOWNLOAD_FILE: {
-                for (int i = 0; i < info.getAttachmentsNumber(); ++i) {
-                    AttachmentInfo attachment = info.getAttachment(this.mBoardName, i);
-                    Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
-                    new DownloadFileTask(this, fileUri).execute();
-                }
-                return true;
-            }
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
-                PostItemViewModel postModel = new PostItemViewModel(Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), this.mSettings, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder), this.mDvachUriBuilder);
+                PostItemViewModel postModel = new PostItemViewModel(this.mBoardName, info.getNumber(), Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
                 this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
                 return true;
             }

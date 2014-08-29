@@ -46,6 +46,12 @@ public class ApplicationSettings {
         editor.putString(this.mResources.getString(R.string.pref_cf_clearance_cookie_domain_key), cookie.getDomain());
         editor.commit();
     }
+    
+    public void saveRecentHistoryTab(int position) {
+        SharedPreferences.Editor editor = this.mSettings.edit();
+        editor.putInt(this.mResources.getString(R.string.pref_history_tab_position), position);
+        editor.commit();
+    }
 
     public String getPassCodeValue() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
@@ -60,6 +66,7 @@ public class ApplicationSettings {
         
         BasicClientCookie c = new BasicClientCookie(Constants.USERCODE_COOKIE, value);
         c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
+        c.setPath("/");
         return c;
     }
 
@@ -72,7 +79,13 @@ public class ApplicationSettings {
 
         BasicClientCookie c = new BasicClientCookie(Constants.CF_CLEARANCE_COOKIE, value);
         c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
+        c.setPath("/");
         return c;
+    }
+    
+    public int getRecentHistoryTab() {
+        int position = this.mSettings.getInt(this.mResources.getString(R.string.pref_history_tab_position), -1);
+        return position;
     }
     
     public String getDownloadPath() {

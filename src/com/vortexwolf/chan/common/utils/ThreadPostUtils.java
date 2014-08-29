@@ -26,6 +26,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
+import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -41,7 +42,6 @@ public class ThreadPostUtils {
     private static final List<String> sWakabaBoards = Arrays.asList(new String[] { 
         "abu", "bo", "f", "hh", "i", "int", "mu", "mus", "sci", "o"
     });
-
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
@@ -105,14 +105,18 @@ public class ThreadPostUtils {
     public static boolean hasAttachment(PostModel item) {
         return item.getAttachments().size() > 0;
     }
+    
+    public static int getAttachmentsNumber(PostModel item) {
+        return item.getAttachments().size();
+    }
 
-    public static void openAttachment(final AttachmentInfo attachment, final Context context, final ApplicationSettings settings, final String threadUrl) {
+    public static void openAttachment(final AttachmentInfo attachment, final Context context) {
         if (attachment == null) {
             return;
         }
 
         int imageSize = attachment.getSize();
-        String url = attachment.getSourceUrl(settings);
+        String url = attachment.getSourceUrl();
 
         long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
         if (allocatedSize > sMaxVmHeap) {
@@ -122,12 +126,14 @@ public class ThreadPostUtils {
         }
 
         Uri uri = Uri.parse(url);
-        if (threadUrl != null && !settings.isLegacyImageViewer() && Factory.getContainer().resolve(ThreadImagesService.class).hasImage(threadUrl, url)) {
+        ThreadImagesService imagesService = Factory.resolve(ThreadImagesService.class);
+        ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
+        if (!settings.isLegacyImageViewer() && imagesService.hasImage(attachment.getThreadUrl(), url)) {
             // open a gallery activity
             Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
             imageGallery.setData(uri);
             imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, threadUrl);
+            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
         } else {
             BrowserLauncher.launchInternalBrowser(context, url);
@@ -153,89 +159,72 @@ public class ThreadPostUtils {
     public static boolean isMakabaBoard(String boardName) {
         return sWakabaBoards.indexOf(boardName) == -1;
     }
-
-    /**
-     * Разбирается с прикрепленным файлом для треда или поста; перенес сюда,
-     * чтобы не повторять код
-     * 
-     * @param attachment
-     *            Модель прикрепленного к треду или посту файла
-     * @param imageView
-     *            Место для картинки
-     * @param bitmapManager
-     *            Для загрузки картинок с интернета
-     * @param thumbnailOnClickListenerFactory
-     *            Для обработки нажатия по картинке
-     * @param activity
-     */
-    public static void handleAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView, View fullThumbnailView, IBitmapManager bitmapManager, final ApplicationSettings settings, final Context context, final String threadUrl) {
-        imageView.setImageResource(android.R.color.transparent); // clear the image content
-
-        // Ищем прикрепленный файл, в случае наличия добавляем его как ссылку
+    
+    public static void refreshAttachmentView(boolean isBusy, AttachmentInfo attachment, ThumbnailViewBag thumbnailView) {
         if (attachment == null || attachment.isEmpty()) {
-            imageView.setVisibility(View.GONE);
-            fullThumbnailView.setVisibility(View.GONE);
-        } else {
-            fullThumbnailView.setVisibility(View.VISIBLE);
-            imageView.setVisibility(View.VISIBLE);
-
-            // Обработчик события нажатия на картинку
-            imageView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ThreadPostUtils.openAttachment(attachment, context, settings, threadUrl);
-                }
-            });
-
-            String thumbnailUrl = attachment.getThumbnailUrl();
-            // Также добавляем уменьшенное изображение, нажатие на которое
-            // открывает файл в полном размере
-            if (thumbnailUrl != null) {
-                // Ничего не загружаем, если так установлено в настройках
-                if (settings.isLoadThumbnails() == false && !bitmapManager.isCached(thumbnailUrl)) {
-                    imageView.setImageResource(R.drawable.empty_image);
-                } else {
-                    imageView.setTag(Uri.parse(thumbnailUrl));
-
-                    if (!isBusy || bitmapManager.isCached(thumbnailUrl)) {
-                        bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, null, R.drawable.error_image);
-                    }
-                }
-            } else {
-                // Иногда можно прикреплять файлы с типом mp3, swf и пр., у
-                // которых thumbnail=null. Нужно нарисовать другую картинку в
-                // таких случаях
-                if (attachment.isFile()) {
-                    imageView.setImageResource(attachment.getDefaultThumbnail());
-                } else {
-                    imageView.setImageResource(R.drawable.error_image);
-                }
-            }
+            thumbnailView.hide();
+            return;
+        }
+        
+        thumbnailView.container.setVisibility(View.VISIBLE);
+        thumbnailView.info.setText(attachment.getDescription());
+        refreshAttachmentImage(isBusy, attachment, thumbnailView.image);
+    }
+    
+    public static void setNonBusyAttachment(AttachmentInfo attachment, ImageView imageView) {
+        if (ThreadPostUtils.shouldLoadFromWeb(attachment)) {
+            ThreadPostUtils.refreshAttachmentImage(false, attachment, imageView);
         }
     }
 
-    public static boolean isImageHandledWhenWasBusy(AttachmentInfo attachment, ApplicationSettings settings, IBitmapManager bitmapManager) {
-        if (attachment == null || attachment.isEmpty()) {
-            return true;
+    private static void refreshAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView) {
+        // clear the image content
+        imageView.setImageResource(android.R.color.transparent);         
+        imageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Обработчик события нажатия на картинку
+                ThreadPostUtils.openAttachment(attachment, v.getContext());
+            }
+        });
+        
+        if (isBusy && shouldLoadFromWeb(attachment)) {
+            return;
         }
 
         String thumbnailUrl = attachment.getThumbnailUrl();
-        return thumbnailUrl == null || !settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl);
+        // Также добавляем уменьшенное изображение, нажатие на которое
+        // открывает файл в полном размере
+        if (thumbnailUrl != null) {
+            // Ничего не загружаем, если так установлено в настройках
+            ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
+            IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
+            if (settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl)) {
+                bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, null, R.drawable.error_image);
+            } else if (!settings.isLoadThumbnails()) {
+                imageView.setImageResource(R.drawable.empty_image);
+            }
+        } else {
+            // Иногда можно прикреплять файлы с типом mp3, swf и пр., у
+            // которых thumbnail=null. Нужно нарисовать другую картинку в
+            // таких случаях
+            if (attachment.isFile()) {
+                imageView.setImageResource(attachment.getDefaultThumbnail());
+            } else {
+                imageView.setImageResource(R.drawable.error_image);
+            }
+        }
     }
-
-    public static void handleAttachmentDescription(AttachmentInfo attachment, Resources res, TextView attachmentInfoView) {
-        String attachmentInfo;
+    
+    private static boolean shouldLoadFromWeb(AttachmentInfo attachment) {
         if (attachment == null || attachment.isEmpty()) {
-            attachmentInfo = null;
-        } else {
-            attachmentInfo = attachment.getDescription(res.getString(R.string.data_file_size_measure));
+            return false;
         }
-
-        if (attachmentInfo != null) {
-            attachmentInfoView.setText(attachmentInfo);
-            attachmentInfoView.setVisibility(View.VISIBLE);
-        } else {
-            attachmentInfoView.setVisibility(View.GONE);
-        }
+        
+        ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
+        IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
+        
+        String thumbnailUrl = attachment.getThumbnailUrl();
+        return thumbnailUrl != null && settings.isLoadThumbnails() && !bitmapManager.isCached(thumbnailUrl);
     }
 }

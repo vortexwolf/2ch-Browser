@@ -2,11 +2,13 @@ package com.vortexwolf.chan.models.presentation;
 
 import java.util.HashMap;
 
+import android.content.res.Resources;
 import android.net.Uri;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
@@ -14,9 +16,11 @@ import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfo {
-
+    private static final HashMap<String, Integer> sDefaultThumbnails;
+    
     private final AttachmentModel mModel;
-    private final String mBoardCode;
+    private final String mBoardName;
+    private final String mThreadNumber;
     private final boolean mIsEmpty;
     private final boolean mIsVideo;
     private final String mImageUrl;
@@ -24,8 +28,8 @@ public class AttachmentInfo {
     private final String mVideoMobileUrl;
     private final String mThumbnailUrl;
     private final String mSourceExtension;
-    private final DvachUriBuilder mDvachUriBuilder;
-    private static final HashMap<String, Integer> sDefaultThumbnails;
+    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
+    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
 
     static {
         sDefaultThumbnails = new HashMap<String, Integer>();
@@ -34,10 +38,10 @@ public class AttachmentInfo {
         sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
     }
 
-    public AttachmentInfo(AttachmentModel item, String boardCode, DvachUriBuilder dvachUriBuilder) {
+    public AttachmentInfo(AttachmentModel item, String boardName, String threadNumber) {
         this.mModel = item;
-        this.mBoardCode = boardCode;
-        this.mDvachUriBuilder = dvachUriBuilder;
+        this.mBoardName = boardName;
+        this.mThreadNumber = threadNumber;
 
         SourceWithThumbnailModel urls = this.getUrls();
         if (urls != null) {
@@ -60,12 +64,16 @@ public class AttachmentInfo {
             this.mVideoMobileUrl = null;
         }
     }
+    
+    public String getThreadUrl() {
+        return this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
+    }
 
-    public String getSourceUrl(ApplicationSettings settings) {
+    public String getSourceUrl() {
         if (this.mIsEmpty) {
             return null;
         } else if (this.mIsVideo) {
-            return settings.isYoutubeMobileLinks() ? this.mVideoMobileUrl : this.mVideoUrl;
+            return this.mSettings.isYoutubeMobileLinks() ? this.mVideoMobileUrl : this.mVideoUrl;
         } else {
             return this.mImageUrl;
         }
@@ -109,17 +117,16 @@ public class AttachmentInfo {
         return this.mModel.getImageSize();
     }
 
-    public String getDescription(String sizeMeasure) {
+    public String getDescription() {
         String result = "";
 
         if (this.mModel.getImageSize() != 0) {
-            result += this.mModel.getImageSize() + sizeMeasure;
+            result += this.mModel.getImageSize() + Factory.resolve(Resources.class).getString(R.string.data_file_size_measure);
 
             if ("gif".equalsIgnoreCase(this.mSourceExtension)) {
-                result += " gif";
-            }
-            if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
-                result += " webm";
+                result += "\ngif";
+            }else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
+                result += "\nwebm";
             }
         } else if (this.mIsVideo) {
             result = "YouTube";
@@ -135,10 +142,10 @@ public class AttachmentInfo {
         String imageUrl = this.mModel.getPath();
         String imageThumbnail = this.mModel.getThumbnailUrl();
         if (!StringUtils.isEmpty(imageUrl)) {
-            model.imageUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardCode, imageUrl).toString();
+            model.imageUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardName, imageUrl).toString();
         }
         if (!StringUtils.isEmpty(imageThumbnail)) {
-            model.thumbnailUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardCode, imageThumbnail).toString();
+            model.thumbnailUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardName, imageThumbnail).toString();
         }
         // Если выше вызвался любой из двух if, значт прикреплен какой-то файл,
         // а не видео
