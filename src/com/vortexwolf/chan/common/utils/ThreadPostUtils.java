@@ -40,7 +40,7 @@ public class ThreadPostUtils {
     private static long sHeapPad = 1024;
     
     private static final List<String> sWakabaBoards = Arrays.asList(new String[] { 
-        "abu", "bo", "f", "hh", "i", "int", "mu", "mus", "sci", "o"
+        "f", "i", "int", "o"
     });
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
