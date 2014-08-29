@@ -99,6 +99,7 @@
             android:singleLine="true"
             android:text="SUBJ"
             android:textStyle="bold"
+            android:textColor="?threadTitleForeground" 
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -153,112 +154,61 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
-        <LinearLayout
-            android:id="@+id/thumbnail_view_1"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:id="@+id/multi_thumbnails_view"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="5dip"
-            android:orientation="vertical" >
-
-            <com.vortexwolf.chan.common.controls.ExtendedImageView
-                android:id="@+id/thumbnail_1"
-                android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:id="@+id/attachment_info_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?itemInfoForeground" />
+            android:orientation="horizontal"
+            android:visibility="gone" >
+            <include
+			   android:id="@+id/thumbnail_view_1"
+			   layout="@layout/thumbnail_view"
+			   android:layout_width="wrap_content"
+			   android:layout_height="wrap_content"
+			   android:layout_marginRight="5dip"
+			   android:visibility="gone"
+			/>
+            <include
+               android:id="@+id/thumbnail_view_2"
+               layout="@layout/thumbnail_view"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="5dip"
+               android:visibility="gone"
+            />
+            <include
+               android:id="@+id/thumbnail_view_3"
+               layout="@layout/thumbnail_view"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="5dip"
+               android:visibility="gone"
+            />
+            <include
+               android:id="@+id/thumbnail_view_4"
+               layout="@layout/thumbnail_view"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="5dip"
+               android:visibility="gone"
+            />
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/thumbnail_view_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/thumbnail_view_1"
-            android:layout_marginRight="5dip"
-            android:orientation="vertical" >
-
-            <com.vortexwolf.chan.common.controls.ExtendedImageView
-                android:id="@+id/thumbnail_2"
-                android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:id="@+id/attachment_info_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?itemInfoForeground" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/thumbnail_view_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/thumbnail_view_2"
-            android:layout_marginRight="5dip"
-            android:orientation="vertical" >
-
-            <com.vortexwolf.chan.common.controls.ExtendedImageView
-                android:id="@+id/thumbnail_3"
-                android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:id="@+id/attachment_info_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?itemInfoForeground" />
-        </LinearLayout>
-	
-        <LinearLayout
-            android:id="@+id/thumbnail_view_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/thumbnail_view_3"
-            android:layout_marginRight="5dip"
-            android:orientation="vertical" >
-
-            <com.vortexwolf.chan.common.controls.ExtendedImageView
-                android:id="@+id/thumbnail_4"
-                android:layout_width="@dimen/thumbnail_size"
-                android:layout_height="@dimen/thumbnail_size"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:scaleType="centerInside" />
-
-            <TextView
-                android:id="@+id/attachment_info_4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?itemInfoForeground" />
-        </LinearLayout>
+        
+        <include
+	       android:id="@+id/thumbnail_view"
+           layout="@layout/thumbnail_view"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+           android:layout_marginRight="5dip"
+        />
 
         <com.vortexwolf.chan.common.controls.JellyBeanSpanFixTextView
             android:id="@+id/comment"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toRightOf="@id/thumbnail_view_1"
+            android:layout_below="@id/multi_thumbnails_view"
+            android:layout_toRightOf="@id/thumbnail_view"            
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textIsSelectable="true"
             local:postQuoteForeground="?postQuoteForeground"

@@ -288,7 +288,6 @@ public class PickBoardActivity extends ListActivity {
                 break;
             case R.id.tabs_menu_id:
                 Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
-                openTabsIntent.putExtra(Constants.EXTRA_SELECT_TAB, TabsHistoryBookmarksActivity.FAVORITES_TAB_ID);
                 this.startActivity(openTabsIntent);
                 break;
         }

@@ -14,17 +14,11 @@ import com.vortexwolf.chan.models.presentation.FloatImageModel;
 
 public class FlowTextHelper {
 
-    public static boolean sNewClassAvailable;
+    public static boolean sNewClassAvailable = Constants.SDK_VERSION >= 8;
 
     static class MyLeadingMarginSpan2Factory {
         static MyLeadingMarginSpan2 create(int lines, int margin) {
             return new MyLeadingMarginSpan2(lines, margin);
-        }
-    }
-
-    static {
-        if (Constants.SDK_VERSION >= 8) { // Froyo
-            sNewClassAvailable = true;
         }
     }
 

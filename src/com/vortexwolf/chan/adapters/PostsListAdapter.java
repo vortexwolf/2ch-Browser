@@ -68,7 +68,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mBitmapManager = bitmapManager;
         this.mInflater = LayoutInflater.from(context);
         this.mTheme = theme;
-        this.mPostsViewModel = new PostsViewModel();
+        this.mPostsViewModel = new PostsViewModel(boardName, threadNumber);
         this.mSettings = settings;
         this.mListView = listView;
         this.mActivityContext = context;
@@ -144,10 +144,10 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     public void setAdapterData(PostModel[] posts) {
         this.clear();
 
-        List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
+        List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this, this.mActivityContext.getResources());
         for (PostItemViewModel model : models) {
             for (int i=0; i<4; ++i) {
-                AttachmentInfo attachment = model.getAttachment(this.mBoardName, i);
+                AttachmentInfo attachment = model.getAttachment(i);
                 if (attachment != null && attachment.isImage()) {
                     this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
                 }
@@ -187,10 +187,10 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             }
         }
 
-        List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this.mSettings, this, this.mDvachUriBuilder, this.mActivityContext.getResources(), this.mBoardName, this.mThreadNumber);
+        List<PostItemViewModel> newModels = this.mPostsViewModel.addModels(newPosts, this.mTheme, this, this.mActivityContext.getResources());
         for (PostItemViewModel model : newModels) {
             for (int i=0; i<4; ++i) {
-                AttachmentInfo attachment = model.getAttachment(this.mBoardName, i);
+                AttachmentInfo attachment = model.getAttachment(i);
                 if (attachment != null && attachment.isImage()) {
                     this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
                 }

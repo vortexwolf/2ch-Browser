@@ -13,21 +13,20 @@ import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class ThreadItemViewModel {
-
+    private final String mBoardName;
     private final Theme mTheme;
     private final PostModel mOpPost;
     private final int mReplyCount;
     private final int mImageCount;
-    private final DvachUriBuilder mDvachUriBuilder;
 
     private final SpannableStringBuilder mSpannedComment;
-    private AttachmentInfo[] mAttachments = new AttachmentInfo[4];  //4 - максимальное число аттачей к посту на макабе
+    private AttachmentInfo mAttachment = null;
     private boolean mEllipsized = false;
     private boolean mHidden = false;
 
-    public ThreadItemViewModel(ThreadModel model, Theme theme, DvachUriBuilder dvachUriBuilder) {
+    public ThreadItemViewModel(String boardName, ThreadModel model, Theme theme) {
+        this.mBoardName = boardName;
         this.mTheme = theme;
-        this.mDvachUriBuilder = dvachUriBuilder;
 
         this.mOpPost = model.getPosts()[0];
         this.mReplyCount = model.getReplyCount();
@@ -62,17 +61,13 @@ public class ThreadItemViewModel {
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mOpPost);
     }
-  
-    public int getAttachmentsNumber() {
-        return this.mOpPost.getAttachments().size();
-    }
-
-    public AttachmentInfo getAttachment(String boardCode, int attachmentNumber) {
-        if (this.mAttachments[attachmentNumber] == null && this.getAttachmentsNumber() > attachmentNumber) {
-            this.mAttachments[attachmentNumber] = new AttachmentInfo(this.mOpPost.getAttachments().get(attachmentNumber), boardCode, this.mDvachUriBuilder);
+    
+    public AttachmentInfo getAttachment() {
+        if (this.mAttachment == null && this.hasAttachment()) {
+            this.mAttachment = new AttachmentInfo(this.mOpPost.getAttachments().get(0), this.mBoardName, this.mOpPost.getParentThread());
         }
 
-        return this.mAttachments[attachmentNumber];
+        return this.mAttachment;
     }
 
     public PostModel getOpPost() {

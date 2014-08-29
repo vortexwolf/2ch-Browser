@@ -34,6 +34,7 @@
     <string name="pref_cf_clearance_cookie_domain_key">pref_cf_clearance_cookie_domain_key</string>
     <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
     <string name="pref_passcode_cookie_domain_key">pref_passcode_cookie_domain_key</string>
+    <string name="pref_history_tab_position">pref_history_tab_position</string>
     
     <string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>
@@ -46,6 +47,7 @@
         <item>@string/pref_theme_dark_value</item>
         <item>@string/pref_theme_photon_value</item>
     </string-array>
+
     <string-array name="addpost_politics" translatable="false">
         <item>Полит. предпочтения (Нет)</item>
         <item>Коммунизм</item>
@@ -58,7 +60,6 @@
         <item>Аноним</item>
         <item>Оппозиция</item>
         <item>Власть</item>
-        <item>Национал-социализм</item>
         <item>Национализм</item>
         <item>Кургинян</item>
         <item>Исламизм</item>
@@ -66,15 +67,18 @@
         <item>Технократия</item>
         <item>Христианство</item>
 		<item>Украина</item>
-        <item>ХТО, ЯК НЕ МИ</item>
+        <item>Свобода</item>
 		<item>Беларусь</item>
 		<item>ЛГБТ</item>
 		<item>Nya</item>
-		<item>Экологи</item>
 		<item>Госдеп</item>
 		<item>YARRR!!!</item>
         <item>Родноверы</item>
         <item>Соцдем</item>
+		<item>Крым</item>
+		<item>Rebel</item>
+		<item>ДНР</item>
+		<item>ISIS</item>
     </string-array>
     <string-array name="pickboard_boards">
         <item>Тематика</item>

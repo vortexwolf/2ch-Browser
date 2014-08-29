@@ -13,6 +13,7 @@ import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
@@ -57,7 +58,8 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
 
             List<Cookie> cookies = mHttpClient.getCookieStore().getCookies();
             for (Cookie cookie : cookies) {
-                if (Constants.CF_CLEARANCE_COOKIE.equals(cookie.getName())) {
+                if (Constants.CF_CLEARANCE_COOKIE.equals(cookie.getName()) && 
+                    UriUtils.areCookieDomainsEqual(cookie.getDomain(), mApplicationSettings.getDomainUri().getHost())) {
                     mApplicationSettings.saveCloudflareClearanceCookie(cookie);
                     return true;
                 }

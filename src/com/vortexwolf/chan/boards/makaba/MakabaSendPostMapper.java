@@ -50,6 +50,11 @@ public class MakabaSendPostMapper {
             multipartEntity.addPart(FILE, new FileBody(model.getAttachment()));
         }
         
+        // Only for /po and /test
+        if (model.getPolitics() != null) {
+            this.addStringValue(multipartEntity, "icon", model.getPolitics());
+        }
+        
         return multipartEntity;
     }
     

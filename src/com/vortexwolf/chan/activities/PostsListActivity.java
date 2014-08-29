@@ -312,7 +312,7 @@ public class PostsListActivity extends BaseListActivity {
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
         }
-        if (item.hasAttachment() && item.getAttachment(this.mBoardName, 0).isFile()) {
+        if (item.hasAttachment() && item.getAttachment(0).isFile()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(item.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
         }
         if (!StringUtils.isEmpty(item.getSpannedComment())) {
@@ -346,8 +346,8 @@ public class PostsListActivity extends BaseListActivity {
                 break;
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
                 for (int i = 0; i < info.getAttachmentsNumber(); ++i) {
-                    AttachmentInfo attachment = info.getAttachment(this.mBoardName, i);
-                    Uri fileUri = Uri.parse(attachment.getSourceUrl(this.mSettings));
+                    AttachmentInfo attachment = info.getAttachment(i);
+                    Uri fileUri = Uri.parse(attachment.getSourceUrl());
                     new DownloadFileTask(this, fileUri).execute();
                 }
                 break;

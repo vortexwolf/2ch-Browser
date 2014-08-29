@@ -32,7 +32,6 @@ import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
-import com.vortexwolf.chan.services.CloudflarePageParser;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;

@@ -32,6 +32,7 @@ import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.BadgeModel;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
+import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewBuilder {
@@ -72,31 +73,28 @@ public class PostItemViewBuilder {
             vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
             vb.commentView = (ClickableLinksTextView) view.findViewById(R.id.comment);
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
-            vb.attachmentInfoView[0] = (TextView) view.findViewById(R.id.attachment_info_1);
-            vb.attachmentInfoView[1] = (TextView) view.findViewById(R.id.attachment_info_2);
-            vb.attachmentInfoView[2] = (TextView) view.findViewById(R.id.attachment_info_3);
-            vb.attachmentInfoView[3] = (TextView) view.findViewById(R.id.attachment_info_4);
-            vb.fullThumbnailView[0] = view.findViewById(R.id.thumbnail_view_1);
-            vb.fullThumbnailView[1] = view.findViewById(R.id.thumbnail_view_2);
-            vb.fullThumbnailView[2] = view.findViewById(R.id.thumbnail_view_3);
-            vb.fullThumbnailView[3] = view.findViewById(R.id.thumbnail_view_4);
-            vb.imageView[0] = (ImageView) view.findViewById(R.id.thumbnail_1);
-            vb.imageView[1] = (ImageView) view.findViewById(R.id.thumbnail_2);
-            vb.imageView[2] = (ImageView) view.findViewById(R.id.thumbnail_3);
-            vb.imageView[3] = (ImageView) view.findViewById(R.id.thumbnail_4);
+            vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
             vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
             vb.badgeView = view.findViewById(R.id.badge_view);
             vb.badgeImage = (ImageView) view.findViewById(R.id.badge_image);
             vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
+            
+            vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
+            vb.thumbnailViews = new ThumbnailViewBag[4];
+            vb.thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
+            vb.thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
+            vb.thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
+            vb.thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
+            
             view.setTag(vb);
         }
 
         vb.currentModel = item;
 
         if (item.canMakeCommentFloat() || item.isCommentFloat()) {
-            FlowTextHelper.setFloatLayoutPosition(vb.fullThumbnailView[0], vb.commentView);
+            FlowTextHelper.setFloatLayoutPosition(vb.singleThumbnailView.container, vb.commentView);
         } else {
-            FlowTextHelper.setDefaultLayoutPosition(vb.fullThumbnailView[0], vb.commentView);
+            FlowTextHelper.setDefaultLayoutPosition(vb.singleThumbnailView.container, vb.commentView);
         }
 
         // Apply info from the data item
@@ -158,27 +156,25 @@ public class PostItemViewBuilder {
         }
 
         // Обрабатываем прикрепленные файлы
-        for (int i=0; i<4; ++i) {
-            AttachmentInfo attachment = item.getAttachment(this.mBoardName, i);
-            String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
-            ThreadPostUtils.handleAttachmentImage(isBusy, attachment, vb.imageView[i], vb.fullThumbnailView[i], this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
-            ThreadPostUtils.handleAttachmentDescription(attachment, this.mAppContext.getResources(), vb.attachmentInfoView[i]);
+        if (item.getAttachmentsNumber() == 1) {
+            vb.multiThumbnailsView.setVisibility(View.GONE);
+            
+            ThreadPostUtils.refreshAttachmentView(isBusy, item.getAttachment(0), vb.singleThumbnailView);
+        } else if (item.getAttachmentsNumber() > 1) {
+            vb.multiThumbnailsView.setVisibility(View.VISIBLE);
+            vb.singleThumbnailView.hide();
+            
+            for (int i = 0; i < 4; ++i) {
+                ThreadPostUtils.refreshAttachmentView(isBusy, item.getAttachment(i), vb.thumbnailViews[i]);
+            }
+        } else {
+            vb.multiThumbnailsView.setVisibility(View.GONE);
+            vb.singleThumbnailView.hide();
         }
 
-        // Комментарий (обновляем после файла)
-        if (item.getAttachmentsNumber()>1) { // расположение текста комментария относительно картинок, если их больше 1
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) vb.commentView.getLayoutParams();
-            int[] rules = layoutParams.getRules();
-            rules[RelativeLayout.BELOW] = R.id.thumbnail_view_1;
-            rules[RelativeLayout.RIGHT_OF] = 0;
-        } else { // без этого разметка почему-то ломается
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) vb.commentView.getLayoutParams();
-            int[] rules = layoutParams.getRules();
-            rules[RelativeLayout.BELOW] = 0;
-        }
 
         if (item.canMakeCommentFloat()) {
-            FloatImageModel floatModel = new FloatImageModel(vb.fullThumbnailView[0], vb.commentView.getPaint(), this.mWindowManager.getDefaultDisplay(), this.mAppContext.getResources());
+            FloatImageModel floatModel = new FloatImageModel(vb.singleThumbnailView.container, vb.commentView.getPaint(), this.mWindowManager.getDefaultDisplay(), this.mAppContext.getResources());
             item.makeCommentFloat(floatModel);
         }
 
@@ -189,8 +185,7 @@ public class PostItemViewBuilder {
 
         // Ответы на сообщение
         if (this.mThreadNumber != null && item.hasReferencesFrom()) {
-            SpannableStringBuilder replies = item.getReferencesFromAsSpannableString(this.mAppContext.getResources(), this.mBoardName, this.mThreadNumber);
-            vb.postRepliesView.setText(replies);
+            vb.postRepliesView.setText(item.getReferencesFromAsSpannableString());
             vb.postRepliesView.setMovementMethod(MyLinkMovementMethod.getInstance());
             vb.postRepliesView.setVisibility(View.VISIBLE);
         } else {
@@ -282,15 +277,16 @@ public class PostItemViewBuilder {
     }
 
     public void displayThumbnail(final View v, final PostItemViewModel item) {
-        if (item != null) {
-            ViewBag vb = (ViewBag) v.getTag();
-            for (int i=0; i<4; ++i) {
-                AttachmentInfo attachment = item.getAttachment(this.mBoardName, i);
-
-                if (vb != null && !ThreadPostUtils.isImageHandledWhenWasBusy(attachment, this.mSettings, this.mBitmapManager)) {
-                    String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
-                    ThreadPostUtils.handleAttachmentImage(false, attachment, vb.imageView[i], vb.fullThumbnailView[i], this.mBitmapManager, this.mSettings, this.mAppContext, threadUrl);
-                }
+        ViewBag vb = (ViewBag) v.getTag();
+        if (item == null || vb == null) {
+            return;
+        }
+        
+        if (item.getAttachmentsNumber() == 1) {
+            ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
+        } else if (item.getAttachmentsNumber() > 1) {
+            for (int i = 0; i < 4; ++i) {
+                ThreadPostUtils.setNonBusyAttachment(item.getAttachment(i), vb.thumbnailViews[i].image);
             }
         }
     }
@@ -307,13 +303,14 @@ public class PostItemViewBuilder {
         public TextView postTripView;
         public TextView postSubjectView;
         public ClickableLinksTextView commentView;
-        public TextView[] attachmentInfoView = new TextView[4];
         public TextView postRepliesView;
         public TextView showFullTextView;
-        public View[] fullThumbnailView = new View[4];
-        public ImageView[] imageView = new ImageView[4];
+        public ThumbnailViewBag singleThumbnailView;
         public View badgeView;
         public ImageView badgeImage;
         public TextView badgeTitle;
+        
+        public View multiThumbnailsView;
+        public ThumbnailViewBag[] thumbnailViews;
     }
 }
