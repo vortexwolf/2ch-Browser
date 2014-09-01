@@ -31,10 +31,11 @@ public class Constants {
     public static final String DEFAULT_DOWNLOAD_FOLDER = "/download/2ch Browser/";
 
     // Иногда меняется (когда-то был 2ch.so), поэтому добавил в настройки. 
-    public static final String DEFAULT_DOMAIN = "2ch.pm";
+    public static final String DEFAULT_DOMAIN = "2ch.hk";
 
     // Для http-запросов
-    public static final String USER_AGENT_STRING = "2ch browser (Android)";
+    //public static final String USER_AGENT_STRING = "2ch browser (Android)";
+    public static final String USER_AGENT_STRING = "Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0";
     public static final String SAGE_EMAIL = "sage";
     public static final Charset UTF8_CHARSET = Charset.forName(HTTP.UTF_8);
     

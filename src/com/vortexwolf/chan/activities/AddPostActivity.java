@@ -48,6 +48,7 @@ import com.vortexwolf.chan.models.presentation.CaptchaViewType;
 import com.vortexwolf.chan.models.presentation.DraftPostModel;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
+import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
@@ -331,9 +332,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
 
-        if (error.startsWith("Ошибка: Неверный код подтверждения.")) {
+        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.equals(this.getString(R.string.notification_cloudflare_finished))) {
             this.mCaptchaAnswerView.setText("");
             this.refreshCaptcha();
+        }
+        if (error.startsWith("503")) {
+            String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
+            new CloudflareCheckService(url, this, this).start();
         }
     }
 

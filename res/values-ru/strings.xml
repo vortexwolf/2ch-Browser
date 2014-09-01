@@ -128,8 +128,8 @@
     <string name="pref_name_summary">Оставьте пустым</string>
     <string name="pref_name_hint">Аноним</string>
     <string name="pref_domain">Домен</string>
-    <string name="pref_domain_summary">Резервные адреса: 2ch.pm, 2ch.hk, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
-    <string name="pref_domain_hint">2ch.pm или 85.17.28.149</string>
+    <string name="pref_domain_summary">Резервные адреса: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    <string name="pref_domain_hint">2ch.hk или 85.17.28.149</string>
     <string name="pref_display_post_date">Время сообщений</string>
     <string name="pref_display_post_date_summary">Включите для отображения времени сообщений</string>
     <string name="pref_convert_post_date">Локальное время</string>
@@ -212,5 +212,7 @@
     <string name="notification_post_copied">Сообщение скопировано</string>
     <string name="notification_passcode_correct">Пасс-код был успешно проверен</string>
     <string name="notification_passcode_incorrect">Неверный пасс-код</string>
+    <string name="notification_cloudflare_started">Выполняется проверка Cloudflare, подождите...</string>
+    <string name="notification_cloudflare_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
 
 </resources>

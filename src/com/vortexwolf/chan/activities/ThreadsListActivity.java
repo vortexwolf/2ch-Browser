@@ -45,6 +45,7 @@ import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
+import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
@@ -461,6 +462,10 @@ public class ThreadsListActivity extends BaseListActivity {
         @Override
         public void showError(String error) {
             ThreadsListActivity.this.switchToErrorView(error);
+            if (error != null && error.startsWith("503")) {
+                String url = Factory.resolve(DvachUriBuilder.class).createBoardUri(mBoardName, mPageNumber).toString();
+                new CloudflareCheckService(url, ThreadsListActivity.this).start();
+            }
         }
         
         @Override
