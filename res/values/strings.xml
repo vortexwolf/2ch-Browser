@@ -120,8 +120,8 @@
     <string name="pref_name_summary">Leave it blank</string>
     <string name="pref_name_hint">Anonymous</string>
     <string name="pref_domain">Domain</string>
-    <string name="pref_domain_summary">Reserved domains: 2ch.pm, 2ch.hk, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
-    <string name="pref_domain_hint">2ch.pm or 85.17.28.149</string>
+    <string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
+    <string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
     <string name="pref_display_post_date">Time of posts</string>
     <string name="pref_display_post_date_summary">Enable to display the time of each post</string>
     <string name="pref_convert_post_date">Show local time</string>
@@ -204,5 +204,7 @@
     <string name="notification_post_copied">Copied to clipboard</string>
     <string name="notification_passcode_correct">The passcode has been successfully validated</string>
     <string name="notification_passcode_incorrect">The passcode is incorrect</string>
+    <string name="notification_cloudflare_started">Started Cloudflare checking, wait...</string>
+    <string name="notification_cloudflare_finished">Cloudflare checking is complete, try again</string>
 
 </resources>

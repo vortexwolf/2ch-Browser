@@ -497,6 +497,7 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void showError(String error) {
+            if (error.startsWith("503")) error = "Error 503: it seems like Cloudflare check, open any board first.";
             PostsListActivity.this.switchToErrorView(error);
         }
         
