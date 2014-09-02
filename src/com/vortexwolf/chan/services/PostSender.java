@@ -24,8 +24,10 @@ import com.vortexwolf.chan.boards.makaba.MakabaSendPostMapper;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.interfaces.IPostSender;
@@ -64,7 +66,7 @@ public class PostSender implements IPostSender {
         
         String uri;
         if (ThreadPostUtils.isMakabaBoard(boardName)) {
-            uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
+            uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi?json=1").toString();
         } else {
             uri = this.mDvachUriBuilder.createBoardUri(boardName, "/wakaba.pl").toString();
         }
@@ -73,7 +75,13 @@ public class PostSender implements IPostSender {
 
         // 1 - 'ро' на кириллице, 2 - 'р' на кириллице, 3 - 'о' на кириллице, 4
         // - все латинскими буквами,
-        String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post", };
+        String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post" };
+        if (ThreadPostUtils.isMakabaBoard(boardName)) { 
+            // makaba has normal "post" value, put it first
+            possibleTasks[0] = "post";
+            possibleTasks[3] = "роst";
+        }
+        
         HashMap<String, String> extraValues = new HashMap<String, String>();
         int statusCode = 502; // Возвращается при неправильном значении
                               // task=post, часто меняется, поэтому неизвестно
@@ -135,6 +143,8 @@ public class PostSender implements IPostSender {
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
         HttpResponse response = null;
         try {
+            httpPost.setHeader("content-type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
+            
             HttpEntity entity;
             if (ThreadPostUtils.isMakabaBoard(boardName)) {
                 String usercode = this.mApplicationSettings.getPassCodeValue();
@@ -142,7 +152,7 @@ public class PostSender implements IPostSender {
             } else {
                 entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
             }
-            
+
             httpPost.setEntity(entity);
             
             // post and ignore recvfrom exceptions

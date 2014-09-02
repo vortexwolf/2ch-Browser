@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+
+import org.apache.http.HttpEntity;
+
 import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
@@ -18,6 +21,7 @@ import android.provider.BaseColumns;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
+
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.CancellableInputStream;
 import com.vortexwolf.chan.common.library.MyLog;
@@ -319,5 +323,17 @@ public class IoUtils {
 
     public static long convertMbToBytes(double mb) {
         return (long) (mb * 1024 * 1024);
+    }
+    
+    public static String convertHttpEntityToString(HttpEntity entity){
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int)entity.getContentLength());
+        try {
+            entity.writeTo(out);
+        } catch (IOException e) {
+            return null;
+        }
+        
+        String str = new String(out.toByteArray());
+        return str;
     }
 }

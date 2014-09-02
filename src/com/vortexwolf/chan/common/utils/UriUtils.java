@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 
 import android.net.Uri;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 
 public class UriUtils {
 
@@ -54,5 +56,15 @@ public class UriUtils {
         }
         
         return cookieDomain.equalsIgnoreCase(siteDomain);
+    }
+    
+    public static Uri createRefererUri(String boardName, String threadNumber) {
+        DvachUriBuilder uriBuilder = Factory.resolve(DvachUriBuilder.class);
+        
+        if(StringUtils.isEmpty(threadNumber) || threadNumber == Constants.ADD_THREAD_PARENT) {
+            return uriBuilder.createBoardUri(boardName, 0);
+        }
+        
+        return Uri.parse(uriBuilder.createThreadUri(boardName, threadNumber));
     }
 }

@@ -28,7 +28,7 @@ public class DvachSendPostMapper {
     private static final String VIDEO = "video";  
     
     public HttpEntity mapModelToHttpEntity(SendPostModel model, HashMap<String, String> customValues) {       
-        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         
         if (customValues != null) {
             for (Entry<String, String> entry : customValues.entrySet()) {
