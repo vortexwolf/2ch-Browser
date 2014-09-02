@@ -330,7 +330,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
 
-        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.equals(this.getString(R.string.notification_cloudflare_finished))) {
+        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.equals(this.getString(R.string.notification_cloudflare_finished))) {
             this.mCaptchaAnswerView.setText("");
             this.refreshCaptcha();
         }

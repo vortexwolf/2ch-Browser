@@ -203,6 +203,7 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void setImage(File file, ImageItemViewBag viewBag) {
+        AppearanceUtils.setScaleWebView(viewBag.webView, file);
         viewBag.webView.loadUrl(Uri.fromFile(file).toString());
 
         this.mImageLoaded = true;
