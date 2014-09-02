@@ -39,7 +39,7 @@ public class CloudflareCheckService {
     private WebViewClient mClient = new WebViewClient() {
 	public void onPageFinished(WebView webView, String url) {
 	    super.onPageFinished(webView, url);
-	    MyLog.d("Cloudflare", "Got Page: "+url);
+	    MyLog.d(TAG, "Got Page: "+url);
 	    String value = null;
 	    String[] cookies = CookieManager.getInstance().getCookie(url).split("[;]");
 	    for (String cookie : cookies)

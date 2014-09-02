@@ -162,6 +162,7 @@ public class BrowserActivity extends Activity {
     private void setImage(File file) {
         this.mLoadedFile = file;
 
+        AppearanceUtils.setScaleWebView(this.mWebView, file);
         this.mWebView.loadUrl(Uri.fromFile(file).toString());
 
         this.mImageLoaded = true;

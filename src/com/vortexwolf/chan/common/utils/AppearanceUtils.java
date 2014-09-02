@@ -1,10 +1,14 @@
 package com.vortexwolf.chan.common.utils;
 
+import java.io.File;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,10 +17,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.MainApplication;
 
 public class AppearanceUtils {
+
+    private static final String TAG = "AppearanceUtils";
 
     public static void showToastMessage(Context context, String msg) {
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
@@ -85,12 +92,16 @@ public class AppearanceUtils {
 
     public static void prepareWebView(WebView webView, int backgroundColor) {
         webView.setBackgroundColor(backgroundColor);
-        webView.setInitialScale(1);
+        webView.setInitialScale(100);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollbarFadingEnabled(true);
 
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
         settings.setAllowFileAccess(true);
+        settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
+        //settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
@@ -99,7 +110,30 @@ public class AppearanceUtils {
         }
 
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
-            settings.setDisplayZoomControls(false);
+            //settings.setDisplayZoomControls(false);
+        }
+    }
+    
+    public static void setScaleWebView(WebView webView, File file) {
+        int scale = 100;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            Point imageSize = new Point(options.outWidth, options.outHeight);
+            
+            View webViewParent = (View)webView.getParent();
+            Point resolution = new Point(webViewParent.getWidth(), webViewParent.getHeight());
+            
+            double scaleX = (double)resolution.x / (double)imageSize.x;
+            double scaleY = (double)resolution.y / (double)imageSize.y;
+            scale = (int)(Math.min(scaleX, scaleY) * 100d);
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+        } finally {
+            //webView.setInitialScale(Math.min(scale, 100));
+            webView.setInitialScale(scale);
+            webView.setPadding(0, 0, 0, 0);
         }
     }
 
