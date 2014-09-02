@@ -105,9 +105,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (extras != null) {
             this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
             this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
-            this.mRefererUri = StringUtils.isEmpty(this.mThreadNumber) || this.mThreadNumber == Constants.ADD_THREAD_PARENT
-                    ? mUriBuilder.createBoardUri(this.mBoardName, 0)
-                    : Uri.parse(mUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber));
+            this.mRefererUri = UriUtils.createRefererUri(this.mBoardName, this.mThreadNumber);
         }
 
         this.resetUI();

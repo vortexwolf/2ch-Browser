@@ -27,8 +27,8 @@ public class MakabaSendPostMapper {
     private static final String CAPTCHA_ANSWER = "captcha_value_id_06";
     private static final String FILE = "image1"; 
     
-    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model, HashMap<String, String> customValues) {       
-        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model, HashMap<String, String> customValues) {         
+        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         
         if (customValues != null) {
             for (Entry<String, String> entry : customValues.entrySet()) {
