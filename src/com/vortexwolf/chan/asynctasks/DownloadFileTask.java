@@ -116,6 +116,9 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
             if (this.mUserError.equals("503")) {
             	String url = DownloadFileTask.this.mFrom.toString();
         		new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareListener(){
+        			public void timeout() {
+        				DownloadFileTask.this.mProgressView.hideLoading();
+        			}
 					public void success() {
 						if (DownloadFileTask.this.retry)
 							new DownloadFileTask(

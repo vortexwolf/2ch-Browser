@@ -487,6 +487,7 @@ public class ThreadsListActivity extends BaseListActivity {
         		String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
         		if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
         		new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareListener(){
+        			public void timeout() {}
 					public void success() {
 						refresh();
 					}
