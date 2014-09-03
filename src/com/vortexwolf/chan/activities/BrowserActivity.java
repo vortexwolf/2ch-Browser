@@ -68,7 +68,7 @@ public class BrowserActivity extends Activity {
         this.mErrorView = this.findViewById(R.id.error);
 
         int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-        AppearanceUtils.prepareWebView(this.mWebView, background);
+        AppearanceUtils.prepareWebView(this.mWebView, background, mSettings.isDisplayZoomControls());
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();

@@ -36,6 +36,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 
         this.addPreferencesFromResource(R.xml.preferences);
 
+        this.updateListSummary(R.string.pref_video_preview_key);
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
         this.updateNameSummary();

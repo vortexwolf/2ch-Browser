@@ -187,6 +187,21 @@ public class ApplicationSettings {
     public boolean isMultiThumbnailsInThreads() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }
+    
+    public boolean isDisplayZoomControls() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_zoom_controls_key), false);
+    }
+    
+    public int getVideoPreviewMethod() {
+    	final String defaultMethodValue = this.mResources.getString(R.string.pref_video_preview_default_value);
+    	final String changeDomainMethodValue = this.mResources.getString(R.string.pref_video_preview_change_domain_value);
+    	final String downloadMethodValue = this.mResources.getString(R.string.pref_video_preview_download_value);
+    	String method = this.mSettings.getString(this.mResources.getString(R.string.pref_video_preview_key), defaultMethodValue);
+    	if (method.equals(defaultMethodValue)) return 0;
+    	if (method.equals(changeDomainMethodValue)) return 1;
+    	if (method.equals(downloadMethodValue)) return 2;
+    	return -1;
+    }
 
     public int getTheme() {
         final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_default_value);

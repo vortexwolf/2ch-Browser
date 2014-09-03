@@ -54,6 +54,13 @@
             android:key="@string/pref_download_background_key"
             android:summary="@string/pref_download_background_summary"
             android:title="@string/pref_download_background" />
+        <ListPreference 
+            android:entries="@array/pref_video_preview_choices" 
+            android:entryValues="@array/pref_video_preview_values" 
+            android:dialogTitle="@string/pref_video_preview" 
+            android:key="@string/pref_video_preview_key" 
+            android:title="@string/pref_video_preview" 
+            android:defaultValue="@string/pref_video_preview_default_value"/>
         
         <CheckBoxPreference
             android:defaultValue="false"
@@ -61,7 +68,7 @@
             android:summary="@string/pref_legacy_image_viewer_summary"
             android:title="@string/pref_legacy_image_viewer" />
 
-	<CheckBoxPreference
+	<CheckBoxPreference android:summary="@string/pref_display_zoom_controls_summary" android:key="@string/pref_display_zoom_controls_key" android:title="@string/pref_display_zoom_controls" android:defaultValue="false"/><CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_kitkat_fix_key"
             android:summary="@string/pref_kitkat_fix_summary"
@@ -72,6 +79,8 @@
             android:key="@string/pref_multithumbnails_in_threads_key"
             android:summary="@string/pref_multithumbnails_in_threads_summary"
             android:title="@string/pref_multithumbnails_in_threads" />
+	
+	
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_category_datetime" >
         <CheckBoxPreference

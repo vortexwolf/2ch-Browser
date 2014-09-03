@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.common.utils;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -21,8 +23,10 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.activities.ImageGalleryActivity;
+import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.DialogDownloadFileView;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
@@ -136,7 +140,34 @@ public class ThreadPostUtils {
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
         } else {
-            BrowserLauncher.launchInternalBrowser(context, url);
+        	boolean done = false;
+        	if (!UriUtils.isImageUri(uri)) {
+        		switch (settings.getVideoPreviewMethod()) {
+        		case 2:
+        			done = true;
+        			new DownloadFileTask(context, uri, null, new DialogDownloadFileView(context){
+        				@Override
+						public void showSuccess(File file) { play(file); }
+						@Override
+						public void showFileExists(File file) { play(file); }
+						private void play(File file) {
+							String type = "*/*";
+							if ("webm".equalsIgnoreCase(attachment.getSourceExtension())) type = "video/*";
+							Intent intent = new Intent(Intent.ACTION_VIEW);
+        					intent.setDataAndType(Uri.fromFile(file), type);
+        					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+        		        	context.startActivity(intent);
+						}
+        			}, true).execute();
+        			break;
+        		case 1:
+        			url = url.replace(settings.getDomainUri().toString(), "https://2ch.pm/");
+        			break;
+        		case 0:
+        			break;
+        		}
+        	}
+        	if (!done) BrowserLauncher.launchInternalBrowser(context, url);
         }
     }
 
