@@ -229,7 +229,7 @@ public class ImageGalleryActivity extends Activity {
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
 
-            AppearanceUtils.prepareWebView(vb.webView, ImageGalleryActivity.this.mBackgroundColor);
+            AppearanceUtils.prepareWebView(vb.webView, ImageGalleryActivity.this.mBackgroundColor, mApplicationSettings.isDisplayZoomControls());
 
             return view;
         }

@@ -1,7 +1,9 @@
 package com.vortexwolf.chan.activities;
 
 import java.io.File;
+
 import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
@@ -38,6 +41,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
+import com.vortexwolf.chan.interfaces.ICloudflareListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IPostSendView;
@@ -306,7 +310,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardName, this.mThreadNumber, pe);
         this.mCurrentPostSendTask.execute();
     }
-
+    
     @Override
     public void showSuccess(String redirectedPage) {
         AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_send_post_success));
@@ -330,13 +334,17 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
 
-        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.equals(this.getString(R.string.notification_cloudflare_finished))) {
-            this.mCaptchaAnswerView.setText("");
-            this.refreshCaptcha();
+        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна")) {
+        	refreshCaptcha();
         }
+        
         if (error.startsWith("503")) {
             String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
-            new CloudflareCheckService(url, this, this).start();
+            new CloudflareCheckService(url, this, new ICloudflareListener(){
+				public void success() {
+					refreshCaptcha();
+				}
+    		}).start();
         }
     }
 

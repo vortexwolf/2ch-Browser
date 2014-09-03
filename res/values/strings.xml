@@ -145,6 +145,16 @@
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in thread previews</string>
 
+    <string name="pref_display_zoom_controls">Display Zoom Controls</string>
+    <string name="pref_display_zoom_controls_summary">Sets whether the WebView should use its built-in zoom mechanisms (only Android 3 and newer)</string>
+    
+    <string name="pref_video_preview">Video Preview Method</string>
+    <string-array name="pref_video_preview_choices">
+        <item>Default</item>
+        <item>Open from 2ch.pm</item>
+        <item>Download and open locally</item>
+    </string-array>
+    
     <string-array name="pref_text_size_choices">
         <item>Medium</item>
         <item>Large</item>
@@ -206,5 +216,7 @@
     <string name="notification_passcode_incorrect">The passcode is incorrect</string>
     <string name="notification_cloudflare_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_finished">Cloudflare checking is complete, try again</string>
+    
+    
 
 </resources>

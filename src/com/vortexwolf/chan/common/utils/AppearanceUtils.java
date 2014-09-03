@@ -95,7 +95,7 @@ public class AppearanceUtils {
     }
 
     @SuppressLint("NewApi")
-    public static void prepareWebView(WebView webView, int backgroundColor) {
+    public static void prepareWebView(WebView webView, int backgroundColor, boolean isDisplayZoomControls) {
         webView.setBackgroundColor(backgroundColor);
         webView.setInitialScale(100);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -115,7 +115,7 @@ public class AppearanceUtils {
         }
 
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
-            //settings.setDisplayZoomControls(false);
+        	settings.setDisplayZoomControls(isDisplayZoomControls);
         }
     }
     
