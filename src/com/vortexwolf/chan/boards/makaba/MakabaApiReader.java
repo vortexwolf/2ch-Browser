@@ -1,8 +1,18 @@
 package com.vortexwolf.chan.boards.makaba;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
+
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
@@ -15,6 +25,7 @@ import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.JsonReader;
 
 public class MakabaApiReader implements IJsonApiReader {
+	static final String TAG = "MakabaApiReader";
     private final HttpStreamReader mHttpStreamReader;
     private final JsonReader mJsonReader;
     private final DvachUriBuilder mDvachUriBuilder;
@@ -63,8 +74,25 @@ public class MakabaApiReader implements IJsonApiReader {
 
     @Override
     public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        // not applicable
-        return null;
+    	String uri = this.mDvachUriBuilder.createUri("/makaba/makaba.fcgi").toString();
+    	
+    	MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
+    	try {
+    		entity.addPart("task", new StringBody("search", Constants.UTF8_CHARSET));
+			entity.addPart("board", new StringBody(boardName, Constants.UTF8_CHARSET));
+			entity.addPart("find", new StringBody(searchQuery, Constants.UTF8_CHARSET));
+			entity.addPart("json", new StringBody("1", Constants.UTF8_CHARSET));
+		} catch (UnsupportedEncodingException e) {
+			MyLog.e(TAG, e);
+		}
+    	
+    	MakabaFoundPostsList result = this.mJsonReader.readData(uri, MakabaFoundPostsList.class, listener, task, true, entity);
+        if (result == null) {
+        	return null;
+        }
+
+        SearchPostListModel model = this.mMakabaModelsMapper.mapSearchPostListModel(result);
+        return model;
     }
     
     private String formatThreadsUri(String boardName, int page) {
