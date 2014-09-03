@@ -31,7 +31,7 @@
     <string name="favorites">Favorites</string>
     <string name="search_board_hint">Search</string>
     <string name="show_full_comment"><a href=''>Show the full text</a></string>
-
+    
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
         <item quantity="one">%d post</item>
@@ -145,8 +145,11 @@
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in thread previews</string>
 
-    <string name="pref_display_zoom_controls">Display Zoom Controls</string>
-    <string name="pref_display_zoom_controls_summary">Sets whether the WebView should use its built-in zoom mechanisms (only Android 3 and newer)</string>
+	<string name="pref_use_catalog">Catalog</string>
+	<string name="pref_use_catalog_summary">Use catalog to get thread list</string>
+    
+    <string name="pref_display_zoom_controls">Disable Zoom Controls</string>
+    <string name="pref_display_zoom_controls_summary">Disable built-in zoom buttons (only Android 3 and newer)</string>
     
     <string name="pref_video_preview">Video Preview Method</string>
     <string-array name="pref_video_preview_choices">

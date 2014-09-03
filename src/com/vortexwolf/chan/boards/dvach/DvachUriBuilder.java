@@ -32,7 +32,7 @@ public class DvachUriBuilder {
     }
 
     public Uri createBoardUri(String board, int pageNumber) {
-        return this.createBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
+        return this.createBoardUri(board, pageNumber <= 0 ? null : pageNumber + ".html");
     }
 
     public Uri createBoardUri(String board, String path) {

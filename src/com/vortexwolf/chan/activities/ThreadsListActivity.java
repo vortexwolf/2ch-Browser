@@ -29,6 +29,7 @@ import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
@@ -93,17 +94,19 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
         }
         
+        if (this.mSettings.useCatalog()) mPageNumber = -1;
+        
         if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
             this.mJsonReader = Factory.resolve(MakabaApiReader.class);
         } else {
             this.mJsonReader = Factory.resolve(DvachApiReader.class);
         }
-
+        
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
 
         // Заголовок страницы
-        String pageTitle = this.mPageNumber != 0
+        String pageTitle = this.mPageNumber > 0
                 ? String.format(this.getString(R.string.data_board_title_with_page), this.mBoardName, this.mPageNumber)
                 : String.format(this.getString(R.string.data_board_title), this.mBoardName);
         this.setTitle(pageTitle);
@@ -171,7 +174,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar() ? View.VISIBLE : View.GONE);
 
         TextView pageNumberView = (TextView) this.findViewById(R.id.threads_page_number);
-        pageNumberView.setText(String.valueOf(this.mPageNumber));
+        pageNumberView.setText(this.mPageNumber == -1 ? "" : String.valueOf(this.mPageNumber));
 
         ImageButton nextButton = (ImageButton) this.findViewById(R.id.threads_next_page);
         ImageButton prevButton = (ImageButton) this.findViewById(R.id.threads_prev_page);
@@ -179,6 +182,9 @@ public class ThreadsListActivity extends BaseListActivity {
             prevButton.setVisibility(View.GONE);
         } else if (this.mPageNumber == 19) {
             nextButton.setVisibility(View.GONE);
+        } else if (this.mPageNumber == -1) {
+        	prevButton.setVisibility(View.GONE);
+        	nextButton.setVisibility(View.GONE);
         }
 
         prevButton.setOnClickListener(new View.OnClickListener() {
@@ -395,6 +401,20 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     protected void refresh() {
+    	if (this.mSettings.useCatalog()) {
+    		if (mPageNumber != -1) {
+    			mPageNumber = -1;
+    			this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
+    			resetUI();
+    		}
+    	} else {
+    		if (mPageNumber == -1) {
+    			mPageNumber = 0;
+    			this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
+    			resetUI();
+    		}
+    	}
+    		
         this.refreshThreads(false); // поставил здесь пока false, т.к. иначе, если треды остались те же самые, обновление возвращает null и ошибка error_list_empty
     }
 
@@ -465,6 +485,7 @@ public class ThreadsListActivity extends BaseListActivity {
         	ThreadsListActivity.this.switchToErrorView(error);
         	if (error != null && error.startsWith("503")) {
         		String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
+        		if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
         		new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareListener(){
 					public void success() {
 						refresh();

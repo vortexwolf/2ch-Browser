@@ -188,8 +188,12 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }
     
+    public boolean useCatalog() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_catalog_key), false);
+    }
+    
     public boolean isDisplayZoomControls() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_zoom_controls_key), false);
+        return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), true);
     }
     
     public int getVideoPreviewMethod() {

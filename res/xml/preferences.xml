@@ -26,6 +26,11 @@
         android:singleLine="true"
         android:summary="@string/pref_homepage_summary"
         android:title="@string/pref_homepage" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_use_catalog_key"
+        android:summary="@string/pref_use_catalog_summary"
+        android:title="@string/pref_use_catalog" />
     <EditTextPreference
         android:hint="@string/pref_domain_hint"
         android:inputType="textUri"
@@ -68,7 +73,13 @@
             android:summary="@string/pref_legacy_image_viewer_summary"
             android:title="@string/pref_legacy_image_viewer" />
 
-	<CheckBoxPreference android:summary="@string/pref_display_zoom_controls_summary" android:key="@string/pref_display_zoom_controls_key" android:title="@string/pref_display_zoom_controls" android:defaultValue="false"/><CheckBoxPreference
+	<CheckBoxPreference 
+	    android:summary="@string/pref_disable_zoom_controls_summary" 
+	    android:key="@string/pref_disable_zoom_controls_key"
+	    android:title="@string/pref_disable_zoom_controls"
+	    android:defaultValue="true"/>
+	
+	<CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_kitkat_fix_key"
             android:summary="@string/pref_kitkat_fix_summary"
