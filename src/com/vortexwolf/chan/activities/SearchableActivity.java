@@ -272,6 +272,7 @@ public class SearchableActivity extends BaseListActivity {
         	if (error != null && error.startsWith("503")) {
         		String url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
         		new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareListener(){
+        			public void timeout() {}
 					public void success() {
 						refresh();
 					}

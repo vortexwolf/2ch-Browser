@@ -107,6 +107,7 @@ public class CloudflareCheckService {
 					if (isActive) {
 						CloudflareCheckService.this.stop();
 						showMessage("Timeout");
+						if (mListener != null) mListener.timeout();
 					}
 				}
 			}.start();

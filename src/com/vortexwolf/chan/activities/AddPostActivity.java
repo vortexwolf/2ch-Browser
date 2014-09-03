@@ -341,6 +341,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (error.startsWith("503")) {
             String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
             new CloudflareCheckService(url, this, new ICloudflareListener(){
+            	public void timeout() {}
 				public void success() {
 					refreshCaptcha();
 				}
