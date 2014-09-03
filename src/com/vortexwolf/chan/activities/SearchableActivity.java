@@ -21,11 +21,14 @@ import com.vortexwolf.chan.adapters.FoundPostsListAdapter;
 import com.vortexwolf.chan.asynctasks.SearchPostsTask;
 import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
@@ -40,7 +43,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class SearchableActivity extends BaseListActivity {
     private static final String TAG = "SearchableActivity";
 
-    private final IJsonApiReader mJsonReader = Factory.getContainer().resolve(DvachApiReader.class);
+    private IJsonApiReader mJsonReader;
     private final IBitmapManager mBitmapManager = Factory.getContainer().resolve(IBitmapManager.class);
     private final ApplicationSettings mApplciationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
@@ -56,6 +59,12 @@ public class SearchableActivity extends BaseListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (ThreadPostUtils.isMakabaBoard(Constants.EXTRA_BOARD_NAME)) {
+            this.mJsonReader = Factory.resolve(MakabaApiReader.class);
+        } else {
+            this.mJsonReader = Factory.resolve(DvachApiReader.class);
+        }
+        
         this.resetUI();
 
         this.handleIntent(this.getIntent());

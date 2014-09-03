@@ -9,7 +9,6 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
@@ -70,21 +69,18 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
         this.clear();
 
         for (PostModel item : posts) {
-            if (item.getAttachments().size() == 0) {
-                continue;
-            }
-            
-            AttachmentModel attachment = item.getAttachments().get(0);
-            String thumbnail = attachment.getThumbnailUrl();
-            if (thumbnail != null && thumbnail.startsWith(this.mBoardName + "/")) {
-                attachment.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
-            }
+            if (item.getAttachments().size() != 0) {
+                AttachmentModel attachment = item.getAttachments().get(0);
+                String thumbnail = attachment.getThumbnailUrl();
+                if (thumbnail != null && thumbnail.startsWith(this.mBoardName + "/")) {
+                	attachment.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
+                }
 
-            String image = attachment.getPath();
-            if (image != null && image.startsWith(this.mBoardName + "/")) {
-                attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
+                String image = attachment.getPath();
+                if (image != null && image.startsWith(this.mBoardName + "/")) {
+                	attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
+                }
             }
-
             PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, item.getParentThread(), this.getCount(), item, this.mTheme, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
             this.add(viewModel);
         }

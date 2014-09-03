@@ -82,7 +82,8 @@ public class SearchPostsTask extends AsyncTask<Void, Long, Boolean> implements I
 
     @Override
     public void indeterminateProgress() {
-        this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
+        //this.mView.setWindowProgress(Window.PROGRESS_INDETERMINATE_ON);
+    	//Only the original thread that created a view hierarchy can touch its views.
     }
 
     @Override

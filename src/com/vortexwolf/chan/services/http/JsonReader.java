@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -47,13 +48,17 @@ public class JsonReader {
     }
 
     public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    	return this.readData(url, valueType, listener, task, false, null);
+    }
+    
+    public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws JsonApiReaderException, HtmlNotJsonException {
         T result = null;
         boolean parseSuccess = false;
         boolean wasCancelled = false;
 
         for (int i = 0; i < 2; i++) {
             try {
-                result = this.tryReadAndParse(url, valueType, listener, task);
+                result = this.tryReadAndParse(url, valueType, listener, task, isPostRequest, entity);
                 parseSuccess = true;
                 break;
             } catch (HttpRequestException e) {
@@ -83,10 +88,11 @@ public class JsonReader {
         return result;
     }
 
-    private <T> T tryReadAndParse(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws HttpRequestException, CancelTaskException, IOException, HtmlNotJsonException {
+    private <T> T tryReadAndParse(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws HttpRequestException, CancelTaskException, IOException, HtmlNotJsonException {
         HttpStreamModel streamModel = null;
         try {
-            streamModel = this.mHttpStreamReader.fromUri(url, null, listener, task);
+            if (isPostRequest) streamModel = this.mHttpStreamReader.fromUri(url, null, entity, listener, task);
+            else streamModel = this.mHttpStreamReader.fromUri(url, null, listener, task);
 
             if (streamModel.notModifiedResult || streamModel.stream == null) {
                 throw new CancelTaskException();

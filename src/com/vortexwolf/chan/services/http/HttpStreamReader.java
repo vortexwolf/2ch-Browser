@@ -12,6 +12,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
@@ -82,6 +85,41 @@ public class HttpStreamReader {
 
         return result;
     }
+    
+    public HttpStreamModel fromUri(String uri, Header[] customHeaders, HttpEntity entity, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
+    	List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
+        HttpPost request = null;
+        HttpResponse response = null;
+        InputStream stream = null;
+        
+        try {
+        	request = this.createRequest(uri, headersList, entity);
+        	try {
+        		response = this.getResponse(request);
+        	} catch (Exception e) {
+                throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
+            }
+        	
+        	StatusLine status = response.getStatusLine();
+        	if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
+        		throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
+        	} else {
+        		stream = this.fromResponse(response, listener, task);
+        	}
+        	
+        } catch (HttpRequestException e) {
+            ExtendedHttpClient.releaseRequestResponse(request, response);
+            throw e;
+        }
+        
+        HttpStreamModel result = new HttpStreamModel();
+        result.stream = stream;
+        result.request = request;
+        result.response = response;
+        result.notModifiedResult = false;
+
+        return result;
+    }
 
     public InputStream fromResponse(HttpResponse response) throws HttpRequestException {
         return this.fromResponse(response, null, null);
@@ -109,7 +147,6 @@ public class HttpStreamReader {
         HttpGet request = null;
         try {
             request = new HttpGet(uri);
-
             if (customHeaders != null) {
                 for (Header header : customHeaders) {
                     request.addHeader(header);
@@ -123,8 +160,27 @@ public class HttpStreamReader {
 
         return request;
     }
-
-    public HttpResponse getResponse(HttpGet request) throws IOException {
+    
+    public HttpPost createRequest(String uri, List<Header> customHeaders, HttpEntity entity) throws IllegalArgumentException {
+        HttpPost request = null;
+        try {
+            request = new HttpPost(uri);
+            request.setHeader("content-type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
+            if (customHeaders != null) {
+                for (Header header : customHeaders) {
+                    request.addHeader(header);
+                }
+            }
+            request.setEntity(entity);
+        } catch (IllegalArgumentException e) {
+            MyLog.e(TAG, e);
+            ExtendedHttpClient.releaseRequest(request);
+            throw e;
+        }
+        return request;
+    }
+    
+    public HttpResponse getResponse(HttpRequestBase request) throws IOException {
         HttpResponse response = null;
         IOException responseException = null;
 
@@ -149,7 +205,7 @@ public class HttpStreamReader {
         }
 
         if (responseException != null) {
-            ExtendedHttpClient.releaseRequestResponse(request, response);
+            //ExtendedHttpClient.releaseRequestResponse(request, response);
             throw responseException;
         }
 

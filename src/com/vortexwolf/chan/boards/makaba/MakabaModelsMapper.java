@@ -1,6 +1,7 @@
 package com.vortexwolf.chan.boards.makaba;
 
 import com.vortexwolf.chan.boards.makaba.models.MakabaFileInfo;
+import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
@@ -9,6 +10,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
+import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class MakabaModelsMapper {
@@ -74,6 +76,13 @@ public class MakabaModelsMapper {
         model.setImageSize(file.size);
         model.setImageWidth(file.width);
         model.setImageHeight(file.height);
+        
+        return model;
+    }
+    
+    public SearchPostListModel mapSearchPostListModel(MakabaFoundPostsList source) {
+        SearchPostListModel model = new SearchPostListModel();
+        model.setPosts(this.mapPostModels(source.posts));
         
         return model;
     }
