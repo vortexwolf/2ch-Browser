@@ -148,9 +148,22 @@
     <string name="pref_cut_posts_summary">Обрезать длинные сообщения, если их высота больше заданного значения</string>
     <string name="pref_kitkat_fix">Киткатопроблемы</string>
     <string name="pref_kitkat_fix_summary">Принудительно использовать системную галерею в Android 4.4 и выше</string>
-    <string name="pref_multithumbnails_in_threads">Мультипикчи</string>
-    <string name="pref_multithumbnails_in_threads_summary">Отображать мультипикчи при предпросмотре тредов (на странице доски)</string>
+    <string name="pref_multithumbnails_in_threads">Множественные вложения</string>
+    <string name="pref_multithumbnails_in_threads_summary">Отображать множественные вложения при предпросмотре тредов (на странице доски)</string>
 
+    <string name="pref_use_catalog">Каталог</string>
+	<string name="pref_use_catalog_summary">Использовать каталог для получения списка тредов</string>
+    
+    <string name="pref_disable_zoom_controls">Отключить кнопки масштаба</string>
+    <string name="pref_disable_zoom_controls_summary">Отключить встроенные кнопки масштаба при просмотре изображений (только для Android 3 и выше)</string>
+    
+    <string name="pref_video_preview">Способ просмотра видео</string>
+    <string-array name="pref_video_preview_choices">
+        <item>По умолчанию</item>
+        <item>Открывать с 2ch.pm</item>
+        <item>Загружать полностью и открывать локально</item>
+    </string-array>
+    
     <string-array name="pref_text_size_choices">
         <item>Средний</item>
         <item>Большой</item>

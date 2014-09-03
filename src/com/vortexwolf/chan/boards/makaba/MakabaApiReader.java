@@ -11,6 +11,7 @@ import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
+import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsListCatalog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
@@ -40,6 +41,7 @@ public class MakabaApiReader implements IJsonApiReader {
     
     @Override
     public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    	if (page == -1) return readCatalog(boardName, checkModified, listener, task);
         String uri = this.formatThreadsUri(boardName, page);
 
         if (checkModified == false) {
@@ -52,6 +54,23 @@ public class MakabaApiReader implements IJsonApiReader {
         }
         
         ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
+        return models;
+    }
+    
+    private ThreadModel[] readCatalog(String boardName, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    	String path = String.format("/makaba/makaba.fcgi?task=catalog&board=%s&json=1", boardName);
+    	String uri = this.mDvachUriBuilder.createUri(path).toString();
+    	
+    	if (checkModified == false) {
+            this.mHttpStreamReader.removeIfModifiedForUri(uri);
+        }
+    	
+    	MakabaThreadsListCatalog result = this.mJsonReader.readData(uri, MakabaThreadsListCatalog.class, listener, task);
+    	if (result == null) {
+            return null;
+        }
+    	
+    	ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
         return models;
     }
 
