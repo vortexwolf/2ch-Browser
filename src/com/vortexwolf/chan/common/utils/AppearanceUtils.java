@@ -106,7 +106,7 @@ public class AppearanceUtils {
         settings.setSupportZoom(true);
         settings.setAllowFileAccess(true);
         settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
-        //settings.setLoadWithOverviewMode(true);
+        settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
