@@ -6,6 +6,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -89,17 +90,26 @@ public class CloudflareCheckService {
     public void start() {
    		if (!isActive) {
    			isActive = true;
-   			MyLog.d(TAG, "Started CF checking");
-   			showMessage(mActivity.getString(R.string.notification_cloudflare_started));
-   			mWebView = new WebView(mActivity);
-   			mWebView.setVisibility(View.GONE);
-   			mLayout.addView(mWebView);
-   			CookieSyncManager.createInstance(mActivity);
-   			CookieManager.getInstance().removeAllCookie();
-   			mWebView.setWebViewClient(mClient);
-   			mWebView.getSettings().setUserAgentString(Constants.USER_AGENT_STRING);
-  			mWebView.getSettings().setJavaScriptEnabled(true);
-   			mWebView.loadUrl(url);
+			MyLog.d(TAG, "Started CF checking");
+			showMessage(mActivity.getString(R.string.notification_cloudflare_started));
+			mWebView = new WebView(mActivity);
+			mWebView.setVisibility(View.GONE);
+			mLayout.addView(mWebView);
+			CookieSyncManager.createInstance(mActivity);
+			CookieManager.getInstance().removeAllCookie();
+			mWebView.setWebViewClient(mClient);
+			mWebView.getSettings().setUserAgentString(Constants.USER_AGENT_STRING);
+			mWebView.getSettings().setJavaScriptEnabled(true);
+			mWebView.loadUrl(url);
+			new CountDownTimer(20000, 1000) {
+				public void onTick(long millisUntilFinished) { }
+				public void onFinish() {
+					if (isActive) {
+						CloudflareCheckService.this.stop();
+						showMessage("Timeout");
+					}
+				}
+			}.start();
    		}
     }
     
