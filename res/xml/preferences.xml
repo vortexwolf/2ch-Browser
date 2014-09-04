@@ -73,25 +73,25 @@
             android:summary="@string/pref_legacy_image_viewer_summary"
             android:title="@string/pref_legacy_image_viewer" />
 
-	<CheckBoxPreference 
-	    android:summary="@string/pref_disable_zoom_controls_summary" 
-	    android:key="@string/pref_disable_zoom_controls_key"
-	    android:title="@string/pref_disable_zoom_controls"
-	    android:defaultValue="true"/>
-	
-	<CheckBoxPreference
+        <CheckBoxPreference 
+            android:summary="@string/pref_disable_zoom_controls_summary" 
+            android:key="@string/pref_disable_zoom_controls_key"
+            android:title="@string/pref_disable_zoom_controls"
+            android:defaultValue="true"/>
+
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_kitkat_fix_key"
             android:summary="@string/pref_kitkat_fix_summary"
             android:title="@string/pref_kitkat_fix" />
 
-	<CheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_multithumbnails_in_threads_key"
             android:summary="@string/pref_multithumbnails_in_threads_summary"
             android:title="@string/pref_multithumbnails_in_threads" />
-	
-	
+
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_category_datetime" >
         <CheckBoxPreference

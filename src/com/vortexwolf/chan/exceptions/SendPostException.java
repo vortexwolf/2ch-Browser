@@ -3,8 +3,8 @@ package com.vortexwolf.chan.exceptions;
 public class SendPostException extends Exception {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1635351366953690702L;
 
     public SendPostException() {

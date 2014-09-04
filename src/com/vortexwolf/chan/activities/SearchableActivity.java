@@ -268,22 +268,22 @@ public class SearchableActivity extends BaseListActivity {
 
         @Override
         public void showError(String error) {
-        	SearchableActivity.this.switchToErrorView(error);
-        	if (error != null && error.startsWith("503")) {
-        		String url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
-        		new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareListener(){
-        			public void timeout() {}
-					public void success() {
-						refresh();
-					}
-        		}, this).start();
-        	}
+            SearchableActivity.this.switchToErrorView(error);
+            if (error != null && error.startsWith("503")) {
+                String url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
+                new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareListener(){
+                    public void timeout() {}
+                    public void success() {
+                        refresh();
+                    }
+                }, this).start();
+            }
         }
         
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
-        	// TODO: replace by captcha view
-        	this.showError("Cloudflare captcha, open any board first.");
+            // TODO: replace by captcha view
+            this.showError("Cloudflare captcha, open any board first.");
         }
 
         @Override

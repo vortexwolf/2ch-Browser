@@ -16,7 +16,7 @@
             android:layout_height="fill_parent"
             android:fastScrollEnabled="true"
             android:dividerHeight="0.5dip"
-	        android:scrollingCache="false" />
+            android:scrollingCache="false" />
 
         <include
             android:id="@+id/loadingView"

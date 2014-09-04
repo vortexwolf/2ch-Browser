@@ -26,7 +26,7 @@ import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.JsonReader;
 
 public class MakabaApiReader implements IJsonApiReader {
-	static final String TAG = "MakabaApiReader";
+    static final String TAG = "MakabaApiReader";
     private final HttpStreamReader mHttpStreamReader;
     private final JsonReader mJsonReader;
     private final DvachUriBuilder mDvachUriBuilder;
@@ -41,7 +41,7 @@ public class MakabaApiReader implements IJsonApiReader {
     
     @Override
     public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-    	if (page == -1) return readCatalog(boardName, checkModified, listener, task);
+        if (page == -1) return readCatalog(boardName, checkModified, listener, task);
         String uri = this.formatThreadsUri(boardName, page);
 
         if (checkModified == false) {
@@ -58,19 +58,19 @@ public class MakabaApiReader implements IJsonApiReader {
     }
     
     private ThreadModel[] readCatalog(String boardName, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-    	String path = String.format("/makaba/makaba.fcgi?task=catalog&board=%s&json=1", boardName);
-    	String uri = this.mDvachUriBuilder.createUri(path).toString();
-    	
-    	if (checkModified == false) {
+        String path = String.format("/makaba/makaba.fcgi?task=catalog&board=%s&json=1", boardName);
+        String uri = this.mDvachUriBuilder.createUri(path).toString();
+        
+        if (checkModified == false) {
             this.mHttpStreamReader.removeIfModifiedForUri(uri);
         }
-    	
-    	MakabaThreadsListCatalog result = this.mJsonReader.readData(uri, MakabaThreadsListCatalog.class, listener, task);
-    	if (result == null) {
+        
+        MakabaThreadsListCatalog result = this.mJsonReader.readData(uri, MakabaThreadsListCatalog.class, listener, task);
+        if (result == null) {
             return null;
         }
-    	
-    	ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
+        
+        ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
         return models;
     }
 
@@ -93,21 +93,21 @@ public class MakabaApiReader implements IJsonApiReader {
 
     @Override
     public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-    	String uri = this.mDvachUriBuilder.createUri("/makaba/makaba.fcgi").toString();
-    	
-    	MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
-    	try {
-    		entity.addPart("task", new StringBody("search", Constants.UTF8_CHARSET));
-			entity.addPart("board", new StringBody(boardName, Constants.UTF8_CHARSET));
-			entity.addPart("find", new StringBody(searchQuery, Constants.UTF8_CHARSET));
-			entity.addPart("json", new StringBody("1", Constants.UTF8_CHARSET));
-		} catch (UnsupportedEncodingException e) {
-			MyLog.e(TAG, e);
-		}
-    	
-    	MakabaFoundPostsList result = this.mJsonReader.readData(uri, MakabaFoundPostsList.class, listener, task, true, entity);
+        String uri = this.mDvachUriBuilder.createUri("/makaba/makaba.fcgi").toString();
+        
+        MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
+        try {
+            entity.addPart("task", new StringBody("search", Constants.UTF8_CHARSET));
+            entity.addPart("board", new StringBody(boardName, Constants.UTF8_CHARSET));
+            entity.addPart("find", new StringBody(searchQuery, Constants.UTF8_CHARSET));
+            entity.addPart("json", new StringBody("1", Constants.UTF8_CHARSET));
+        } catch (UnsupportedEncodingException e) {
+            MyLog.e(TAG, e);
+        }
+        
+        MakabaFoundPostsList result = this.mJsonReader.readData(uri, MakabaFoundPostsList.class, listener, task, true, entity);
         if (result == null) {
-        	return null;
+            return null;
         }
 
         SearchPostListModel model = this.mMakabaModelsMapper.mapSearchPostListModel(result);

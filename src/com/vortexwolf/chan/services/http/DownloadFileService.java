@@ -58,10 +58,10 @@ public class DownloadFileService {
             wasCancelled = true;
             throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
         } catch (HttpRequestException e) {
-        	MyLog.e(TAG, e);
-        	wasCancelled = true;
-        	if (e.getMessage().startsWith("503")) { throw new DownloadFileException("503"); }
-        	else throw new DownloadFileException(this.mResources.getString(R.string.error_save_file));
+            MyLog.e(TAG, e);
+            wasCancelled = true;
+            if (e.getMessage().startsWith("503")) { throw new DownloadFileException("503"); }
+            else throw new DownloadFileException(this.mResources.getString(R.string.error_save_file));
         } catch (Exception e) {
             MyLog.e(TAG, e);
             wasCancelled = true;

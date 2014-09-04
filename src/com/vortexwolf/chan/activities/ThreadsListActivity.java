@@ -183,8 +183,8 @@ public class ThreadsListActivity extends BaseListActivity {
         } else if (this.mPageNumber == 19) {
             nextButton.setVisibility(View.GONE);
         } else if (this.mPageNumber == -1) {
-        	prevButton.setVisibility(View.GONE);
-        	nextButton.setVisibility(View.GONE);
+            prevButton.setVisibility(View.GONE);
+            nextButton.setVisibility(View.GONE);
         }
 
         prevButton.setOnClickListener(new View.OnClickListener() {
@@ -401,21 +401,21 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     protected void refresh() {
-    	if (this.mSettings.useCatalog()) {
-    		if (mPageNumber != -1) {
-    			mPageNumber = -1;
-    			this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
-    			resetUI();
-    		}
-    	} else {
-    		if (mPageNumber == -1) {
-    			mPageNumber = 0;
-    			this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
-    			resetUI();
-    		}
-    	}
-    		
-        this.refreshThreads(false); // поставил здесь пока false, т.к. иначе, если треды остались те же самые, обновление возвращает null и ошибка error_list_empty
+        if (this.mSettings.useCatalog()) {
+            if (mPageNumber != -1) {
+                mPageNumber = -1;
+                this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
+                resetUI();
+            }
+        } else {
+            if (mPageNumber == -1) {
+                mPageNumber = 0;
+                this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
+                resetUI();
+            }
+        }
+            
+        this.refreshThreads(false);
     }
 
     private void refreshThreads(boolean checkModified) {
@@ -482,22 +482,22 @@ public class ThreadsListActivity extends BaseListActivity {
 
         @Override
         public void showError(String error) {
-        	ThreadsListActivity.this.switchToErrorView(error);
-        	if (error != null && error.startsWith("503")) {
-        		String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
-        		if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
-        		new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareListener(){
-        			public void timeout() {}
-					public void success() {
-						refresh();
-					}
-        		}, this).start();
-        	}
+            ThreadsListActivity.this.switchToErrorView(error);
+            if (error != null && error.startsWith("503")) {
+                String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
+                if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
+                new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareListener(){
+                    public void timeout() {}
+                    public void success() {
+                        refresh();
+                    }
+                }, this).start();
+            }
         }
         
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
-        	ThreadsListActivity.this.switchToCaptchaView(captcha);
+            ThreadsListActivity.this.switchToCaptchaView(captcha);
         }
 
         @Override

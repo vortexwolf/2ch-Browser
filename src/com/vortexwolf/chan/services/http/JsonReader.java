@@ -48,7 +48,7 @@ public class JsonReader {
     }
 
     public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-    	return this.readData(url, valueType, listener, task, false, null);
+        return this.readData(url, valueType, listener, task, false, null);
     }
     
     public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws JsonApiReaderException, HtmlNotJsonException {

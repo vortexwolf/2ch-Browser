@@ -184,16 +184,16 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
                 }
 
                 ViewBag vb = (ViewBag) v.getTag();
-                
-                        
-		if (mSettings.isMultiThumbnailsInThreads() && this.getItem(position).getAttachmentsNumber() > 1) {
-		    for (int j = 0; j < 4; ++j) {
-			ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(j), vb.thumbnailViews[j].image);
-		    }
-		} else if (this.getItem(position).getAttachmentsNumber() >= 1) {
-		    ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(0), vb.singleThumbnailView.image);
-		}
-	    }
+
+
+                if (mSettings.isMultiThumbnailsInThreads() && this.getItem(position).getAttachmentsNumber() > 1) {
+                    for (int j = 0; j < 4; ++j) {
+                        ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(j), vb.thumbnailViews[j].image);
+                    }
+                } else if (this.getItem(position).getAttachmentsNumber() >= 1) {
+                    ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(0), vb.singleThumbnailView.image);
+                }
+            }
         }
     }
 

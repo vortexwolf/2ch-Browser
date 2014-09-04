@@ -36,7 +36,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private final IDownloadFileView mProgressView;
     private final ICacheDirectoryManager mCacheDirectoryManager;
     private final boolean mUpdateGallery;
-    private boolean retry = true; //afrer cloudflare check
+    private boolean retry = true; //after cloudflare check
 
     private File mSaveTo;
     private String mUserError = null;
@@ -70,7 +70,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-            	DownloadFileTask.this.retry = false;
+                DownloadFileTask.this.retry = false;
                 DownloadFileTask.this.cancel(true);
             }
         });
@@ -114,24 +114,24 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
             this.mProgressView.showSuccess(this.mSaveTo);
         } else {
             if (this.mUserError.equals("503")) {
-            	String url = DownloadFileTask.this.mFrom.toString();
-        		new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareListener(){
-        			public void timeout() {
-        				DownloadFileTask.this.mProgressView.hideLoading();
-        			}
-					public void success() {
-						if (DownloadFileTask.this.retry)
-							new DownloadFileTask(
-									DownloadFileTask.this.mContext,
-									DownloadFileTask.this.mFrom,
-									null,
-									DownloadFileTask.this.mProgressView,
-									true).execute();
-					}
-        		}).start();
+                String url = DownloadFileTask.this.mFrom.toString();
+                new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareListener(){
+                    public void timeout() {
+                        DownloadFileTask.this.mProgressView.hideLoading();
+                    }
+                    public void success() {
+                        if (DownloadFileTask.this.retry)
+                            new DownloadFileTask(
+                                DownloadFileTask.this.mContext,
+                                DownloadFileTask.this.mFrom,
+                                null,
+                                DownloadFileTask.this.mProgressView,
+                                true).execute();
+                    }
+                }).start();
             } else {
-            	this.mProgressView.hideLoading();
-            	this.mProgressView.showError(this.mUserError);
+                this.mProgressView.hideLoading();
+                this.mProgressView.showError(this.mUserError);
             }
         }
     }

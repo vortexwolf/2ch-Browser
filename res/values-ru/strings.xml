@@ -152,7 +152,7 @@
     <string name="pref_multithumbnails_in_threads_summary">Отображать множественные вложения при предпросмотре тредов (на странице доски)</string>
 
     <string name="pref_use_catalog">Каталог</string>
-	<string name="pref_use_catalog_summary">Использовать каталог для получения списка тредов</string>
+    <string name="pref_use_catalog_summary">Использовать каталог для получения списка тредов</string>
     
     <string name="pref_disable_zoom_controls">Отключить кнопки масштаба</string>
     <string name="pref_disable_zoom_controls_summary">Отключить встроенные кнопки масштаба при просмотре изображений (только для Android 3 и выше)</string>

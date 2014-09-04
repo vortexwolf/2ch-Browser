@@ -54,7 +54,7 @@ public class MainApplication extends Application {
     public static boolean MULTITOUCH_SUPPORT = false;
 
     @SuppressLint("NewApi")
-	@Override
+    @Override
     public void onCreate() {
         super.onCreate();
 
