@@ -11,36 +11,36 @@
         android:orientation="horizontal"
         android:visibility="gone" >
         <include
-	    android:id="@+id/thumbnail_view_1"
-	    layout="@layout/thumbnail_view"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginRight="5dip"
-	    android:visibility="gone"
-	/>
-        <include
-	    android:id="@+id/thumbnail_view_2"
-	    layout="@layout/thumbnail_view"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginRight="5dip"
-	    android:visibility="gone"
+            android:id="@+id/thumbnail_view_1"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:visibility="gone"
         />
         <include
-	    android:id="@+id/thumbnail_view_3"
-	    layout="@layout/thumbnail_view"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginRight="5dip"
-	    android:visibility="gone"
+            android:id="@+id/thumbnail_view_2"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:visibility="gone"
         />
         <include
-	    android:id="@+id/thumbnail_view_4"
-	    layout="@layout/thumbnail_view"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginRight="5dip"
-	    android:visibility="gone"
+            android:id="@+id/thumbnail_view_3"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:visibility="gone"
+        />
+        <include
+            android:id="@+id/thumbnail_view_4"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:visibility="gone"
         />
     </LinearLayout>
     <include

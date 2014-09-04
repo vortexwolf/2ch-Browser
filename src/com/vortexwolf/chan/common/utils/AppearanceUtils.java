@@ -115,23 +115,23 @@ public class AppearanceUtils {
         }
 
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
-        	settings.setDisplayZoomControls(isDisplayZoomControls);
+            settings.setDisplayZoomControls(isDisplayZoomControls);
         }
     }
     
     public static void setScaleWebView(WebView webView, File file, Activity context) {
         int scale = 100;
         try {
-        	Point imageSize = getImageSize(file);
+            Point imageSize = getImageSize(file);
             Point resolution = getResolution(webView);
             if (resolution.equals(0, 0)) {
-            	Point displayResolution = getDisplayResolution(context);
-            	if (AppearanceUtils.resolution.x == displayResolution.x || displayResolution.equals(0, 0)) {
-            		resolution = AppearanceUtils.resolution;
-            	} else {
-            		resolution = displayResolution;
-            		AppearanceUtils.resolution = resolution;
-            	}
+                Point displayResolution = getDisplayResolution(context);
+                if (AppearanceUtils.resolution.x == displayResolution.x || displayResolution.equals(0, 0)) {
+                    resolution = AppearanceUtils.resolution;
+                } else {
+                    resolution = displayResolution;
+                    AppearanceUtils.resolution = resolution;
+                }
             } else AppearanceUtils.resolution = resolution;
             
             if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
@@ -150,24 +150,24 @@ public class AppearanceUtils {
     }
     
     private static Point getImageSize(File file) {
-    	BitmapFactory.Options options = new BitmapFactory.Options();
+        BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         return new Point(options.outWidth, options.outHeight);
     }
     
     private static Point getResolution(View view) {
-    	View viewParent = (View) view.getParent();
+        View viewParent = (View) view.getParent();
         return new Point(viewParent.getWidth(), viewParent.getHeight());
     }
     
     @SuppressLint("NewApi")
     private static Point getDisplayResolution(Activity context) {
-    	Point mResolution = new Point();
-    	Display display = context.getWindowManager().getDefaultDisplay();
-    	if (Constants.SDK_VERSION >= 11) display.getSize(mResolution);
-    	else mResolution.set(display.getWidth(), display.getHeight());
-    	return mResolution;
+        Point mResolution = new Point();
+        Display display = context.getWindowManager().getDefaultDisplay();
+        if (Constants.SDK_VERSION >= 11) display.getSize(mResolution);
+        else mResolution.set(display.getWidth(), display.getHeight());
+        return mResolution;
     }
     
     public static int getThemeColor(Theme theme, int styleableId) {

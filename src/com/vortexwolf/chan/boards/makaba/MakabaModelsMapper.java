@@ -42,17 +42,17 @@ public class MakabaModelsMapper {
     }
     
     public ThreadModel[] mapThreadModels(MakabaThreadsListCatalog source){
-    	ThreadModel[] result = new ThreadModel[source.threads.length];
-    	for (int i = 0; i < result.length; i++) {
-    		ThreadModel model = new ThreadModel();
-    		model.setReplyCount(source.threads[i].postsCount+1);
-    		model.setImageCount(source.threads[i].filesCount+source.threads[i].files.length);
-    		PostModel[] posts = new PostModel[1];
-    		posts[0]=mapPostModel(source.threads[i]);
-    		model.setPosts(posts);
+        ThreadModel[] result = new ThreadModel[source.threads.length];
+        for (int i = 0; i < result.length; i++) {
+            ThreadModel model = new ThreadModel();
+            model.setReplyCount(source.threads[i].postsCount+1);
+            model.setImageCount(source.threads[i].filesCount+source.threads[i].files.length);
+            PostModel[] posts = new PostModel[1];
+            posts[0]=mapPostModel(source.threads[i]);
+            model.setPosts(posts);
             result[i] = model;
         }
-    	return result;
+        return result;
     }
     
     public PostModel[] mapPostModels(MakabaPostInfo[] source){

@@ -18,10 +18,10 @@
         android:imeOptions="flagNoExtractUi|flagNoFullscreen|actionSend"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:singleLine="true" />
-	<Button
-		android:id="@+id/cloudflare_send_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal"
-		android:text="@string/addpost_send_button" />
+    <Button
+        android:id="@+id/cloudflare_send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/addpost_send_button" />
 </LinearLayout>

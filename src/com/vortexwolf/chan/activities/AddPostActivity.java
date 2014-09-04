@@ -335,17 +335,17 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         AppearanceUtils.showToastMessage(this, error);
 
         if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна")) {
-        	refreshCaptcha();
+            refreshCaptcha();
         }
         
         if (error.startsWith("503")) {
             String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
-            new CloudflareCheckService(url, this, new ICloudflareListener(){
-            	public void timeout() {}
-				public void success() {
-					refreshCaptcha();
-				}
-    		}).start();
+            new CloudflareCheckService(url, this, new ICloudflareListener() {
+                public void timeout() {}
+                public void success() {
+                    refreshCaptcha();
+                }
+            }).start();
         }
     }
 

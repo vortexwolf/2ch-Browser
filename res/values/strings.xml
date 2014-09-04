@@ -145,8 +145,8 @@
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in thread previews</string>
 
-	<string name="pref_use_catalog">Catalog</string>
-	<string name="pref_use_catalog_summary">Use catalog to get thread list</string>
+    <string name="pref_use_catalog">Catalog</string>
+    <string name="pref_use_catalog_summary">Use catalog to get thread list</string>
     
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons (only Android 3 and newer)</string>

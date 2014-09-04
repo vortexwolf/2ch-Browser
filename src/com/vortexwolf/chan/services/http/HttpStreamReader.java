@@ -87,26 +87,26 @@ public class HttpStreamReader {
     }
     
     public HttpStreamModel fromUri(String uri, Header[] customHeaders, HttpEntity entity, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
-    	List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
+        List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
         HttpPost request = null;
         HttpResponse response = null;
         InputStream stream = null;
         
         try {
-        	request = this.createRequest(uri, headersList, entity);
-        	try {
-        		response = this.getResponse(request);
-        	} catch (Exception e) {
+            request = this.createRequest(uri, headersList, entity);
+            try {
+                response = this.getResponse(request);
+            } catch (Exception e) {
                 throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
             }
-        	
-        	StatusLine status = response.getStatusLine();
-        	if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
-        		throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
-        	} else {
-        		stream = this.fromResponse(response, listener, task);
-        	}
-        	
+            
+            StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
+                throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
+            } else {
+                stream = this.fromResponse(response, listener, task);
+            }
+            
         } catch (HttpRequestException e) {
             ExtendedHttpClient.releaseRequestResponse(request, response);
             throw e;

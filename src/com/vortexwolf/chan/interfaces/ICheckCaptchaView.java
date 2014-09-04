@@ -1,7 +1,7 @@
 package com.vortexwolf.chan.interfaces;
 
 public interface ICheckCaptchaView {
-	void showSuccess();
-	
-	void showError(String message);
+    void showSuccess();
+    
+    void showError(String message);
 }

@@ -42,86 +42,85 @@ public class CloudflareCheckService {
     private WebView mWebView = null;
     
     private WebViewClient mClient = new WebViewClient() {
-    	public void onPageFinished(WebView webView, String url) {
-   			super.onPageFinished(webView, url);
-   			MyLog.d(TAG, "Got Page: "+url);
-   			String value = null;
-   			String[] cookies = CookieManager.getInstance().getCookie(url).split("[;]");
-   			for (String cookie : cookies)
-   				if ((!StringUtils.isEmptyOrWhiteSpace(cookie)) && (cookie.startsWith(" "+Constants.CF_CLEARANCE_COOKIE+"=")))
-   					value = cookie.substring(Constants.CF_CLEARANCE_COOKIE.length() + 2);
-   			
-   			if (value != null) {
-   				BasicClientCookie cf_cookie = new BasicClientCookie(Constants.CF_CLEARANCE_COOKIE, value);
-   				cf_cookie.setDomain("."+Uri.parse(url).getHost());
-   				cf_cookie.setPath("/");
-   				mHttpClient.setCookie(cf_cookie);
-   				mSettings.saveCloudflareClearanceCookie(cf_cookie);
-   				showMessage(mActivity.getString(R.string.notification_cloudflare_finished));
-   				if (mListener != null) mListener.success();
-   				MyLog.d(TAG, "Cookie found: "+value);
-   				stop();
-   			} else { MyLog.d(TAG, "Cookie is not found"); }
-    	}
+        public void onPageFinished(WebView webView, String url) {
+            super.onPageFinished(webView, url);
+            MyLog.d(TAG, "Got Page: "+url);
+            String value = null;
+            String[] cookies = CookieManager.getInstance().getCookie(url).split("[;]");
+            for (String cookie : cookies)
+                if ((!StringUtils.isEmptyOrWhiteSpace(cookie)) && (cookie.startsWith(" "+Constants.CF_CLEARANCE_COOKIE+"=")))
+                    value = cookie.substring(Constants.CF_CLEARANCE_COOKIE.length() + 2);
+            if (value != null) {
+                BasicClientCookie cf_cookie = new BasicClientCookie(Constants.CF_CLEARANCE_COOKIE, value);
+                cf_cookie.setDomain("."+Uri.parse(url).getHost());
+                cf_cookie.setPath("/");
+                mHttpClient.setCookie(cf_cookie);
+                mSettings.saveCloudflareClearanceCookie(cf_cookie);
+                showMessage(mActivity.getString(R.string.notification_cloudflare_finished));
+                if (mListener != null) mListener.success();
+                MyLog.d(TAG, "Cookie found: "+value);
+                stop();
+            } else { MyLog.d(TAG, "Cookie is not found"); }
+        }
     };
-	
+
     private void showMessage(String message) {
-    	if (mListView != null) { mListView.showError(message); }
-    	else { AppearanceUtils.showToastMessage(mActivity, message);}
+        if (mListView != null) { mListView.showError(message); }
+        else { AppearanceUtils.showToastMessage(mActivity, message);}
     }
-	    
+    
     public CloudflareCheckService(String url, Activity activity) {
-    	this.url = url;
-    	mActivity = activity;
-    	mLayout = (ViewGroup)activity.getWindow().getDecorView().getRootView();
+        this.url = url;
+        mActivity = activity;
+        mLayout = (ViewGroup)activity.getWindow().getDecorView().getRootView();
     }
     
     public CloudflareCheckService(String url, Activity activity, ICloudflareListener listener) {
-    	this(url, activity);
-    	this.mListener = listener;
+        this(url, activity);
+        this.mListener = listener;
     }
     
     public CloudflareCheckService(String url, Activity activity, ICloudflareListener listener, IListView listView) {
-    	this(url, activity, listener);
-    	this.mListView = listView;
+        this(url, activity, listener);
+        this.mListView = listView;
     }
-	
+    
     @SuppressLint("SetJavaScriptEnabled")
     public void start() {
-   		if (!isActive) {
-   			isActive = true;
-			MyLog.d(TAG, "Started CF checking");
-			showMessage(mActivity.getString(R.string.notification_cloudflare_started));
-			mWebView = new WebView(mActivity);
-			mWebView.setVisibility(View.GONE);
-			mLayout.addView(mWebView);
-			CookieSyncManager.createInstance(mActivity);
-			CookieManager.getInstance().removeAllCookie();
-			mWebView.setWebViewClient(mClient);
-			mWebView.getSettings().setUserAgentString(Constants.USER_AGENT_STRING);
-			mWebView.getSettings().setJavaScriptEnabled(true);
-			mWebView.loadUrl(url);
-			new CountDownTimer(20000, 1000) {
-				public void onTick(long millisUntilFinished) { }
-				public void onFinish() {
-					if (isActive) {
-						CloudflareCheckService.this.stop();
-						showMessage("Timeout");
-						if (mListener != null) mListener.timeout();
-					}
-				}
-			}.start();
-   		}
+        if (!isActive) {
+            isActive = true;
+            MyLog.d(TAG, "Started CF checking");
+            showMessage(mActivity.getString(R.string.notification_cloudflare_started));
+            mWebView = new WebView(mActivity);
+            mWebView.setVisibility(View.GONE);
+            mLayout.addView(mWebView);
+            CookieSyncManager.createInstance(mActivity);
+            CookieManager.getInstance().removeAllCookie();
+            mWebView.setWebViewClient(mClient);
+            mWebView.getSettings().setUserAgentString(Constants.USER_AGENT_STRING);
+            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.loadUrl(url);
+            new CountDownTimer(20000, 1000) {
+                public void onTick(long millisUntilFinished) { }
+                public void onFinish() {
+                    if (isActive) {
+                        CloudflareCheckService.this.stop();
+                        showMessage("Timeout");
+                        if (mListener != null) mListener.timeout();
+                    }
+                }
+            }.start();
+        }
     }
     
     public void stop() {
-    	mLayout.removeView(mWebView);
-    	mWebView.stopLoading();
-    	mWebView.clearCache(true);
-    	mWebView.destroy();
-    	mWebView = null;
-    	isActive = false;
-    	MyLog.d(TAG, "Task finished");
+        mLayout.removeView(mWebView);
+        mWebView.stopLoading();
+        mWebView.clearCache(true);
+        mWebView.destroy();
+        mWebView = null;
+        isActive = false;
+        MyLog.d(TAG, "Task finished");
     }
 
 }

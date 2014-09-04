@@ -503,8 +503,8 @@ public class PostsListActivity extends BaseListActivity {
         
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
-        	// TODO: replace by captcha view
-        	this.showError("Cloudflare captcha, open any board first.");
+            // TODO: replace by captcha view
+            this.showError("Cloudflare captcha, open any board first.");
         }
 
         @Override

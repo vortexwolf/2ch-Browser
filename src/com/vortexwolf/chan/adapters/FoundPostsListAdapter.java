@@ -73,12 +73,12 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
                 AttachmentModel attachment = item.getAttachments().get(0);
                 String thumbnail = attachment.getThumbnailUrl();
                 if (thumbnail != null && thumbnail.startsWith(this.mBoardName + "/")) {
-                	attachment.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
+                    attachment.setThumbnailUrl(thumbnail.substring(thumbnail.indexOf("/") + 1, thumbnail.length()));
                 }
 
                 String image = attachment.getPath();
                 if (image != null && image.startsWith(this.mBoardName + "/")) {
-                	attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
+                    attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
                 }
             }
             PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, item.getParentThread(), this.getCount(), item, this.mTheme, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));

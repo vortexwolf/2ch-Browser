@@ -78,19 +78,19 @@
         <item>Сионизм</item>
         <item>Технократия</item>
         <item>Христианство</item>
-		<item>Украина</item>
+        <item>Украина</item>
         <item>Свобода</item>
-		<item>Беларусь</item>
-		<item>ЛГБТ</item>
-		<item>Nya</item>
-		<item>Госдеп</item>
-		<item>YARRR!!!</item>
+        <item>Беларусь</item>
+        <item>ЛГБТ</item>
+        <item>Nya</item>
+        <item>Госдеп</item>
+        <item>YARRR!!!</item>
         <item>Родноверы</item>
         <item>Соцдем</item>
-		<item>Крым</item>
-		<item>Rebel</item>
-		<item>ДНР</item>
-		<item>ISIS</item>
+        <item>Крым</item>
+        <item>Rebel</item>
+        <item>ДНР</item>
+        <item>ISIS</item>
     </string-array>
     <string-array name="pickboard_boards">
         <item>Тематика</item>
