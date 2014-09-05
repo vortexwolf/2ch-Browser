@@ -61,7 +61,7 @@ public class AttachmentInfo {
     }
 
     public String getSourceUrl() {
-        if (!this.mIsEmpty && this.isImage()){
+        if (!this.mIsEmpty){
             return this.mImageUrl;
         }
         return null;
