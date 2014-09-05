@@ -5,12 +5,14 @@ import java.io.File;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
+import android.os.Build;
 
 import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachModelsMapper;
@@ -20,6 +22,7 @@ import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.ExtendedObjectMapper;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
 import com.vortexwolf.chan.db.DvachSqlHelper;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
@@ -53,13 +56,12 @@ public class MainApplication extends Application {
 
     public static boolean MULTITOUCH_SUPPORT = false;
 
-    @SuppressLint("NewApi")
     @Override
     public void onCreate() {
         super.onCreate();
 
         if (Constants.SDK_VERSION >= 7) {
-            MULTITOUCH_SUPPORT = this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
+            MULTITOUCH_SUPPORT = CompatibilityUtilsImpl.hasMultitouchSupport(this.getPackageManager());
         }
 
         MyTracker tracker = new MyTracker(this);

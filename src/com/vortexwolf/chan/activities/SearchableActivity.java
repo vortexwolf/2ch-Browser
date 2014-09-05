@@ -30,7 +30,7 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
-import com.vortexwolf.chan.interfaces.ICloudflareListener;
+import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
@@ -271,12 +271,17 @@ public class SearchableActivity extends BaseListActivity {
             SearchableActivity.this.switchToErrorView(error);
             if (error != null && error.startsWith("503")) {
                 String url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
-                new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareListener(){
-                    public void timeout() {}
-                    public void success() {
+                new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareCheckListener(){
+                    public void onSuccess() {
                         refresh();
                     }
-                }, this).start();
+                    public void onStart() {
+                        showError(getString(R.string.notification_cloudflare_check_started));
+                    }
+                    public void onTimeout() {
+                        showError(getString(R.string.error_cloudflare_check_timeout));
+                    }
+                }).start();
             }
         }
         

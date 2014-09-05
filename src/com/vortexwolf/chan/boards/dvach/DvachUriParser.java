@@ -14,11 +14,14 @@ public class DvachUriParser {
     private static final Pattern groupsDvachUriPattern = Pattern.compile("^/(\\w+)/?(?:(?:(\\d+).html)|(?:res/(\\d+)\\.html))?$");
 
     public String getBoardName(Uri uri) {
+        if (uri.toString().contains("makaba.fcgi?task=catalog")) return uri.toString().substring(uri.toString().lastIndexOf("=") + 1);
+        //надо запилить нормальный regex, с учетом того, что board=XX может быть не в конце строки
         String boardName = RegexUtils.getGroupValue(uri, groupsDvachUriPattern, 1);
         return boardName;
     }
 
     public int getBoardPageNumber(Uri uri) {
+        if (uri.toString().contains("makaba.fcgi?task=catalog")) return -1;
         String pageNumber = RegexUtils.getGroupValue(uri, groupsDvachUriPattern, 2);
         return pageNumber == null ? 0 : Integer.parseInt(pageNumber);
     }

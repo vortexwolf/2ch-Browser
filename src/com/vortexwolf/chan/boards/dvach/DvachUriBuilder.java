@@ -32,7 +32,8 @@ public class DvachUriBuilder {
     }
 
     public Uri createBoardUri(String board, int pageNumber) {
-        return this.createBoardUri(board, pageNumber <= 0 ? null : pageNumber + ".html");
+        if (pageNumber == -1) return this.createUri("makaba/makaba.fcgi?task=catalog&board=" + board);
+        return this.createBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
     }
 
     public Uri createBoardUri(String board, String path) {
