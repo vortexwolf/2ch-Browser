@@ -13,6 +13,7 @@ public class PostModel implements Serializable {
     private String comment;
     private String email;
     private String trip;
+    private String icon;
     private boolean op;
     private long timestamp;
     private String parentThread;
@@ -53,6 +54,12 @@ public class PostModel implements Serializable {
     }
     public void setTrip(String trip) {
         this.trip = trip;
+    }
+    public String getIcon() {
+        return icon;
+    }
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
     public boolean isOp() {
         return op;

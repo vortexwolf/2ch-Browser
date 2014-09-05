@@ -149,6 +149,10 @@ public class PostItemViewModel {
     public String getNumber() {
         return this.mModel.getNumber();
     }
+    
+    public String getIcon() {
+        return this.mModel.getIcon();
+    }
 
     public BadgeModel getBadge() {
         return this.mBadge;

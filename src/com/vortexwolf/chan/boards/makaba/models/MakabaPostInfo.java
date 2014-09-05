@@ -35,4 +35,7 @@ public class MakabaPostInfo {
     
     @JsonProperty("op")
     public int op;
+    
+    @JsonProperty("icon")
+    public String icon;
 }

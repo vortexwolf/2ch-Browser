@@ -24,6 +24,7 @@
     <string name="tabs_bookmarks">Закладки</string>
     <string name="tabs_history">История</string>
     <string name="addpost_politics_prompt">Политические предпочтения</string>
+    <string name="addpost_politics_default">Полит. предпочтения (Нет)</string>
     <string name="share_via">Способ отправки</string>
     <string name="attach_youtube_hint">http://youtube.com/watch?v=code или просто код</string>
     <string name="attach_youtube_title">Добавить youtube видео</string>
