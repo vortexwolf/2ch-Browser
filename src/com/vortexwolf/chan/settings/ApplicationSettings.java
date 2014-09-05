@@ -188,10 +188,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }
     
-    public boolean useCatalog() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_catalog_key), false);
-    }
-    
     public boolean isDisplayZoomControls() {
         return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), true);
     }
@@ -201,10 +197,9 @@ public class ApplicationSettings {
         final String changeDomainMethodValue = this.mResources.getString(R.string.pref_video_preview_change_domain_value);
         final String downloadMethodValue = this.mResources.getString(R.string.pref_video_preview_download_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_video_preview_key), defaultMethodValue);
-        if (method.equals(defaultMethodValue)) return 0;
-        if (method.equals(changeDomainMethodValue)) return 1;
-        if (method.equals(downloadMethodValue)) return 2;
-        return -1;
+        if (method.equals(downloadMethodValue)) return Constants.VIDEO_PREVIEW_METHOD_DOWNLOAD;
+        if (method.equals(changeDomainMethodValue)) return Constants.VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN;
+        return Constants.VIDEO_PREVIEW_METHOD_DEFAULT;
     }
 
     public int getTheme() {

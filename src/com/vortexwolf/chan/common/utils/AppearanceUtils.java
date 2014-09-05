@@ -94,28 +94,31 @@ public class AppearanceUtils {
         return resizedBitmap;
     }
 
-    @SuppressLint("NewApi")
     public static void prepareWebView(WebView webView, int backgroundColor, boolean isDisplayZoomControls) {
         webView.setBackgroundColor(backgroundColor);
         webView.setInitialScale(100);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-        webView.setScrollbarFadingEnabled(true);
+        if (Constants.SDK_VERSION >= 5) {
+            CompatibilityUtilsImpl.setScrollbarFadingEnabled(webView, true);
+        }
 
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
         settings.setAllowFileAccess(true);
-        settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
-        settings.setLoadWithOverviewMode(true);
+        if (Constants.SDK_VERSION >= 7) {
+            CompatibilityUtilsImpl.setDefaultZoomFAR(settings);
+            CompatibilityUtilsImpl.setLoadWithOverviewMode(settings, true);
+        }
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         if (Constants.SDK_VERSION >= 8) {
-            settings.setBlockNetworkLoads(true);
+            CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
 
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
-            settings.setDisplayZoomControls(isDisplayZoomControls);
+            CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
         }
     }
     
@@ -136,11 +139,11 @@ public class AppearanceUtils {
             
             if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
             
-            MyLog.e(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
+            //MyLog.d(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
             double scaleX = (double)resolution.x / (double)imageSize.x;
             double scaleY = (double)resolution.y / (double)imageSize.y;
             scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
-            MyLog.e(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
+            //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
         } catch (Exception e) {
             MyLog.e(TAG, e);
         } finally {
@@ -158,14 +161,14 @@ public class AppearanceUtils {
     
     private static Point getResolution(View view) {
         View viewParent = (View) view.getParent();
+        //MyLog.d(TAG, "webView width: "+view.getWidth()+"; parent: "+viewParent.getWidth());
         return new Point(viewParent.getWidth(), viewParent.getHeight());
     }
     
-    @SuppressLint("NewApi")
     private static Point getDisplayResolution(Activity context) {
         Point mResolution = new Point();
         Display display = context.getWindowManager().getDefaultDisplay();
-        if (Constants.SDK_VERSION >= 11) display.getSize(mResolution);
+        if (Constants.SDK_VERSION >= 11) CompatibilityUtilsImpl.displayGetSize(display, mResolution);
         else mResolution.set(display.getWidth(), display.getHeight());
         return mResolution;
     }

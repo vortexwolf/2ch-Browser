@@ -58,7 +58,9 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         // HTTPS scheme registry
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        SSLSocketFactory ssf = SSLSocketFactory.getSocketFactory();
+        SSLSocketFactory ssf = Constants.SDK_VERSION < 10 ?
+                MySSLSocketFactory.getSocketFactory() :
+                    SSLSocketFactory.getSocketFactory();
         ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         schemeRegistry.register(new Scheme("https", ssf, 443));
 

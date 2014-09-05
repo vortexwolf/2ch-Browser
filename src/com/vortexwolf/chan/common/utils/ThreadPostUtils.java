@@ -143,7 +143,7 @@ public class ThreadPostUtils {
             boolean done = false;
             if (!UriUtils.isImageUri(uri)) {
                 switch (settings.getVideoPreviewMethod()) {
-                case 2:
+                case Constants.VIDEO_PREVIEW_METHOD_DOWNLOAD:
                     done = true;
                     new DownloadFileTask(context, uri, null, new DialogDownloadFileView(context){
                         @Override
@@ -160,17 +160,17 @@ public class ThreadPostUtils {
                         }
                     }, true).execute();
                     break;
-                case 1:
+                case Constants.VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN:
                     url = url.replace(settings.getDomainUri().toString(), "https://2ch.pm/");
                     break;
-                case 0:
+                case Constants.VIDEO_PREVIEW_METHOD_DEFAULT:
                     break;
                 }
             }
             if (!done) BrowserLauncher.launchInternalBrowser(context, url);
         }
     }
-
+    
     /** Отображение комбобокса с политическими взглядами */
     public static boolean isPoliticsBoard(String boardName) {
         boolean hasPoliticsView = boardName.equals("po");

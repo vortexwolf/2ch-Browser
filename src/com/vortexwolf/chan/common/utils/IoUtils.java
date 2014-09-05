@@ -212,13 +212,12 @@ public class IoUtils {
         return null;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getPath(final Context context, final Uri uri) {
         // DocumentProvider
         if (isKitKatDocument(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
+                final String docId = CompatibilityUtilsImpl.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -231,14 +230,14 @@ public class IoUtils {
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
-                final String id = DocumentsContract.getDocumentId(uri);
+                final String id = CompatibilityUtilsImpl.getDocumentId(uri);
                 final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
+                final String docId = CompatibilityUtilsImpl.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -275,13 +274,12 @@ public class IoUtils {
         return null;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static boolean isKitKatDocument(Context context, Uri uri) {
         if (Constants.SDK_VERSION < 19) {
             return false;
         }
         
-        return DocumentsContract.isDocumentUri(context, uri);
+        return CompatibilityUtilsImpl.isDocumentUri(context, uri);
     }
     
     public static boolean isExternalStorageDocument(Uri uri) {

@@ -3,7 +3,14 @@ package com.vortexwolf.chan.common.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.net.Uri;
+import android.provider.DocumentsContract;
+import android.view.Display;
 import android.view.ViewConfiguration;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 /**
@@ -13,6 +20,42 @@ import android.widget.TextView;
 @SuppressLint("NewApi")
 public class CompatibilityUtilsImpl {
 
+    public static boolean hasMultitouchSupport(PackageManager packageManager) {
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
+    }
+    
+    public static String getDocumentId(Uri uri) {
+        return DocumentsContract.getDocumentId(uri);
+    }
+    
+    public static boolean isDocumentUri(Context context, Uri uri) {
+        return DocumentsContract.isDocumentUri(context, uri);
+    }
+    
+    public static void displayGetSize(Display display, Point point) {
+        display.getSize(point);
+    }
+    
+    public static void setScrollbarFadingEnabled(WebView webView, boolean fadeScrollbars) {
+        webView.setScrollbarFadingEnabled(fadeScrollbars);
+    }
+    
+    public static void setDefaultZoomFAR(WebSettings settings) {
+        settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
+    }
+    
+    public static void setLoadWithOverviewMode(WebSettings settings, boolean overview) {
+        settings.setLoadWithOverviewMode(overview);
+    }
+    
+    public static void setBlockNetworkLoads(WebSettings settings, boolean flag) {
+        settings.setBlockNetworkLoads(flag);
+    }
+    
+    public static void setDisplayZoomControls(WebSettings settings, boolean enabled) {
+        settings.setDisplayZoomControls(enabled);
+    }
+    
     public static void setDisplayHomeAsUpEnabled(Activity activity) {
         activity.getActionBar().setDisplayHomeAsUpEnabled(true);
     }

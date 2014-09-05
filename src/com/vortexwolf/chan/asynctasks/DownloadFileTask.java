@@ -19,7 +19,7 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.exceptions.DownloadFileException;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.ICancelled;
-import com.vortexwolf.chan.interfaces.ICloudflareListener;
+import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
 import com.vortexwolf.chan.services.CloudflareCheckService;
@@ -115,11 +115,12 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
         } else {
             if (this.mUserError.equals("503")) {
                 String url = DownloadFileTask.this.mFrom.toString();
-                new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareListener(){
-                    public void timeout() {
+                new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareCheckListener(){
+                    public void onTimeout() {
                         DownloadFileTask.this.mProgressView.hideLoading();
+                        DownloadFileTask.this.mProgressView.showError(mResources.getString(R.string.error_cloudflare_check_timeout));
                     }
-                    public void success() {
+                    public void onSuccess() {
                         if (DownloadFileTask.this.retry)
                             new DownloadFileTask(
                                 DownloadFileTask.this.mContext,
@@ -127,6 +128,9 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
                                 null,
                                 DownloadFileTask.this.mProgressView,
                                 true).execute();
+                    }
+                    public void onStart() {
+                        DownloadFileTask.this.mProgressView.showError(mResources.getString(R.string.notification_cloudflare_check_started));
                     }
                 }).start();
             } else {

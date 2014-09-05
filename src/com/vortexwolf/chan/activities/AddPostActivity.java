@@ -41,7 +41,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
-import com.vortexwolf.chan.interfaces.ICloudflareListener;
+import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IPostSendView;
@@ -340,10 +340,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         
         if (error.startsWith("503")) {
             String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
-            new CloudflareCheckService(url, this, new ICloudflareListener() {
-                public void timeout() {}
-                public void success() {
+            new CloudflareCheckService(url, this, new ICloudflareCheckListener() {
+                public void onSuccess() {
                     refreshCaptcha();
+                    AppearanceUtils.showToastMessage(AddPostActivity.this, getString(R.string.notification_cloudflare_check_finished));
+                }
+                public void onStart() {
+                    AppearanceUtils.showToastMessage(AddPostActivity.this, getString(R.string.notification_cloudflare_check_started));
+                }
+                public void onTimeout() {
+                    AppearanceUtils.showToastMessage(AddPostActivity.this, getString(R.string.error_cloudflare_check_timeout));
                 }
             }).start();
         }
@@ -491,7 +497,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         return true;
     }
 
-    @SuppressLint("NewApi")
+    //@SuppressLint("NewApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {

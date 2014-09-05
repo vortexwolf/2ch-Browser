@@ -26,11 +26,6 @@
         android:singleLine="true"
         android:summary="@string/pref_homepage_summary"
         android:title="@string/pref_homepage" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/pref_use_catalog_key"
-        android:summary="@string/pref_use_catalog_summary"
-        android:title="@string/pref_use_catalog" />
     <EditTextPreference
         android:hint="@string/pref_domain_hint"
         android:inputType="textUri"

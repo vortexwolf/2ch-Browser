@@ -35,7 +35,7 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.IBitmapManager;
-import com.vortexwolf.chan.interfaces.ICloudflareListener;
+import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
@@ -93,9 +93,7 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mBoardName = mDvachUriParser.getBoardName(data);
             this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
         }
-        
-        if (this.mSettings.useCatalog()) mPageNumber = -1;
-        
+
         if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
             this.mJsonReader = Factory.resolve(MakabaApiReader.class);
         } else {
@@ -108,7 +106,9 @@ public class ThreadsListActivity extends BaseListActivity {
         // Заголовок страницы
         String pageTitle = this.mPageNumber > 0
                 ? String.format(this.getString(R.string.data_board_title_with_page), this.mBoardName, this.mPageNumber)
-                : String.format(this.getString(R.string.data_board_title), this.mBoardName);
+                : this.mPageNumber == 0
+                ? String.format(this.getString(R.string.data_board_title), this.mBoardName)
+                : String.format(this.getString(R.string.data_board_title_catalog), this.mBoardName);
         this.setTitle(pageTitle);
 
         // Сохраняем во вкладках
@@ -174,7 +174,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar() ? View.VISIBLE : View.GONE);
 
         TextView pageNumberView = (TextView) this.findViewById(R.id.threads_page_number);
-        pageNumberView.setText(this.mPageNumber == -1 ? "" : String.valueOf(this.mPageNumber));
+        pageNumberView.setText(this.mPageNumber == -1 ? this.getString(R.string.menu_catalog) : String.valueOf(this.mPageNumber));
 
         ImageButton nextButton = (ImageButton) this.findViewById(R.id.threads_next_page);
         ImageButton prevButton = (ImageButton) this.findViewById(R.id.threads_prev_page);
@@ -281,6 +281,9 @@ public class ThreadsListActivity extends BaseListActivity {
                 break;
             case R.id.menu_search_id:
                 this.onSearchRequested();
+                break;
+            case R.id.menu_catalog_id:
+                this.navigateToBoardPageNumber(this.mBoardName, -1);
                 break;
         }
 
@@ -396,25 +399,10 @@ public class ThreadsListActivity extends BaseListActivity {
     private void navigateToBoardPageNumber(String boardCode, int pageNumber) {
         Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
         i.setData(this.mDvachUriBuilder.createBoardUri(boardCode, pageNumber));
-
         this.startActivity(i);
     }
 
     protected void refresh() {
-        if (this.mSettings.useCatalog()) {
-            if (mPageNumber != -1) {
-                mPageNumber = -1;
-                this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
-                resetUI();
-            }
-        } else {
-            if (mPageNumber == -1) {
-                mPageNumber = 0;
-                this.setTitle(String.format(this.getString(R.string.data_board_title), this.mBoardName));
-                resetUI();
-            }
-        }
-            
         this.refreshThreads(false);
     }
 
@@ -486,12 +474,17 @@ public class ThreadsListActivity extends BaseListActivity {
             if (error != null && error.startsWith("503")) {
                 String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
                 if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
-                new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareListener(){
-                    public void timeout() {}
-                    public void success() {
+                new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareCheckListener(){
+                    public void onSuccess() {
                         refresh();
                     }
-                }, this).start();
+                    public void onStart() {
+                        showError(getString(R.string.notification_cloudflare_check_started));
+                    }
+                    public void onTimeout() {
+                        showError(getString(R.string.error_cloudflare_check_timeout));
+                    }
+                }).start();
             }
         }
         
