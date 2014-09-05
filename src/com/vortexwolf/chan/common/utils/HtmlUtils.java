@@ -22,6 +22,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyHtml;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.library.UnknownTagsHandler;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 

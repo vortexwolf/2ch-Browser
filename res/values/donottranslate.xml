@@ -58,38 +58,6 @@
         <item>@string/pref_theme_photon_value</item>
     </string-array>
 
-    <string-array name="addpost_politics" translatable="false">
-        <item>Полит. предпочтения (Нет)</item>
-        <item>Коммунизм</item>
-        <item>Социализм</item>
-        <item>Либерализм</item>
-        <item>Монархизм</item>
-        <item>Консерватизм</item>
-        <item>Либертарианство</item>
-        <item>Анархизм</item>
-        <item>Аноним</item>
-        <item>Оппозиция</item>
-        <item>Власть</item>
-        <item>Национализм</item>
-        <item>Кургинян</item>
-        <item>Исламизм</item>
-        <item>Сионизм</item>
-        <item>Технократия</item>
-        <item>Христианство</item>
-        <item>Украина</item>
-        <item>Свобода</item>
-        <item>Беларусь</item>
-        <item>ЛГБТ</item>
-        <item>Nya</item>
-        <item>Госдеп</item>
-        <item>YARRR!!!</item>
-        <item>Родноверы</item>
-        <item>Соцдем</item>
-        <item>Крым</item>
-        <item>Rebel</item>
-        <item>ДНР</item>
-        <item>ISIS</item>
-    </string-array>
     <string-array name="pickboard_boards">
         <item>Тематика</item>
         <item>au; автомобили и транспорт; 0</item>

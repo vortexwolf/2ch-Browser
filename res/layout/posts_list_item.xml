@@ -63,6 +63,16 @@
             android:text="SAGE"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?postSageForeground" />
+        
+        <TextView
+            android:id="@+id/post_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_marginRight="4dip"
+            android:layout_toRightOf="@id/post_sage"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/post_trip"
@@ -70,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_sage"
+            android:layout_toRightOf="@id/post_icon"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="!7qYk/yEq0Y"

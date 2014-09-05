@@ -7,12 +7,16 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 
+import android.content.res.Resources;
+
+import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsListCatalog;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
@@ -22,6 +26,7 @@ import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
+import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.JsonReader;
 
@@ -53,8 +58,22 @@ public class MakabaApiReader implements IJsonApiReader {
             return null;
         }
         
+        setIcons(result, boardName);
+        
         ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
         return models;
+    }
+    
+    private void setIcons(MakabaThreadsList source, String boardName) {
+        try {
+            if (source.enable_icons == 1) {
+                String[] icons = new String[source.icons.length + 1];
+                icons[0] = Factory.resolve(Resources.class).getString(R.string.addpost_politics_default);
+                for (int i = 0; i < source.icons.length; ++i)
+                    icons[source.icons[i].num] = source.icons[i].name;
+                Factory.resolve(IconsList.class).setData(boardName, icons);
+            } else Factory.resolve(IconsList.class).setData(boardName, null);
+        } catch (Exception e) { MyLog.e(TAG, e); }
     }
     
     private ThreadModel[] readCatalog(String boardName, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {

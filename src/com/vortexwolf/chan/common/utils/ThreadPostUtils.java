@@ -171,13 +171,6 @@ public class ThreadPostUtils {
         }
     }
     
-    /** Отображение комбобокса с политическими взглядами */
-    public static boolean isPoliticsBoard(String boardName) {
-        boolean hasPoliticsView = boardName.equals("po");
-
-        return hasPoliticsView;
-    }
-
     /** Будет отображать другим цветом посты после бамплимита */
     public static int getBumpLimitNumber(String boardName) {
         if (boardName.equals("vg")) {

@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -57,6 +58,7 @@ import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
+import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
 import com.vortexwolf.chan.services.http.HttpStringReader;
@@ -97,6 +99,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private Button mSendButton;
     private EditText mSubjectView;
     private Spinner mPoliticsView;
+    private boolean isPoliticsBoard = false;
 
     // Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить
     // (после успешной отправки)
@@ -209,9 +212,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         final ImageButton refreshCaptchaButton = (ImageButton) this.findViewById(R.id.addpost_refresh_button);
         final LinearLayout textFormatView = (LinearLayout) this.findViewById(R.id.addpost_textformat_view);
 
-        if (ThreadPostUtils.isPoliticsBoard(this.mBoardName)) {
-            this.mPoliticsView.setVisibility(View.VISIBLE);
-        }
+        try {
+            if (Factory.resolve(IconsList.class).getData(mBoardName) != null) {
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Factory.resolve(IconsList.class).getData(mBoardName));
+                this.mPoliticsView.setAdapter(adapter);
+                this.mPoliticsView.setVisibility(View.VISIBLE);
+                isPoliticsBoard = true;
+            }
+        } catch (Exception e) { MyLog.e(TAG, e); }
 
         View.OnClickListener formatButtonListener = new View.OnClickListener() {
             @Override
@@ -293,10 +301,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         String subject = StringUtils.nullIfEmpty(this.mSubjectView.getText().toString());
 
         String politics = null;
-        if (ThreadPostUtils.isPoliticsBoard(this.mBoardName)) {
+        if (isPoliticsBoard) {
             int itemIndex = this.mPoliticsView.getSelectedItemPosition();
-            politics = Math.max(itemIndex - 1, -1) + ""; // the list starts from
-                                                         // -1
+            politics = Math.max(itemIndex, 0) + "";
         }
 
         String name = this.mSettings.getName();

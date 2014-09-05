@@ -31,7 +31,6 @@
             android:id="@+id/addpost_politics"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/addpost_politics"
             android:prompt="@string/addpost_politics_prompt"
             android:visibility="gone" />
 

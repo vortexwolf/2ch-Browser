@@ -23,6 +23,7 @@
     <string name="tabs_bookmarks">Favorites</string>
     <string name="tabs_history">History</string>
     <string name="addpost_politics_prompt">Political preferences</string>
+    <string name="addpost_politics_default">Polit. preferences (No)</string>
     <string name="share_via">Share via</string>
     <string name="attach_youtube_hint">http://youtube.com/watch?v=code or just a code</string>
     <string name="attach_youtube_title">Add youtube video</string>

@@ -80,6 +80,7 @@ public class MakabaModelsMapper {
         }
         model.setTimestamp(source.timestamp != 0 ? source.timestamp * 1000 : ThreadPostUtils.parseMoscowTextDate(source.date));
         model.setParentThread(source.parent);
+        model.setIcon(source.icon);
         
         return model;
     }
