@@ -64,7 +64,6 @@
     <string name="data_add_thread_title">/%1$s/ - Новый тред</string>
     <string name="data_add_post_title">/%1$s/%2$s - Новое сообщение</string>
     <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string>
-    <string name="data_add_post_video_attachment_name">Video %1$s</string>
 
     <!-- Menus -->
     <string name="menu_pick_board">Форумы</string>
@@ -82,7 +81,6 @@
     <string name="menu_share">Поделиться</string>
     <string name="menu_add_favorites">Добавить в закладки</string>
     <string name="menu_remove_favorites">Удалить из закладок</string>
-    <string name="menu_attach_youtube">Прикрепить YouTube видео</string>
     <string name="menu_add_board">Добавить форум</string>
     <string name="menu_search">Поиск</string>
     <string name="menu_catalog">Каталог</string>
@@ -140,8 +138,6 @@
     <string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
     <string name="pref_display_navigation_bar">Панель навигации</string>
     <string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
-    <string name="pref_youtube_mobile_links">YouTube-видео</string>
-    <string name="pref_youtube_mobile_links_summary">Открывать мобильный YouTube вместо обычного</string>
     <string name="pref_display_name">Имена</string>
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
     <string name="pref_text_size">Размер текста</string>
@@ -204,7 +200,6 @@
     <string name="error_image_cannot_be_attached">Выбранное изображение не может быть прикреплено.</string>
     <string name="error_image_search">Поиск в TinEye не работает.</string>
     <string name="error_download_no_space_sdcard">Не удалось сохранить файл, нет места в памяти устройства.</string>
-    <string name="error_incorrect_youtube_link">Неправильный формат ссылки на видео.</string>
     <string name="error_create_request">Невозможно выполнить запрос к странице.</string>
     <string name="error_read_response">Невозможно прочитать ответ сервера.</string>
     <string name="error_not_json">Невозможно использовать JSON API. Откройте страницу во внешнем браузере.</string>
@@ -212,11 +207,12 @@
     <string name="error_cloudflare_check_timeout">Timeout</string>
 
     <!-- Warnings -->
-    <string name="warning_enter_captcha">Введите код подтверждения</string>
-    <string name="warning_write_comment">Напишите что-нибудь в сообщении</string>
-    <string name="warning_enter_board">Введите корректный код форума</string>
-    <string name="warning_attach_file_new_thread">Прикрепите файл для создания нового треда</string>
-
+    <string name="warning_enter_captcha">Введите код подтверждения.</string>
+    <string name="warning_write_comment">Напишите что-нибудь в сообщении.</string>
+    <string name="warning_enter_board">Введите корректный код форума.</string>
+    <string name="warning_attach_file_new_thread">Прикрепите файл для создания нового треда.</string>
+    <string name="warning_maximum_attachments">Невозможно прикрепить больше файлов.</string>
+    
     <!-- Notifications -->
     <string name="notification_send_post_success">Сообщение успешно отправлено</string>
     <string name="notification_no_new_posts">Нет новых сообщений</string>

@@ -128,11 +128,6 @@
             android:summary="@string/pref_display_navigation_bar_summary"
             android:title="@string/pref_display_navigation_bar" />
         <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/pref_youtube_mobile_links_key"
-            android:summary="@string/pref_youtube_mobile_links_summary"
-            android:title="@string/pref_youtube_mobile_links" />
-        <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_display_name_key"
             android:summary="@string/pref_display_name_summary"

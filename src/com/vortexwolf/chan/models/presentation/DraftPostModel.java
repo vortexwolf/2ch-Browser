@@ -1,12 +1,14 @@
 package com.vortexwolf.chan.models.presentation;
 
+import java.util.List;
+
 import android.graphics.Bitmap;
 
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 
 public class DraftPostModel {
     private String mComment;
-    private ImageFileModel mAttachedFile;
+    private List<ImageFileModel> mAttachedFiles;
     private boolean mIsSage;
     private CaptchaViewType mCaptchaType;
     private CaptchaEntity mCaptcha;
@@ -14,9 +16,9 @@ public class DraftPostModel {
     private boolean mCaptchaPasscodeSuccess;
     private boolean mCaptchaPasscodeFail;
 
-    public DraftPostModel(String comment, ImageFileModel attachedFile, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, boolean isCaptchaPasscodeSuccess, boolean isCaptchaPasscodeFail) {
+    public DraftPostModel(String comment, List<ImageFileModel> attachedFiles, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, boolean isCaptchaPasscodeSuccess, boolean isCaptchaPasscodeFail) {
         this.mComment = comment;
-        this.mAttachedFile = attachedFile;
+        this.mAttachedFiles = attachedFiles;
         this.mIsSage = isSage;
         this.mCaptchaType = captchaType;
         this.mCaptcha = captcha;
@@ -29,8 +31,8 @@ public class DraftPostModel {
         return this.mComment;
     }
 
-    public ImageFileModel getAttachedFile() {
-        return this.mAttachedFile;
+    public List<ImageFileModel> getAttachedFiles() {
+        return this.mAttachedFiles;
     }
 
     public boolean isSage() {

@@ -22,10 +22,7 @@ public class AttachmentInfo {
     private final String mBoardName;
     private final String mThreadNumber;
     private final boolean mIsEmpty;
-    private final boolean mIsVideo;
     private final String mImageUrl;
-    private final String mVideoUrl;
-    private final String mVideoMobileUrl;
     private final String mThumbnailUrl;
     private final String mSourceExtension;
     private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
@@ -46,22 +43,16 @@ public class AttachmentInfo {
         SourceWithThumbnailModel urls = this.getUrls();
         if (urls != null) {
             this.mIsEmpty = false;
-            this.mIsVideo = urls.isVideo;
             this.mImageUrl = urls.imageUrl;
             this.mThumbnailUrl = urls.thumbnailUrl;
             this.mSourceExtension = this.mImageUrl != null
                     ? RegexUtils.getFileExtension(this.mImageUrl)
                     : null;
-            this.mVideoUrl = urls.videoUrl;
-            this.mVideoMobileUrl = urls.videoMobileUrl;
         } else {
             this.mIsEmpty = true;
-            this.mIsVideo = false;
             this.mImageUrl = null;
             this.mThumbnailUrl = null;
             this.mSourceExtension = null;
-            this.mVideoUrl = null;
-            this.mVideoMobileUrl = null;
         }
     }
     
@@ -70,13 +61,10 @@ public class AttachmentInfo {
     }
 
     public String getSourceUrl() {
-        if (this.mIsEmpty) {
-            return null;
-        } else if (this.mIsVideo) {
-            return this.mSettings.isYoutubeMobileLinks() ? this.mVideoMobileUrl : this.mVideoUrl;
-        } else {
+        if (!this.mIsEmpty && this.isImage()){
             return this.mImageUrl;
         }
+        return null;
     }
 
     public String getImageUrlIfImage() {
@@ -128,8 +116,6 @@ public class AttachmentInfo {
             }else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
                 result += "\nwebm";
             }
-        } else if (this.mIsVideo) {
-            result = "YouTube";
         }
 
         return result;
@@ -153,25 +139,11 @@ public class AttachmentInfo {
             return model;
         }
 
-        // И видео
-        String videoHtml = this.mModel.getVideoHtml();
-        String videoCode = RegexUtils.getYouTubeCode(videoHtml);
-        if (!StringUtils.isEmpty(videoCode)) {
-            model.isVideo = true;
-            model.videoMobileUrl = UriUtils.formatYoutubeMobileUri(videoCode);
-            model.videoUrl = UriUtils.formatYoutubeUri(videoCode);
-            model.thumbnailUrl = UriUtils.formatYoutubeThumbnailUri(videoCode);
-            return model;
-        }
-
         return null;
     }
 
     private class SourceWithThumbnailModel {
-        public boolean isVideo = false;
         public String imageUrl;
-        public String videoUrl;
-        public String videoMobileUrl;
         public String thumbnailUrl;
     }
 }

@@ -1,29 +1,29 @@
 package com.vortexwolf.chan.models.domain;
 
 import java.io.File;
+import java.util.List;
 
 public class SendPostModel {
     private String mCaptchaKey;
     private String mCaptchaAnswer;
     private String mComment;
     private boolean mIsSage;
-    private File mAttachment;
+    private List<File> mAttachedFiles;
     private String mSubject;
     private String mPolitics;
     private String mName;
     private String mVideo;
     private String mParentThread;
 
-    public SendPostModel(String captchaKey, String captchaAnswer, String comment, boolean isSage, File attachment, String subject, String politics, String name, String video) {
+    public SendPostModel(String captchaKey, String captchaAnswer, String comment, boolean isSage, List<File> attachedFiles, String subject, String politics, String name) {
         this.mCaptchaKey = captchaKey;
         this.mCaptchaAnswer = captchaAnswer;
         this.mComment = comment;
         this.mIsSage = isSage;
-        this.mAttachment = attachment;
+        this.mAttachedFiles = attachedFiles;
         this.mSubject = subject;
         this.mPolitics = politics;
         this.mName = name;
-        this.mVideo = video;
     }
 
     public void setCaptchaKey(String captchaKey) {
@@ -58,12 +58,8 @@ public class SendPostModel {
         return this.mIsSage;
     }
 
-    public void setAttachment(File attachment) {
-        this.mAttachment = attachment;
-    }
-
-    public File getAttachment() {
-        return this.mAttachment;
+    public List<File> getAttachedFiles() {
+        return this.mAttachedFiles;
     }
 
     public void setSubject(String subject) {
@@ -88,14 +84,6 @@ public class SendPostModel {
 
     public void setName(String name) {
         this.mName = name;
-    }
-
-    public String getVideo() {
-        return this.mVideo;
-    }
-
-    public void setVideo(String video) {
-        this.mVideo = video;
     }
 
     public String getParentThread() {

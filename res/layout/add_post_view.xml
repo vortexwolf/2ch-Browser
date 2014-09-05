@@ -35,49 +35,31 @@
             android:prompt="@string/addpost_politics_prompt"
             android:visibility="gone" />
 
-        <LinearLayout
-            android:id="@+id/addpost_attachment_view"
+        <include
+            android:id="@+id/addpost_attachment_view_1"
+            layout="@layout/add_post_attachment_view"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone" >
-
-            <ImageView
-                android:layout_width="32dip"
-                android:layout_height="32dip"
-                android:layout_gravity="center_vertical"
-                android:paddingLeft="5dip"
-                android:src="@drawable/ic_email_attachment" />
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:orientation="vertical"
-                android:paddingLeft="5dip" >
-
-                <TextView
-                    android:id="@+id/addpost_attachment_name"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceMedium" />
-
-                <TextView
-                    android:id="@+id/addpost_attachment_size"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceMedium" />
-            </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/addpost_attachment_remove"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:background="@null"
-                android:src="@android:drawable/btn_dialog" />
-        </LinearLayout>
-
+            android:visibility="gone" />
+        <include
+            android:id="@+id/addpost_attachment_view_2"
+            layout="@layout/add_post_attachment_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+        <include
+            android:id="@+id/addpost_attachment_view_3"
+            layout="@layout/add_post_attachment_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+        <include
+            android:id="@+id/addpost_attachment_view_4"
+            layout="@layout/add_post_attachment_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+        
         <LinearLayout
             android:id="@+id/addpost_textformat_view"
             android:layout_width="wrap_content"

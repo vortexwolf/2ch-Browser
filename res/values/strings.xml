@@ -56,7 +56,6 @@
     <string name="data_add_thread_title">/%1$s/ - Add new thread</string>
     <string name="data_add_post_title">/%1$s/%2$s - Add new post</string>
     <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string>
-    <string name="data_add_post_video_attachment_name">Video %1$s</string>
     <string name="data_search_posts_title">Search /%1$s/: %2$s</string>
 
     <!-- Menus -->
@@ -74,7 +73,6 @@
     <string name="menu_share">Share</string>
     <string name="menu_add_favorites">Add to favorites</string>
     <string name="menu_remove_favorites">Remove from favorites</string>
-    <string name="menu_attach_youtube">Attach YouTube video</string>
     <string name="menu_add_board">Add board</string>
     <string name="menu_search">Search</string>
     <string name="menu_catalog">Catalog</string>
@@ -130,8 +128,6 @@
     <string name="pref_convert_post_date_summary">Enable to display your local time instead of Moscow time</string>
     <string name="pref_display_navigation_bar">Navigation bar</string>
     <string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
-    <string name="pref_youtube_mobile_links">Video attachments</string>
-    <string name="pref_youtube_mobile_links_summary">Open YouTube mobile link instead of PC link</string>
     <string name="pref_popup_link">Popup links</string>
     <string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
     <string name="pref_display_name">Names</string>
@@ -196,7 +192,6 @@
     <string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
     <string name="error_image_search">The TinEye website doesn\'t work.</string>
     <string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
-    <string name="error_incorrect_youtube_link">Incorrect format of the link to the video.</string>
     <string name="error_create_request">Unable to make a request to the page.</string>
     <string name="error_read_response">Unable to read the response from the server.</string>
     <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
@@ -204,10 +199,11 @@
     <string name="error_cloudflare_check_timeout">Timeout</string>
 
     <!-- Warnings -->
-    <string name="warning_enter_captcha">Enter the confirmation code</string>
-    <string name="warning_write_comment">Write a comment</string>
-    <string name="warning_enter_board">Enter a valid board name</string>
-    <string name="warning_attach_file_new_thread">Attach a file to create a new thread</string>
+    <string name="warning_enter_captcha">Enter the confirmation code.</string>
+    <string name="warning_write_comment">Write a comment.</string>
+    <string name="warning_enter_board">Enter a valid board name.</string>
+    <string name="warning_attach_file_new_thread">Attach a file to create a new thread.</string>
+    <string name="warning_maximum_attachments">Cannot attach more files.</string>
 
     <!-- Notifications -->
     <string name="notification_send_post_success">The post was sent successfully</string>

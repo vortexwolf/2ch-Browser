@@ -191,6 +191,10 @@ public class ThreadPostUtils {
         return sWakabaBoards.indexOf(boardName) == -1;
     }
     
+    public static int getMaximumAttachments(String boardName) {
+        return ThreadPostUtils.isMakabaBoard(boardName) ? 4 : 1;
+    }
+    
     public static void refreshAttachmentView(boolean isBusy, AttachmentInfo attachment, ThumbnailViewBag thumbnailView) {
         if (attachment == null || attachment.isEmpty()) {
             thumbnailView.hide();

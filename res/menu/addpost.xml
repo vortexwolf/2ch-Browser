@@ -10,9 +10,5 @@
         android:icon="?iconPicture"
         android:showAsAction="ifRoom"
         android:title="@string/menu_gallery"/>
-    <item
-        android:id="@+id/menu_attach_youtube_id"
-        android:icon="@drawable/ic_menu_upload_you_tube"
-        android:title="@string/menu_attach_youtube"/>
 
 </menu>

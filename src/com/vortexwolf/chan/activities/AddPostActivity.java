@@ -1,6 +1,8 @@
 package com.vortexwolf.chan.activities;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -48,6 +50,7 @@ import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.models.presentation.AddAttachmentViewBag;
 import com.vortexwolf.chan.models.presentation.CaptchaViewType;
 import com.vortexwolf.chan.models.presentation.DraftPostModel;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
@@ -70,8 +73,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
     
-    private ImageFileModel mAttachedFile;
-    private String mAttachedVideo;
+    private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
     private String mBoardName;
     private String mThreadNumber;
@@ -90,7 +92,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private EditText mCaptchaAnswerView = null;
     private CheckBox mSageCheckBox;
     private EditText mCommentView;
-    private View mAttachmentView;
+    private AddAttachmentViewBag[] mAttachmentViews = new AddAttachmentViewBag[4];
     private ProgressDialog mProgressDialog;
     private Button mSendButton;
     private EditText mSubjectView;
@@ -123,8 +125,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 commentBuilder.append(draft.getComment() + "\n");
             }
 
-            if (draft.getAttachedFile() != null) {
-                this.setAttachment(draft.getAttachedFile());
+            for (ImageFileModel file : draft.getAttachedFiles()) {
+                this.setAttachment(file);
             }
 
             this.mSageCheckBox.setChecked(draft.isSage());
@@ -176,7 +178,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     protected void onPause() {
         MyLog.v(TAG, "save state");
         if (!this.mFinishedSuccessfully) {
-            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.mAttachedFile, this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaPasscodeSuccess, this.mCaptchaPasscodeFail);
+            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.getAttachments(), this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaPasscodeSuccess, this.mCaptchaPasscodeFail);
 
             this.mDraftPostsStorage.saveDraft(this.mBoardName, this.mThreadNumber, draft);
         } else {
@@ -196,11 +198,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaAnswerView = (EditText) this.findViewById(R.id.addpost_captcha_input);
         this.mCommentView = (EditText) this.findViewById(R.id.addpost_comment_input);
         this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
-        this.mAttachmentView = this.findViewById(R.id.addpost_attachment_view);
+        this.mAttachmentViews[0] = AddAttachmentViewBag.fromView(this.findViewById(R.id.addpost_attachment_view_1));
+        this.mAttachmentViews[1] = AddAttachmentViewBag.fromView(this.findViewById(R.id.addpost_attachment_view_2));
+        this.mAttachmentViews[2] = AddAttachmentViewBag.fromView(this.findViewById(R.id.addpost_attachment_view_3));
+        this.mAttachmentViews[3] = AddAttachmentViewBag.fromView(this.findViewById(R.id.addpost_attachment_view_4));
         this.mSendButton = (Button) this.findViewById(R.id.addpost_send_button);
         this.mSubjectView = (EditText) this.findViewById(R.id.addpost_subject);
         this.mPoliticsView = (Spinner) this.findViewById(R.id.addpost_politics);
-        final ImageButton removeAttachmentButton = (ImageButton) this.findViewById(R.id.addpost_attachment_remove);
+
         final ImageButton refreshCaptchaButton = (ImageButton) this.findViewById(R.id.addpost_refresh_button);
         final LinearLayout textFormatView = (LinearLayout) this.findViewById(R.id.addpost_textformat_view);
 
@@ -249,12 +254,15 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             }
         });
         // Удаляем прикрепленный файл
-        removeAttachmentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddPostActivity.this.removeAttachment();
-            }
-        });
+        for (int i = 0; i < this.mAttachmentViews.length; i++) {
+            final int index = i;
+            this.mAttachmentViews[i].removeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AddPostActivity.this.removeAttachment(index);
+                }
+            });
+        }
         // Обновляем нажатие кнопки Refresh для капчи
         refreshCaptchaButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,15 +278,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         String comment = this.mCommentView.getText().toString();
 
-        if (StringUtils.isEmpty(comment) && this.mAttachedFile == null && this.mAttachedVideo == null) {
+        if (StringUtils.isEmpty(comment) && !this.hasAttachments()) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_write_comment));
             return;
         }
 
         boolean isSage = this.mSageCheckBox.isChecked();
 
-        File attachment = this.mAttachedFile != null ? this.mAttachedFile.file : null;
-        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && attachment == null && this.mAttachedVideo == null) {
+        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && !this.hasAttachments()) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }
@@ -294,7 +301,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         String name = this.mSettings.getName();
         String captchaKey = this.mCaptcha != null ? this.mCaptcha.getKey() : null;
-        SendPostModel pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, attachment, subject, politics, name, this.mAttachedVideo);
+        SendPostModel pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
         pe.setParentThread(this.mThreadNumber);
 
         // Отправляем
@@ -456,13 +463,23 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_attach_file_id:
+                if (this.getAttachments().size() >= ThreadPostUtils.getMaximumAttachments(this.mBoardName)) {
+                    AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
+                    break;
+                }
+                
                 Intent intent = new Intent(this, FilesListActivity.class);
-                intent.putExtra(FilesListActivity.EXTRA_CURRENT_FILE, this.mAttachedFile != null
-                        ? this.mAttachedFile.file.getAbsolutePath()
-                        : null);
+                if (this.hasAttachments()) {
+                    intent.putExtra(FilesListActivity.EXTRA_CURRENT_FILE, this.getAttachments().get(0).file.getAbsolutePath());
+                }
                 this.startActivityForResult(intent, Constants.REQUEST_CODE_FILE_LIST_ACTIVITY);
                 break;
             case R.id.menu_gallery_id:
+                if (this.getAttachments().size() >= ThreadPostUtils.getMaximumAttachments(this.mBoardName)) {
+                    AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
+                    break;
+                }
+                
                 if (Constants.SDK_VERSION < 19 || !mSettings.isKitKatFix()) {
                     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                     i.setType("image/*");
@@ -473,24 +490,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     i.setType("image/*");
                     this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 }
-                break;
-            case R.id.menu_attach_youtube_id:
-                final EditTextDialog dialog = new EditTextDialog(this);
-                dialog.setTitle(this.getString(R.string.attach_youtube_title));
-                dialog.setHint(this.getString(R.string.attach_youtube_hint));
-
-                dialog.setPositiveButtonListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        boolean success = AddPostActivity.this.setVideoAttachment(dialog.getText());
-                        // don't hide the dialog if there was an error, only if success
-                        if (success) {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-
-                dialog.show();
                 break;
         }
 
@@ -527,53 +526,46 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
     }
 
-    private boolean setVideoAttachment(String videoEditText) {
-        if (StringUtils.isEmpty(videoEditText)) {
-            AppearanceUtils.showToastMessage(this, this.getString(R.string.error_incorrect_youtube_link));
-            return false;
-        }
-
-        String code = null;
-        if (videoEditText.length() == Constants.YOUTUBE_CODE_LENGTH) {
-            code = videoEditText;
-        } else if (UriUtils.isYoutubeUri(Uri.parse(videoEditText))) {
-            code = RegexUtils.getYouTubeCode(videoEditText);
-        }
-
-        if (code != null) {
-            this.mAttachedVideo = UriUtils.formatYoutubeUri(code);
-            this.mAttachedFile = null;
-            this.displayAttachmentView(this.getString(R.string.data_add_post_video_attachment_name, code), "youtube.com");
-            return true;
-        } else {
-            AppearanceUtils.showToastMessage(this, this.getString(R.string.error_incorrect_youtube_link));
-            return false;
-        }
-    }
-
     private void setAttachment(ImageFileModel fileModel) {
-        this.mAttachedFile = fileModel;
-        this.mAttachedVideo = null;
-
-        String infoFormat = this.getResources().getString(R.string.data_add_post_attachment_info);
-        String info = String.format(infoFormat, fileModel.getFileSize(), fileModel.imageWidth, fileModel.imageHeight);
-        this.displayAttachmentView(fileModel.file.getName(), info);
+        int index = 0;
+        for (int i = 0; i < this.mAttachedFiles.length; i++) {
+            if (this.mAttachedFiles[i] == null) {
+                index = i;
+                break;
+            }
+        }
+        
+        this.mAttachedFiles[index] = fileModel;
+        this.mAttachmentViews[index].show(fileModel, this.getResources());
     }
 
-    private void displayAttachmentView(String name, String info) {
-        this.mAttachmentView.setVisibility(View.VISIBLE);
-        TextView fileNameView = (TextView) this.findViewById(R.id.addpost_attachment_name);
-        TextView fileSizeView = (TextView) this.findViewById(R.id.addpost_attachment_size);
-
-        fileNameView.setText(name);
-        fileSizeView.setText(info);
+    private void removeAttachment(int index) {
+        this.mAttachedFiles[index] = null;
+        this.mAttachmentViews[index].hide();
     }
-
-    private void removeAttachment() {
-        this.mAttachedFile = null;
-        this.mAttachedVideo = null;
-
-        this.mAttachmentView.setVisibility(View.GONE);
+    
+    private boolean hasAttachments() {
+        return this.getAttachments().size() > 0;
+    }
+    
+    private List<ImageFileModel> getAttachments() {
+        ArrayList<ImageFileModel> attachments = new ArrayList<ImageFileModel>(4);
+        for (ImageFileModel file : this.mAttachedFiles) {
+            if (file != null) {
+                attachments.add(file);
+            }
+        }
+        
+        return attachments;
+    }
+    
+    private List<File> getAttachedFiles() {
+        ArrayList<File> files = new ArrayList<File>(4);
+        for (ImageFileModel file : this.getAttachments()) {
+            files.add(file.file);
+        }
+        
+        return files;
     }
 
     private void refreshCaptcha() {
