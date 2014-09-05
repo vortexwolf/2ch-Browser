@@ -68,7 +68,6 @@ public class DvachModelsMapper {
     public AttachmentModel mapAttachmentModel(DvachPostInfo source) {
         AttachmentModel model = new AttachmentModel();
         model.setThumbnailUrl(source.thumbnail);
-        model.setVideoHtml(source.video);
         model.setPath(source.image);
         model.setImageSize(source.size);
         model.setImageWidth(source.width);

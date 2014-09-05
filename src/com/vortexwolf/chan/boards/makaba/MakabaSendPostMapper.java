@@ -1,7 +1,9 @@
 package com.vortexwolf.chan.boards.makaba;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
@@ -25,7 +27,7 @@ public class MakabaSendPostMapper {
     private static final String SUBJECT = "subject";
     private static final String CAPTCHA_KEY = "captcha";
     private static final String CAPTCHA_ANSWER = "captcha_value_id_06";
-    private static final String FILE = "image1"; 
+    private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" }; 
     
     public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model, HashMap<String, String> customValues) {         
         MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
@@ -46,8 +48,9 @@ public class MakabaSendPostMapper {
         this.addStringValue(multipartEntity, NAME, model.getName());
         this.addStringValue(multipartEntity, EMAIL, model.isSage() ? Constants.SAGE_EMAIL : null);
         
-        if (model.getAttachment() != null) {
-            multipartEntity.addPart(FILE, new FileBody(model.getAttachment()));
+        List<File> files = model.getAttachedFiles();
+        for (int i = 0; i < files.size(); i++) {
+            multipartEntity.addPart(IMAGES[i], new FileBody(files.get(i)));
         }
         
         // Only for /po and /test

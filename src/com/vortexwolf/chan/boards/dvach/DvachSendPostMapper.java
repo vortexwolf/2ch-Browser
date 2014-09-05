@@ -1,8 +1,10 @@
 package com.vortexwolf.chan.boards.dvach;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
@@ -24,8 +26,7 @@ public class DvachSendPostMapper {
     private static final String PARENT = "parent";
     private static final String CAPTCHA_KEY = "captcha";
     private static final String CAPTCHA_ANSWER = "captcha_value_id_06";
-    private static final String FILE = "file";    
-    private static final String VIDEO = "video";  
+    private static final String FILE = "file";
     
     public HttpEntity mapModelToHttpEntity(SendPostModel model, HashMap<String, String> customValues) {       
         MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
@@ -40,13 +41,13 @@ public class DvachSendPostMapper {
         this.addStringValue(multipartEntity, COMMENT, StringUtils.emptyIfNull(model.getComment()));
         this.addStringValue(multipartEntity, CAPTCHA_KEY, model.getCaptchaKey());
         this.addStringValue(multipartEntity, CAPTCHA_ANSWER, model.getCaptchaAnswer());
-        this.addStringValue(multipartEntity, VIDEO, model.getVideo());
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());
         this.addStringValue(multipartEntity, NAME, model.getName());
         this.addStringValue(multipartEntity, EMAIL, model.isSage() ? Constants.SAGE_EMAIL : null);
         
-        if (model.getAttachment() != null) {
-            multipartEntity.addPart(FILE, new FileBody(model.getAttachment()));
+        List<File> files = model.getAttachedFiles();
+        if (files.size() > 0) {
+            multipartEntity.addPart(FILE, new FileBody(files.get(0)));
         }
         
         // Only for /po and /test

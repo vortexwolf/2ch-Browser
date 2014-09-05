@@ -160,10 +160,6 @@ public class ApplicationSettings {
         return this.mSettings.getInt(this.mResources.getString(R.string.pref_auto_refresh_interval_key), 60);
     }
 
-    public boolean isYoutubeMobileLinks() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_youtube_mobile_links_key), false);
-    }
-
     public boolean isDisplayNames() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_name_key), true);
     }

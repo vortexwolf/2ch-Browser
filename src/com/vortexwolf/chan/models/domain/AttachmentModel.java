@@ -6,7 +6,6 @@ public class AttachmentModel implements Serializable {
     private static final long serialVersionUID = 2679952635069517972L;
     
     private String thumbnailUrl;
-    private String videoHtml;
     private String path;
     private int imageSize;
     private int imageWidth;
@@ -17,12 +16,6 @@ public class AttachmentModel implements Serializable {
     }
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
-    }
-    public String getVideoHtml() {
-        return videoHtml;
-    }
-    public void setVideoHtml(String videoHtml) {
-        this.videoHtml = videoHtml;
     }
     public String getPath() {
         return path;

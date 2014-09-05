@@ -128,14 +128,8 @@ public class AppearanceUtils {
             Point imageSize = getImageSize(file);
             Point resolution = getResolution(webView);
             if (resolution.equals(0, 0)) {
-                Point displayResolution = getDisplayResolution(context);
-                if (AppearanceUtils.resolution.x == displayResolution.x || displayResolution.equals(0, 0)) {
-                    resolution = AppearanceUtils.resolution;
-                } else {
-                    resolution = displayResolution;
-                    AppearanceUtils.resolution = resolution;
-                }
-            } else AppearanceUtils.resolution = resolution;
+                resolution = getDisplayResolution(context);
+            }
             
             if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
             
@@ -143,6 +137,7 @@ public class AppearanceUtils {
             double scaleX = (double)resolution.x / (double)imageSize.x;
             double scaleY = (double)resolution.y / (double)imageSize.y;
             scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
+            scale = Math.max(scale, 1);
             //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
         } catch (Exception e) {
             MyLog.e(TAG, e);
