@@ -124,11 +124,6 @@
             android:title="@string/pref_popup_link" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="@string/pref_display_navigation_bar_key"
-            android:summary="@string/pref_display_navigation_bar_summary"
-            android:title="@string/pref_display_navigation_bar" />
-        <CheckBoxPreference
-            android:defaultValue="true"
             android:key="@string/pref_display_name_key"
             android:summary="@string/pref_display_name_summary"
             android:title="@string/pref_display_name" />

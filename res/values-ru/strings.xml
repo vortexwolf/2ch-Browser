@@ -59,7 +59,7 @@
     <string name="data_file_size_measure">Кб</string>
     <string name="data_board_title">/%1$s/</string>
     <string name="data_board_title_with_page">/%1$s/%2$s</string>
-    <string name="data_board_title_with_catalog">/%1$s/ - Каталог</string>
+    <string name="data_board_title_catalog">/%1$s/ - каталог</string>
     <string name="data_thread_title">/%1$s/%2$s</string>
     <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string>
     <string name="data_add_thread_title">/%1$s/ - Новый тред</string>
@@ -137,8 +137,6 @@
     <string name="pref_convert_post_date_summary">Отображать локальное время вместо московского</string>
     <string name="pref_popup_link">Ссылки во всплывающих окнах</string>
     <string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
-    <string name="pref_display_navigation_bar">Панель навигации</string>
-    <string name="pref_display_navigation_bar_summary">Включите для отображения панели навигации внизу страницы</string>
     <string name="pref_display_name">Имена</string>
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
     <string name="pref_text_size">Размер текста</string>
@@ -225,4 +223,12 @@
     <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите...</string>
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
 
+    <string-array name="catalog_filters">
+		<item>Сортировка по Бампам</item>
+		<item>Сортировка по Последнему ответу</item>
+		<item>Сортировка по Времени создания</item>
+		<item>Сортировка по Размеру изображения</item>
+	</string-array>
+    
+    
 </resources>

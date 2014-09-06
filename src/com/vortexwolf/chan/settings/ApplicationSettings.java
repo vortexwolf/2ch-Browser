@@ -148,10 +148,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_popup_link_key), true);
     }
 
-    public boolean isDisplayNavigationBar() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_navigation_bar_key), true);
-    }
-
     public boolean isAutoRefresh() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_auto_refresh_key), false);
     }

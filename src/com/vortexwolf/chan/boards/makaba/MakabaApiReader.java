@@ -46,7 +46,7 @@ public class MakabaApiReader implements IJsonApiReader {
     
     @Override
     public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        if (page == -1) return readCatalog(boardName, checkModified, listener, task);
+        if (page < 0) return readCatalog(boardName, page, checkModified, listener, task);
         String uri = this.formatThreadsUri(boardName, page);
 
         if (checkModified == false) {
@@ -76,9 +76,8 @@ public class MakabaApiReader implements IJsonApiReader {
         } catch (Exception e) { MyLog.e(TAG, e); }
     }
     
-    private ThreadModel[] readCatalog(String boardName, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String path = String.format("/makaba/makaba.fcgi?task=catalog&board=%s&json=1", boardName);
-        String uri = this.mDvachUriBuilder.createUri(path).toString();
+    private ThreadModel[] readCatalog(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        String uri = mDvachUriBuilder.createBoardUri(boardName, page).toString() + "&json=1";
         
         if (checkModified == false) {
             this.mHttpStreamReader.removeIfModifiedForUri(uri);

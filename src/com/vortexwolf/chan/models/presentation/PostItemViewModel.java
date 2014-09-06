@@ -150,8 +150,15 @@ public class PostItemViewModel {
         return this.mModel.getNumber();
     }
     
-    public String getIcon() {
-        return this.mModel.getIcon();
+    public String getIconUrl() {
+        try {
+            String iconHtml = this.mModel.getIcon();
+            String icon = iconHtml.substring(iconHtml.indexOf("src") + 5);
+            icon = icon.substring(0, icon.indexOf("\""));
+            return Factory.getContainer().resolve(DvachUriBuilder.class).createUri(icon).toString();
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public BadgeModel getBadge() {

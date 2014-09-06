@@ -6,7 +6,6 @@
     <string name="pref_download_path_key">pref_download_path_key</string>
     <string name="pref_name_key">pref_name_key</string>
     <string name="pref_display_post_date_key">pref_display_post_date_key</string>
-    <string name="pref_display_navigation_bar_key">pref_display_navigation_bar_key</string>
     <string name="pref_popup_link_key">pref_popup_link_key</string>
     <string name="pref_text_size_key">pref_text_size_key</string>
     <string name="pref_text_size_default_value">TEXT_SIZE_MEDIUM</string>
@@ -66,7 +65,7 @@
         <item>bo; книги; 1</item>
         <item>br; барахолка; 0</item>
         <item>c; комиксы и мультфильмы; 0</item>
-        <item>di; столовая; 1</item>
+        <item>cul; культура; 0</item>
         <item>em; другие страны и туризм; 0</item>
         <item>ew; конец света; 0</item>
         <item>fa; мода и стиль; 0</item>
@@ -74,41 +73,33 @@
         <item>fl; иностранные языки; 1</item>
         <item>fs; фэнтези; 0</item>
         <item>ftb; футбол; 1</item>
-        <item>gd; gamedev; 0</item>
-        <item>hh; хип-хоп культура; 0</item>
+        <item>hh; hip-hop; 0</item>
         <item>hi; история; 1</item>
-        <item>hw; железо; 0</item>
         <item>me; медицина; 0</item>
         <item>mg; магия; 0</item>
         <item>mlp; my little pony; 1</item>
-        <item>mobi; мобильные устройства; 0</item>
-        <item>mov; фильмы; 1</item>
         <item>mo; мотоциклы; 0</item>
+        <item>mov; фильмы; 1</item>
         <item>mu; музыка; 1</item>
         <item>ne; животные и природа; 1</item>
-        <item>pvc; коллекционные фигурки; 0</item>
+        <item>pvc; фигурки; 0</item>
+        <item>ph; философия; 0</item>
         <item>po; политика и новости; 0</item>
-        <item>pr; программирование; 0</item>
         <item>psy; психология; 1</item>
-        <item>ra; радиотехника; 0</item>
-        <item>re; религия и философия; 0</item>
-        <item>s; программы; 0</item>
+        <item>re; религия; 0</item>
         <item>sf; научная фантастика; 1</item>
         <item>sci; наука; 0</item>
         <item>sn; паранормальные явления; 0</item>
         <item>sp; спорт; 1</item>
-        <item>spc; космос; 0</item>
-        <item>t; техника; 0</item>
+        <item>spc; космос и астрономия ; 0</item>
         <item>tr; транспорт и авиация; 0</item>
-        <item>trv; путешествия; 1</item>
-        <item>tv; тв; 1</item>
+        <item>tv; тв и кино; 1</item>
         <item>un; образование; 0</item>
-        <item>web; веб-мастера; 0</item>
+        <item>w; оружие; 1</item>
         <item>wh; warhammer; 1</item>
         <item>wm; военная техника; 0</item>
-        <item>w; оружие; 1</item>
-        <item>wrk; работа и карьера; 0</item>
         <item>Творчество</item>
+        <item>di; столовая; 1</item>
         <item>de; дизайн; 0</item>
         <item>diy; хобби; 1</item>
         <item>dom; домострой; 1</item>
@@ -116,10 +107,24 @@
         <item>izd; издательство; 0</item>
         <item>mus; музыканты; 1</item>
         <item>o; мазня; 1</item>
+        <item>out; активный отдых; 0</item>
         <item>pa; живопись; 1</item>
         <item>p; фото; 0</item>
         <item>td; трёхмерная графика; 0</item>
         <item>wp; обои и высокое разрешение; 0</item>
+        <item>wrk; работа и карьера; 0</item>
+        <item>td; трёхмерная графика; 0</item>
+        <item>trv; путешествия; 1</item>
+        <item>Техника и софт</item>
+        <item>cc; криптовалюта; 0</item>
+        <item>gd; gamedev; 0</item>
+        <item>hw; железо; 0</item>
+        <item>mobi; мобильные устройства; 0</item>
+        <item>pr; программирование; 0</item>
+        <item>ra; радиотехника; 0</item>
+        <item>s; программы; 0</item>
+        <item>t; техника; 0</item>
+        <item>web; веб-мастера; 0</item>
         <item>Игры</item>
         <item>bg; настольные игры; 0</item>
         <item>cg; консоли; 1</item>
@@ -127,9 +132,9 @@
         <item>mc; minecraft; 0</item>
         <item>mmo; MMO; 0</item>
         <item>moba; MOBA; 0</item>
+        <item>tes; the elder scrolls; 0</item>
         <item>vg; видеоигры; 1</item>
         <item>wr; текстовые ролевые игры; 0</item>
-        <item>tes; the elder scrolls; 0</item>
     </string-array>
     <string-array name="pickboard_boards_hidden">
         <item>Японская культура</item>
@@ -142,12 +147,14 @@
         <item>to; touhou</item>
         <item>vn; визуальные новеллы</item>
         <item>Разное</item>
-        <item>b; бред</item>
         <item>d; обсуждение двача</item>
+        <item>b; бред</item>
         <item>soc; общение</item>
+        <item>media; анимация</item>
         <item>r; просьбы</item>
-        <item>gif; анимированные GIF</item>
+        <item>abu; здесь живет абу</item>
         <item>int; international</item>
+        <item>old; олдфаги</item>
     </string-array>
     
 
