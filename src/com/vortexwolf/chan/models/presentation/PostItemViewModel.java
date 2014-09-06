@@ -29,6 +29,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class PostItemViewModel {
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
     private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?title=\"(.+?)\".+?/>");
+    private static final Pattern sFlagPattern = Pattern.compile("<img.+?src=\"(.+?)\".+?/>");
 
     private final String mBoardName;
     private final String mThreadNumber;
@@ -92,6 +93,15 @@ public class PostItemViewModel {
             model.title = m.group(2);
             return model;
         }
+        
+        m = sFlagPattern.matcher(this.mName);
+        if (m.find() && m.groupCount() > 0) {
+            this.mName = this.mName.replace(m.group(0), "");
+
+            BadgeModel model = new BadgeModel();
+            model.source = m.group(1);
+            return model;
+        }
 
         return null;
     }
@@ -150,17 +160,6 @@ public class PostItemViewModel {
         return this.mModel.getNumber();
     }
     
-    public String getIconUrl() {
-        try {
-            String iconHtml = this.mModel.getIcon();
-            String icon = iconHtml.substring(iconHtml.indexOf("src") + 5);
-            icon = icon.substring(0, icon.indexOf("\""));
-            return Factory.getContainer().resolve(DvachUriBuilder.class).createUri(icon).toString();
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-
     public BadgeModel getBadge() {
         return this.mBadge;
     }

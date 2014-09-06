@@ -70,7 +70,6 @@ public class PostItemViewBuilder {
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
             vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
-            vb.postIconView = (ImageView) view.findViewById(R.id.post_icon);
             vb.postOpView = (TextView) view.findViewById(R.id.post_op);
             vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
             vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
@@ -116,7 +115,6 @@ public class PostItemViewBuilder {
 
         // Имя, иконка, трип и тема поста
         String name = item.getName();
-        String icon = item.getIconUrl();
         String trip = item.getTrip();
         String subject = item.getSubject();
         
@@ -133,15 +131,7 @@ public class PostItemViewBuilder {
         } else {
             vb.postTripView.setVisibility(View.GONE);
         }
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(icon)) {
-            vb.postIconView.setVisibility(View.VISIBLE);
-            vb.postIconView.setImageResource(android.R.color.transparent);
-            IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
-            bitmapManager.fetchBitmapOnThread(icon, vb.postIconView, null, android.R.color.transparent);
-            
-        } else {
-            vb.postIconView.setVisibility(View.GONE);
-        }
+        
         if (!StringUtils.isEmptyOrWhiteSpace(subject)) {
             vb.postSubjectView.setText(MyHtml.fromHtml(subject, HtmlUtils.sImageGetter, null));
             vb.postSubjectView.setVisibility(View.VISIBLE);
@@ -313,7 +303,6 @@ public class PostItemViewBuilder {
         public TextView postIndexView;
         public TextView postDateView;
         public TextView postSageView;
-        public ImageView postIconView;
         public TextView postOpView;
         public TextView postTripView;
         public TextView postSubjectView;
