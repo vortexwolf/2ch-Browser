@@ -27,10 +27,10 @@ import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.DialogDownloadFileView;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
+import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -196,16 +196,16 @@ public class ThreadPostUtils {
         
         thumbnailView.container.setVisibility(View.VISIBLE);
         thumbnailView.info.setText(attachment.getDescription());
-        refreshAttachmentImage(isBusy, attachment, thumbnailView.image);
+        loadAttachmentImage(isBusy, attachment, thumbnailView.image);
     }
     
     public static void setNonBusyAttachment(AttachmentInfo attachment, ImageView imageView) {
         if (ThreadPostUtils.shouldLoadFromWeb(attachment)) {
-            ThreadPostUtils.refreshAttachmentImage(false, attachment, imageView);
+            ThreadPostUtils.loadAttachmentImage(false, attachment, imageView);
         }
     }
 
-    private static void refreshAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView) {
+    private static void loadAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView) {
         // clear the image content
         imageView.setImageResource(android.R.color.transparent);         
         imageView.setOnClickListener(new OnClickListener() {
@@ -226,9 +226,9 @@ public class ThreadPostUtils {
         if (thumbnailUrl != null) {
             // Ничего не загружаем, если так установлено в настройках
             ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
-            IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
+            BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
             if (settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl)) {
-                bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, null, R.drawable.error_image);
+                bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, true, null, R.drawable.error_image);
             } else if (!settings.isLoadThumbnails()) {
                 imageView.setImageResource(R.drawable.empty_image);
             }
@@ -250,7 +250,7 @@ public class ThreadPostUtils {
         }
         
         ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
-        IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
+        BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
         
         String thumbnailUrl = attachment.getThumbnailUrl();
         return thumbnailUrl != null && settings.isLoadThumbnails() && !bitmapManager.isCached(thumbnailUrl);

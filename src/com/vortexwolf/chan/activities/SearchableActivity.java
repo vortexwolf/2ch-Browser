@@ -29,7 +29,6 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
@@ -46,7 +45,6 @@ public class SearchableActivity extends BaseListActivity {
     private static final String TAG = "SearchableActivity";
 
     private IJsonApiReader mJsonReader;
-    private final IBitmapManager mBitmapManager = Factory.getContainer().resolve(IBitmapManager.class);
     private final ApplicationSettings mApplciationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
     private final FoundPostsListener mFoundPostsListener = new FoundPostsListener();
@@ -212,7 +210,7 @@ public class SearchableActivity extends BaseListActivity {
     }
 
     private void setAdapter(String boardName) {
-        this.mAdapter = new FoundPostsListAdapter(this, boardName, this.mBitmapManager, this.mApplciationSettings, this.getTheme(), this.mDvachUriBuilder);
+        this.mAdapter = new FoundPostsListAdapter(this, boardName, this.mApplciationSettings, this.getTheme(), this.mDvachUriBuilder);
         this.setListAdapter(this.mAdapter);
 
         if (Integer.valueOf(Build.VERSION.SDK) > 7) {

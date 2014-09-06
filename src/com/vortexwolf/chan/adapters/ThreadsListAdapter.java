@@ -18,7 +18,6 @@ import com.vortexwolf.chan.common.controls.EllipsizingTextView;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
@@ -31,7 +30,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
 
     private final LayoutInflater mInflater;
-    private final IBitmapManager mBitmapManager;
     private final Theme mTheme;
     private final ApplicationSettings mSettings;
     private final HiddenThreadsDataSource mHiddenThreadsDataSource;
@@ -41,11 +39,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
     private boolean mIsBusy = false;
 
-    public ThreadsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource, DvachUriBuilder dvachUriBuilder) {
+    public ThreadsListAdapter(Context context, String boardName, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource, DvachUriBuilder dvachUriBuilder) {
         super(context.getApplicationContext(), 0);
 
         this.mBoardName = boardName;
-        this.mBitmapManager = bitmapManager;
         this.mTheme = theme;
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = settings;

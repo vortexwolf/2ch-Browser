@@ -27,7 +27,6 @@ import com.vortexwolf.chan.db.DvachSqlHelper;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -110,7 +109,7 @@ public class MainApplication extends Application {
         container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
         container.register(HttpImageManager.class, imageManager);
-        container.register(IBitmapManager.class, new BitmapManager(imageManager));
+        container.register(BitmapManager.class, new BitmapManager(imageManager));
         container.register(HistoryDataSource.class, historyDataSource);
         container.register(FavoritesDataSource.class, favoritesDataSource);
         container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);

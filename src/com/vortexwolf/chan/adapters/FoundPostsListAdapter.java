@@ -9,7 +9,6 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
@@ -21,7 +20,6 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IBusyAdapter {
 
     private final LayoutInflater mInflater;
-    private final IBitmapManager mBitmapManager;
     private final String mBoardName;
     private final PostItemViewBuilder mPostItemViewBuilder;
     private final ApplicationSettings mSettings;
@@ -30,17 +28,16 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
 
     private boolean mIsBusy = false;
 
-    public FoundPostsListAdapter(Context context, String boardName, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, DvachUriBuilder dvachUriBuilder) {
+    public FoundPostsListAdapter(Context context, String boardName, ApplicationSettings settings, Theme theme, DvachUriBuilder dvachUriBuilder) {
         super(context.getApplicationContext(), 0);
 
         this.mBoardName = boardName;
-        this.mBitmapManager = bitmapManager;
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = settings;
         this.mTheme = theme;
         this.mDvachUriBuilder = dvachUriBuilder;
 
-        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mBoardName, null, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);
     }
 
     @Override

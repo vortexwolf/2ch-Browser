@@ -18,7 +18,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.asynctasks.DisplayImageUriTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
@@ -27,17 +29,17 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.BadgeModel;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
+import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewBuilder {
     private final LayoutInflater mInflater;
-    private final IBitmapManager mBitmapManager;
+    private final BitmapManager mBitmapManager = Factory.resolve(BitmapManager.class);
     private final String mBoardName;
     private final String mThreadNumber;
     private final Context mAppContext;
@@ -45,10 +47,9 @@ public class PostItemViewBuilder {
     private final WindowManager mWindowManager;
     private final DvachUriBuilder mDvachUriBuilder;
 
-    public PostItemViewBuilder(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, DvachUriBuilder dvachUriBuilder) {
+    public PostItemViewBuilder(Context context, String boardName, String threadNumber, ApplicationSettings settings, DvachUriBuilder dvachUriBuilder) {
         this.mAppContext = context.getApplicationContext();
         this.mInflater = LayoutInflater.from(context);
-        this.mBitmapManager = bitmapManager;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mSettings = settings;
@@ -68,7 +69,6 @@ public class PostItemViewBuilder {
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
             vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
-            vb.postIconView = (TextView) view.findViewById(R.id.post_icon);
             vb.postOpView = (TextView) view.findViewById(R.id.post_op);
             vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
             vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
@@ -114,7 +114,6 @@ public class PostItemViewBuilder {
 
         // Имя, иконка, трип и тема поста
         String name = item.getName();
-        String icon = item.getIcon();
         String trip = item.getTrip();
         String subject = item.getSubject();
         
@@ -129,12 +128,6 @@ public class PostItemViewBuilder {
             vb.postTripView.setVisibility(View.VISIBLE);
         } else {
             vb.postTripView.setVisibility(View.GONE);
-        }
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(icon)) {
-            vb.postIconView.setText(MyHtml.fromHtml(icon, HtmlUtils.sImageGetter, null));
-            vb.postIconView.setVisibility(View.VISIBLE);
-        } else {
-            vb.postIconView.setVisibility(View.GONE);
         }
         if (!StringUtils.isEmptyOrWhiteSpace(subject)) {
             vb.postSubjectView.setText(MyHtml.fromHtml(subject, HtmlUtils.sImageGetter, null));
@@ -207,7 +200,7 @@ public class PostItemViewBuilder {
             vb.badgeTitle.setText(badge.title);
 
             Uri uri = this.mDvachUriBuilder.adjustRelativeUri(Uri.parse(badge.source));
-            this.mBitmapManager.fetchBitmapOnThread(uri.toString(), vb.badgeImage, null, null);
+            this.mBitmapManager.fetchBitmapOnThread(uri.toString(), vb.badgeImage, false, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
         }
@@ -307,7 +300,6 @@ public class PostItemViewBuilder {
         public TextView postIndexView;
         public TextView postDateView;
         public TextView postSageView;
-        public TextView postIconView;
         public TextView postOpView;
         public TextView postTripView;
         public TextView postSubjectView;

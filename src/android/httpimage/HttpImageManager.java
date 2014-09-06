@@ -158,7 +158,7 @@ public class HttpImageManager {
     }
 
     public Bitmap loadImage(Uri uri) {
-        return this.loadImage(new LoadRequest(uri));
+        return this.loadImage(new LoadRequest(uri), false);
     }
 
     public boolean isCached(String uriString) {
@@ -174,7 +174,7 @@ public class HttpImageManager {
      * @param r
      * @return
      */
-    public Bitmap loadImage(LoadRequest r) {
+    public Bitmap loadImage(LoadRequest r, boolean reduceSize) {
         if (r == null || r.getUri() == null || TextUtils.isEmpty(r.getUri().toString())) {
             throw new IllegalArgumentException("null or empty request");
         }
@@ -188,7 +188,7 @@ public class HttpImageManager {
                 r.mListener.beforeLoad(r);
             }
 
-            this.mExecutor.submit(this.newRequestCall(r));
+            this.mExecutor.submit(this.newRequestCall(r, reduceSize));
 
             return null;
         }
@@ -197,7 +197,7 @@ public class HttpImageManager {
     }
 
     // //PRIVATE
-    private Callable<LoadRequest> newRequestCall(final LoadRequest request) {
+    private Callable<LoadRequest> newRequestCall(final LoadRequest request, final boolean reduceSize) {
         return new Callable<LoadRequest>() {
             @Override
             public LoadRequest call() {
@@ -228,7 +228,9 @@ public class HttpImageManager {
                         data = HttpImageManager.this.mPersistence.loadData(key);
                         if (data != null) {
                             // load it into memory
-                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            if (reduceSize) {
+                                data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            }
                             HttpImageManager.this.mCache.storeData(key, data);
                         } else {
                             // we go to network
@@ -236,7 +238,9 @@ public class HttpImageManager {
                             data = HttpImageManager.this.mNetworkResourceLoader.fromUri(request.getUri().toString());
 
                             // load it into memory
-                            data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            if (reduceSize) {
+                                data = AppearanceUtils.reduceBitmapSize(HttpImageManager.this.mResources, data);
+                            }
                             HttpImageManager.this.mCache.storeData(key, data);
 
                             // persist it
