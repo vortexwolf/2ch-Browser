@@ -44,6 +44,7 @@ public class Constants {
 
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;
+    public static final int BUMP_LIMIT_EXTENDED = 1000;
 
     public static final int OP_POST_POSITION = 0;
 

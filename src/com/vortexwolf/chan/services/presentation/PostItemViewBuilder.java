@@ -24,6 +24,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
@@ -117,7 +118,8 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
         
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")) {
+        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals(ThreadPostUtils.getDefaultName(mBoardName))) {
+            if (name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
             vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
