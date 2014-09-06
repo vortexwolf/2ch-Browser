@@ -120,7 +120,8 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
         
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals("Аноним")) {
+        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals(ThreadPostUtils.getDefaultName(mBoardName))) {
+            if (name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
             vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {

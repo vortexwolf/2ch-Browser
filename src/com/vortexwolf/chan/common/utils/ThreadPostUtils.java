@@ -261,4 +261,11 @@ public class ThreadPostUtils {
         String thumbnailUrl = attachment.getThumbnailUrl();
         return thumbnailUrl != null && settings.isLoadThumbnails() && !bitmapManager.isCached(thumbnailUrl);
     }
+    
+    public static String getDefaultName(String board) {
+        if (board.equals("fg")) return "уточка";
+        if (board.equals("ukr")) return "Безосібний";
+        if (board.equals("test")) return "Анонимчик";
+        return "Аноним";
+    }
 }
