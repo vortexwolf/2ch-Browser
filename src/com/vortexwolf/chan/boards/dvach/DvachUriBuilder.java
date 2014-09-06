@@ -53,7 +53,7 @@ public class DvachUriBuilder {
     }
 
     public Uri adjustRelativeUri(Uri uri) {
-        return uri.isRelative() ? this.appendPath(this.getDvachHostUri(), uri.toString()) : uri;
+        return uri.isRelative() ? this.createUri(uri.toString()) : uri;
     }
 
     private Uri appendPath(Uri baseUri, String path) {

@@ -41,7 +41,7 @@ public class RegexUtils {
         return getGroupValues(uri.getPath(), pattern);
     }
     
-    private static String[] getGroupValues(String str, Pattern pattern) {
+    public static String[] getGroupValues(String str, Pattern pattern) {
         if (str == null) {
             return null;
         }

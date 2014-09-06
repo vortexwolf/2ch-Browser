@@ -31,7 +31,6 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
@@ -61,7 +60,6 @@ public class PostsListActivity extends BaseListActivity {
     private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
-    private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
 
@@ -189,7 +187,7 @@ public class PostsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService, this.mUriParser);
+        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mSettings, this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService, this.mUriParser);
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки

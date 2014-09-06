@@ -20,7 +20,6 @@ import com.vortexwolf.chan.asynctasks.DisplayImageUriTask;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.CloudflareCaptchaModel;

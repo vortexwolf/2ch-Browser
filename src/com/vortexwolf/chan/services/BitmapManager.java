@@ -8,22 +8,19 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 
-public class BitmapManager implements IBitmapManager {
+public class BitmapManager {
     private final HttpImageManager mImageManager;
 
     public BitmapManager(HttpImageManager imageManager) {
         this.mImageManager = imageManager;
     }
 
-    @Override
     public boolean isCached(String uriString) {
         return this.mImageManager.isCached(uriString);
     }
 
-    @Override
-    public void fetchBitmapOnThread(final String uriString, final ImageView imageView, final View indeterminateProgressBar, final Integer errorImageId) {
+    public void fetchBitmapOnThread(final String uriString, final ImageView imageView, boolean reduceSize, final View indeterminateProgressBar, final Integer errorImageId) {
         Uri uri = Uri.parse(uriString);
         imageView.setTag(uri);
 
@@ -56,7 +53,7 @@ public class BitmapManager implements IBitmapManager {
         });
 
         // Запрос
-        Bitmap b = this.mImageManager.loadImage(r);
+        Bitmap b = this.mImageManager.loadImage(r, reduceSize);
         // Если удалось взять из кэша, отображаем сразу
         if (b != null) {
             imageView.setImageBitmap(b);

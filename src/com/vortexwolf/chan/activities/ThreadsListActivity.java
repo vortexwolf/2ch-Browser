@@ -34,7 +34,6 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
@@ -67,7 +66,6 @@ public class ThreadsListActivity extends BaseListActivity {
     private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
-    private final IBitmapManager mBitmapManager = Factory.resolve(IBitmapManager.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
     private PostItemViewBuilder mPostItemViewBuilder;
 
@@ -101,7 +99,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
         
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);
 
         // Заголовок страницы
         String pageTitle = this.mPageNumber > 0
@@ -207,7 +205,7 @@ public class ThreadsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mBitmapManager, this.mSettings, this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
+        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mSettings, this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки

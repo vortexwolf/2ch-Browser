@@ -5,5 +5,5 @@
     <dimen name="thumbnail_size">64dip</dimen>
     <dimen name="filelist_frame_size">50dip</dimen>
     <dimen name="filelist_thumbnail_size">42dip</dimen>
-
+    <dimen name="badge_size">15dp</dimen>
 </resources>

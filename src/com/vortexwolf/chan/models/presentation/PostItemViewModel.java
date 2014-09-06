@@ -28,7 +28,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewModel {
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
-    private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?title=\"(.+?)\".+?/>");
+    private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?(?:title=\"(.+?)\")?.*?/>");
 
     private final String mBoardName;
     private final String mThreadNumber;
@@ -64,7 +64,7 @@ public class PostItemViewModel {
         this.mThreadNumber = threadNumber;
 
         this.parseReferences();
-        this.mBadge = this.parseBadge();
+        this.mBadge = this.parseBadgeFromIcon();
         this.mSpannedComment = this.createSpannedComment();
     }
 
@@ -76,24 +76,22 @@ public class PostItemViewModel {
 
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50);
     }
-
-    private BadgeModel parseBadge() {
-        this.mName = this.mModel.getName();
-        if (this.mName == null) {
+    
+    private BadgeModel parseBadgeFromIcon() {
+        String icon = this.mModel.getIcon();
+        if (StringUtils.isEmpty(icon)) {
             return null;
         }
-
-        Matcher m = sBadgePattern.matcher(this.mName);
-        if (m.find() && m.groupCount() > 0) {
-            this.mName = this.mName.replace(m.group(0), "");
-
-            BadgeModel model = new BadgeModel();
-            model.source = m.group(1);
-            model.title = m.group(2);
-            return model;
+        
+        String[] imgGroups = RegexUtils.getGroupValues(icon, sBadgePattern);
+        if (imgGroups == null) {
+            return null;
         }
-
-        return null;
+        
+        BadgeModel model = new BadgeModel();
+        model.source = imgGroups[1];
+        model.title = imgGroups.length >= 2 ? imgGroups[2] : "";
+        return model;
     }
 
     private void parseReferences() {
@@ -150,10 +148,6 @@ public class PostItemViewModel {
         return this.mModel.getNumber();
     }
     
-    public String getIcon() {
-        return this.mModel.getIcon();
-    }
-
     public BadgeModel getBadge() {
         return this.mBadge;
     }

@@ -25,7 +25,6 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.interfaces.IBitmapManager;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 import com.vortexwolf.chan.models.domain.PostModel;
@@ -41,7 +40,6 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private static final String TAG = "PostsListAdapter";
 
     private final LayoutInflater mInflater;
-    private final IBitmapManager mBitmapManager;
     private final String mBoardName;
     private final String mThreadNumber;
     private final String mUri;
@@ -60,12 +58,11 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private boolean mIsLoadingMore = false;
     private LoadImagesTimerTask mCurrentLoadImagesTask;
 
-    public PostsListAdapter(Context context, String boardName, String threadNumber, IBitmapManager bitmapManager, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService, DvachUriParser uriParser) {
+    public PostsListAdapter(Context context, String boardName, String threadNumber, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService, DvachUriParser uriParser) {
         super(context.getApplicationContext(), 0);
 
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
-        this.mBitmapManager = bitmapManager;
         this.mInflater = LayoutInflater.from(context);
         this.mTheme = theme;
         this.mPostsViewModel = new PostsViewModel(boardName, threadNumber);
@@ -73,7 +70,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         this.mListView = listView;
         this.mActivityContext = context;
         this.mDvachUriBuilder = dvachUriBuilder;
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mBitmapManager, this.mSettings, this.mDvachUriBuilder);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivityContext, this.mBoardName, this.mThreadNumber, this.mSettings, this.mDvachUriBuilder);
         this.mLoadImagesTimer = new Timer();
         this.mThreadImagesService = threadImagesService;
         this.mUriParser = uriParser;
