@@ -348,7 +348,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
 
-        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна")) {
+        if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.startsWith("Вы постите слишком быстро")) {
             refreshCaptcha();
         }
         

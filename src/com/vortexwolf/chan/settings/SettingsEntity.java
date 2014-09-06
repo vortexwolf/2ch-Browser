@@ -5,6 +5,5 @@ public class SettingsEntity {
     public boolean isDisplayDate;
     public boolean isLocalDate;
     public boolean isLoadThumbnails;
-    public boolean isDisplayNavigationBar;
     public boolean isDisplayAllBoards;
 }

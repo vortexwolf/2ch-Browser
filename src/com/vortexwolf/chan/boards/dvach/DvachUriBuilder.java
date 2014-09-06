@@ -2,12 +2,14 @@ package com.vortexwolf.chan.boards.dvach;
 
 import android.net.Uri;
 
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class DvachUriBuilder {
     private final Uri mDvachHostUri;
     private final ApplicationSettings mSettings;
+    private final String[] filters = {"standart", "last_reply", "num", "image_size"};
 
     public DvachUriBuilder(Uri hostUri) {
         this.mDvachHostUri = hostUri;
@@ -32,7 +34,10 @@ public class DvachUriBuilder {
     }
 
     public Uri createBoardUri(String board, int pageNumber) {
-        if (pageNumber == -1) return this.createUri("makaba/makaba.fcgi?task=catalog&board=" + board);
+        if (pageNumber < 0) {
+            String path = String.format("makaba/makaba.fcgi?task=catalog&board=%s&filter=%s", board, filters[-1-pageNumber]);
+            return this.createUri(path);
+        }
         return this.createBoardUri(board, pageNumber == 0 ? null : pageNumber + ".html");
     }
 

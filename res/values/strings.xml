@@ -51,7 +51,7 @@
     <string name="data_file_size_measure">KB</string>
     <string name="data_board_title">/%1$s/</string>
     <string name="data_board_title_with_page">/%1$s/%2$s</string>
-    <string name="data_board_title_catalog">/%1$s/ - Catalog</string>
+    <string name="data_board_title_catalog">/%1$s/ - catalog</string>
     <string name="data_thread_title">/%1$s/%2$s</string>
     <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string>
     <string name="data_add_thread_title">/%1$s/ - Add new thread</string>
@@ -127,8 +127,6 @@
     <string name="pref_display_post_date_summary">Enable to display the time of each post</string>
     <string name="pref_convert_post_date">Show local time</string>
     <string name="pref_convert_post_date_summary">Enable to display your local time instead of Moscow time</string>
-    <string name="pref_display_navigation_bar">Navigation bar</string>
-    <string name="pref_display_navigation_bar_summary">Enable to display the navigation bar at the bottom</string>
     <string name="pref_popup_link">Popup links</string>
     <string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
     <string name="pref_display_name">Names</string>
@@ -217,6 +215,11 @@
     <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     
-    
+    <string-array name="catalog_filters">
+		<item>Sort by Bump order</item>
+		<item>Sort by Last Reply</item>
+		<item>Sort by Creation date</item>
+		<item>Sort by Image size</item>
+	</string-array>
 
 </resources>

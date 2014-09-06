@@ -64,15 +64,12 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?postSageForeground" />
         
-        <TextView
-            android:id="@+id/post_icon"
+        <ImageView
+        	android:id="@+id/post_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/post_index"
             android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_sage"
-            android:text=""
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_toRightOf="@id/post_sage" />
 
         <TextView
             android:id="@+id/post_trip"

@@ -108,6 +108,7 @@ public class PickBoardActivity extends ListActivity {
     }
 
     private void parseAllBoards() {
+        //TODO: загружать /makaba/mobile.fcgi?task=get_boards
         this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards));
         this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards_hidden));
     }

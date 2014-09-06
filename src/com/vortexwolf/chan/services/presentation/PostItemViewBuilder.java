@@ -19,9 +19,11 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
@@ -68,7 +70,7 @@ public class PostItemViewBuilder {
             vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
             vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
             vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
-            vb.postIconView = (TextView) view.findViewById(R.id.post_icon);
+            vb.postIconView = (ImageView) view.findViewById(R.id.post_icon);
             vb.postOpView = (TextView) view.findViewById(R.id.post_op);
             vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
             vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
@@ -114,7 +116,7 @@ public class PostItemViewBuilder {
 
         // Имя, иконка, трип и тема поста
         String name = item.getName();
-        String icon = item.getIcon();
+        String icon = item.getIconUrl();
         String trip = item.getTrip();
         String subject = item.getSubject();
         
@@ -131,8 +133,11 @@ public class PostItemViewBuilder {
             vb.postTripView.setVisibility(View.GONE);
         }
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(icon)) {
-            vb.postIconView.setText(MyHtml.fromHtml(icon, HtmlUtils.sImageGetter, null));
             vb.postIconView.setVisibility(View.VISIBLE);
+            vb.postIconView.setImageResource(android.R.color.transparent);
+            IBitmapManager bitmapManager = Factory.resolve(IBitmapManager.class);
+            bitmapManager.fetchBitmapOnThread(icon, vb.postIconView, null, android.R.color.transparent);
+            
         } else {
             vb.postIconView.setVisibility(View.GONE);
         }
@@ -307,7 +312,7 @@ public class PostItemViewBuilder {
         public TextView postIndexView;
         public TextView postDateView;
         public TextView postSageView;
-        public TextView postIconView;
+        public ImageView postIconView;
         public TextView postOpView;
         public TextView postTripView;
         public TextView postSubjectView;
