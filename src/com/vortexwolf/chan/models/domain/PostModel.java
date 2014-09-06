@@ -55,12 +55,6 @@ public class PostModel implements Serializable {
     public void setTrip(String trip) {
         this.trip = trip;
     }
-    public String getIcon() {
-        return icon;
-    }
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
     public boolean isOp() {
         return op;
     }

@@ -67,7 +67,9 @@ public class MakabaModelsMapper {
     public PostModel mapPostModel(MakabaPostInfo source){
         PostModel model = new PostModel();
         model.setNumber(source.num);
-        model.setName(source.name);
+        String name = StringUtils.emptyIfNull(source.name);
+        String icon = StringUtils.emptyIfNull(source.icon);
+        model.setName(StringUtils.nullIfEmpty(icon + name));
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
         model.setEmail(source.email);
@@ -80,7 +82,6 @@ public class MakabaModelsMapper {
         }
         model.setTimestamp(source.timestamp != 0 ? source.timestamp * 1000 : ThreadPostUtils.parseMoscowTextDate(source.date));
         model.setParentThread(source.parent);
-        model.setIcon(source.icon);
         
         return model;
     }
