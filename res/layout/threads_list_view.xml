@@ -70,5 +70,16 @@
             android:background="@null"
             android:src="?iconForward" />
     </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/threads_catalog_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/navigation_button_size" >
+        <Spinner
+            android:id="@+id/threads_filter_select"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:entries="@array/catalog_filters" />
+    </RelativeLayout>    
 
 </LinearLayout>

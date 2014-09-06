@@ -10,6 +10,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.StringUtils;
@@ -42,6 +43,12 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();
+        if (Constants.SDK_VERSION < 19) {
+            this.disablePreference(R.string.pref_kitkat_fix_key);
+        }
+        if (Constants.SDK_VERSION < 11) {
+            this.disablePreference(R.string.pref_disable_zoom_controls_key);
+        }
 
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
@@ -106,5 +113,11 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         } else {
             preference.setSummary(this.getString(prefSummary));
         }
+    }
+    
+    private void disablePreference(int prefKey) {
+        Preference preference = this.getPreferenceManager().findPreference(this.getString(prefKey));
+        preference.setShouldDisableView(true);
+        preference.setEnabled(false);
     }
 }

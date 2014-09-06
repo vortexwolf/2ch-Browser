@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
@@ -76,6 +78,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private SettingsEntity mCurrentSettings;
 
     private View mNavigationBar;
+    private View mCatalogBar;
 
     private OpenTabModel mTabModel;
     private String mBoardName;
@@ -143,10 +146,6 @@ public class ThreadsListActivity extends BaseListActivity {
             return;
         }
 
-        if (this.mCurrentSettings.isDisplayNavigationBar != newSettings.isDisplayNavigationBar) {
-            this.mNavigationBar.setVisibility(newSettings.isDisplayNavigationBar ? View.VISIBLE : View.GONE);
-        }
-
         if (this.mCurrentSettings.isLoadThumbnails != newSettings.isLoadThumbnails) {
             this.mAdapter.notifyDataSetChanged();
         }
@@ -169,19 +168,19 @@ public class ThreadsListActivity extends BaseListActivity {
 
         // Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
-        this.mNavigationBar.setVisibility(this.mSettings.isDisplayNavigationBar() ? View.VISIBLE : View.GONE);
+        this.mNavigationBar.setVisibility(this.mPageNumber < 0 ? View.GONE : View.VISIBLE);
+        
+        this.mCatalogBar = this.findViewById(R.id.threads_catalog_bar);
+        this.mCatalogBar.setVisibility(this.mPageNumber < 0 ? View.VISIBLE : View.GONE);
 
         TextView pageNumberView = (TextView) this.findViewById(R.id.threads_page_number);
-        pageNumberView.setText(this.mPageNumber == -1 ? this.getString(R.string.menu_catalog) : String.valueOf(this.mPageNumber));
+        pageNumberView.setText(String.valueOf(this.mPageNumber));
 
         ImageButton nextButton = (ImageButton) this.findViewById(R.id.threads_next_page);
         ImageButton prevButton = (ImageButton) this.findViewById(R.id.threads_prev_page);
         if (this.mPageNumber == 0) {
             prevButton.setVisibility(View.GONE);
         } else if (this.mPageNumber == 19) {
-            nextButton.setVisibility(View.GONE);
-        } else if (this.mPageNumber == -1) {
-            prevButton.setVisibility(View.GONE);
             nextButton.setVisibility(View.GONE);
         }
 
@@ -197,6 +196,20 @@ public class ThreadsListActivity extends BaseListActivity {
             public void onClick(View v) {
                 ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber + 1);
             }
+        });
+        
+        Spinner filterSelect = (Spinner) this.findViewById(R.id.threads_filter_select);
+        filterSelect.setSelection(-1-mPageNumber);
+        filterSelect.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (ThreadsListActivity.this.mPageNumber != -1-position) {
+                    ThreadsListActivity.this.mPageNumber = -1-position;
+                    ThreadsListActivity.this.refreshThreads(false);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
     }
 
@@ -471,7 +484,6 @@ public class ThreadsListActivity extends BaseListActivity {
             ThreadsListActivity.this.switchToErrorView(error);
             if (error != null && error.startsWith("503")) {
                 String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
-                if (mPageNumber == -1) url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
                 new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareCheckListener(){
                     public void onSuccess() {
                         refresh();

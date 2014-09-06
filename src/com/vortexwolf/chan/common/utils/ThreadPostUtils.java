@@ -27,6 +27,7 @@ import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.DialogDownloadFileView;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
@@ -46,6 +47,10 @@ public class ThreadPostUtils {
     private static final List<String> sWakabaBoards = Arrays.asList(new String[] { 
         "f"
     });
+    private static final List<String> sExtendedBumpLimit = Arrays.asList(new String[] {
+        "vg", "ukr", "wm", "mobi", "vn"
+    });
+    
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
@@ -173,15 +178,16 @@ public class ThreadPostUtils {
     
     /** Будет отображать другим цветом посты после бамплимита */
     public static int getBumpLimitNumber(String boardName) {
-        if (boardName.equals("vg")) {
-            return 1000;
-        }
-
-        return 500;
+        if (isExtendedBumpLimit(boardName)) return Constants.BUMP_LIMIT_EXTENDED;
+        return Constants.BUMP_LIMIT;
     }
     
     public static boolean isMakabaBoard(String boardName) {
         return sWakabaBoards.indexOf(boardName) == -1;
+    }
+    
+    public static boolean isExtendedBumpLimit(String boardName) {
+        return sExtendedBumpLimit.indexOf(boardName) != -1;
     }
     
     public static int getMaximumAttachments(String boardName) {
@@ -254,5 +260,12 @@ public class ThreadPostUtils {
         
         String thumbnailUrl = attachment.getThumbnailUrl();
         return thumbnailUrl != null && settings.isLoadThumbnails() && !bitmapManager.isCached(thumbnailUrl);
+    }
+    
+    public static String getDefaultName(String board) {
+        if (board.equals("fg")) return "уточка";
+        if (board.equals("ukr")) return "Безосібний";
+        if (board.equals("test")) return "Анонимчик";
+        return "Аноним";
     }
 }
