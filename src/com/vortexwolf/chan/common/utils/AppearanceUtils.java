@@ -128,8 +128,20 @@ public class AppearanceUtils {
             Point imageSize = getImageSize(file);
             Point resolution = getResolution(webView);
             if (resolution.equals(0, 0)) {
-                resolution = getDisplayResolution(context);
-            }
+                Point displayResolution = getDisplayResolution(context);
+                /* getDisplayResolution менее точно определяет Y (не учитывает высоту панели, элементов управления).
+                   в то время как getResolution обычно срабатывает только в случае, когда изображение отсутствует
+                   в кэше (еще загружается, и View успевает отобразиться), т.е. обычно - только в первое открытие файла.
+                   Поэтому значение разрешения, полученное от getResolution сохраняется в static переменную,
+                   а getDisplayResolution используется только в случаях, когда или значение от View еще не было получено,
+                   ИЛИ когда поменялась ориентация экрана (тоже необходимо учитывать!) */
+                if (AppearanceUtils.resolution.x == displayResolution.x || displayResolution.equals(0, 0)) {
+                    resolution = AppearanceUtils.resolution;
+                } else {
+                    resolution = displayResolution;
+                    AppearanceUtils.resolution = resolution;
+                }
+            } else AppearanceUtils.resolution = resolution;
             
             if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
             
@@ -139,6 +151,16 @@ public class AppearanceUtils {
             scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
             scale = Math.max(scale, 1);
             //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
+            if (Constants.SDK_VERSION >= 7) {
+                double picdpi = (context.getResources().getDisplayMetrics().density * 160d) / scaleX;
+                if (picdpi >= 240) {
+                    CompatibilityUtilsImpl.setDefaultZoomFAR(webView.getSettings());
+                } else if (picdpi <= 120) {
+                    CompatibilityUtilsImpl.setDefaultZoomCLOSE(webView.getSettings());
+                } else {
+                    CompatibilityUtilsImpl.setDefaultZoomMEDIUM(webView.getSettings());
+                }
+            }
         } catch (Exception e) {
             MyLog.e(TAG, e);
         } finally {
