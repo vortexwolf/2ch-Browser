@@ -45,7 +45,6 @@ public class PostItemViewModel {
     private AttachmentInfo[] mAttachments = new AttachmentInfo[4]; //4 - максимальное число аттачей к посту на макабе
     private String mPostDate = null;
     private final BadgeModel mBadge;
-    private String mName = null;
 
     private final ArrayList<String> refersTo = new ArrayList<String>();
     private final ArrayList<String> referencesFrom = new ArrayList<String>();
@@ -158,7 +157,7 @@ public class PostItemViewModel {
     }
 
     public String getName() {
-        return this.mName;
+        return this.mModel.getName();
     }
     
     public String getTrip() {
