@@ -44,6 +44,14 @@ public class CompatibilityUtilsImpl {
         settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
     }
     
+    public static void setDefaultZoomCLOSE(WebSettings settings) {
+        settings.setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
+    }
+    
+    public static void setDefaultZoomMEDIUM(WebSettings settings) {
+        settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);
+    }
+    
     public static void setLoadWithOverviewMode(WebSettings settings, boolean overview) {
         settings.setLoadWithOverviewMode(overview);
     }
