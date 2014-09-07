@@ -88,7 +88,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-            android:id="@+id/post_subject"
+            android:id="@+id/post_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
@@ -97,24 +97,11 @@
             android:layout_toRightOf="@id/post_trip"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="SUBJ"
-            android:textStyle="bold"
-            android:textColor="?threadTitleForeground" 
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <TextView
-            android:id="@+id/post_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toLeftOf="@id/post_item_date_id"
-            android:layout_toRightOf="@id/post_subject"
-            android:ellipsize="end"
-            android:singleLine="true"
             android:text="anon anonanonanonanon"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
+
+    
     <LinearLayout 
             android:id="@+id/badge_view"
             android:layout_width="fill_parent"
@@ -203,13 +190,26 @@
            android:layout_height="wrap_content"
            android:layout_marginRight="5dip"
         />
-
+        
+        <TextView
+            android:id="@+id/post_subject"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_below="@id/multi_thumbnails_view"
+            android:layout_toRightOf="@id/thumbnail_view"
+            android:text="SUBJ"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="?threadTitleForeground"
+            android:textStyle="bold" 
+            android:visibility="gone" />
+        
         <com.vortexwolf.chan.common.controls.JellyBeanSpanFixTextView
             android:id="@+id/comment"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_below="@id/multi_thumbnails_view"
+            android:layout_below="@id/post_subject"
             android:layout_toRightOf="@id/thumbnail_view"            
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textIsSelectable="true"
