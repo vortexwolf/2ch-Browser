@@ -127,12 +127,12 @@ public class ThreadPostUtils {
         int imageSize = attachment.getSize();
         String url = attachment.getSourceUrl();
 
-        long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
+        /*long allocatedSize = Debug.getNativeHeapAllocatedSize() / 1024 + imageSize + sHeapPad;
         if (allocatedSize > sMaxVmHeap) {
             long freeSize = Math.max(0, imageSize - (allocatedSize - sMaxVmHeap));
             AppearanceUtils.showToastMessage(context, "Image is " + imageSize + "Kb. Available Memory is " + freeSize + "Kb");
             return;
-        }
+        }*/
 
         Uri uri = Uri.parse(url);
         ThreadImagesService imagesService = Factory.resolve(ThreadImagesService.class);
