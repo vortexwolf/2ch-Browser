@@ -13,11 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.davemorrissey.labs.subscaleview.ScaleImageView;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
@@ -40,7 +44,6 @@ public class BrowserActivity extends Activity {
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
 
-    private WebView mWebView = null;
     private View mLoadingView = null;
     private View mErrorView = null;
 
@@ -51,6 +54,8 @@ public class BrowserActivity extends Activity {
     private boolean mImageLoaded = false;
     private File mLoadedFile = null;
     private ViewType mViewType = null;
+    
+    private FrameLayout mLay = null;
 
     private DownloadFileTask mCurrentTask = null;
 
@@ -63,12 +68,9 @@ public class BrowserActivity extends Activity {
         this.setTheme(mSettings.getTheme());
         this.setContentView(R.layout.browser);
 
-        this.mWebView = (WebViewFixed) this.findViewById(R.id.webview);
+        this.mLay = (FrameLayout) this.findViewById(R.id.image);
         this.mLoadingView = this.findViewById(R.id.loading);
         this.mErrorView = this.findViewById(R.id.error);
-
-        int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-        AppearanceUtils.prepareWebView(this.mWebView, background, mSettings.isDisplayZoomControls());
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();
@@ -161,9 +163,22 @@ public class BrowserActivity extends Activity {
 
     private void setImage(File file) {
         this.mLoadedFile = file;
+        int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
 
-        AppearanceUtils.setScaleWebView(this.mWebView, file, this);
-        this.mWebView.loadUrl(Uri.fromFile(file).toString());
+        if (Constants.SDK_VERSION >= 10 && !file.getAbsolutePath().toLowerCase().endsWith("gif")) {
+            SubsamplingScaleImageView iV = new SubsamplingScaleImageView(this);
+            iV.setBackgroundColor(background);
+            iV.setImageFile(file.getAbsolutePath());
+            mLay.addView(iV);
+        } else {
+            WebViewFixed wV = new WebViewFixed(this);
+            AppearanceUtils.prepareWebView(wV, background, mSettings.isDisplayZoomControls());
+            AppearanceUtils.setScaleWebView(wV, file, this);
+            wV.loadUrl(Uri.fromFile(file).toString());
+            mLay.addView(wV);
+        }
+        
+        mLay.setVisibility(View.VISIBLE);
 
         this.mImageLoaded = true;
         this.updateOptionsMenu();
@@ -207,17 +222,18 @@ public class BrowserActivity extends Activity {
 
         switch (vt) {
             case PAGE:
-                this.mWebView.setVisibility(View.VISIBLE);
+                //this.mWebView.setVisibility(View.VISIBLE);
+                mLay.setVisibility(View.VISIBLE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case LOADING:
-                this.mWebView.setVisibility(View.GONE);
+                this.mLay.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.VISIBLE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case ERROR:
-                this.mWebView.setVisibility(View.GONE);
+                this.mLay.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.VISIBLE);
                 break;

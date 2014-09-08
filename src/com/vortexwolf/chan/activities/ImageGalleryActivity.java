@@ -1,6 +1,8 @@
 package com.vortexwolf.chan.activities;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -9,6 +11,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,16 +19,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.davemorrissey.labs.subscaleview.ScaleImageView;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.felipecsl.gifimageview.library.GifImageView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
+import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
@@ -203,8 +212,28 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void setImage(File file, ImageItemViewBag viewBag) {
-        AppearanceUtils.setScaleWebView(viewBag.webView, file, this);
-        viewBag.webView.loadUrl(Uri.fromFile(file).toString());
+        MyLog.d(TAG, Debug.getNativeHeapAllocatedSize()/1024+" "+Runtime.getRuntime().maxMemory()/1024+" "+Debug.getNativeHeapFreeSize());
+        if (Constants.SDK_VERSION >= 10 && !file.getAbsolutePath().toLowerCase().endsWith("gif")) {
+            SubsamplingScaleImageView iV = new SubsamplingScaleImageView(this);
+            iV.setImageFile(file.getAbsolutePath());
+            viewBag.mLay.addView(iV);
+                /*GifImageView gW = new GifImageView(this);
+                byte[] buf = new byte[(int) file.length()];
+                try {
+                    new FileInputStream(file).read(buf);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                gW.setBytes(buf);
+                gW.startAnimation();
+                viewBag.mLay.addView(gW);*/
+        } else {
+            WebViewFixed wV = new WebViewFixed(this); 
+            AppearanceUtils.prepareWebView(wV, ImageGalleryActivity.this.mBackgroundColor, mApplicationSettings.isDisplayZoomControls());
+            AppearanceUtils.setScaleWebView(wV, file, this);
+            wV.loadUrl(Uri.fromFile(file).toString());
+            viewBag.mLay.addView(wV);
+        }
 
         this.mImageLoaded = true;
         this.mImageLoadedFile = file;
@@ -224,12 +253,10 @@ public class ImageGalleryActivity extends Activity {
             View view = this.mInflater.inflate(R.layout.browser, null);
 
             ImageItemViewBag vb = new ImageItemViewBag();
-            vb.webView = (WebView) view.findViewById(R.id.webview);
+            vb.mLay = (FrameLayout) view.findViewById(R.id.image);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
-
-            AppearanceUtils.prepareWebView(vb.webView, ImageGalleryActivity.this.mBackgroundColor, mApplicationSettings.isDisplayZoomControls());
 
             return view;
         }
@@ -237,7 +264,8 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void onViewUnselected(int position, View view) {
             ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
-            vb.webView.loadUrl("about:blank");
+            //vb.webView.loadUrl("about:blank");
+            vb.mLay.removeAllViews();
         }
 
         @Override
@@ -275,7 +303,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showLoading(String message) {
-            this.mViewBag.webView.setVisibility(View.GONE);
+            this.mViewBag.mLay.setVisibility(View.GONE);
             this.mViewBag.loading.setVisibility(View.VISIBLE);
             this.mViewBag.error.setVisibility(View.GONE);
         }
@@ -283,7 +311,7 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void hideLoading() {
             ImageGalleryActivity.this.setProgress(Window.PROGRESS_END);
-            this.mViewBag.webView.setVisibility(View.VISIBLE);
+            this.mViewBag.mLay.setVisibility(View.VISIBLE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.GONE);
         }
@@ -299,7 +327,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showError(String error) {
-            this.mViewBag.webView.setVisibility(View.GONE);
+            this.mViewBag.mLay.setVisibility(View.GONE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.VISIBLE);
 
@@ -314,7 +342,7 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private static class ImageItemViewBag {
-        WebView webView;
+        FrameLayout mLay;
         View loading;
         View error;
     }
