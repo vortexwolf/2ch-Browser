@@ -1,6 +1,7 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
+
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 import android.app.Activity;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.controls.GIFView;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
@@ -197,9 +199,11 @@ public class AppearanceUtils {
         if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
             GifDrawable drawable = null;
             try {
-                drawable = new GifDrawable(file.getAbsolutePath());
-                GifImageView gifView = new GifImageView(context);
-                gifView.setImageDrawable(drawable);
+                /*drawable = new GifDrawable(file.getAbsolutePath());
+                ImageView gifView = new ImageView(context);
+                gifView.setImageDrawable(drawable);*/
+                GIFView gifView = new GIFView(context);
+                gifView.setPath(file.getAbsolutePath());
                 gifView.setLayoutParams(MATCH_PARAMS);
                 gifView.setBackgroundColor(background);
                 layout.addView(gifView);
