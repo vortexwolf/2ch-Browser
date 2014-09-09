@@ -2,21 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:orientation="horizontal">
-
-    <ImageView
-        android:layout_width="32dip"
-        android:layout_height="32dip"
-        android:layout_gravity="center_vertical"
-        android:paddingLeft="5dip"
-        android:src="@drawable/ic_email_attachment" />
+	android:orientation="horizontal"
+	android:gravity="center_vertical">
+	
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_marginLeft="5dip">
+        <ImageView
+            android:layout_width="@dimen/filelist_frame_size"
+            android:layout_height="@dimen/filelist_frame_size"
+            android:src="@drawable/thumbnail_frame" />
+        <ImageView
+            android:id="@+id/addpost_thumbnail"
+            android:layout_width="@dimen/filelist_thumbnail_size"
+            android:layout_height="@dimen/filelist_thumbnail_size"
+            android:layout_marginLeft="4dip"
+            android:layout_marginTop="4dip" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_weight="1.0"
         android:orientation="vertical"
-        android:paddingLeft="5dip" >
+        android:layout_marginLeft="5dip">
 
         <TextView
             android:id="@+id/addpost_attachment_name"
@@ -35,7 +45,7 @@
         android:id="@+id/addpost_attachment_remove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_marginRight="5dip"
         android:background="@null"
         android:src="@android:drawable/btn_dialog" />
 </LinearLayout>
