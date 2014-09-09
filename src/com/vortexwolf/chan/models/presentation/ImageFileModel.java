@@ -6,8 +6,10 @@ import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.IoUtils;
 
 public class ImageFileModel {
     public File file;
@@ -26,14 +28,10 @@ public class ImageFileModel {
     public ImageFileModel(File file) {
         this.file = file;
 
-        // Decode image size
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
+        Point size = IoUtils.getImageSize(file);
 
-        this.readBitmapFromFile(o);
-
-        this.imageHeight = o.outHeight;
-        this.imageWidth = o.outWidth;
+        this.imageHeight = size.y;
+        this.imageWidth = size.x;
     }
 
     public int getFileSize() {
@@ -42,34 +40,9 @@ public class ImageFileModel {
 
     public Bitmap getBitmap(double maxSize) {
         if (this.mBitmap == null) {
-            int scale = 1;
-            if (this.imageHeight > maxSize || this.imageWidth > maxSize) {
-                double realScale = Math.max(this.imageHeight, this.imageWidth) / maxSize;
-                double roundedScale = Math.pow(2, Math.ceil(Math.log(realScale) / Math.log(2)));
-                scale = (int) roundedScale; // 2, 4, 8, 16
-            }
-
-            // Decode with inSampleSize
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inSampleSize = scale;
-
-            this.mBitmap = this.readBitmapFromFile(o);
+            this.mBitmap = IoUtils.readBitmapFromFile(file, maxSize);
         }
 
         return this.mBitmap;
-    }
-
-    private Bitmap readBitmapFromFile(BitmapFactory.Options o) {
-        try {
-            FileInputStream fis = new FileInputStream(this.file);
-            Bitmap b = BitmapFactory.decodeStream(fis, null, o);
-            fis.close();
-
-            return b;
-        } catch (IOException e) {
-            MyLog.e("FileModel", e);
-        }
-
-        return null;
     }
 }
