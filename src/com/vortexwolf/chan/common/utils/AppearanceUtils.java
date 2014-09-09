@@ -197,19 +197,21 @@ public class AppearanceUtils {
         layout.removeAllViews();
         System.gc();
         if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-            GifDrawable drawable = null;
-            try {
-                /*drawable = new GifDrawable(file.getAbsolutePath());
-                ImageView gifView = new ImageView(context);
-                gifView.setImageDrawable(drawable);*/
-                GIFView gifView = new GIFView(context);
-                gifView.setPath(file.getAbsolutePath());
-                gifView.setLayoutParams(MATCH_PARAMS);
-                gifView.setBackgroundColor(background);
-                layout.addView(gifView);
-                isDone = true;
-            } catch (Exception e) {
-                MyLog.e(TAG, e);
+            if (Constants.SDK_VERSION >= 11) {
+                GifDrawable drawable = null;
+                try {
+                    /*drawable = new GifDrawable(file.getAbsolutePath());
+                    ImageView gifView = new ImageView(context);
+                    gifView.setImageDrawable(drawable);*/
+                    GIFView gifView = new GIFView(context);
+                    gifView.setPath(file.getAbsolutePath());
+                    gifView.setLayoutParams(MATCH_PARAMS);
+                    gifView.setBackgroundColor(background);
+                    layout.addView(gifView);
+                    isDone = true;
+                } catch (Exception e) {
+                    MyLog.e(TAG, e);
+                }
             }
         } else {
             if (Constants.SDK_VERSION >= 10) {
