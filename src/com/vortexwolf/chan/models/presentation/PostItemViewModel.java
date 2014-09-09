@@ -89,7 +89,7 @@ public class PostItemViewModel {
         
         BadgeModel model = new BadgeModel();
         model.source = imgGroups[1];
-        model.title = imgGroups.length >= 2 ? imgGroups[2] : "";
+        model.title = imgGroups[2];
         return model;
     }
 
