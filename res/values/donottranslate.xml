@@ -35,6 +35,7 @@
     <string name="pref_history_tab_position">pref_history_tab_position</string>
     <string name="pref_kitkat_fix_key">pref_kitkat_fix_key</string>
     <string name="pref_multithumbnails_in_threads_key">pref_multithumbnails_in_threads_key</string>
+    <string name="pref_disable_zoom_controls_key">pref_display_zoom_controls_key</string>
     <string name="pref_video_preview_key">pref_video_preview_key</string>
     <string name="pref_video_preview_default_value">VIDEO_PREVIEW_DEFAULT</string>
     <string name="pref_video_preview_change_domain_value">VIDEO_PREVIEW_CHANGE_DOMAIN</string>
@@ -44,6 +45,23 @@
         <item>@string/pref_video_preview_change_domain_value</item>
         <item>@string/pref_video_preview_download_value</item>
     </string-array>
+    <string name="pref_image_preview_key">pref_image_preview_key</string>
+    <string name="pref_image_preview_default_value">IMAGE_PREVIEW_DEFAULT</string>
+    <string name="pref_image_preview_subscaleview_value">IMAGE_PREVIEW_SUBSCALEVIEW</string>
+    <string-array name="pref_image_preview_values" translatable="false">
+        <item>@string/pref_image_preview_default_value</item>
+        <item>@string/pref_image_preview_subscaleview_value</item>
+    </string-array>
+    <string name="pref_gif_preview_key">pref_gif_preview_key</string>
+    <string name="pref_gif_preview_default_value">GIF_PREVIEW_DEFAULT</string>
+    <string name="pref_gif_preview_gifdrawable_value">GIF_PREVIEW_GIFDRAWABLEVIEW</string>
+    <string name="pref_gif_preview_simplegifview_value">GIF_PREVIEW_SIMPLEGIFVIEW</string>
+    <string-array name="pref_gif_preview_values" translatable="false">
+        <item>@string/pref_gif_preview_default_value</item>
+        <item>@string/pref_gif_preview_gifdrawable_value</item>
+        <item>@string/pref_gif_preview_simplegifview_value</item>
+    </string-array>
+    
     <string-array name="pref_text_size_values" translatable="false">
         <item>@string/pref_text_size_default_value</item>
         <item>@string/pref_text_size_large_value</item>

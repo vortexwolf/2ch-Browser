@@ -141,12 +141,31 @@
     <string name="pref_kitkat_fix_summary">Force to use the system gallery in Android 4.4 or newer</string>
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
+    
+    <string name="pref_extended_preferences">Image Gallery Preferences</string>
+    <string name="pref_extended_preferences_summary">Extended Preferences</string>
+    
+    <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
+    <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
 
     <string name="pref_video_preview">Video Preview Method</string>
     <string-array name="pref_video_preview_choices">
         <item>Default</item>
         <item>Open from 2ch.pm</item>
         <item>Download and open locally</item>
+    </string-array>
+    
+    <string name="pref_gif_preview">GIF Viewer</string>
+    <string-array name="pref_gif_preview_choices">
+        <item>WebView (Default)</item>
+        <item>Native Library</item>
+        <item>SimpleGifView (requires Android 3.0 and newer)</item>
+    </string-array>
+    
+    <string name="pref_image_preview">Image Viewer</string>
+    <string-array name="pref_image_preview_choices">
+        <item>WebView (Default)</item>
+        <item>subsampling-scale-image-view (requires Android 2.3.3 and newer)</item>
     </string-array>
     
     <string-array name="pref_text_size_choices">

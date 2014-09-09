@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -362,4 +363,9 @@ public class IoUtils {
         Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), o);
         return b;
     }
+    
+    public static byte[] fileToBytes(File f) throws FileNotFoundException, IOException {
+        return convertStreamToBytes(new FileInputStream(f));
+    }
+    
 }

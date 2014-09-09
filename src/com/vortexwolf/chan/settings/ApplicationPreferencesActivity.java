@@ -27,7 +27,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // set theme before creating
         this.mSettings = Factory.resolve(ApplicationSettings.class);
-        this.setTheme(this.mSettings.getTheme()); 
+        this.setTheme(Constants.SDK_VERSION > 13 || Constants.SDK_VERSION < 6 ? this.mSettings.getTheme() : R.style.Theme_Dark_Medium);
         
         // create
         super.onCreate(savedInstanceState);
@@ -40,11 +40,16 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.updateListSummary(R.string.pref_video_preview_key);
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
+        this.updateListSummary(R.string.pref_image_preview_key);
+        this.updateListSummary(R.string.pref_gif_preview_key);
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();
         if (Constants.SDK_VERSION < 19) {
             this.disablePreference(R.string.pref_kitkat_fix_key);
+        }
+        if (Constants.SDK_VERSION < 11) {
+            this.disablePreference(R.string.pref_disable_zoom_controls_key);
         }
 
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
