@@ -167,10 +167,7 @@ public class AppearanceUtils {
     }
     
     private static Point getImageSize(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        return new Point(options.outWidth, options.outHeight);
+        return IoUtils.getImageSize(file);
     }
     
     private static Point getResolution(View view) {

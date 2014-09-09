@@ -3,6 +3,7 @@ package com.vortexwolf.chan.common.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +15,9 @@ import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -333,5 +337,29 @@ public class IoUtils {
         
         String str = new String(out.toByteArray());
         return str;
+    }
+    
+    public static Point getImageSize(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        return new Point(options.outWidth, options.outHeight);
+    }
+    
+    public static Bitmap readBitmapFromFile(File file, double maxDimension) {
+        int scale = 1;
+        Point size = getImageSize(file);
+        if (size.x > maxDimension || size.y > maxDimension) {
+            double realScale = Math.max(size.x, size.y) / (double)maxDimension;
+            double roundedScale = Math.pow(2, Math.ceil(Math.log(realScale) / Math.log(2)));
+            scale = (int) roundedScale; // 2, 4, 8, 16
+        }
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inSampleSize = scale;
+        
+        Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), o);
+        return b;
     }
 }
