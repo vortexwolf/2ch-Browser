@@ -1,8 +1,6 @@
 package com.vortexwolf.chan.activities;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -11,34 +9,33 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.davemorrissey.labs.subscaleview.ScaleImageView;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.felipecsl.gifimageview.library.GifImageView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
-import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
+import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
+import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.ThreadImagesService;
@@ -185,6 +182,10 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void loadImage(ThreadImageModel model, ImageItemViewBag viewBag) {
+        if (model.attachment != null) {
+            this.setThumbnail(model.attachment, viewBag);
+            return;
+        }
         if (this.mCurrentTask != null) {
             // only 1 image per time
             this.mCurrentTask.cancel(true);
@@ -211,34 +212,46 @@ public class ImageGalleryActivity extends Activity {
         }
     }
 
-    private void setImage(File file, ImageItemViewBag viewBag) {
-        MyLog.d(TAG, Debug.getNativeHeapAllocatedSize()/1024+" "+Runtime.getRuntime().maxMemory()/1024+" "+Debug.getNativeHeapFreeSize());
-        if (Constants.SDK_VERSION >= 10 && !file.getAbsolutePath().toLowerCase().endsWith("gif")) {
-            SubsamplingScaleImageView iV = new SubsamplingScaleImageView(this);
-            iV.setImageFile(file.getAbsolutePath());
-            viewBag.mLay.addView(iV);
-                /*GifImageView gW = new GifImageView(this);
-                byte[] buf = new byte[(int) file.length()];
-                try {
-                    new FileInputStream(file).read(buf);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                gW.setBytes(buf);
-                gW.startAnimation();
-                viewBag.mLay.addView(gW);*/
+    private void setThumbnail(final AttachmentInfo attachment, ImageItemViewBag viewBag) {
+        int thumbnailSize = (int) getResources().getDimension(R.dimen.thumbnail_size);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(thumbnailSize, thumbnailSize, Gravity.CENTER);
+        
+        ImageView thumbnailView = new ImageView(this);
+        thumbnailView.setLayoutParams(layoutParams);
+        thumbnailView.setBackgroundColor(ImageGalleryActivity.this.mBackgroundColor);
+        viewBag.layout.removeAllViews();
+        viewBag.layout.addView(thumbnailView);
+        thumbnailView.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                ThreadPostUtils.openExternalAttachment(attachment, ImageGalleryActivity.this);
+            }
+        });
+        
+        String thumbnailUrl = attachment.getThumbnailUrl();
+        if (thumbnailUrl != null) {
+            BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
+            bitmapManager.fetchBitmapOnThread(thumbnailUrl, thumbnailView, true, null, R.drawable.error_image);
         } else {
-            WebViewFixed wV = new WebViewFixed(this); 
-            AppearanceUtils.prepareWebView(wV, ImageGalleryActivity.this.mBackgroundColor, mApplicationSettings.isDisplayZoomControls());
-            AppearanceUtils.setScaleWebView(wV, file, this);
-            wV.loadUrl(Uri.fromFile(file).toString());
-            viewBag.mLay.addView(wV);
+            if (attachment.isFile()) {
+                thumbnailView.setImageResource(attachment.getDefaultThumbnail());
+            } else {
+                thumbnailView.setImageResource(R.drawable.error_image);
+            }
         }
+        
+        AppearanceUtils.showToastMessage(this, getResources().getString(R.string.notification_video_thumbnail));
+    }
+    
+    private void setImage(File file, ImageItemViewBag viewBag) {
+        AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
 
         this.mImageLoaded = true;
         this.mImageLoadedFile = file;
         this.updateOptionsMenu();
     }
+    
+    
 
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
         private final LayoutInflater mInflater;
@@ -250,10 +263,10 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         protected View createView(int position) {
-            View view = this.mInflater.inflate(R.layout.browser, null);
+            View view = this.mInflater.inflate(R.layout.image_gallery_item, null);
 
             ImageItemViewBag vb = new ImageItemViewBag();
-            vb.mLay = (FrameLayout) view.findViewById(R.id.image);
+            vb.layout = (FrameLayout) view.findViewById(R.id.image_layout);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
@@ -264,8 +277,7 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void onViewUnselected(int position, View view) {
             ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
-            //vb.webView.loadUrl("about:blank");
-            vb.mLay.removeAllViews();
+            vb.layout.removeAllViews();
         }
 
         @Override
@@ -303,7 +315,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showLoading(String message) {
-            this.mViewBag.mLay.setVisibility(View.GONE);
+            this.mViewBag.layout.setVisibility(View.GONE);
             this.mViewBag.loading.setVisibility(View.VISIBLE);
             this.mViewBag.error.setVisibility(View.GONE);
         }
@@ -311,7 +323,7 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void hideLoading() {
             ImageGalleryActivity.this.setProgress(Window.PROGRESS_END);
-            this.mViewBag.mLay.setVisibility(View.VISIBLE);
+            this.mViewBag.layout.setVisibility(View.VISIBLE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.GONE);
         }
@@ -327,7 +339,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showError(String error) {
-            this.mViewBag.mLay.setVisibility(View.GONE);
+            this.mViewBag.layout.setVisibility(View.GONE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.VISIBLE);
 
@@ -342,8 +354,9 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private static class ImageItemViewBag {
-        FrameLayout mLay;
+        FrameLayout layout;
         View loading;
         View error;
     }
+    
 }

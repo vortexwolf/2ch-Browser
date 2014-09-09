@@ -180,10 +180,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }
     
-    public boolean isDisplayZoomControls() {
-        return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), true);
-    }
-    
     public int getVideoPreviewMethod() {
         final String defaultMethodValue = this.mResources.getString(R.string.pref_video_preview_default_value);
         final String changeDomainMethodValue = this.mResources.getString(R.string.pref_video_preview_change_domain_value);

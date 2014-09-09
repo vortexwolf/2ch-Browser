@@ -3,13 +3,14 @@ package com.vortexwolf.chan.services;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
 
 public class ThreadImagesService {
     private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<String, ArrayList<ThreadImageModel>>();
 
-    public void addThreadImage(String threadUrl, String imageUrl, double size) {
-        if (imageUrl == null) {
+    public void addThreadImage(String threadUrl, String imageUrl, double size, AttachmentInfo attachment) {
+        if (imageUrl == null && attachment == null) {
             return;
         }
 
@@ -19,8 +20,13 @@ public class ThreadImagesService {
         model.position = imagesList.size() + 1;
         model.url = imageUrl;
         model.size = size;
+        model.attachment = attachment;
 
         imagesList.add(model);
+    }
+    
+    public void addThreadImage(String threadUrl, String imageUrl, double size) {
+        this.addThreadImage(threadUrl, imageUrl, size, null);
     }
 
     public void clearThreadImages(String threadUrl) {
@@ -49,7 +55,7 @@ public class ThreadImagesService {
 
     public ThreadImageModel getImageByUrl(ArrayList<ThreadImageModel> images, String imageUrl) {
         for (ThreadImageModel image : images) {
-            if (image.url.equals(imageUrl)) {
+            if (image.url != null && image.url.equals(imageUrl)) {
                 return image;
             }
         }

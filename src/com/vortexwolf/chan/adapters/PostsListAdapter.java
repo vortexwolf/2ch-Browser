@@ -145,8 +145,12 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         for (PostItemViewModel model : models) {
             for (int i=0; i<4; ++i) {
                 AttachmentInfo attachment = model.getAttachment(i);
-                if (attachment != null && attachment.isImage()) {
-                    this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                if (attachment != null) {
+                    if (attachment.isImage()) {
+                        this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                    } else {
+                        this.mThreadImagesService.addThreadImage(this.mUri, null, attachment.getSize(), attachment);
+                    }
                 }
             }
 
@@ -188,8 +192,12 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
         for (PostItemViewModel model : newModels) {
             for (int i=0; i<4; ++i) {
                 AttachmentInfo attachment = model.getAttachment(i);
-                if (attachment != null && attachment.isImage()) {
-                    this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                if (attachment != null) {
+                    if (attachment.isImage()) {
+                        this.mThreadImagesService.addThreadImage(this.mUri, attachment.getImageUrlIfImage(), attachment.getSize());
+                    } else {
+                        this.mThreadImagesService.addThreadImage(this.mUri, null, attachment.getSize(), attachment);
+                    }
                 }
             }
 
