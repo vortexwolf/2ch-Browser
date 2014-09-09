@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.common.controls;
 
+import com.vortexwolf.chan.common.Constants;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -34,7 +35,7 @@ public class SimpleGifView extends View {
     private void init() {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        setLayerType(LAYER_TYPE_SOFTWARE, paint);
+        if (Constants.SDK_VERSION >= 11) setLayerType(LAYER_TYPE_SOFTWARE, paint);
     }
 
     public boolean setData(byte[] array) {

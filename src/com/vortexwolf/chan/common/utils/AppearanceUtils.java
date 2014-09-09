@@ -205,7 +205,7 @@ public class AppearanceUtils {
         System.gc();
         try {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 11) {
+                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 7) {
                     SimpleGifView gifView = new SimpleGifView(context);
                     gifView.setData(IoUtils.fileToBytes(file));
                     gifView.setLayoutParams(MATCH_PARAMS);
