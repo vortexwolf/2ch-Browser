@@ -1,20 +1,3 @@
-/*
- * Clover - 4chan browser https://github.com/Floens/Clover/
- * Copyright (C) 2014  Floens
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package com.vortexwolf.chan.common.controls;
 
 import android.annotation.TargetApi;
@@ -24,36 +7,26 @@ import android.graphics.Color;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 
-//import org.floens.chan.utils.Utils;
-
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class GIFView extends View {
-    private static final ExecutorService executor = Executors.newFixedThreadPool(1);
-
+public class SimpleGifView extends View {
     private Movie movie;
     private long movieStart;
 
-    public GIFView(Context activity) {
+    public SimpleGifView(Context activity) {
         super(activity);
         init();
     }
 
-    public GIFView(Context activity, AttributeSet attbs) {
+    public SimpleGifView(Context activity, AttributeSet attbs) {
         super(activity, attbs);
         init();
     }
 
-    public GIFView(Context activity, AttributeSet attbs, int style) {
+    public SimpleGifView(Context activity, AttributeSet attbs, int style) {
         super(activity, attbs, style);
         init();
     }
@@ -64,22 +37,20 @@ public class GIFView extends View {
         setLayerType(LAYER_TYPE_SOFTWARE, paint);
     }
 
-    public void setPath(final String path) {
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                final Movie movie = Movie.decodeFile(path);
-                if (movie != null) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            GIFView.this.movie = movie;
-                            invalidate();
-                        }
-                    });
-                }
-            }
-        });
+    public boolean setData(byte[] array) {
+        Movie movie = Movie.decodeByteArray(array, 0, array.length);
+
+        return onMovieLoaded(movie);
+    }
+
+    private boolean onMovieLoaded(Movie movie) {
+        if (movie != null) {
+            this.movie = movie;
+            invalidate();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

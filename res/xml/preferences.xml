@@ -54,25 +54,49 @@
             android:key="@string/pref_download_background_key"
             android:summary="@string/pref_download_background_summary"
             android:title="@string/pref_download_background" />
-        <ListPreference 
-            android:entries="@array/pref_video_preview_choices" 
-            android:entryValues="@array/pref_video_preview_values" 
-            android:dialogTitle="@string/pref_video_preview" 
-            android:key="@string/pref_video_preview_key" 
-            android:title="@string/pref_video_preview" 
-            android:defaultValue="@string/pref_video_preview_default_value"/>
-        
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/pref_legacy_image_viewer_key"
-            android:summary="@string/pref_legacy_image_viewer_summary"
-            android:title="@string/pref_legacy_image_viewer" />
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="@string/pref_kitkat_fix_key"
-            android:summary="@string/pref_kitkat_fix_summary"
-            android:title="@string/pref_kitkat_fix" />
+        <PreferenceScreen
+            android:title="@string/pref_extended_preferences"
+            android:summary="@string/pref_extended_preferences_summary">
+        	<CheckBoxPreference
+        	    android:disableDependentsState="true"
+            	android:defaultValue="false"
+            	android:key="@string/pref_legacy_image_viewer_key"
+            	android:summary="@string/pref_legacy_image_viewer_summary"
+            	android:title="@string/pref_legacy_image_viewer" />
+        	<ListPreference
+        	    android:dependency="@string/pref_legacy_image_viewer_key"
+            	android:entries="@array/pref_image_preview_choices" 
+            	android:entryValues="@array/pref_image_preview_values" 
+            	android:dialogTitle="@string/pref_image_preview" 
+            	android:key="@string/pref_image_preview_key" 
+            	android:title="@string/pref_image_preview" 
+            	android:defaultValue="@string/pref_image_preview_default_value"/>
+        	<ListPreference
+        	    android:dependency="@string/pref_legacy_image_viewer_key"
+            	android:entries="@array/pref_gif_preview_choices" 
+            	android:entryValues="@array/pref_gif_preview_values" 
+            	android:dialogTitle="@string/pref_gif_preview" 
+            	android:key="@string/pref_gif_preview_key" 
+            	android:title="@string/pref_gif_preview" 
+            	android:defaultValue="@string/pref_gif_preview_default_value"/>
+        	<ListPreference
+            	android:entries="@array/pref_video_preview_choices" 
+            	android:entryValues="@array/pref_video_preview_values" 
+            	android:dialogTitle="@string/pref_video_preview" 
+            	android:key="@string/pref_video_preview_key" 
+            	android:title="@string/pref_video_preview" 
+            	android:defaultValue="@string/pref_video_preview_default_value"/>
+        	<CheckBoxPreference
+				android:summary="@string/pref_disable_zoom_controls_summary"
+				android:key="@string/pref_disable_zoom_controls_key"
+				android:title="@string/pref_disable_zoom_controls"
+				android:defaultValue="false"/>
+        	<CheckBoxPreference
+	            android:defaultValue="false"
+            	android:key="@string/pref_kitkat_fix_key"
+            	android:summary="@string/pref_kitkat_fix_summary"
+            	android:title="@string/pref_kitkat_fix" />
+        </PreferenceScreen>
 
         <CheckBoxPreference
             android:defaultValue="false"

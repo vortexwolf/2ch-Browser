@@ -27,11 +27,13 @@ import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.controls.GIFView;
+import com.vortexwolf.chan.common.controls.SimpleGifView;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AppearanceUtils {
 
@@ -127,9 +129,10 @@ public class AppearanceUtils {
             CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
 
-        /*if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
+        if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
+            boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
             CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
-        }*/
+        }
     }
     
     public static void setScaleWebView(WebView webView, View layout, File file, Activity context) {
@@ -193,29 +196,34 @@ public class AppearanceUtils {
     }
     
     public static void setImage(File file, Activity context, final FrameLayout layout, int background) {
+        final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
+        int gifMethod = mSettings.getGifView();
+        int picMethod = mSettings.getImageView();
+        
         boolean isDone = false;
         layout.removeAllViews();
         System.gc();
-        if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-            if (Constants.SDK_VERSION >= 11) {
-                GifDrawable drawable = null;
-                try {
-                    /*drawable = new GifDrawable(file.getAbsolutePath());
-                    ImageView gifView = new ImageView(context);
-                    gifView.setImageDrawable(drawable);*/
-                    GIFView gifView = new GIFView(context);
-                    gifView.setPath(file.getAbsolutePath());
+        try {
+            if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
+                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 11) {
+                    SimpleGifView gifView = new SimpleGifView(context);
+                    gifView.setData(IoUtils.fileToBytes(file));
                     gifView.setLayoutParams(MATCH_PARAMS);
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
                     isDone = true;
-                } catch (Exception e) {
-                    MyLog.e(TAG, e);
                 }
-            }
-        } else {
-            if (Constants.SDK_VERSION >= 10) {
-                try {
+                if (gifMethod == Constants.GIF_VIEW_GIFDRAWABLE) {
+                    GifDrawable drawable = new GifDrawable(file.getAbsolutePath());
+                    GifImageView gifView = new GifImageView(context);
+                    gifView.setImageDrawable(drawable);
+                    gifView.setLayoutParams(MATCH_PARAMS);
+                    gifView.setBackgroundColor(background);
+                    layout.addView(gifView);
+                    isDone = true;
+                }
+            } else {
+                if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
                     final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
                     imageView.setImageFile(file.getAbsolutePath());
                     imageView.setLayoutParams(MATCH_PARAMS);
@@ -234,10 +242,10 @@ public class AppearanceUtils {
                         }
                     });
                     isDone = true;
-                } catch (Exception e) {
-                    MyLog.e(TAG, e);
                 }
             }
+        } catch (Throwable e) {
+            MyLog.e(TAG, e);
         }
         if (!isDone) {
             WebViewFixed wV = new WebViewFixed(context);

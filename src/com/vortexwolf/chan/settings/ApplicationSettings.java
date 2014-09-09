@@ -180,6 +180,28 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }
     
+    public boolean isDisplayZoomControls() {
+        return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), false);
+    }
+    
+    public int getImageView() {
+        final String defaultValue = this.mResources.getString(R.string.pref_image_preview_default_value);
+        final String subScaleViewValue = this.mResources.getString(R.string.pref_image_preview_subscaleview_value);
+        String method = this.mSettings.getString(this.mResources.getString(R.string.pref_image_preview_key), defaultValue);
+        if (method.equals(subScaleViewValue)) return Constants.IMAGE_VIEW_SUBSCALEVIEW;
+        return Constants.IMAGE_VIEW_DEFAULT;
+    }
+    
+    public int getGifView() {
+        final String defaultValue = this.mResources.getString(R.string.pref_gif_preview_default_value);
+        final String gifDrawableValue = this.mResources.getString(R.string.pref_gif_preview_gifdrawable_value);
+        final String simpleGifViewValue = this.mResources.getString(R.string.pref_gif_preview_simplegifview_value);
+        String method = this.mSettings.getString(this.mResources.getString(R.string.pref_gif_preview_key), defaultValue);
+        if (method.equals(gifDrawableValue)) return Constants.GIF_VIEW_GIFDRAWABLE;
+        if (method.equals(simpleGifViewValue)) return Constants.GIF_VIEW_SIMPLEGIFVIEW;
+        return Constants.GIF_VIEW_DEFAULT;
+    }
+    
     public int getVideoPreviewMethod() {
         final String defaultMethodValue = this.mResources.getString(R.string.pref_video_preview_default_value);
         final String changeDomainMethodValue = this.mResources.getString(R.string.pref_video_preview_change_domain_value);
