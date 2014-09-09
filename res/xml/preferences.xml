@@ -68,12 +68,6 @@
             android:summary="@string/pref_legacy_image_viewer_summary"
             android:title="@string/pref_legacy_image_viewer" />
 
-        <CheckBoxPreference 
-            android:summary="@string/pref_disable_zoom_controls_summary" 
-            android:key="@string/pref_disable_zoom_controls_key"
-            android:title="@string/pref_disable_zoom_controls"
-            android:defaultValue="true"/>
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/pref_kitkat_fix_key"

@@ -46,9 +46,6 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         if (Constants.SDK_VERSION < 19) {
             this.disablePreference(R.string.pref_kitkat_fix_key);
         }
-        if (Constants.SDK_VERSION < 11) {
-            this.disablePreference(R.string.pref_disable_zoom_controls_key);
-        }
 
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }

@@ -1,8 +1,8 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
-
-import android.annotation.SuppressLint;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -11,15 +11,22 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.MainApplication;
@@ -27,7 +34,8 @@ import com.vortexwolf.chan.common.MainApplication;
 public class AppearanceUtils {
 
     private static final String TAG = "AppearanceUtils";
-    private static Point resolution = new Point();
+    
+    public final static ViewGroup.LayoutParams MATCH_PARAMS = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
     public static void showToastMessage(Context context, String msg) {
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
@@ -94,7 +102,7 @@ public class AppearanceUtils {
         return resizedBitmap;
     }
 
-    public static void prepareWebView(WebView webView, int backgroundColor, boolean isDisplayZoomControls) {
+    public static void prepareWebView(WebView webView, int backgroundColor) {
         webView.setBackgroundColor(backgroundColor);
         webView.setInitialScale(100);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -117,31 +125,19 @@ public class AppearanceUtils {
             CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
 
-        if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
+        /*if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
             CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
-        }
+        }*/
     }
     
-    public static void setScaleWebView(WebView webView, File file, Activity context) {
+    public static void setScaleWebView(WebView webView, View layout, File file, Activity context) {
         int scale = 100;
         try {
             Point imageSize = getImageSize(file);
-            Point resolution = getResolution(webView);
-            if (resolution.equals(0, 0)) {
-                Point displayResolution = getDisplayResolution(context);
-                /* getDisplayResolution менее точно определяет Y (не учитывает высоту панели, элементов управления).
-                   в то время как getResolution обычно срабатывает только в случае, когда изображение отсутствует
-                   в кэше (еще загружается, и View успевает отобразиться), т.е. обычно - только в первое открытие файла.
-                   Поэтому значение разрешения, полученное от getResolution сохраняется в static переменную,
-                   а getDisplayResolution используется только в случаях, когда или значение от View еще не было получено,
-                   ИЛИ когда поменялась ориентация экрана (тоже необходимо учитывать!) */
-                if (AppearanceUtils.resolution.x == displayResolution.x || displayResolution.equals(0, 0)) {
-                    resolution = AppearanceUtils.resolution;
-                } else {
-                    resolution = displayResolution;
-                    AppearanceUtils.resolution = resolution;
-                }
-            } else AppearanceUtils.resolution = resolution;
+            Point resolution = getResolution(layout);
+            if (resolution == null || resolution.equals(0, 0)) {
+                resolution = getDisplayResolution(context);
+            }
             
             if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
             
@@ -164,6 +160,7 @@ public class AppearanceUtils {
         } catch (Exception e) {
             MyLog.e(TAG, e);
         } finally {
+            MyLog.d(TAG, ""+scale);
             webView.setInitialScale(scale);
             webView.setPadding(0, 0, 0, 0);
         }
@@ -177,9 +174,7 @@ public class AppearanceUtils {
     }
     
     private static Point getResolution(View view) {
-        View viewParent = (View) view.getParent();
-        //MyLog.d(TAG, "webView width: "+view.getWidth()+"; parent: "+viewParent.getWidth());
-        return new Point(viewParent.getWidth(), viewParent.getHeight());
+        return new Point(view.getWidth(), view.getHeight());
     }
     
     private static Point getDisplayResolution(Activity context) {
@@ -196,6 +191,58 @@ public class AppearanceUtils {
         a.recycle();
 
         return color;
+    }
+    
+    public static void setImage(File file, Activity context, final FrameLayout layout, int background) {
+        boolean isDone = false;
+        layout.removeAllViews();
+        if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
+            GifDrawable drawable = null;
+            try {
+                drawable = new GifDrawable(file.getAbsolutePath());
+                GifImageView gifView = new GifImageView(context);
+                gifView.setImageDrawable(drawable);
+                gifView.setLayoutParams(MATCH_PARAMS);
+                gifView.setBackgroundColor(background);
+                layout.addView(gifView);
+                isDone = true;
+            } catch (Exception e) {
+                MyLog.e(TAG, e);
+            }
+        } else {
+            if (Constants.SDK_VERSION >= 10) {
+                try {
+                    final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
+                    imageView.setImageFile(file.getAbsolutePath());
+                    imageView.setLayoutParams(MATCH_PARAMS);
+                    imageView.setBackgroundColor(background);
+                    layout.addView(imageView);
+                    imageView.setInitCallback(new FixedSubsamplingScaleImageView.InitedCallback() {   
+                        @Override
+                        public void onInit() {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run(){
+                                    layout.removeAllViews();
+                                    layout.addView(imageView);
+                                }
+                            });
+                        }
+                    });
+                    isDone = true;
+                } catch (Exception e) {
+                    MyLog.e(TAG, e);
+                }
+            }
+        }
+        if (!isDone) {
+            WebViewFixed wV = new WebViewFixed(context);
+            wV.setLayoutParams(MATCH_PARAMS);
+            layout.addView(wV);
+            AppearanceUtils.prepareWebView(wV, background);
+            AppearanceUtils.setScaleWebView(wV, layout, file, context);
+            wV.loadUrl(Uri.fromFile(file).toString());
+        }
     }
 
     public static class ListViewPosition {

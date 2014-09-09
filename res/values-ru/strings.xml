@@ -148,9 +148,6 @@
     <string name="pref_multithumbnails_in_threads">Множественные вложения</string>
     <string name="pref_multithumbnails_in_threads_summary">Отображать множественные вложения при предпросмотре тредов (на странице доски)</string>
 
-    <string name="pref_disable_zoom_controls">Отключить кнопки масштаба</string>
-    <string name="pref_disable_zoom_controls_summary">Отключить встроенные кнопки масштаба при просмотре изображений (только для Android 3 и выше)</string>
-    
     <string name="pref_video_preview">Способ просмотра видео</string>
     <string-array name="pref_video_preview_choices">
         <item>По умолчанию</item>
@@ -222,6 +219,7 @@
     <string name="notification_passcode_incorrect">Неверный пасс-код</string>
     <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите...</string>
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
+    <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>

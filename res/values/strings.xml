@@ -140,11 +140,8 @@
     <string name="pref_kitkat_fix">Android KitKat Fix</string>
     <string name="pref_kitkat_fix_summary">Force to use the system gallery in Android 4.4 or newer</string>
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
-    <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in thread previews</string>
+    <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
 
-    <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
-    <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons (only Android 3 and newer)</string>
-    
     <string name="pref_video_preview">Video Preview Method</string>
     <string-array name="pref_video_preview_choices">
         <item>Default</item>
@@ -214,6 +211,7 @@
     <string name="notification_passcode_incorrect">The passcode is incorrect</string>
     <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
+    <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
     
     <string-array name="catalog_filters">
 		<item>Sort by Bump order</item>

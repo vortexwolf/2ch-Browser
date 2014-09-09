@@ -3,11 +3,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="?activityRootBackground" >
-
-    <com.vortexwolf.chan.common.controls.WebViewFixed
-        android:id="@+id/webview"
+    
+    <FrameLayout
+        android:id="@+id/image_layout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="fill_parent" >
+    </FrameLayout>
 
     <include
         android:id="@+id/loading"
@@ -24,5 +25,7 @@
         android:layout_gravity="center"
         layout="@layout/error"
         android:visibility="gone" />
+
+
 
 </FrameLayout>
