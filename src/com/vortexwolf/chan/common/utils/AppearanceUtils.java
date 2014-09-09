@@ -193,6 +193,7 @@ public class AppearanceUtils {
     public static void setImage(File file, Activity context, final FrameLayout layout, int background) {
         boolean isDone = false;
         layout.removeAllViews();
+        System.gc();
         if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
             GifDrawable drawable = null;
             try {
