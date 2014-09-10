@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import pl.droidsonroids.gif.GifDrawable;
-import pl.droidsonroids.gif.GifImageView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -93,9 +91,5 @@ public class CompatibilityUtilsImpl {
             android.content.ClipData clip = android.content.ClipData.newPlainText(label, text);
             clipboard.setPrimaryClip(clip);
         }
-    }
-    
-    public static void setBackground(GifImageView gifImageView, GifDrawable gifDrawable) {
-        gifImageView.setBackground(gifDrawable);
     }
 }

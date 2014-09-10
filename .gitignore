@@ -10,10 +10,10 @@
 
 # generated files
 bin/
-obj/
+#obj/
 gen/
 dist/
-*.so
+#*.so
 
 # Local configuration file (sdk path, etc)
 local.properties

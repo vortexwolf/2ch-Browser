@@ -158,7 +158,6 @@
     <string name="pref_gif_preview">GIF Viewer</string>
     <string-array name="pref_gif_preview_choices">
         <item>WebView (Default)</item>
-        <item>Native Library</item>
         <item>SimpleGifView (requires Android 3.0 and newer)</item>
     </string-array>
     
