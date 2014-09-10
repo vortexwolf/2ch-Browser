@@ -44,7 +44,7 @@ public class ExtendedViewPager extends ViewPager {
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
         if (Constants.SDK_VERSION < 14 && v instanceof WebViewFixed) {
             return ((WebViewFixed) v).canScrollHorizontallyOldAPI(-dx);
-        } else if (Constants.SDK_VERSION < 14 && v instanceof TouchGifView) {
+        } else if (v instanceof TouchGifView) {
             return ((TouchGifView) v).canScrollHorizontallyOldAPI(-dx);
         } else {
             return super.canScroll(v, checkV, dx, x, y);

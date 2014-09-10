@@ -1,19 +1,14 @@
 package com.vortexwolf.chan.common.controls;
 
-import com.vortexwolf.chan.common.library.MyLog;
-
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Movie;
 import android.graphics.PointF;
 import android.os.Build;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.ImageView.ScaleType;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
 public class TouchGifView extends SimpleGifView {
@@ -30,6 +25,9 @@ public class TouchGifView extends SimpleGifView {
     float minScale = 1f;
     float maxScale = 3f;
     float defaultScale = 2f; //maximum value
+    final float cMinScale = 1f;
+    final float cMaxScale = 3f;
+    final float cDefaultScale = 2f;
     float[] m;
 
     float redundantXSpace, redundantYSpace;
@@ -210,17 +208,18 @@ public class TouchGifView extends SimpleGifView {
         //default scale.
         float scaleX =  (float)width / (float)bmWidth;
         float scaleY = (float)height / (float)bmHeight;
-        float scale = Math.min(scaleX, scaleY);
-        defaultScale = Math.min(defaultScale, scale);
-        minScale = Math.min(minScale, scale)/defaultScale;
-        maxScale = Math.max(maxScale, scale)/defaultScale;
+        float scale = Math.min(scaleX, scaleY); //to fit the screen
+        defaultScale = Math.min(cDefaultScale, scale);
+        defaultScale *= 3;
+        minScale = Math.min(cMinScale, scale)/defaultScale;
+        maxScale = cMaxScale/defaultScale;
         matrix.setScale(defaultScale, defaultScale);
         setImageMatrix(matrix);
         saveScale = 1f;
     
         //Center the image
-        redundantYSpace = (float)height - (scale * (float)bmHeight) ;
-        redundantXSpace = (float)width - (scale * (float)bmWidth);
+        redundantYSpace = (float)height - (defaultScale * (float)bmHeight) ;
+        redundantXSpace = (float)width - (defaultScale * (float)bmWidth);
         redundantYSpace /= (float)2;
         redundantXSpace /= (float)2;
     
