@@ -173,7 +173,8 @@ public class ApplicationSettings {
     }
     
     public boolean isKitKatFix() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_kitkat_fix_key), false);
+        return false;
+        //return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_kitkat_fix_key), false);
     }
     
     public boolean isMultiThumbnailsInThreads() {
