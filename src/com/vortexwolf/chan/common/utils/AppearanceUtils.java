@@ -192,10 +192,14 @@ public class AppearanceUtils {
         return color;
     }
     
-    public static void setImage(File file, Activity context, final FrameLayout layout, int background) {
+    public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background) {
+        setImage(file, context, layout, background, false);
+    }
+    
+    public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background, boolean forceWebView) {
         final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        int gifMethod = mSettings.getGifView();
-        int picMethod = mSettings.getImageView();
+        int gifMethod = forceWebView ? Constants.GIF_VIEW_DEFAULT : mSettings.getGifView();
+        int picMethod = forceWebView ? Constants.IMAGE_VIEW_DEFAULT : mSettings.getImageView();
         
         boolean isDone = false;
         layout.removeAllViews();
@@ -213,7 +217,12 @@ public class AppearanceUtils {
             } else {
                 if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
                     final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
-                    imageView.setImageFile(file.getAbsolutePath());
+                    imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.InitedCallback() {
+                        @Override
+                        public void onInit() {
+                            AppearanceUtils.setImage(file, context, layout, background, true);
+                        }
+                    });
                     imageView.setLayoutParams(MATCH_PARAMS);
                     imageView.setBackgroundColor(background);
                     layout.addView(imageView);

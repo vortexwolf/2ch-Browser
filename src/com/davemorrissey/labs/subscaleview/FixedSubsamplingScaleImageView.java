@@ -19,7 +19,7 @@ limitations under the License.
  * - removed xml attributes;
  * - added annotation TargetApi;
  * - changed zoom values (default, min, max, double-tap behavior);
- * - added callback listener;
+ * - added callback and fail listener;
  */
 
 package com.davemorrissey.labs.subscaleview;
@@ -256,9 +256,14 @@ public class FixedSubsamplingScaleImageView extends View {
      */
     public final void setImageFile(String extFile) {
         reset(true);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false);
+        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false, this.failListener);
         task.execute();
         invalidate();
+    }
+    
+    public final void setImageFile(String extFile, InitedCallback failListener) {
+        this.failListener = failListener;
+        setImageFile(extFile);
     }
 
     /**
@@ -271,7 +276,7 @@ public class FixedSubsamplingScaleImageView extends View {
     public final void setImageFile(String extFile, ImageViewState state) {
         reset(true);
         restoreState(state);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false);
+        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false, this.failListener);
         task.execute();
         invalidate();
     }
@@ -294,7 +299,7 @@ public class FixedSubsamplingScaleImageView extends View {
     public final void setImageAsset(String assetName, ImageViewState state) {
         reset(true);
         restoreState(state);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), assetName, true);
+        BitmapInitTask task = new BitmapInitTask(this, getContext(), assetName, true, this.failListener);
         task.execute();
         invalidate();
     }
@@ -1006,12 +1011,14 @@ public class FixedSubsamplingScaleImageView extends View {
         private final String source;
         private final boolean sourceIsAsset;
         private BitmapRegionDecoder decoder;
+        private final InitedCallback listener;
 
-        public BitmapInitTask(FixedSubsamplingScaleImageView view, Context context, String source, boolean sourceIsAsset) {
+        public BitmapInitTask(FixedSubsamplingScaleImageView view, Context context, String source, boolean sourceIsAsset, InitedCallback listener) {
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
             this.contextRef = new WeakReference<Context>(context);
             this.source = source;
             this.sourceIsAsset = sourceIsAsset;
+            this.listener = listener;
         }
 
         @Override
@@ -1055,6 +1062,7 @@ public class FixedSubsamplingScaleImageView extends View {
 
         @Override
         protected void onPostExecute(int[] xyo) {
+            if (xyo == null && listener != null) listener.onInit();
             if (viewRef != null && decoder != null) {
                 final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
                 if (subsamplingScaleImageView != null && decoder != null && xyo != null && xyo.length == 3) {
@@ -1853,6 +1861,7 @@ public class FixedSubsamplingScaleImageView extends View {
     
     
     private InitedCallback initCallback;
+    private InitedCallback failListener;
     
     public void setInitCallback(InitedCallback initCallback) {
         this.initCallback = initCallback;
