@@ -210,7 +210,6 @@ public class TouchGifView extends SimpleGifView {
         float scaleY = (float)height / (float)bmHeight;
         float scale = Math.min(scaleX, scaleY); //to fit the screen
         defaultScale = Math.min(cDefaultScale, scale);
-        defaultScale *= 3;
         minScale = Math.min(cMinScale, scale)/defaultScale;
         maxScale = cMaxScale/defaultScale;
         matrix.setScale(defaultScale, defaultScale);
