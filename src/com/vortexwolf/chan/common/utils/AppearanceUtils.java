@@ -2,8 +2,6 @@ package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
 
-import pl.droidsonroids.gif.GifDrawable;
-import pl.droidsonroids.gif.GifImageView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -207,15 +205,6 @@ public class AppearanceUtils {
                 if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 7) {
                     SimpleGifView gifView = new SimpleGifView(context);
                     gifView.setData(IoUtils.fileToBytes(file));
-                    gifView.setLayoutParams(MATCH_PARAMS);
-                    gifView.setBackgroundColor(background);
-                    layout.addView(gifView);
-                    isDone = true;
-                }
-                if (gifMethod == Constants.GIF_VIEW_GIFDRAWABLE) {
-                    GifDrawable drawable = new GifDrawable(file.getAbsolutePath());
-                    GifImageView gifView = new GifImageView(context);
-                    gifView.setImageDrawable(drawable);
                     gifView.setLayoutParams(MATCH_PARAMS);
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
