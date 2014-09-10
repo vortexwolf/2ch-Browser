@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.controls.SimpleGifView;
+import com.vortexwolf.chan.common.controls.TouchGifView;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
@@ -206,9 +207,11 @@ public class AppearanceUtils {
         System.gc();
         try {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 7) {
-                    SimpleGifView gifView = new SimpleGifView(context);
-                    gifView.setData(IoUtils.fileToBytes(file));
+                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 8) {
+                    TouchGifView gifView = new TouchGifView(context);
+                    if (!gifView.setData(IoUtils.fileToBytes(file))) {
+                        throw new Exception("failed to set gif data");
+                    }
                     gifView.setLayoutParams(MATCH_PARAMS);
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
