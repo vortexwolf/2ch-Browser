@@ -165,7 +165,6 @@ public class AppearanceUtils {
         } catch (Exception e) {
             MyLog.e(TAG, e);
         } finally {
-            MyLog.d(TAG, ""+scale);
             webView.setInitialScale(scale);
             webView.setPadding(0, 0, 0, 0);
         }

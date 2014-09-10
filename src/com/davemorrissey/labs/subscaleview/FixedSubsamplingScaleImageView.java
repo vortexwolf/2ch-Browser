@@ -367,8 +367,14 @@ public class FixedSubsamplingScaleImageView extends View {
             public boolean onDoubleTap(MotionEvent e) {
                 if (zoomEnabled && readySent && vTranslate != null) {
                     float doubleTapZoomScale = Math.min(maxScale, FixedSubsamplingScaleImageView.this.doubleTapZoomScale);
-                    boolean zoomIn = scale <= doubleTapZoomScale * 0.9 || scale * 0.9 >= doubleTapZoomScale;
-                    float targetScale = zoomIn ? doubleTapZoomScale : defaultScale;
+                    
+                    float targetScale;
+                    if (scale > doubleTapZoomScale * 0.9 && scale * 0.9 < doubleTapZoomScale) targetScale = maxScale;
+                    else if (scale == maxScale) targetScale = defaultScale;
+                    else targetScale = doubleTapZoomScale;
+                    
+                    boolean zoomIn = scale <= targetScale;
+                    
                     PointF targetSCenter = viewToSourceCoord(new PointF(e.getX(), e.getY()));
                     if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER_IMMEDIATE) {
                         setScaleAndCenter(targetScale, targetSCenter);
