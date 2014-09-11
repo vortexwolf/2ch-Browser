@@ -164,7 +164,7 @@
     <string name="pref_gif_preview">Просмотрщик GIF файлов</string>
     <string-array name="pref_gif_preview_choices">
         <item>WebView (По умолчанию)</item>
-        <item>SimpleGifView (требуется Android 3.0 или выше)</item>
+        <item>libgif.so</item>
     </string-array>
     
     <string name="pref_image_preview">Просмотрщик картинок</string>

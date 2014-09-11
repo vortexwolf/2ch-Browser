@@ -2,6 +2,7 @@ package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
 
+import pl.droidsonroids.gif.GifDrawable;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -209,9 +210,11 @@ public class AppearanceUtils {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
                 if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 8) {
                     TouchGifView gifView = new TouchGifView(context);
-                    if (!gifView.setData(IoUtils.fileToBytes(file))) {
+                    /*if (!gifView.setData(IoUtils.fileToBytes(file))) {
                         throw new Exception("failed to set gif data");
-                    }
+                    }*/
+                    GifDrawable gd = new GifDrawable(file.getAbsolutePath());
+                    gifView.setImageDrawable(gd);
                     gifView.setLayoutParams(MATCH_PARAMS);
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
