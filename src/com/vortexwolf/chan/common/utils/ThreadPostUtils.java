@@ -150,7 +150,10 @@ public class ThreadPostUtils {
             case Constants.VIDEO_PREVIEW_METHOD_DEFAULT:
                 break;
             }
-        if (!done) BrowserLauncher.launchInternalBrowser(context, url);
+        
+        if (!done) {
+            BrowserLauncher.launchExternalBrowser(context, url);
+        }
     }
     
     public static void openAttachment(final AttachmentInfo attachment, final Context context) {
