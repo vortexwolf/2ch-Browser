@@ -364,8 +364,4 @@ public class IoUtils {
         return b;
     }
     
-    public static byte[] fileToBytes(File f) throws FileNotFoundException, IOException {
-        return convertStreamToBytes(new FileInputStream(f));
-    }
-    
 }

@@ -70,7 +70,7 @@
             	android:dialogTitle="@string/pref_image_preview" 
             	android:key="@string/pref_image_preview_key" 
             	android:title="@string/pref_image_preview" 
-            	android:defaultValue="@string/pref_image_preview_default_value"/>
+            	android:defaultValue="@string/pref_image_preview_subscaleview_value"/>
         	<ListPreference
         	    android:dependency="@string/pref_legacy_image_viewer_key"
             	android:entries="@array/pref_gif_preview_choices" 
@@ -78,7 +78,7 @@
             	android:dialogTitle="@string/pref_gif_preview" 
             	android:key="@string/pref_gif_preview_key" 
             	android:title="@string/pref_gif_preview" 
-            	android:defaultValue="@string/pref_gif_preview_default_value"/>
+            	android:defaultValue="@string/pref_gif_preview_native_lib_value"/>
         	<ListPreference
             	android:entries="@array/pref_video_preview_choices" 
             	android:entryValues="@array/pref_video_preview_values" 
