@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.BoardsListAdapter;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -266,9 +266,9 @@ public class PickBoardActivity extends ListActivity {
                 dialog.setTitle(this.getString(R.string.menu_add_favorites));
                 dialog.setHint(this.getString(R.string.pick_board_input_hint));
 
-                dialog.setPositiveButtonListener(new View.OnClickListener() {
+                dialog.setPositiveButtonListener(new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface d, int which) {
                         String boardCode = dialog.getText();
                         boolean success = PickBoardActivity.this.validateBoardCode(boardCode);
 
@@ -288,7 +288,8 @@ public class PickBoardActivity extends ListActivity {
                 this.startActivity(preferencesIntent);
                 break;
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), 
+                        Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
                 this.startActivity(openTabsIntent);
                 break;
         }

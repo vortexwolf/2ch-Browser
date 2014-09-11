@@ -174,7 +174,7 @@ public class ThreadPostUtils {
         Uri uri = Uri.parse(url);
         ThreadImagesService imagesService = Factory.resolve(ThreadImagesService.class);
         ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
-        if (!settings.isLegacyImageViewer() && imagesService.hasImage(attachment.getThreadUrl(), url)) {
+        if (Constants.SDK_VERSION >= 4 && !settings.isLegacyImageViewer() && imagesService.hasImage(attachment.getThreadUrl(), url)) {
             // open a gallery activity
             Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
             imageGallery.setData(uri);
