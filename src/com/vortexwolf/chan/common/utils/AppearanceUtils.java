@@ -1,19 +1,18 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
-import android.annotation.SuppressLint;
+
+import pl.droidsonroids.gif.GifDrawable;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -23,9 +22,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.controls.SimpleGifView;
 import com.vortexwolf.chan.common.controls.TouchGifView;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
@@ -203,14 +202,19 @@ public class AppearanceUtils {
         
         boolean isDone = false;
         layout.removeAllViews();
+        
         System.gc();
         try {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                if (gifMethod == Constants.GIF_VIEW_SIMPLEGIFVIEW && Constants.SDK_VERSION >= 8) {
-                    TouchGifView gifView = new TouchGifView(context);
-                    if (!gifView.setData(IoUtils.fileToBytes(file))) {
-                        throw new Exception("failed to set gif data");
+                if (gifMethod == Constants.GIF_NATIVE_LIB) {
+                    GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
+                    ImageView gifView;
+                    if (Constants.SDK_VERSION >= 8) {
+                        gifView = new TouchGifView(context);
+                    } else {
+                        gifView = new ImageView(context);
                     }
+                    gifView.setImageDrawable(gifDrawable);
                     gifView.setLayoutParams(MATCH_PARAMS);
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
