@@ -375,7 +375,7 @@ public class FixedSubsamplingScaleImageView extends View {
                     
                     float targetScale;
                     if (scale > doubleTapZoomScale * 0.9 && scale * 0.9 < doubleTapZoomScale) targetScale = maxScale;
-                    else if (scale == maxScale) targetScale = defaultScale;
+                    else if (scale > maxScale * 0.99) targetScale = defaultScale;
                     else targetScale = doubleTapZoomScale;
                     
                     boolean zoomIn = scale <= targetScale;
@@ -1035,7 +1035,7 @@ public class FixedSubsamplingScaleImageView extends View {
                             try {
                                 ExifInterface exifInterface = new ExifInterface(source);
                                 int orientationAttr = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                                if (orientationAttr == ExifInterface.ORIENTATION_NORMAL) {
+                                if (orientationAttr == ExifInterface.ORIENTATION_NORMAL || orientationAttr == ExifInterface.ORIENTATION_UNDEFINED) {
                                     exifOrientation = ORIENTATION_0;
                                 } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_90) {
                                     exifOrientation = ORIENTATION_90;
@@ -1056,6 +1056,9 @@ public class FixedSubsamplingScaleImageView extends View {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to initialise bitmap decoder", e);
+            } catch (OutOfMemoryError e) {
+                Log.e(TAG, "OutOfMemory in initialise bitmap decoder", e);
+                System.gc();
             }
             return null;
         }
@@ -1118,6 +1121,9 @@ public class FixedSubsamplingScaleImageView extends View {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to decode tile", e);
+            } catch (OutOfMemoryError e) {
+                Log.e(TAG, "OutOfMemory in decode tile", e);
+                System.gc();
             }
             return null;
         }

@@ -201,54 +201,54 @@ public class AppearanceUtils {
         int picMethod = forceWebView ? Constants.IMAGE_VIEW_DEFAULT : mSettings.getImageView();
         
         boolean isDone = false;
-        layout.removeAllViews();
         
+        layout.removeAllViews();
         System.gc();
+        
         try {
-            if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                if (gifMethod == Constants.GIF_NATIVE_LIB) {
-                    GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
-                    ImageView gifView;
-                    if (Constants.SDK_VERSION >= 8) {
-                        gifView = new TouchGifView(context);
-                    } else {
-                        gifView = new ImageView(context);
+            if (gifMethod == Constants.GIF_NATIVE_LIB && RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
+                GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
+                ImageView gifView;
+                if (Constants.SDK_VERSION >= 8) {
+                    gifView = new TouchGifView(context);
+                } else {
+                    gifView = new ImageView(context);
+                }
+                gifView.setImageDrawable(gifDrawable);
+                gifView.setLayoutParams(MATCH_PARAMS);
+                gifView.setBackgroundColor(background);
+                layout.addView(gifView);
+                isDone = true;
+            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
+                final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
+                imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.InitedCallback() {
+                    @Override
+                    public void onInit() {
+                        AppearanceUtils.setImage(file, context, layout, background, true);
                     }
-                    gifView.setImageDrawable(gifDrawable);
-                    gifView.setLayoutParams(MATCH_PARAMS);
-                    gifView.setBackgroundColor(background);
-                    layout.addView(gifView);
-                    isDone = true;
-                }
-            } else {
-                if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
-                    final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
-                    imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.InitedCallback() {
-                        @Override
-                        public void onInit() {
-                            AppearanceUtils.setImage(file, context, layout, background, true);
-                        }
-                    });
-                    imageView.setLayoutParams(MATCH_PARAMS);
-                    imageView.setBackgroundColor(background);
-                    layout.addView(imageView);
-                    imageView.setInitCallback(new FixedSubsamplingScaleImageView.InitedCallback() {   
-                        @Override
-                        public void onInit() {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run(){
-                                    layout.removeAllViews();
-                                    layout.addView(imageView);
-                                }
-                            });
-                        }
-                    });
-                    isDone = true;
-                }
+                });
+                imageView.setLayoutParams(MATCH_PARAMS);
+                imageView.setBackgroundColor(background);
+                layout.addView(imageView);
+                imageView.setInitCallback(new FixedSubsamplingScaleImageView.InitedCallback() {   
+                    @Override
+                    public void onInit() {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run(){
+                                layout.removeAllViews();
+                                layout.addView(imageView);
+                            }
+                        });
+                    }
+                });
+                isDone = true;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             MyLog.e(TAG, e);
+        } catch (OutOfMemoryError e) {
+            MyLog.e(TAG, e);
+            System.gc();
         }
         if (!isDone) {
             WebViewFixed wV = new WebViewFixed(context);
