@@ -206,19 +206,21 @@ public class AppearanceUtils {
         System.gc();
         
         try {
-            if (gifMethod == Constants.GIF_NATIVE_LIB && RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
-                ImageView gifView;
-                if (Constants.SDK_VERSION >= 8) {
-                    gifView = new TouchGifView(context);
-                } else {
-                    gifView = new ImageView(context);
+            if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
+                if (gifMethod == Constants.GIF_NATIVE_LIB) {
+                    GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
+                    ImageView gifView;
+                    if (Constants.SDK_VERSION >= 8) {
+                        gifView = new TouchGifView(context);
+                    } else {
+                        gifView = new ImageView(context);
+                    }
+                    gifView.setImageDrawable(gifDrawable);
+                    gifView.setLayoutParams(MATCH_PARAMS);
+                    gifView.setBackgroundColor(background);
+                    layout.addView(gifView);
+                    isDone = true;
                 }
-                gifView.setImageDrawable(gifDrawable);
-                gifView.setLayoutParams(MATCH_PARAMS);
-                gifView.setBackgroundColor(background);
-                layout.addView(gifView);
-                isDone = true;
             } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
                 imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.InitedCallback() {
