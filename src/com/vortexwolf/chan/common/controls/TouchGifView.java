@@ -5,13 +5,15 @@ import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.Movie;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageView;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
-public class TouchGifView extends SimpleGifView {
+public class TouchGifView extends ImageView {
 
     Matrix matrix = new Matrix();
 
@@ -50,7 +52,7 @@ public class TouchGifView extends SimpleGifView {
         matrix.setTranslate(1f, 1f);
         m = new float[9];
         setImageMatrix(matrix);
-        //setScaleType(ScaleType.MATRIX);
+        setScaleType(ScaleType.MATRIX);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -123,12 +125,18 @@ public class TouchGifView extends SimpleGifView {
         });
     }
 
-    @Override
+    /*@Override
     public boolean setData(byte[] array) { 
         Movie movie = Movie.decodeByteArray(array, 0, array.length);
         bmWidth = movie.width();
         bmHeight = movie.height();
         return super.setMovie(movie);
+    }*/
+    @Override
+    public void setImageDrawable(Drawable drawable) {
+       super.setImageDrawable(drawable);
+       bmWidth = drawable.getIntrinsicWidth();
+       bmHeight = drawable.getIntrinsicWidth();
     }
 
     public void setMaxZoom(float x) {
@@ -232,7 +240,16 @@ public class TouchGifView extends SimpleGifView {
     }
     
     public boolean canScrollHorizontallyOldAPI(int direction) {
-        return this.saveScale > 1f;
+        matrix.getValues(m);
+        float x = m[Matrix.MTRANS_X];
+        if (bmWidth < width) {
+            return false;
+        } else if (x >= -1 && direction < 0) {
+            return false;
+        } else if (Math.abs(x) + width + 1 >= bmWidth && direction > 0) {
+            return false;
+        }
+        return true;
     }
 
 }
