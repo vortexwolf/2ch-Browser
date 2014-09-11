@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.common.utils;
 
+import com.vortexwolf.chan.common.Constants;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -8,7 +10,9 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.view.Display;
+import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewTreeObserver;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
@@ -90,6 +94,14 @@ public class CompatibilityUtilsImpl {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText(label, text);
             clipboard.setPrimaryClip(clip);
+        }
+    }
+    
+    public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
+        if(Constants.SDK_VERSION < 16) {
+            view.getViewTreeObserver().removeGlobalOnLayoutListener(victim);
+        } else {
+            view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
         }
     }
 }
