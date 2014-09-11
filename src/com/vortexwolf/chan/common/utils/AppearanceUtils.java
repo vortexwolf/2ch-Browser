@@ -264,7 +264,11 @@ public class AppearanceUtils {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
+                if(Constants.SDK_VERSION < 16) {
+                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
+                }
                 
                 runnable.run();
             }
