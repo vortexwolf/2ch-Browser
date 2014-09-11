@@ -98,10 +98,6 @@ public class CompatibilityUtilsImpl {
     }
     
     public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
-        if(Constants.SDK_VERSION < 16) {
-            view.getViewTreeObserver().removeGlobalOnLayoutListener(victim);
-        } else {
-            view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
-        }
+        view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
     }
 }
