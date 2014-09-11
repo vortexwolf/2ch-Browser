@@ -125,13 +125,6 @@ public class TouchGifView extends ImageView {
         });
     }
 
-    /*@Override
-    public boolean setData(byte[] array) { 
-        Movie movie = Movie.decodeByteArray(array, 0, array.length);
-        bmWidth = movie.width();
-        bmHeight = movie.height();
-        return super.setMovie(movie);
-    }*/
     @Override
     public void setImageDrawable(Drawable drawable) {
        super.setImageDrawable(drawable);
@@ -239,7 +232,8 @@ public class TouchGifView extends ImageView {
         setImageMatrix(matrix);
     }
     
-    public boolean canScrollHorizontallyOldAPI(int direction) {
+    @Override
+    public boolean canScrollHorizontally(int direction) {
         matrix.getValues(m);
         float x = m[Matrix.MTRANS_X];
         if (bmWidth < width) {
@@ -250,6 +244,10 @@ public class TouchGifView extends ImageView {
             return false;
         }
         return true;
+    }
+    
+    public boolean canScrollHorizontallyOldAPI(int direction) {
+        return canScrollHorizontally(direction);
     }
 
 }

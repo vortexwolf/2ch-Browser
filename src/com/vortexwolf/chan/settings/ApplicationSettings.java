@@ -195,9 +195,9 @@ public class ApplicationSettings {
     
     public int getGifView() {
         final String defaultValue = this.mResources.getString(R.string.pref_gif_preview_default_value);
-        final String simpleGifViewValue = this.mResources.getString(R.string.pref_gif_preview_simplegifview_value);
+        final String nativeLibValue = this.mResources.getString(R.string.pref_gif_preview_native_lib_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_gif_preview_key), defaultValue);
-        if (method.equals(simpleGifViewValue)) return Constants.GIF_VIEW_SIMPLEGIFVIEW;
+        if (method.equals(nativeLibValue)) return Constants.GIF_NATIVE_LIB;
         return Constants.GIF_VIEW_DEFAULT;
     }
     

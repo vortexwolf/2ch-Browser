@@ -98,5 +98,5 @@ public class Constants {
     public static final int IMAGE_VIEW_SUBSCALEVIEW = 1;
     
     public static final int GIF_VIEW_DEFAULT = 0;
-    public static final int GIF_VIEW_SIMPLEGIFVIEW = 1;
+    public static final int GIF_NATIVE_LIB = 1;
 }
