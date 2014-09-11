@@ -1,44 +1,35 @@
 package com.vortexwolf.chan.services;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-
 import android.content.Context;
 
-import com.google.analytics.tracking.android.ExceptionReporter;
-import com.google.analytics.tracking.android.GAServiceManager;
-import com.google.analytics.tracking.android.GoogleAnalytics;
-import com.google.analytics.tracking.android.Tracker;
 import com.vortexwolf.chan.common.Constants;
 
 public class MyTracker {
 
-    private final Tracker mTracker;
-
+    private MyTrackerCompatibility m;
+    
     public MyTracker(Context context) {
-        GoogleAnalytics instance = GoogleAnalytics.getInstance(context);
-        this.mTracker = instance.getTracker(Constants.ANALYTICS_KEY);
-
-        instance.setDefaultTracker(this.mTracker);
-        instance.setDebug(Constants.DEBUG);
-
-        UncaughtExceptionHandler myHandler = new ExceptionReporter(this.mTracker, GAServiceManager.getInstance(), Thread.getDefaultUncaughtExceptionHandler(), context);
-        Thread.setDefaultUncaughtExceptionHandler(myHandler);
-    }
-
-    public Tracker getInnerTracker() {
-        return this.mTracker;
+        if (Constants.SDK_VERSION >= 4) {
+            m = new MyTrackerCompatibility(context);
+        }
     }
 
     // tracking methods
     public void trackActivityView(String pagePath) {
-        this.mTracker.sendView(pagePath);
+        if (Constants.SDK_VERSION >= 4) {
+            m.trackActivityView(pagePath);
+        }
     }
 
     public void setBoardVar(String boardName) {
-        this.mTracker.setCustomDimension(1, boardName);
+        if (Constants.SDK_VERSION >= 4) {
+            m.setBoardVar(boardName);
+        }
     }
 
     public void setPageNumberVar(int pageNumber) {
-        this.mTracker.setCustomDimension(2, String.valueOf(pageNumber));
+        if (Constants.SDK_VERSION >= 4) {
+            m.setPageNumberVar(pageNumber);
+        }
     }
 }

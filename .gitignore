@@ -10,7 +10,7 @@
 
 # generated files
 bin/
-#obj/
+obj/
 gen/
 dist/
 #*.so

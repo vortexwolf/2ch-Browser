@@ -246,7 +246,8 @@ public class PostsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(), TabsHistoryBookmarksActivity.class);
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), 
+                        Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
                 openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
                 this.startActivity(openTabsIntent);
                 break;

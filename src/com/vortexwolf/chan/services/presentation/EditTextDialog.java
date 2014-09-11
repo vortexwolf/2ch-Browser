@@ -3,6 +3,7 @@ package com.vortexwolf.chan.services.presentation;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,7 +19,7 @@ public class EditTextDialog {
 
     private String mHint;
     private String mTitle;
-    private View.OnClickListener mPositiveButtonListener;
+    private OnClickListener mPositiveButtonListener;
     private AlertDialog mDialog;
     private EditText mEditTextView;
 
@@ -35,7 +36,7 @@ public class EditTextDialog {
         this.mHint = hint;
     }
 
-    public void setPositiveButtonListener(View.OnClickListener listener) {
+    public void setPositiveButtonListener(OnClickListener listener) {
         this.mPositiveButtonListener = listener;
     }
 
@@ -46,12 +47,9 @@ public class EditTextDialog {
     public void show() {
         View view = this.createView();
 
-        this.mDialog = this.mBuilder.setTitle(this.mTitle).setNegativeButton(this.mContext.getString(R.string.cancel), null).setPositiveButton(this.mContext.getString(R.string.ok), null).setView(view).create();
+        this.mDialog = this.mBuilder.setTitle(this.mTitle).setNegativeButton(this.mContext.getString(R.string.cancel), null).setPositiveButton(this.mContext.getString(R.string.ok), mPositiveButtonListener).setView(view).create();
 
         this.mDialog.show();
-
-        Button b = this.mDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        b.setOnClickListener(EditTextDialog.this.mPositiveButtonListener);
     }
 
     public void dismiss() {
