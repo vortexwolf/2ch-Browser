@@ -1,7 +1,7 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -16,13 +16,13 @@ import android.os.Looper;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.controls.SimpleGifView;
@@ -134,39 +134,46 @@ public class AppearanceUtils {
         }
     }
     
-    public static void setScaleWebView(WebView webView, View layout, File file, Activity context) {
-        int scale = 100;
-        try {
-            Point imageSize = getImageSize(file);
-            Point resolution = getResolution(layout);
-            if (resolution == null || resolution.equals(0, 0)) {
-                resolution = getDisplayResolution(context);
+    public static void setScaleWebView(final WebView webView, final View layout, final File file, final Activity context) {
+        Runnable callSetScaleWebView = new Runnable() {
+            @Override
+            public void run() {
+                setPrivateScaleWebView(webView, layout, file, context);
             }
-            
-            if (resolution.equals(0, 0)) throw new Exception("Cannot get screen resolution");
-            
-            //MyLog.d(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
-            double scaleX = (double)resolution.x / (double)imageSize.x;
-            double scaleY = (double)resolution.y / (double)imageSize.y;
-            scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
-            scale = Math.max(scale, 1);
-            //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
-            if (Constants.SDK_VERSION >= 7) {
-                double picdpi = (context.getResources().getDisplayMetrics().density * 160d) / scaleX;
-                if (picdpi >= 240) {
-                    CompatibilityUtilsImpl.setDefaultZoomFAR(webView.getSettings());
-                } else if (picdpi <= 120) {
-                    CompatibilityUtilsImpl.setDefaultZoomCLOSE(webView.getSettings());
-                } else {
-                    CompatibilityUtilsImpl.setDefaultZoomMEDIUM(webView.getSettings());
-                }
-            }
-        } catch (Exception e) {
-            MyLog.e(TAG, e);
-        } finally {
-            webView.setInitialScale(scale);
-            webView.setPadding(0, 0, 0, 0);
+        };
+        
+        Point resolution = getResolution(layout);
+        if (resolution.equals(0, 0)) {
+            // wait until the view is measured and its size is known
+            callWhenLoaded(layout, callSetScaleWebView);
+        } else {
+            callSetScaleWebView.run();
         }
+    }
+    
+    private static void setPrivateScaleWebView(WebView webView, View layout, File file, Activity context) {
+        Point imageSize = getImageSize(file);
+        Point resolution = getResolution(layout);
+        
+        //MyLog.d(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
+        double scaleX = (double)resolution.x / (double)imageSize.x;
+        double scaleY = (double)resolution.y / (double)imageSize.y;
+        int scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
+        scale = Math.max(scale, 1);
+        //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
+        if (Constants.SDK_VERSION >= 7) {
+            double picdpi = (context.getResources().getDisplayMetrics().density * 160d) / scaleX;
+            if (picdpi >= 240) {
+                CompatibilityUtilsImpl.setDefaultZoomFAR(webView.getSettings());
+            } else if (picdpi <= 120) {
+                CompatibilityUtilsImpl.setDefaultZoomCLOSE(webView.getSettings());
+            } else {
+                CompatibilityUtilsImpl.setDefaultZoomMEDIUM(webView.getSettings());
+            }
+        }
+
+        webView.setInitialScale(scale);
+        webView.setPadding(0, 0, 0, 0);
     }
     
     private static Point getImageSize(File file) {
@@ -175,14 +182,6 @@ public class AppearanceUtils {
     
     private static Point getResolution(View view) {
         return new Point(view.getWidth(), view.getHeight());
-    }
-    
-    private static Point getDisplayResolution(Activity context) {
-        Point mResolution = new Point();
-        Display display = context.getWindowManager().getDefaultDisplay();
-        if (Constants.SDK_VERSION >= 11) CompatibilityUtilsImpl.displayGetSize(display, mResolution);
-        else mResolution.set(display.getWidth(), display.getHeight());
-        return mResolution;
     }
     
     public static int getThemeColor(Theme theme, int styleableId) {
@@ -255,6 +254,17 @@ public class AppearanceUtils {
             AppearanceUtils.setScaleWebView(wV, layout, file, context);
             wV.loadUrl(Uri.fromFile(file).toString());
         }
+    }
+    
+    public static void callWhenLoaded(final View view, final Runnable runnable){
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
+                
+                runnable.run();
+            }
+        });
     }
 
     public static class ListViewPosition {
