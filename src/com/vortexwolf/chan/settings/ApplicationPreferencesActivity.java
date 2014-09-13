@@ -88,7 +88,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
             }
             if (key.equals(res.getString(R.string.pref_unsafe_ssl_key))) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationPreferencesActivity.this);
-                builder.setMessage(R.string.pref_text_size);
+                builder.setMessage(R.string.notification_will_restart);
                 builder.setCancelable(false);
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
