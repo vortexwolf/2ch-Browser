@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.net.ssl.SSLException;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -96,6 +98,8 @@ public class HttpStreamReader {
             request = this.createRequest(uri, headersList, entity);
             try {
                 response = this.getResponse(request);
+            } catch (SSLException e) {
+                throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
             } catch (Exception e) {
                 throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
             }
@@ -231,6 +235,8 @@ public class HttpStreamReader {
         HttpResponse response = null;
         try {
             response = this.getResponse(request);
+        } catch (SSLException e) {
+            throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
         } catch (Exception e) {
             throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
         }

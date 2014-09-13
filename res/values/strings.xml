@@ -216,6 +216,7 @@
     <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
     <string name="error_list_empty">The list is empty.</string>
     <string name="error_cloudflare_check_timeout">Timeout</string>
+    <string name="error_unsafe_ssl">This Connection is Untrusted</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code.</string>
