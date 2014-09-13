@@ -22,21 +22,21 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
  *  Added for compatibility with Android 2.2 and older
  */
 
-public class MySSLSocketFactory extends SSLSocketFactory {
+public class UnsafeSSLSocketFactory extends SSLSocketFactory {
     
     SSLContext sslContext = SSLContext.getInstance("TLS");
     
-    public static MySSLSocketFactory getSocketFactory() {
+    public static UnsafeSSLSocketFactory getSocketFactory() {
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);
-            return new MySSLSocketFactory(trustStore);
+            return new UnsafeSSLSocketFactory(trustStore);
         } catch (Exception e) {
         }
         return null;
     }
     
-    public MySSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+    public UnsafeSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
         super(truststore);
 
         TrustManager tm = new X509TrustManager() {

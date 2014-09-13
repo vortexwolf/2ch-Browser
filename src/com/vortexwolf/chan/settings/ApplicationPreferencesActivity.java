@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.settings;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -84,6 +86,20 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
             } else if (key.equals(res.getString(R.string.pref_download_path_key))) {
                 ApplicationPreferencesActivity.this.updateDownloadPathSummary();
             }
+            if (key.equals(res.getString(R.string.pref_unsafe_ssl_key))) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationPreferencesActivity.this);
+                builder.setMessage(R.string.pref_text_size);
+                builder.setCancelable(false);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.exit(0);                 
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+            
         }
     }
 

@@ -177,6 +177,10 @@ public class ApplicationSettings {
         //return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_kitkat_fix_key), false);
     }
     
+    public boolean isUnsafeSSL() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_unsafe_ssl_key), false);
+    }
+    
     public boolean isMultiThumbnailsInThreads() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_multithumbnails_in_threads_key), false);
     }

@@ -11,6 +11,7 @@ import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.boards.makaba.models.MakabaError;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsList;
@@ -100,7 +101,22 @@ public class MakabaApiReader implements IJsonApiReader {
             this.mHttpStreamReader.removeIfModifiedForUri(uri);
         }
         
-        MakabaPostInfo[] result = this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task);
+        MakabaPostInfo[] result = null;
+        try {
+            result = this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task);
+        } catch (JsonApiReaderException e) {
+            MakabaError makabaError = null;
+            try {
+                makabaError = this.mJsonReader.readData(uri, MakabaError.class, listener, task);
+            } catch (Exception ex) {
+                MyLog.e(TAG, ex);
+            }
+            if (makabaError != null) {
+                String error = makabaError.code == -404 ? "404" : Integer.toString(makabaError.code);
+                if (makabaError.error != null) error += ": " + makabaError.error;
+                throw new JsonApiReaderException(error);
+            } else throw e;
+        }
         if (result == null) {
             return null;
         }
