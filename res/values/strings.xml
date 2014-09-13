@@ -142,6 +142,9 @@
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
     
+    <string name="pref_use_https">Use HTTPS</string>
+    <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>
+    
     <string name="pref_extended_preferences">Image Gallery Preferences</string>
     <string name="pref_extended_preferences_summary">Extended Preferences</string>
     
@@ -157,13 +160,13 @@
     
     <string name="pref_gif_preview">GIF Viewer</string>
     <string-array name="pref_gif_preview_choices">
-        <item>WebView (Default)</item>
+        <item>WebView</item>
         <item>libgif.so</item>
     </string-array>
     
     <string name="pref_image_preview">Image Viewer</string>
     <string-array name="pref_image_preview_choices">
-        <item>WebView (Default)</item>
+        <item>WebView</item>
         <item>subsampling-scale-image-view (requires Android 2.3.3 and newer)</item>
     </string-array>
     
