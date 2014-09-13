@@ -224,6 +224,7 @@
     <string name="error_not_json">Невозможно использовать JSON API. Откройте страницу во внешнем браузере.</string>
     <string name="error_list_empty">Список пуст.</string>
     <string name="error_cloudflare_check_timeout">Timeout</string>
+    <string name="error_unsafe_ssl">Это соединение является недоверенным</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения.</string>
