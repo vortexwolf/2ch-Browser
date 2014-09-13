@@ -38,7 +38,7 @@ import com.vortexwolf.chan.common.Constants;
 public class ExtendedHttpClient extends DefaultHttpClient {
     private static final String TAG = "ExtendedHttpClient";
 
-    private static final int SOCKET_OPERATION_TIMEOUT = 15 * 1000;
+    private static final int SOCKET_OPERATION_TIMEOUT = 30 * 1000;
 
     private static final BasicHttpParams sParams;
     private static final ClientConnectionManager sConnectionManager;
