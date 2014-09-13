@@ -66,7 +66,7 @@ public class MainApplication extends Application {
 
         MyTracker tracker = new MyTracker(this);
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
-        ExtendedHttpClient httpClient = new ExtendedHttpClient(settings.isUnsafeSSL());
+        ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
         DvachUriParser uriParser = new DvachUriParser();
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
