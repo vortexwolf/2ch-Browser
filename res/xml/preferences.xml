@@ -38,6 +38,12 @@
  		android:key="@string/pref_use_https_key"
  		android:summary="@string/pref_use_https_summary"
  		android:title="@string/pref_use_https" />
+	<CheckBoxPreference
+	    android:dependency="@string/pref_use_https_key"
+ 		android:defaultValue="false"
+ 		android:key="@string/pref_unsafe_ssl_key"
+ 		android:summary="@string/pref_unsafe_ssl_summary"
+ 		android:title="@string/pref_unsafe_ssl" />
 
     <PreferenceCategory android:title="@string/pref_category_images" >
         <CheckBoxPreference

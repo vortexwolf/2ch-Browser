@@ -42,6 +42,9 @@ public class ExtendedHttpClient extends DefaultHttpClient {
 
     private static final BasicHttpParams sParams;
     private static final ClientConnectionManager sConnectionManager;
+    private static final ClientConnectionManager sUnsafeConnectionManager;
+    
+    private boolean unsafe;
 
     static {
 
@@ -58,23 +61,33 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         // HTTPS scheme registry
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        SSLSocketFactory ssf = Constants.SDK_VERSION < 10 ?
-                MySSLSocketFactory.getSocketFactory() :
-                    SSLSocketFactory.getSocketFactory();
-        ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SSLSocketFactory ssf = SSLSocketFactory.getSocketFactory();
+        ssf.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         schemeRegistry.register(new Scheme("https", ssf, 443));
 
         // Multi threaded connection manager
         sParams = params;
         sConnectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
-
+        
+        // unsafe connection manager
+        schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        ssf = UnsafeSSLSocketFactory.getSocketFactory();
+        ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        schemeRegistry.register(new Scheme("https", ssf, 443));
+        sUnsafeConnectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
     }
 
-    public ExtendedHttpClient() {
-        super(sConnectionManager, sParams);
-                
+    public ExtendedHttpClient(boolean unsafe) {
+        super(unsafe ? sUnsafeConnectionManager : sConnectionManager, sParams);
+        this.unsafe = unsafe;
+        
         this.addRequestInterceptor(new DefaultRequestInterceptor());
         this.addResponseInterceptor(new GzipResponseInterceptor());
+    }
+    
+    public boolean isUnsafe() {
+        return unsafe;
     }
     
     public void setCookie(Cookie cookie) {
