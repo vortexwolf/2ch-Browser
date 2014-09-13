@@ -145,7 +145,7 @@
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>
     <string name="pref_unsafe_ssl">Ignore SSL Certificate Errors</string>
-    <string name="pref_unsafe_ssl_summary">Restart required</string>
+    <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
     
     <string name="pref_extended_preferences">Image Gallery Preferences</string>
     <string name="pref_extended_preferences_summary">Extended Preferences</string>
@@ -235,7 +235,6 @@
     <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
-    <string name="notification_will_restart">Application will restart</string>
     
     <string-array name="catalog_filters">
 		<item>Sort by Bump order</item>

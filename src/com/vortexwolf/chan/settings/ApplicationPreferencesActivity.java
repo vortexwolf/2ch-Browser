@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.settings;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -15,6 +17,7 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.services.MyTracker;
 
@@ -87,17 +90,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
                 ApplicationPreferencesActivity.this.updateDownloadPathSummary();
             }
             if (key.equals(res.getString(R.string.pref_unsafe_ssl_key))) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationPreferencesActivity.this);
-                builder.setMessage(R.string.notification_will_restart);
-                builder.setCancelable(false);
-                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        System.exit(0);                 
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                ((ExtendedHttpClient)Factory.resolve(DefaultHttpClient.class)).setSafe(!mSettings.isUnsafeSSL());
             }
             
         }

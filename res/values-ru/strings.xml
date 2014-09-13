@@ -151,7 +151,7 @@
     <string name="pref_use_https">Использовать HTTPS</string>
     <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
     <string name="pref_unsafe_ssl">Игнорировать ошибки SSL сертификата</string>
-    <string name="pref_unsafe_ssl_summary">Требуется перезапуск</string>
+    <string name="pref_unsafe_ssl_summary">Отключить проверку сертификата</string>
     
     <string name="pref_extended_preferences">Настройки галереи</string>
     <string name="pref_extended_preferences_summary">Дополнительные настройки</string>
@@ -243,7 +243,6 @@
     <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите...</string>
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
     <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
-    <string name="notification_will_restart">Приложение будет перезапущено</string>
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>
