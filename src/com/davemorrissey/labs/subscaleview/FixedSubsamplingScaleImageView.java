@@ -780,7 +780,7 @@ public class FixedSubsamplingScaleImageView extends View {
 
         List<Tile> baseGrid = tileMap.get(fullImageSampleSize);
         for (Tile baseTile : baseGrid) {
-            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, baseTile);
+            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, baseTile, this.failListener);
             task.execute();
         }
 
@@ -811,7 +811,7 @@ public class FixedSubsamplingScaleImageView extends View {
                     if (RectF.intersects(sVisRect, convertRect(tile.sRect))) {
                         tile.visible = true;
                         if (!tile.loading && tile.bitmap == null && load) {
-                            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, tile);
+                            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, tile, this.failListener);
                             task.execute();
                         }
                     } else if (tile.sampleSize != fullImageSampleSize) {
@@ -1083,8 +1083,11 @@ public class FixedSubsamplingScaleImageView extends View {
         private final WeakReference<BitmapRegionDecoder> decoderRef;
         private final WeakReference<Object> decoderLockRef;
         private final WeakReference<Tile> tileRef;
+        private final InitedCallback listener;
+        private boolean isFail = false;
 
-        public BitmapTileTask(FixedSubsamplingScaleImageView view, BitmapRegionDecoder decoder, Object decoderLock, Tile tile) {
+        public BitmapTileTask(FixedSubsamplingScaleImageView view, BitmapRegionDecoder decoder, Object decoderLock, Tile tile, InitedCallback listener) {
+            this.listener = listener;
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
             this.decoderRef = new WeakReference<BitmapRegionDecoder>(decoder);
             this.decoderLockRef = new WeakReference<Object>(decoderLock);
@@ -1124,12 +1127,14 @@ public class FixedSubsamplingScaleImageView extends View {
             } catch (OutOfMemoryError e) {
                 Log.e(TAG, "OutOfMemory in decode tile", e);
                 System.gc();
+                this.isFail = true;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+            if (this.isFail && listener != null) listener.onInit();
             if (viewRef != null && tileRef != null && bitmap != null) {
                 final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
                 final Tile tile = tileRef.get();
