@@ -13,6 +13,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -232,6 +233,7 @@ public class AppearanceUtils {
                 imageView.setLayoutParams(MATCH_PARAMS);
                 imageView.setBackgroundColor(background);
                 layout.addView(imageView);
+                layout.addView(LayoutInflater.from(context).inflate(R.layout.loading, null));
                 imageView.setInitCallback(new FixedSubsamplingScaleImageView.InitedCallback() {   
                     @Override
                     public void onInit() {
