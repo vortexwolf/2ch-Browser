@@ -487,16 +487,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     break;
                 }
                 
-                if (Constants.SDK_VERSION < 19) {
-                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                    i.setType("image/*");
-                    this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
-                } else {
-                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    i.addCategory(Intent.CATEGORY_OPENABLE);
-                    i.setType("image/*");
-                    this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
-                }
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.setType("image/*");
+                this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
         }
 
