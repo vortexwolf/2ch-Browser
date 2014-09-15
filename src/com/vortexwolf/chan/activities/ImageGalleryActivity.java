@@ -231,7 +231,7 @@ public class ImageGalleryActivity extends Activity {
         String thumbnailUrl = attachment.getThumbnailUrl();
         if (thumbnailUrl != null) {
             BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
-            bitmapManager.fetchBitmapOnThread(thumbnailUrl, thumbnailView, true, null, R.drawable.error_image);
+            bitmapManager.fetchBitmapOnThread(Uri.parse(thumbnailUrl), thumbnailView, true, null, R.drawable.error_image);
         } else {
             if (attachment.isFile()) {
                 thumbnailView.setImageResource(attachment.getDefaultThumbnail());

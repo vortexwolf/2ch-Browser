@@ -261,7 +261,7 @@ public class FixedSubsamplingScaleImageView extends View {
         invalidate();
     }
     
-    public final void setImageFile(String extFile, InitedCallback failListener) {
+    public final void setImageFile(String extFile, FailedCallback failListener) {
         this.failListener = failListener;
         setImageFile(extFile);
     }
@@ -1011,9 +1011,9 @@ public class FixedSubsamplingScaleImageView extends View {
         private final String source;
         private final boolean sourceIsAsset;
         private BitmapRegionDecoder decoder;
-        private final InitedCallback listener;
+        private final FailedCallback listener;
 
-        public BitmapInitTask(FixedSubsamplingScaleImageView view, Context context, String source, boolean sourceIsAsset, InitedCallback listener) {
+        public BitmapInitTask(FixedSubsamplingScaleImageView view, Context context, String source, boolean sourceIsAsset, FailedCallback listener) {
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
             this.contextRef = new WeakReference<Context>(context);
             this.source = source;
@@ -1065,7 +1065,7 @@ public class FixedSubsamplingScaleImageView extends View {
 
         @Override
         protected void onPostExecute(int[] xyo) {
-            if (xyo == null && listener != null) listener.onInit();
+            if (xyo == null && listener != null) listener.onFail();
             if (viewRef != null && decoder != null) {
                 final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
                 if (subsamplingScaleImageView != null && decoder != null && xyo != null && xyo.length == 3) {
@@ -1083,10 +1083,10 @@ public class FixedSubsamplingScaleImageView extends View {
         private final WeakReference<BitmapRegionDecoder> decoderRef;
         private final WeakReference<Object> decoderLockRef;
         private final WeakReference<Tile> tileRef;
-        private final InitedCallback listener;
+        private final FailedCallback listener;
         private boolean isFail = false;
 
-        public BitmapTileTask(FixedSubsamplingScaleImageView view, BitmapRegionDecoder decoder, Object decoderLock, Tile tile, InitedCallback listener) {
+        public BitmapTileTask(FixedSubsamplingScaleImageView view, BitmapRegionDecoder decoder, Object decoderLock, Tile tile, FailedCallback listener) {
             this.listener = listener;
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
             this.decoderRef = new WeakReference<BitmapRegionDecoder>(decoder);
@@ -1134,7 +1134,7 @@ public class FixedSubsamplingScaleImageView extends View {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            if (this.isFail && listener != null) listener.onInit();
+            if (this.isFail && listener != null) listener.onFail();
             if (viewRef != null && tileRef != null && bitmap != null) {
                 final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
                 final Tile tile = tileRef.get();
@@ -1872,7 +1872,7 @@ public class FixedSubsamplingScaleImageView extends View {
     
     
     private InitedCallback initCallback;
-    private InitedCallback failListener;
+    private FailedCallback failListener;
     
     public void setInitCallback(InitedCallback initCallback) {
         this.initCallback = initCallback;
@@ -1880,6 +1880,10 @@ public class FixedSubsamplingScaleImageView extends View {
     
     public interface InitedCallback {
         public void onInit();
+    }
+    
+    public interface FailedCallback {
+        public void onFail();
     }
     
 }
