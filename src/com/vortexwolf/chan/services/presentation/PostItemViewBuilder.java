@@ -202,7 +202,7 @@ public class PostItemViewBuilder {
             vb.badgeTitle.setText(badge.title);
 
             Uri uri = this.mDvachUriBuilder.adjustRelativeUri(Uri.parse(badge.source));
-            this.mBitmapManager.fetchBitmapOnThread(uri.toString(), vb.badgeImage, false, null, null);
+            this.mBitmapManager.fetchBitmapOnThread(uri, vb.badgeImage, false, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
         }

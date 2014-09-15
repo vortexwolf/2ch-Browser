@@ -20,8 +20,7 @@ public class BitmapManager {
         return this.mImageManager.isCached(uriString);
     }
 
-    public void fetchBitmapOnThread(final String uriString, final ImageView imageView, boolean reduceSize, final View indeterminateProgressBar, final Integer errorImageId) {
-        Uri uri = Uri.parse(uriString);
+    public void fetchBitmapOnThread(final Uri uri, final ImageView imageView, boolean reduceSize, final View indeterminateProgressBar, final Integer errorImageId) {
         imageView.setTag(uri);
 
         LoadRequest r = new LoadRequest(uri, new HttpImageManager.OnLoadResponseListener() {

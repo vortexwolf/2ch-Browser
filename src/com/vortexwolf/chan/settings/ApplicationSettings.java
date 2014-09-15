@@ -172,11 +172,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_no_limit_key), false);
     }
     
-    public boolean isKitKatFix() {
-        return false;
-        //return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_kitkat_fix_key), false);
-    }
-    
     public boolean isUnsafeSSL() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_unsafe_ssl_key), false);
     }
@@ -190,19 +185,23 @@ public class ApplicationSettings {
     }
     
     public int getImageView() {
-        final String defaultValue = this.mResources.getString(R.string.pref_image_preview_default_value);
         final String subScaleViewValue = this.mResources.getString(R.string.pref_image_preview_subscaleview_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_image_preview_key), subScaleViewValue);
-        if (method.equals(subScaleViewValue)) return Constants.IMAGE_VIEW_SUBSCALEVIEW;
-        return Constants.IMAGE_VIEW_DEFAULT;
+        if (method.equals(subScaleViewValue)) {
+            return Constants.IMAGE_VIEW_SUBSCALEVIEW;
+        }
+        
+        return Constants.IMAGE_VIEW_WEB_VIEW;
     }
     
     public int getGifView() {
-        final String defaultValue = this.mResources.getString(R.string.pref_gif_preview_default_value);
         final String nativeLibValue = this.mResources.getString(R.string.pref_gif_preview_native_lib_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_gif_preview_key), nativeLibValue);
-        if (method.equals(nativeLibValue)) return Constants.GIF_NATIVE_LIB;
-        return Constants.GIF_VIEW_DEFAULT;
+        if (method.equals(nativeLibValue)) {
+            return Constants.GIF_NATIVE_LIB;
+        }
+        
+        return Constants.GIF_WEB_VIEW;
     }
     
     public int getVideoPreviewMethod() {

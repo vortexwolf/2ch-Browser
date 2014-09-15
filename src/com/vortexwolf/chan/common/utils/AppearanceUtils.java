@@ -198,8 +198,8 @@ public class AppearanceUtils {
     
     public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background, boolean forceWebView) {
         final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        int gifMethod = forceWebView ? Constants.GIF_VIEW_DEFAULT : mSettings.getGifView();
-        int picMethod = forceWebView ? Constants.IMAGE_VIEW_DEFAULT : mSettings.getImageView();
+        int gifMethod = forceWebView ? Constants.GIF_WEB_VIEW : mSettings.getGifView();
+        int picMethod = forceWebView ? Constants.IMAGE_VIEW_WEB_VIEW : mSettings.getImageView();
         
         boolean isDone = false;
         
@@ -224,28 +224,15 @@ public class AppearanceUtils {
                 }
             } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
-                imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.InitedCallback() {
+                imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.FailedCallback() {
                     @Override
-                    public void onInit() {
+                    public void onFail() {
                         AppearanceUtils.setImage(file, context, layout, background, true);
                     }
                 });
                 imageView.setLayoutParams(MATCH_PARAMS);
                 imageView.setBackgroundColor(background);
                 layout.addView(imageView);
-                layout.addView(LayoutInflater.from(context).inflate(R.layout.loading, null));
-                imageView.setInitCallback(new FixedSubsamplingScaleImageView.InitedCallback() {   
-                    @Override
-                    public void onInit() {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run(){
-                                layout.removeAllViews();
-                                layout.addView(imageView);
-                            }
-                        });
-                    }
-                });
                 isDone = true;
             }
         } catch (Exception e) {

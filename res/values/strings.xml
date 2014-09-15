@@ -137,8 +137,6 @@
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
     <string name="pref_file_cache_no_limit">Unlimited cache</string>
     <string name="pref_file_cache_no_limit_summary">Remove the limit of cache size of 25Mb</string>
-    <string name="pref_kitkat_fix">Android KitKat Fix</string>
-    <string name="pref_kitkat_fix_summary">Force to use the system gallery in Android 4.4 or newer</string>
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
     
@@ -148,7 +146,7 @@
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
     
     <string name="pref_extended_preferences">Image Gallery Preferences</string>
-    <string name="pref_extended_preferences_summary">Extended Preferences</string>
+    <string name="pref_extended_preferences_summary">Page with extra preferences of image viewing</string>
     
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
@@ -197,17 +195,17 @@
     <string name="pref_display_all_boards_summary">Show unmoderated boards</string>
     <string name="pref_passcode">Passcode</string>
     <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
-    <string name="pref_legacy_image_viewer">Image viewer</string>
+    <string name="pref_legacy_image_viewer">Legacy image viewer</string>
     <string name="pref_legacy_image_viewer_summary">Do not use a gallery, open single images instead</string>
 
     <!-- Errors -->
-    <string name="error_send_post">An error has occured while sending the post.</string>
+    <string name="error_send_post">An error has occurred while sending the post.</string>
     <string name="error_download_data">Unable to connect to the page.</string>
-    <string name="error_unknown">An unknown error occured.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
     <string name="error_incorrect_argument">The function argument is incorrect.</string>
     <string name="error_json_parse">Error while reading the page. Try to refresh.</string>
     <string name="error_file_exist">Such file already exists.</string>
-    <string name="error_save_file">An error has occured while saving the file.</string>
+    <string name="error_save_file">An error has occurred while saving the file.</string>
     <string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
     <string name="error_image_search">The TinEye website doesn\'t work.</string>
     <string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>

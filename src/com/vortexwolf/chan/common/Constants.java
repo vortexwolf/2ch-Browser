@@ -94,9 +94,9 @@ public class Constants {
     public static final int VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN = 1;
     public static final int VIDEO_PREVIEW_METHOD_DOWNLOAD = 2;
     
-    public static final int IMAGE_VIEW_DEFAULT = 0;
+    public static final int IMAGE_VIEW_WEB_VIEW = 0;
     public static final int IMAGE_VIEW_SUBSCALEVIEW = 1;
     
-    public static final int GIF_VIEW_DEFAULT = 0;
+    public static final int GIF_WEB_VIEW = 0;
     public static final int GIF_NATIVE_LIB = 1;
 }

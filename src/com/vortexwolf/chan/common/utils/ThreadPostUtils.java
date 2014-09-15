@@ -226,7 +226,9 @@ public class ThreadPostUtils {
     }
 
     private static void loadAttachmentImage(boolean isBusy, final AttachmentInfo attachment, ImageView imageView) {
+        Uri thumbnailUrl = attachment.getThumbnailUrl() != null ? Uri.parse(attachment.getThumbnailUrl()) : null;
         // clear the image content
+        imageView.setTag(thumbnailUrl);
         imageView.setImageResource(android.R.color.transparent);         
         imageView.setOnClickListener(new OnClickListener() {
             @Override
@@ -240,14 +242,13 @@ public class ThreadPostUtils {
             return;
         }
 
-        String thumbnailUrl = attachment.getThumbnailUrl();
         // Также добавляем уменьшенное изображение, нажатие на которое
         // открывает файл в полном размере
         if (thumbnailUrl != null) {
             // Ничего не загружаем, если так установлено в настройках
             ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
             BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
-            if (settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl)) {
+            if (settings.isLoadThumbnails() || bitmapManager.isCached(thumbnailUrl.toString())) {
                 bitmapManager.fetchBitmapOnThread(thumbnailUrl, imageView, true, null, R.drawable.error_image);
             } else if (!settings.isLoadThumbnails()) {
                 imageView.setImageResource(R.drawable.empty_image);
