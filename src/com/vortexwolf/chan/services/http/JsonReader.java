@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -26,6 +28,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.common.utils.ReplaceFilterInputStream;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
@@ -158,6 +161,9 @@ public class JsonReader {
 
     private InputStream createStreamForParsing(byte[] bytes, IJsonProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
         InputStream memoryStream = IoUtils.modifyInputStream(new ByteArrayInputStream(bytes), listener.getContentLength(), listener, task);
+        Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
+        replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x5C});
+        memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
 
         return memoryStream;
     }
