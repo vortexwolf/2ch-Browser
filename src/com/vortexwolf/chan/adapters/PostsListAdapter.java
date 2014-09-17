@@ -30,7 +30,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
@@ -123,7 +123,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
             if (this.mSettings.isLinksInPopup()) {
                 this.mPostItemViewBuilder.displayPopupDialog(this.getItem(position), this.mActivityContext, this.mTheme,
-                        Constants.SDK_VERSION >= 4 && CompatibilityUtilsImpl.isTablet(mActivityContext) ? getSpanCoordinates(v, span) : null);
+                        Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(mActivityContext) ? getSpanCoordinates(v, span) : null);
             } else {
                 this.mListView.setSelection(position);
             }

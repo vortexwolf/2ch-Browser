@@ -19,7 +19,7 @@
     <string name="pref_auto_refresh_key">pref_auto_refresh_key</string>
     <string name="pref_auto_refresh_interval_key">pref_auto_refresh_interval_key</string>
     <string name="pref_display_name_key">pref_display_name_key</string>
-    <string name="pref_domain_key">pref_domain_key</string>
+    <string name="pref_domain_key">pref_domain_key1</string>
     <string name="pref_download_background_key">pref_download_background_key</string>
     <string name="pref_clear_cache_key">pref_clear_cache_key</string>
     <string name="pref_convert_post_date_key">pref_convert_post_date_key</string>

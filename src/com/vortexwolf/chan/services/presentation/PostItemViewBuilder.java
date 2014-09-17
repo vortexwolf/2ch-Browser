@@ -30,7 +30,7 @@ import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
-import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
@@ -122,7 +122,7 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
         
-        if (isTablet == null) isTablet = Constants.SDK_VERSION >= 4 && CompatibilityUtilsImpl.isTablet(mAppContext);
+        if (isTablet == null) isTablet = Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(mAppContext);
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
             if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
                 name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());

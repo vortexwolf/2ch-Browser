@@ -214,7 +214,12 @@
     <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
     <string name="error_list_empty">The list is empty.</string>
     <string name="error_cloudflare_check_timeout">Timeout</string>
-    <string name="error_unsafe_ssl">This Connection is Untrusted</string>
+    <string name="error_unsafe_ssl">This Connection is Untrusted\n
+We can\'t confirm that your connection is secure.\n\n
+Possible Solutions:\n
+- Try to set the default domain name \"2ch.hk\" in Preferences\n
+- If you understand what\'s going on, you can change the preference\n
+\"Ignore SSL Certificate Errors\"</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code.</string>

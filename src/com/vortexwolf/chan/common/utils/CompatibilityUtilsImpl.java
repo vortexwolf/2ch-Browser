@@ -1,12 +1,9 @@
 package com.vortexwolf.chan.common.utils;
 
-import com.vortexwolf.chan.common.Constants;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Point;
 import android.net.Uri;
 import android.provider.DocumentsContract;
@@ -100,10 +97,5 @@ public class CompatibilityUtilsImpl {
     
     public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
         view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
-    }
-    
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }
