@@ -1,11 +1,15 @@
 package com.vortexwolf.chan.services.presentation;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,19 +22,17 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.asynctasks.DisplayImageUriTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.BadgeModel;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -47,6 +49,7 @@ public class PostItemViewBuilder {
     private final ApplicationSettings mSettings;
     private final WindowManager mWindowManager;
     private final DvachUriBuilder mDvachUriBuilder;
+    private static Boolean isTablet = null;
 
     public PostItemViewBuilder(Context context, String boardName, String threadNumber, ApplicationSettings settings, DvachUriBuilder dvachUriBuilder) {
         this.mAppContext = context.getApplicationContext();
@@ -118,8 +121,11 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
         
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && !name.equals(ThreadPostUtils.getDefaultName(mBoardName))) {
-            if (name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
+        if (isTablet == null) isTablet = CompatibilityUtilsImpl.isTablet(mAppContext);
+        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
+            if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
+                name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
+            }
             vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
@@ -256,8 +262,8 @@ public class PostItemViewBuilder {
         vb.showFullTextView.setVisibility(View.GONE);
     }
 
-    public void displayPopupDialog(final PostItemViewModel item, Context activityContext, Theme theme) {
-        View view = this.getView(item, null, false);
+    public void displayPopupDialog(final PostItemViewModel item, final Context activityContext, Theme theme, final Point coordinates) {
+        final View view = this.getView(item, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный
         int backColor = AppearanceUtils.getThemeColor(theme, R.styleable.Theme_activityRootBackground);
@@ -272,11 +278,52 @@ public class PostItemViewBuilder {
         scrollView.setVisibility(View.VISIBLE);
 
         // Отображаем созданное view в диалоге
-        Dialog currentDialog = new Dialog(activityContext);
+        final Dialog currentDialog = new Dialog(activityContext);
         currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         currentDialog.setCanceledOnTouchOutside(true);
         currentDialog.setContentView(view);
         currentDialog.show();
+        
+        if (coordinates != null)
+            AppearanceUtils.callWhenLoaded(view, new Runnable(){
+                @Override
+                public void run() {
+                    boolean gravityLeft = true;
+                    boolean gravityTop = true;
+                    int gravity = 0;
+                    int x = coordinates.x;
+                    int y = coordinates.y;
+                    if (activityContext instanceof Activity) {
+                        Rect windowRect = new Rect();
+                        ((Activity)activityContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
+                        if (x + view.getWidth() > windowRect.width() && x >= view.getWidth()) {
+                            gravityLeft = false;
+                            x = windowRect.width() - x;
+                        }
+                        if (y + view.getHeight() > windowRect.height() && y >= view.getHeight()) {
+                            gravityTop = false;
+                            y = windowRect.height() - y;
+                        }
+                    }
+                    gravity |= gravityLeft ? Gravity.LEFT : Gravity.RIGHT;
+                    gravity |= gravityTop ? Gravity.TOP : Gravity.BOTTOM;
+                    
+                    //нужен новый диалог, т.к. в противном случае неправильно определяются координаты следующей ссылки
+                    ((ViewGroup) view.getParent()).removeView(view);
+                    currentDialog.hide();
+                    currentDialog.cancel();
+                    Dialog currentDialog = new Dialog(activityContext);
+                    WindowManager.LayoutParams params = currentDialog.getWindow().getAttributes();
+                    params.x = x;
+                    params.y = y;
+                    params.gravity = gravity;
+                    currentDialog.getWindow().setAttributes(params);
+                    currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    currentDialog.setCanceledOnTouchOutside(true);
+                    currentDialog.setContentView(view);
+                    currentDialog.show();
+                }
+            });
     }
 
     public void displayThumbnail(final View v, final PostItemViewModel item) {

@@ -20,7 +20,7 @@ public class ClickableURLSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         if (this.mListener != null) {
-            this.mListener.onClick(widget, this.mURL);
+            this.mListener.onClick(widget, this, this.mURL);
         }
     }
 
