@@ -148,7 +148,7 @@
     
     <string name="pref_use_https">Использовать HTTPS</string>
     <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
-    <string name="pref_unsafe_ssl">Игнорировать ошибки SSL сертификата</string>
+    <string name="pref_unsafe_ssl">Игнорировать ошибки SSL</string>
     <string name="pref_unsafe_ssl_summary">Отключить проверку сертификата</string>
     
     <string name="pref_extended_preferences">Настройки галереи</string>
@@ -222,7 +222,12 @@
     <string name="error_not_json">Невозможно использовать JSON API. Откройте страницу во внешнем браузере.</string>
     <string name="error_list_empty">Список пуст.</string>
     <string name="error_cloudflare_check_timeout">Timeout</string>
-    <string name="error_unsafe_ssl">Это соединение является недоверенным</string>
+    <string name="error_unsafe_ssl">Это соединение является недоверенным.\n
+Безопасность защищенного соединения не гарантирована: сертификат не может быть проверен.\n\n
+Возможные решения:\n
+- Попробуйте установить в настройках домен по умолчанию \"2ch.hk\"\n
+- Если вы понимаете, что происходит, вы можете установить в настройках:\n
+\"Игнорировать ошибки SSL\"</string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения.</string>
