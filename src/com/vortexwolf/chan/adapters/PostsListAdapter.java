@@ -6,9 +6,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources.Theme;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.text.Layout;
+import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +21,16 @@ import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
@@ -98,7 +105,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     }
 
     @Override
-    public void onClick(View v, String url) {
+    public void onClick(View v, ClickableURLSpan span, String url) {
 
         Uri uri = Uri.parse(url);
         String pageName = this.mUriParser.getThreadNumber(uri);
@@ -115,13 +122,74 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
             }
 
             if (this.mSettings.isLinksInPopup()) {
-                this.mPostItemViewBuilder.displayPopupDialog(this.getItem(position), this.mActivityContext, this.mTheme);
+                this.mPostItemViewBuilder.displayPopupDialog(this.getItem(position), this.mActivityContext, this.mTheme,
+                        CompatibilityUtilsImpl.isTablet(mActivityContext) ? getSpanCoordinates(v, span) : null);
             } else {
                 this.mListView.setSelection(position);
             }
         } else {
-            ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder).onClick(v, url);
+            ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder).onClick(v, span, url);
         }
+    }
+    
+    private Point getSpanCoordinates(View widget, ClickableURLSpan span) {
+        TextView parentTextView = (TextView) widget;
+
+        Rect parentTextViewRect = new Rect();
+
+        // Initialize values for the computing of clickedText position
+        SpannableString completeText = (SpannableString)(parentTextView).getText();
+        Layout textViewLayout = parentTextView.getLayout();
+
+        double startOffsetOfClickedText = completeText.getSpanStart(span);
+        double endOffsetOfClickedText = completeText.getSpanEnd(span);
+        double startXCoordinatesOfClickedText = textViewLayout.getPrimaryHorizontal((int)startOffsetOfClickedText);
+        double endXCoordinatesOfClickedText = textViewLayout.getPrimaryHorizontal((int)endOffsetOfClickedText);
+
+
+        // Get the rectangle of the clicked text
+        int currentLineStartOffset = textViewLayout.getLineForOffset((int)startOffsetOfClickedText);
+        int currentLineEndOffset = textViewLayout.getLineForOffset((int)endOffsetOfClickedText);
+        boolean keywordIsInMultiLine = currentLineStartOffset != currentLineEndOffset;
+        textViewLayout.getLineBounds(currentLineStartOffset, parentTextViewRect);
+
+
+        // Update the rectangle position to his real position on screen
+        int[] parentTextViewLocation = {0,0};
+        parentTextView.getLocationOnScreen(parentTextViewLocation);
+        
+        double parentTextViewTopAndBottomOffset = (
+            parentTextViewLocation[1] -
+            parentTextView.getScrollY() +
+            parentTextView.getCompoundPaddingTop()
+        );
+        if (mActivityContext instanceof Activity) {
+            Rect windowRect = new Rect();
+            ((Activity)mActivityContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
+            parentTextViewTopAndBottomOffset -= windowRect.top;
+        }
+        parentTextViewRect.top += parentTextViewTopAndBottomOffset;
+        parentTextViewRect.bottom += parentTextViewTopAndBottomOffset;
+
+        parentTextViewRect.left += (
+            parentTextViewLocation[0] +
+            startXCoordinatesOfClickedText +
+            parentTextView.getCompoundPaddingLeft() -
+            parentTextView.getScrollX()
+        );
+        parentTextViewRect.right = (int) (
+            parentTextViewRect.left +
+            endXCoordinatesOfClickedText -
+            startXCoordinatesOfClickedText
+        );
+
+        int x = (parentTextViewRect.left + parentTextViewRect.right) / 2;
+        int y = (parentTextViewRect.top + parentTextViewRect.bottom) / 2;
+        if (keywordIsInMultiLine) {
+            x = parentTextViewRect.left;
+        }
+
+        return new Point(x, y);
     }
 
     private int findPostByNumber(String postNumber) {

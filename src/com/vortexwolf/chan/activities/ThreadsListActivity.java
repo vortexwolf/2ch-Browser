@@ -365,7 +365,7 @@ public class ThreadsListActivity extends BaseListActivity {
             }
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
                 PostItemViewModel postModel = new PostItemViewModel(this.mBoardName, info.getNumber(), Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
-                this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme());
+                this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme(), null);
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
