@@ -103,10 +103,7 @@ public class CompatibilityUtilsImpl {
     }
     
     public static boolean isTablet(Context context) {
-        if (Constants.SDK_VERSION >= 4) {
-            return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-                    >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-        }
-        return false;
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }

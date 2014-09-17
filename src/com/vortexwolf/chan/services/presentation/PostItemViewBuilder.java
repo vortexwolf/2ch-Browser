@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
@@ -121,7 +122,7 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
         
-        if (isTablet == null) isTablet = CompatibilityUtilsImpl.isTablet(mAppContext);
+        if (isTablet == null) isTablet = Constants.SDK_VERSION >= 4 && CompatibilityUtilsImpl.isTablet(mAppContext);
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
             if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
                 name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());

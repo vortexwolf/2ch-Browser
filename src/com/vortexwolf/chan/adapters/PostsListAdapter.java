@@ -123,7 +123,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
             if (this.mSettings.isLinksInPopup()) {
                 this.mPostItemViewBuilder.displayPopupDialog(this.getItem(position), this.mActivityContext, this.mTheme,
-                        CompatibilityUtilsImpl.isTablet(mActivityContext) ? getSpanCoordinates(v, span) : null);
+                        Constants.SDK_VERSION >= 4 && CompatibilityUtilsImpl.isTablet(mActivityContext) ? getSpanCoordinates(v, span) : null);
             } else {
                 this.mListView.setSelection(position);
             }
