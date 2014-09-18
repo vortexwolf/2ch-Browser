@@ -30,6 +30,7 @@ import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
 import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
@@ -289,6 +290,7 @@ public class PostItemViewBuilder {
             AppearanceUtils.callWhenLoaded(view, new Runnable(){
                 @Override
                 public void run() {
+                    final float dimAmount = 0.1f;
                     boolean gravityLeft = true;
                     boolean gravityTop = true;
                     int gravity = 0;
@@ -319,6 +321,8 @@ public class PostItemViewBuilder {
                     params.y = y;
                     params.gravity = gravity;
                     currentDialog.getWindow().setAttributes(params);
+                    if (Constants.SDK_VERSION >= 14) CompatibilityUtilsImpl.setDimAmount(currentDialog.getWindow(), dimAmount);
+                    else currentDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     currentDialog.setCanceledOnTouchOutside(true);
                     currentDialog.setContentView(view);

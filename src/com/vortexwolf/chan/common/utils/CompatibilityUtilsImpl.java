@@ -11,6 +11,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
@@ -97,5 +98,9 @@ public class CompatibilityUtilsImpl {
     
     public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
         view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
+    }
+
+    public static void setDimAmount(Window window, float f) {
+        window.setDimAmount(f);
     }
 }
