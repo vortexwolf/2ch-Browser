@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.services;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 
@@ -111,6 +112,16 @@ public class PostSender implements IPostSender {
                 MyLog.v(TAG, response.getStatusLine());
             }
 
+            if (statusCode == 403) {
+                try {
+                    InputStream responseStream = response.getEntity().getContent();
+                    byte[] bytes = IoUtils.convertStreamToBytes(responseStream);
+                    if (RecaptchaService.isRecaptchaPage(new String(bytes, 0, bytes.length, Constants.UTF8_CHARSET.name()))) {
+                        return "__recaptcha__";
+                    }
+                } catch (Exception e) {}
+            }
+            
             // Вернуть ссылку на тред после успешной отправки и редиректа
             if (statusCode == 302 || statusCode == 303) {
                 return ExtendedHttpClient.getLocationHeader(response);
