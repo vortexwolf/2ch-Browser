@@ -239,6 +239,8 @@ Possible Solutions:\n
     <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
+    <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
+    <string name="error_cloudflare_recaptcha">You have entered an incorrect Captcha</string>
     
     <string-array name="catalog_filters">
 		<item>Sort by Bump order</item>

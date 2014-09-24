@@ -48,6 +48,8 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
+            mHttpClient.getCookieStore().clear();
+            
             String uriPath = CHECK_URL_PATH + "?recaptcha_challenge_field=" + this.mCaptcha.getKey() + "&recaptcha_response_field=" + URLEncoder.encode(this.mCaptchaAnswer, Constants.UTF8_CHARSET.name());
             Uri checkUri = mDvachUriBuilder.createUri(uriPath);
 

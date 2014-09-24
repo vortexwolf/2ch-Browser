@@ -4,9 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,24 +27,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
+import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
@@ -57,12 +54,8 @@ import com.vortexwolf.chan.models.presentation.DraftPostModel;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
-import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MyTracker;
-import com.vortexwolf.chan.services.http.HttpBitmapReader;
-import com.vortexwolf.chan.services.http.HttpStringReader;
-import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
@@ -104,6 +97,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     // Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить
     // (после успешной отправки)
     private boolean mFinishedSuccessfully = false;
+    
+    private boolean isRecaptcha = false;
+    private CheckCloudflareTask mCheckCloudflareTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,6 +279,30 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private void onSend() {
         // Собираем все заполненные поля
         String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
+        
+        if (this.isRecaptcha) {
+            this.showPostLoading();
+            if (this.mCheckCloudflareTask != null) {
+                this.mCheckCloudflareTask.cancel(true);
+            }
+            mCheckCloudflareTask = new CheckCloudflareTask(this.mCaptcha, captchaAnswer, new ICheckCaptchaView(){
+                @Override
+                public void showSuccess() {
+                    AddPostActivity.this.hidePostLoading();
+                    AddPostActivity.this.setRecaptcha(false);
+                    AddPostActivity.this.refreshCaptcha();
+                }
+
+                @Override
+                public void showError(String message) {
+                    AddPostActivity.this.hidePostLoading();
+                    AddPostActivity.this.showError(message != null ? message : AddPostActivity.this.getString(R.string.error_cloudflare_recaptcha));
+                    AddPostActivity.this.refreshCaptcha();
+                }  
+            });
+            mCheckCloudflareTask.execute();
+            return;
+        }
 
         String comment = this.mCommentView.getText().toString();
 
@@ -315,13 +335,19 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.sendPost(pe);
     }
 
+    private void setRecaptcha(boolean isRecaptcha) {
+        this.isRecaptcha = isRecaptcha;
+        this.mCaptchaAnswerView.setInputType(isRecaptcha ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_CLASS_NUMBER);
+        
+    }
+
     private void sendPost(SendPostModel pe) {
 
         if (this.mCurrentPostSendTask != null) {
             this.mCurrentPostSendTask.cancel(true);
         }
 
-        this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this.mBoardName, this.mThreadNumber, pe);
+        this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, pe);
         this.mCurrentPostSendTask.execute();
     }
     
@@ -367,6 +393,11 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 }
             }).start();
         }
+        if (error.equals(this.getString(R.string.notification_cloudflare_recaptcha))) {
+            this.setRecaptcha(true);
+            this.mCaptchaAnswerView.setText("");
+        }
+        
     }
 
     @Override
@@ -575,7 +606,11 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri);
+        if (!this.isRecaptcha) {
+            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri);
+        } else {
+            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this);
+        }
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

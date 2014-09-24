@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.asynctasks;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,9 +9,9 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
+import com.vortexwolf.chan.services.RecaptchaService;
 import com.vortexwolf.chan.services.YandexCaptchaService;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
 
@@ -32,6 +30,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private CaptchaEntity mCaptcha;
     private Bitmap mCaptchaImage;
     private String mUserError;
+    
+    private boolean isRecaptcha = false;
 
     public DownloadCaptchaTask(ICaptchaView view, Uri refererUri) {
         this.mView = view;
@@ -39,6 +39,22 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
         this.mUriParser = Factory.resolve(DvachUriParser.class);
+        this.isRecaptcha = false;
+    }
+    
+    public DownloadCaptchaTask(ICaptchaView view) {
+        this(view, (CaptchaEntity)null);
+    }
+    
+    public DownloadCaptchaTask(ICaptchaView view, CaptchaEntity recaptcha) {
+        this.mView = view;
+        this.mRefererUri = null;
+        this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
+        this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
+        this.mUriParser = Factory.resolve(DvachUriParser.class);
+        
+        this.isRecaptcha = true;
+        this.mCaptcha = recaptcha;
     }
 
     @Override
@@ -59,20 +75,24 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
-        this.mCanSkip = result.canSkip;
-        this.mSuccessPasscode = result.successPassCode;
-        this.mFailPasscode = result.failPassCode;
-        String captchaKey = result.captchaKey;
+        if (!isRecaptcha) {
+            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
+            this.mCanSkip = result.canSkip;
+            this.mSuccessPasscode = result.successPassCode;
+            this.mFailPasscode = result.failPassCode;
+            String captchaKey = result.captchaKey;
 
-        if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
-            return true;
-        }
-        if (captchaKey == null) {
-            return false;
-        }
+            if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
+                return true;
+            }
+            if (captchaKey == null) {
+                return false;
+            }
 
-        this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
+            this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
+        } else {
+            if (this.mCaptcha == null) if ((this.mCaptcha = RecaptchaService.loadCaptcha()) == null) return false;
+        }
 
         if (this.isCancelled()) {
             return false;
