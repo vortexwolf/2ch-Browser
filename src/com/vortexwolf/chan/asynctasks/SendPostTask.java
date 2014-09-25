@@ -42,7 +42,7 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     protected Boolean doInBackground(Void... args) {
         try {
             String result = this.mPostSender.sendPost(this.mBoardName, this.mEntity);
-            if (result.equals("__recaptcha__")) {
+            if (result != null && result.equals("__recaptcha__")) {
                 this.mRecaptcha = RecaptchaService.loadCaptcha();
                 this.mUserError = Factory.resolve(Resources.class).getString(R.string.notification_cloudflare_recaptcha);
                 return false;
