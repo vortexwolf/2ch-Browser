@@ -12,10 +12,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -257,6 +259,18 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 AddPostActivity.this.onSend();
             }
         });
+        // и заодно при нажатии на Send на софтовой клавиатуре при вводе капчи
+        this.mCaptchaAnswerView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (EditorInfo.IME_ACTION_SEND == actionId) {
+                    AddPostActivity.this.onSend();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // Удаляем прикрепленный файл
         for (int i = 0; i < this.mAttachmentViews.length; i++) {
             final int index = i;
