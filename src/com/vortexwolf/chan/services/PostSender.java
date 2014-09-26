@@ -33,6 +33,7 @@ import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.http.HttpStringReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -59,113 +60,80 @@ public class PostSender implements IPostSender {
     }
 
     @Override
-    public String sendPost(String boardName, SendPostModel entity) throws SendPostException {
+    public SendPostResult sendPost(String boardName, SendPostModel entity) {
+        SendPostResult result = new SendPostResult();
+
+        if (!ThreadPostUtils.isMakabaBoard(boardName)) {
+            result.error = "Wakaba is not supported.";
+            return result;
+        }
 
         if (boardName == null || entity == null) {
-            throw new SendPostException(this.mResources.getString(R.string.error_incorrect_argument));
+            result.error = this.mResources.getString(R.string.error_incorrect_argument);
+            return result;
         }
-        
-        String uri;
-        if (ThreadPostUtils.isMakabaBoard(boardName)) {
-            uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi?json=1").toString();
-        } else {
-            uri = this.mDvachUriBuilder.createBoardUri(boardName, "/wakaba.pl").toString();
-        }
-        
+
+        String uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi?json=1").toString();
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
 
-        // 1 - 'ро' на кириллице, 2 - 'р' на кириллице, 3 - 'о' на кириллице, 4
-        // - все латинскими буквами,
-        String[] possibleTasks = new String[] { "роst", "рost", "pоst", "post" };
-        if (ThreadPostUtils.isMakabaBoard(boardName)) { 
-            // makaba has normal "post" value, put it first
-            possibleTasks[0] = "post";
-            possibleTasks[3] = "роst";
-        }
-        
-        HashMap<String, String> extraValues = new HashMap<String, String>();
-        int statusCode = 502; // Возвращается при неправильном значении
-                              // task=post, часто меняется, поэтому неизвестно
-                              // какой будет на данный момент
-        boolean had301 = false;
         HttpPost httpPost = null;
         HttpResponse response = null;
         try {
-            for (int i = 0; i < possibleTasks.length && (statusCode == 502 || statusCode == 301); i++) {
-                httpPost = new HttpPost(uri);
-                extraValues.put("task", possibleTasks[i]);
-                response = this.executeHttpPost(boardName, httpPost, entity, extraValues);
-                // Проверяем код ответа
-                statusCode = response.getStatusLine().getStatusCode();
-
-                if (statusCode == 502) {
-                    httpPost.abort();
-                }
-
-                // TODO: rewrite this error handling
-                if (statusCode == 301 && !had301) {
-                    uri = ExtendedHttpClient.getLocationHeader(response);
-                    had301 = true;
-                    i--;
-                }
-
-                MyLog.v(TAG, response.getStatusLine());
+            httpPost = new HttpPost(uri);
+            response = this.executeHttpPost(boardName, httpPost, entity);
+            if (response == null) {
+                throw new Exception(this.mResources.getString(R.string.error_send_post));
             }
+
+            int statusCode = response.getStatusLine().getStatusCode();
 
             if (statusCode == 403) {
-                try {
-                    InputStream responseStream = response.getEntity().getContent();
-                    byte[] bytes = IoUtils.convertStreamToBytes(responseStream);
-                    if (RecaptchaService.isRecaptchaPage(new String(bytes, 0, bytes.length, Constants.UTF8_CHARSET.name()))) {
-                        return "__recaptcha__";
-                    }
-                } catch (Exception e) {}
+                String html = this.mHttpStringReader.fromResponse(response);
+                if (RecaptchaService.isRecaptchaPage(html)) {
+                    result.isRecaptcha = true;
+                    result.error = this.mResources.getString(R.string.notification_cloudflare_recaptcha);
+                    return result;
+                }
             }
-            
+
             // Вернуть ссылку на тред после успешной отправки и редиректа
             if (statusCode == 302 || statusCode == 303) {
-                return ExtendedHttpClient.getLocationHeader(response);
+                result.isSuccess = true;
+                result.location = ExtendedHttpClient.getLocationHeader(response);
+                return result;
             }
 
             if (statusCode != 200) {
-                throw new SendPostException(statusCode + " - " + response.getStatusLine().getReasonPhrase());
+                throw new Exception(statusCode + " - " + response.getStatusLine().getReasonPhrase());
             }
 
-            // Проверяю 200-response на наличие html-разметки с ошибкой
-            String responseText = null;
-            try {
-                responseText = this.mHttpStringReader.fromResponse(response);
-            } catch (HttpRequestException e) {
-                throw new SendPostException(e.getMessage());
+            if (statusCode == 200) {
+                // check json response for errors
+                String responseText = this.mHttpStringReader.fromResponse(response);
+                result = this.mResponseParser.isPostSuccessful(boardName, responseText);
             }
-
-            // Вызываю только для выброса exception
-            this.mResponseParser.isPostSuccessful(boardName, responseText);
-
-            return null;
+        } catch (Exception e) {
+            result.error = e.getMessage();
         } finally {
             ExtendedHttpClient.releaseRequestResponse(httpPost, response);
         }
+
+        return result;
     }
 
-    private HttpResponse executeHttpPost(String boardName, HttpPost httpPost, SendPostModel postModel, HashMap<String, String> extraValues) throws SendPostException {
+    private HttpResponse executeHttpPost(String boardName, HttpPost httpPost, SendPostModel postModel) {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
         HttpResponse response = null;
         try {
             httpPost.setHeader("content-type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
-            
-            HttpEntity entity;
-            if (ThreadPostUtils.isMakabaBoard(boardName)) {
-                String usercode = this.mApplicationSettings.getPassCodeValue();
-                entity = this.mMakabaSendPostMapper.mapModelToHttpEntity(boardName, usercode, postModel, extraValues);
-            } else {
-                entity = this.mDvachSendPostMapper.mapModelToHttpEntity(postModel, extraValues);
-            }
 
+            String usercode = this.mApplicationSettings.getPassCodeValue();
+
+            HttpEntity entity = this.mMakabaSendPostMapper.mapModelToHttpEntity(boardName, usercode, postModel);
             httpPost.setEntity(entity);
-            
+
             // post and ignore recvfrom exceptions
             for (int i = 0; i < 3; i++) {
                 try {
@@ -183,7 +151,7 @@ public class PostSender implements IPostSender {
             }
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            throw new SendPostException(this.mResources.getString(R.string.error_send_post));
+            return null;
         }
 
         return response;

@@ -1,8 +1,8 @@
 package com.vortexwolf.chan.interfaces;
 
-import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.models.domain.SendPostResult;
 
 public interface IPostSender {
-    String sendPost(String boardName, SendPostModel entity) throws SendPostException;
+    SendPostResult sendPost(String boardName, SendPostModel entity);
 }

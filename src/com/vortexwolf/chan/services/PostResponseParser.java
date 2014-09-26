@@ -8,6 +8,7 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.exceptions.SendPostException;
+import com.vortexwolf.chan.models.domain.SendPostResult;
 
 public class PostResponseParser {
     private static final String TAG = "PostResponseParser";
@@ -15,32 +16,36 @@ public class PostResponseParser {
     private static final Pattern sErrorPattern = Pattern.compile("(.+?)<a[^>]*>Назад</a>.*?");
     private static final Pattern sMakabaErrorPattern = Pattern.compile("\"Reason\":\\s?\"(.*?)\"");
 
-    public boolean isPostSuccessful(String boardName, String response) throws SendPostException {
-        if (response == null) {
-            return true;
+    public SendPostResult isPostSuccessful(String boardName, String responseText) {
+        SendPostResult result = new SendPostResult();
+
+        if (responseText == null) {
+            result.isSuccess = true;
+            return result;
         }
 
         if (ThreadPostUtils.isMakabaBoard(boardName)) {
-            String errorText = RegexUtils.getGroupValue(response, sMakabaErrorPattern, 1);
+            String errorText = RegexUtils.getGroupValue(responseText, sMakabaErrorPattern, 1);
             if (errorText != null) {
-                MyLog.v(TAG, errorText);
-                throw new SendPostException(errorText);
+                result.error = errorText;
+                return result;
             }
         } else {
-            Matcher centerMatcher = sCenterPattern.matcher(response);
+            Matcher centerMatcher = sCenterPattern.matcher(responseText);
             while (centerMatcher.find() && centerMatcher.groupCount() > 0) {
                 String htmlText = RegexUtils.getGroupValue(centerMatcher.group(1), sErrorPattern, 1);
                 if (htmlText != null) {
                     String text = MyHtml.fromHtml(htmlText).toString().replaceAll("\n", "");
-    
-                    MyLog.v(TAG, text);
-                    throw new SendPostException(text);
+
+                    result.error = text;
+                    return result;
                 }
             }
         }
 
         // Пусть будет true, т.к. если не нашел ошибку, то скорей всего
         // результат верный
-        return true;
+        result.isSuccess = true;
+        return result;
     }
 }

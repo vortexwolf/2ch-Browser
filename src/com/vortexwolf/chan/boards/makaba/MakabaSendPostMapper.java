@@ -18,6 +18,7 @@ import com.vortexwolf.chan.models.domain.SendPostModel;
 
 public class MakabaSendPostMapper {
     private static final Charset utf = Constants.UTF8_CHARSET;
+    private static final String TASK = "task";
     private static final String BOARD = "board";
     private static final String THREAD = "thread";
     private static final String USERCODE = "usercode";
@@ -29,15 +30,10 @@ public class MakabaSendPostMapper {
     private static final String CAPTCHA_ANSWER = "captcha_value_id_06";
     private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" }; 
     
-    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model, HashMap<String, String> customValues) {         
+    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model) {         
         MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         
-        if (customValues != null) {
-            for (Entry<String, String> entry : customValues.entrySet()) {
-                this.addStringValue(multipartEntity, entry.getKey(), entry.getValue());
-            }
-        }
-
+        this.addStringValue(multipartEntity, TASK, "post");
         this.addStringValue(multipartEntity, BOARD, boardName);
         this.addStringValue(multipartEntity, THREAD, model.getParentThread());
         this.addStringValue(multipartEntity, USERCODE, userCode);
