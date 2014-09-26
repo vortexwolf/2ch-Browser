@@ -2,6 +2,7 @@ package com.vortexwolf.chan.common.library;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -12,6 +13,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.ClientPNames;
@@ -28,6 +30,7 @@ import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpProtocolParams;
@@ -99,6 +102,17 @@ public class ExtendedHttpClient extends DefaultHttpClient {
         if (cookie != null) {
             this.getCookieStore().addCookie(cookie);
         }
+    }
+    
+    public void removeCookie(String name) {
+        CookieStore store = this.getCookieStore();
+        for (Cookie c : store.getCookies()) {
+            if (c.getName().equals(name)) {
+                ((BasicClientCookie) c).setExpiryDate(new Date(0));
+            }
+        }
+
+        store.clearExpired(new Date());
     }
     
     /** Releases all resources of the request and response objects */

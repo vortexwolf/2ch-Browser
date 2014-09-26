@@ -375,7 +375,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         AppearanceUtils.showToastMessage(this, error);
 
         if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.startsWith("Вы постите слишком быстро")) {
-            refreshCaptcha();
+            this.refreshCaptcha();
         }
         
         if (error.startsWith("503")) {
@@ -395,7 +395,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
         if (error.equals(this.getString(R.string.notification_cloudflare_recaptcha))) {
             this.setRecaptcha(true);
-            this.mCaptchaAnswerView.setText("");
+            this.refreshCaptcha();
         }
         
     }
@@ -609,7 +609,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (!this.isRecaptcha) {
             this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri);
         } else {
-            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this);
+            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, true);
         }
         this.mCurrentDownloadCaptchaTask.execute();
     }

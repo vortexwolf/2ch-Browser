@@ -11,9 +11,10 @@ import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.RecaptchaService;
 
-public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
+public class SendPostTask extends AsyncTask<Void, Long, SendPostResult> {
 
     private final IPostSender mPostSender;
     private final IPostSendView mView;
@@ -22,11 +23,6 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     private final String mBoardName;
     private final String mThreadNumber;
     private final SendPostModel mEntity;
-
-    private String mRedirectedPage = null;
-    private String mUserError;
-    
-    private CaptchaEntity mRecaptcha = null;
 
     public SendPostTask(IPostSender postSender, IPostSendView view, ICaptchaView captchaView, String boardName, String threadNumber, SendPostModel entity) {
         this.mPostSender = postSender;
@@ -39,21 +35,9 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(Void... args) {
-        try {
-            String result = this.mPostSender.sendPost(this.mBoardName, this.mEntity);
-            if (result != null && result.equals("__recaptcha__")) {
-                this.mRecaptcha = RecaptchaService.loadCaptcha();
-                this.mUserError = Factory.resolve(Resources.class).getString(R.string.notification_cloudflare_recaptcha);
-                return false;
-            } else {
-                this.mRedirectedPage = result;
-                return true;
-            }
-        } catch (Exception e) {
-            this.mUserError = e.getMessage();
-            return false;
-        }
+    protected SendPostResult doInBackground(Void... args) {
+        SendPostResult result = this.mPostSender.sendPost(this.mBoardName, this.mEntity);
+        return result;
     }
 
     @Override
@@ -62,14 +46,12 @@ public class SendPostTask extends AsyncTask<Void, Long, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(final Boolean result) {
-
+    protected void onPostExecute(final SendPostResult result) {
         this.mView.hidePostLoading();
-        if (result) {
-            this.mView.showSuccess(this.mRedirectedPage);
-        } else {
-            if (mRecaptcha != null) new DownloadCaptchaTask(mCaptchaView, mRecaptcha).execute();
-            this.mView.showError(this.mUserError);
+        if (result.isSuccess) {
+            this.mView.showSuccess(result.location);
+        } else {            
+            this.mView.showError(result.error);
         }
     }
 }

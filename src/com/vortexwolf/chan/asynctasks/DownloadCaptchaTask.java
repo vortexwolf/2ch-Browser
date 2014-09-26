@@ -30,7 +30,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private CaptchaEntity mCaptcha;
     private Bitmap mCaptchaImage;
     private String mUserError;
-    
+
     private boolean isRecaptcha = false;
 
     public DownloadCaptchaTask(ICaptchaView view, Uri refererUri) {
@@ -39,22 +39,12 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
         this.mUriParser = Factory.resolve(DvachUriParser.class);
-        this.isRecaptcha = false;
     }
-    
-    public DownloadCaptchaTask(ICaptchaView view) {
-        this(view, (CaptchaEntity)null);
-    }
-    
-    public DownloadCaptchaTask(ICaptchaView view, CaptchaEntity recaptcha) {
-        this.mView = view;
-        this.mRefererUri = null;
-        this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
-        this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
-        this.mUriParser = Factory.resolve(DvachUriParser.class);
-        
-        this.isRecaptcha = true;
-        this.mCaptcha = recaptcha;
+
+    public DownloadCaptchaTask(ICaptchaView view, boolean isRecaptcha) {
+        this(view, null);
+
+        this.isRecaptcha = isRecaptcha;
     }
 
     @Override
@@ -75,7 +65,9 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        if (!isRecaptcha) {
+        if (isRecaptcha) {
+            this.mCaptcha = RecaptchaService.loadCaptcha();
+        } else {
             HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
             this.mCanSkip = result.canSkip;
             this.mSuccessPasscode = result.successPassCode;
@@ -85,16 +77,12 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
                 return true;
             }
-            if (captchaKey == null) {
-                return false;
+            if (captchaKey != null) {
+                this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
             }
-
-            this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
-        } else {
-            if (this.mCaptcha == null) if ((this.mCaptcha = RecaptchaService.loadCaptcha()) == null) return false;
         }
 
-        if (this.isCancelled()) {
+        if (this.mCaptcha == null || this.isCancelled()) {
             return false;
         }
 

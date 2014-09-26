@@ -12,6 +12,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
@@ -28,10 +29,10 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     public static final String TAG = "CheckCloudflareTask";
     public static final String CHECK_URL_PATH = "cdn-cgi/l/chk_captcha";
 
-    private static final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
-    private static final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
-    private static final HttpStreamReader mHttpStreamReader = Factory.resolve(HttpStreamReader.class);
-    private static final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
+    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
+    private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
+    private final HttpStreamReader mHttpStreamReader = Factory.resolve(HttpStreamReader.class);
+    private final ExtendedHttpClient mHttpClient = (ExtendedHttpClient)Factory.resolve(DefaultHttpClient.class);
 
     private final CaptchaEntity mCaptcha;
     private final String mCaptchaAnswer;
@@ -48,7 +49,7 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            mHttpClient.getCookieStore().clear();
+            this.mHttpClient.removeCookie(Constants.CF_CLEARANCE_COOKIE);
             
             String uriPath = CHECK_URL_PATH + "?recaptcha_challenge_field=" + this.mCaptcha.getKey() + "&recaptcha_response_field=" + URLEncoder.encode(this.mCaptchaAnswer, Constants.UTF8_CHARSET.name());
             Uri checkUri = mDvachUriBuilder.createUri(uriPath);
