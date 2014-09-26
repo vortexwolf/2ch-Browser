@@ -19,3 +19,6 @@ dist/
 local.properties
 .settings/
 lint.xml
+.idea
+*.iml
+*.eml
