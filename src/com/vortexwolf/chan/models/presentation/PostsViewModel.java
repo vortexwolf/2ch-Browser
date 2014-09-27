@@ -34,16 +34,16 @@ public class PostsViewModel {
                 refModel.addReferenceFrom(viewModel.getNumber());
             }
         }
-
-        this.mViewModels.put(viewModel.getNumber(), viewModel);
     }
 
     public PostItemViewModel getModel(String postNumber) {
         return this.mViewModels.get(postNumber);
     }
 
-    private PostItemViewModel mapModel(PostModel item, Theme theme, IURLSpanClickListener listener) {
+    private PostItemViewModel addModel(PostModel item, Theme theme, IURLSpanClickListener listener) {
         PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, this.mThreadNumber, this.mViewModels.size(), item, theme, listener);
+        this.mViewModels.put(viewModel.getNumber(), viewModel);
+
         this.mLastPostNumber = viewModel.getNumber();
 
         this.processReferences(viewModel);
@@ -54,7 +54,7 @@ public class PostsViewModel {
     public List<PostItemViewModel> addModels(List<PostModel> items, Theme theme, IURLSpanClickListener listener, Resources resources) {
         List<PostItemViewModel> result = new ArrayList<PostItemViewModel>();
         for (PostModel item : items) {
-            PostItemViewModel model = this.mapModel(item, theme, listener);
+            PostItemViewModel model = this.addModel(item, theme, listener);
             result.add(model);
         }
         

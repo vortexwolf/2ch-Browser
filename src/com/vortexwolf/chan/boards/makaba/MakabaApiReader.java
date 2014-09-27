@@ -19,6 +19,7 @@ import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsListCatalog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
@@ -94,8 +95,8 @@ public class MakabaApiReader implements IJsonApiReader {
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = this.formatPostsUri(boardName, threadNumber);
+    public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        String uri = this.formatPostsUri(boardName, threadNumber, fromNumber);
 
         if (checkModified == false) {
             this.mHttpStreamReader.removeIfModifiedForUri(uri);
@@ -154,9 +155,8 @@ public class MakabaApiReader implements IJsonApiReader {
         return this.mDvachUriBuilder.createBoardUri(boardName, pageName + ".json").toString();
     }
 
-    private String formatPostsUri(String boardName, String threadId) {
-        // TODO: add from parameter
-        String path = String.format("/makaba/mobile.fcgi?task=get_thread&board=%s&thread=%s&num=%s", boardName, threadId, threadId);
+    private String formatPostsUri(String boardName, String threadId, String fromId) {
+        String path = String.format("/makaba/mobile.fcgi?task=get_thread&board=%s&thread=%s&num=%s", boardName, threadId, !StringUtils.isEmpty(fromId) ? fromId : threadId);
         return this.mDvachUriBuilder.createUri(path).toString();
     }
 }

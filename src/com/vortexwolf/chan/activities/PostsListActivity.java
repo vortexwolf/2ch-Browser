@@ -183,10 +183,6 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void setAdapter(Bundle savedInstanceState) {
-        if (this.mAdapter != null) {
-            return;
-        }
-
         this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mSettings, this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService, this.mUriParser);
         this.setListAdapter(this.mAdapter);
 
@@ -486,8 +482,8 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         public void setData(PostModel[] posts) {
             if (posts != null && posts.length > 0) {
-                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
                 PostsListActivity.this.setAdapterData(posts);
+                mSerializationService.serializePosts(mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
             } else {
                 PostsListActivity.this.mAdapter.clear();
                 this.showError(PostsListActivity.this.getString(R.string.error_list_empty));
@@ -529,9 +525,7 @@ public class PostsListActivity extends BaseListActivity {
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
-                // Нужно удостовериться, что элементы из posts не менялись после
-                // добавления в адаптер, чтобы сериализация прошла правильно
-                PostsListActivity.this.mSerializationService.serializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber, posts);
+                mSerializationService.serializePosts(mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             } else {
                 AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));

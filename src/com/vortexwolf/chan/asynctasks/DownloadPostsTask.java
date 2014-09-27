@@ -50,7 +50,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
 
         // Читаем по ссылке json-объект со списком постов
         try {
-            this.mPostsList = this.mJsonReader.readPostsList(this.mBoard, this.mThreadNumber, this.mIsCheckModified, this, this);
+            this.mPostsList = this.mJsonReader.readPostsList(this.mBoard, this.mThreadNumber, this.mLoadAfterPost, this.mIsCheckModified, this, this);
             return true;
         } catch (Exception e) {
             this.mUserError = e.getMessage();
