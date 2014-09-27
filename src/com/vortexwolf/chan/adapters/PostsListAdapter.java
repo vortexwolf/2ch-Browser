@@ -60,6 +60,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     private final Timer mLoadImagesTimer;
     private final ThreadImagesService mThreadImagesService;
     private final DvachUriParser mUriParser;
+    private final ArrayList<PostModel> mOriginalPosts = new ArrayList<PostModel>();
 
     private boolean mIsBusy = false;
     private boolean mIsLoadingMore = false;
@@ -208,6 +209,7 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     /** Обновляет адаптер полностью */
     public void setAdapterData(PostModel[] posts) {
         this.clear();
+        this.mOriginalPosts.clear();
 
         List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this, this.mActivityContext.getResources());
         for (PostItemViewModel model : models) {
@@ -224,6 +226,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
             this.add(model);
         }
+        
+        this.mOriginalPosts.addAll(Arrays.asList(posts));
     }
 
     public void scrollToPost(String postNumber) {
@@ -271,6 +275,8 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
 
             this.add(model);
         }
+        
+        this.mOriginalPosts.addAll(newPosts);
 
         // обновить все видимые элементы, чтобы правильно перерисовался список
         // ссылок replies
@@ -345,6 +351,10 @@ public class PostsListAdapter extends ArrayAdapter<PostItemViewModel> implements
     @Override
     public boolean isEnabled(int position) {
         return !this.isStatusView(position);
+    }
+    
+    public PostModel[] getOriginalPosts(){
+        return this.mOriginalPosts.toArray(new PostModel[this.mOriginalPosts.size()]);
     }
 
     private class LoadImagesTimerTask extends TimerTask {

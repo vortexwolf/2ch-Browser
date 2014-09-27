@@ -72,7 +72,7 @@ public class DvachApiReader implements IJsonApiReader {
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.formatPostsUri(boardName, threadNumber);
 
         if (checkModified == false) {
