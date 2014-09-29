@@ -15,32 +15,31 @@
         android:id="@+id/image_gallery_bar"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/navigation_button_size"
-        android:weightSum="100"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/image_gallery_prev"
-            android:layout_width="match_parent"
+            android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
             android:background="@null"
             android:scaleType="fitStart"
-            android:layout_weight="50"
+            android:layout_weight="1"
             android:src="?iconBack" />
 
         <TextView
             android:id="@+id/image_gallery_text"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ImageButton
             android:id="@+id/image_gallery_next"
-            android:layout_width="match_parent"
+            android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
             android:background="@null"
             android:scaleType="fitEnd"
-            android:layout_weight="50"
+            android:layout_weight="1"
             android:src="?iconForward" />
     </LinearLayout>
     
