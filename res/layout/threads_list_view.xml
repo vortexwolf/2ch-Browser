@@ -42,34 +42,36 @@
             android:visibility="gone" />
     </FrameLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/threads_navigation_bar"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/navigation_button_size" >
+        android:layout_height="@dimen/navigation_button_size">
 
         <ImageButton
             android:id="@+id/threads_prev_page"
-            android:layout_width="@dimen/navigation_button_size"
+            android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
-            android:layout_alignParentLeft="true"
             android:background="@null"
-            android:src="?iconBack" />
+            android:src="?iconBack"
+            android:scaleType="fitStart"
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/threads_page_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ImageButton
             android:id="@+id/threads_next_page"
-            android:layout_width="@dimen/navigation_button_size"
+            android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
-            android:layout_alignParentRight="true"
             android:background="@null"
-            android:src="?iconForward" />
-    </RelativeLayout>
+            android:src="?iconForward"
+            android:scaleType="fitEnd"
+            android:layout_weight="1"/>
+    </LinearLayout>
     
     <RelativeLayout
         android:id="@+id/threads_catalog_bar"

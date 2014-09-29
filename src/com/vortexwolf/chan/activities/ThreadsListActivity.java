@@ -179,9 +179,9 @@ public class ThreadsListActivity extends BaseListActivity {
         ImageButton nextButton = (ImageButton) this.findViewById(R.id.threads_next_page);
         ImageButton prevButton = (ImageButton) this.findViewById(R.id.threads_prev_page);
         if (this.mPageNumber == 0) {
-            prevButton.setVisibility(View.GONE);
+            prevButton.setVisibility(View.INVISIBLE);
         } else if (this.mPageNumber == 19) {
-            nextButton.setVisibility(View.GONE);
+            nextButton.setVisibility(View.INVISIBLE);
         }
 
         prevButton.setOnClickListener(new View.OnClickListener() {
