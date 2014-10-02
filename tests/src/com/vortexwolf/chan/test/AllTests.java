@@ -10,9 +10,11 @@ public class AllTests {
         //$JUnit-BEGIN$
         suite.addTestSuite(UriUtilsTest.class);
         suite.addTestSuite(AttachmentInfoTest.class);
-        suite.addTestSuite(HtmlCaptchaCheckerTest.class);
         suite.addTestSuite(PostResponseParserTest.class);
         suite.addTestSuite(HtmlUtilsTest.class);
+        suite.addTestSuite(HtmlCaptchaCheckerTest.class);
+        suite.addTestSuite(ThreadPostUtilsTest.class);
+        suite.addTestSuite(DvachUriBuilderTest.class);
         //$JUnit-END$
         return suite;
     }

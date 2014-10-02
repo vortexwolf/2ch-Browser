@@ -1,6 +1,8 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import pl.droidsonroids.gif.GifDrawable;
 import android.app.Activity;
@@ -222,7 +224,9 @@ public class AppearanceUtils {
                     layout.addView(gifView);
                     isDone = true;
                 }
-            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW && Constants.SDK_VERSION >= 10) {
+            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW 
+                    && Constants.SDK_VERSION >= 10
+                    && !IoUtils.isNonStandardGrayscaleImage(file)) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
                 imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.FailedCallback() {
                     @Override
