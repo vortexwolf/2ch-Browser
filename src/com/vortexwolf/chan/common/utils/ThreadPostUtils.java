@@ -94,7 +94,10 @@ public class ThreadPostUtils {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
+        
         cal.add(Calendar.HOUR, -4); // from GMT+4 to UTC
+        int offset = TimeZone.getDefault().getOffset(cal.getTimeInMillis());
+        cal.add(Calendar.MILLISECOND, offset);
 
         long result = cal.getTimeInMillis();
         return result;

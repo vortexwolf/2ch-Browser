@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -36,11 +39,15 @@ public class HistoryDataSource {
         // добавляю только если не было такой же ссылки последние 24 часа
         if (!this.hasHistoryLastDay(url, currentTime)) {
             ContentValues values = new ContentValues();
-            values.put(DvachSqlHelper.COLUMN_TITLE, title);
+            values.put(DvachSqlHelper.COLUMN_TITLE, StringUtils.emptyIfNull(title));
             values.put(DvachSqlHelper.COLUMN_URL, url);
             values.put(DvachSqlHelper.COLUMN_CREATED, currentTime);
 
-            long insertId = this.mDatabase.insert(TABLE, null, values);
+            try {
+                long insertId = this.mDatabase.insertOrThrow(TABLE, null, values);
+            } catch (Exception e) {
+                MyLog.e("HistoryDataSource", e);
+            }
         }
     }
 
