@@ -1,4 +1,4 @@
-## 2ch Browser
+﻿## 2ch Browser
 
 2ch is an imageboard where anyone can communicate easily and freely, where any point of view is acceptable. 
 The existing boards are dedicated to a variety of topics such as music, videogames, technologies, and comics. 
@@ -18,6 +18,18 @@ https://play.google.com/store/apps/details?id=com.vortexwolf.chan
 
 Direct link: 
 https://dl.dropbox.com/u/8047386/2ch-browser.apk
+
+## Building Source Code
+
+Eclipse: 
+* File → Import → Android → Existing Android code into workspace → select the whole folder.
+* EclipseCleanUpProfile.xml - Window → Preferences → Java → Code Style → Clean Up → Import → select the file → Apply.
+* EclipseFormatterProfile.xml - Window → Preferences → Java → Code Style → Formatter → Import → select the file → Apply.
+
+IntelliJ IDEA / Android Studio: 
+* Import Project → select the settings.gradle file.
+
+
 
 ## License
 

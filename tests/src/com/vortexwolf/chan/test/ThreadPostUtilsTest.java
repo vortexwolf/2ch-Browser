@@ -1,4 +1,4 @@
-﻿package com.vortexwolf.chan.test;
+package com.vortexwolf.chan.test;
 
 import java.util.Date;
 import java.util.TimeZone;

@@ -1,4 +1,4 @@
-﻿package com.vortexwolf.chan.test;
+package com.vortexwolf.chan.test;
 
 import android.test.InstrumentationTestCase;
 

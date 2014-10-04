@@ -13,6 +13,7 @@ bin/
 obj/
 gen/
 dist/
+build/
 #*.so
 
 # Local configuration file (sdk path, etc)
@@ -20,5 +21,6 @@ local.properties
 .settings/
 lint.xml
 .idea
+.gradle
 *.iml
 *.eml
