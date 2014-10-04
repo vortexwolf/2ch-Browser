@@ -1,10 +1,9 @@
-﻿package com.vortexwolf.chan.test;
+package com.vortexwolf.chan.test;
 
 import android.app.Instrumentation;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-import com.vortexwolf.chan.test.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
