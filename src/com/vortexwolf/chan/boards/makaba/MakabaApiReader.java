@@ -34,6 +34,9 @@ import com.vortexwolf.chan.services.http.JsonReader;
 
 public class MakabaApiReader implements IJsonApiReader {
     static final String TAG = "MakabaApiReader";
+    //временный костыль
+    static final boolean MOBILEAPI = false;
+    
     private final HttpStreamReader mHttpStreamReader;
     private final JsonReader mJsonReader;
     private final DvachUriBuilder mDvachUriBuilder;
@@ -104,7 +107,13 @@ public class MakabaApiReader implements IJsonApiReader {
         
         MakabaPostInfo[] result = null;
         try {
-            result = this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task);
+            if (MOBILEAPI) {
+                result = this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task);
+            } else {
+                uri = this.formatThreadJsonUri(boardName, threadNumber);
+                MakabaThreadsList res = this.mJsonReader.readData(uri, MakabaThreadsList.class, listener, task);
+                result = res.threads[0].posts;
+            }
         } catch (JsonApiReaderException e) {
             MakabaError makabaError = null;
             try {
@@ -157,6 +166,11 @@ public class MakabaApiReader implements IJsonApiReader {
 
     private String formatPostsUri(String boardName, String threadId, String fromId) {
         String path = String.format("/makaba/mobile.fcgi?task=get_thread&board=%s&thread=%s&num=%s", boardName, threadId, !StringUtils.isEmpty(fromId) ? fromId : threadId);
+        return this.mDvachUriBuilder.createUri(path).toString();
+    }
+    
+    private String formatThreadJsonUri(String boardName, String threadId) {
+        String path = String.format("/%s/res/%s.json", boardName, threadId);
         return this.mDvachUriBuilder.createUri(path).toString();
     }
 }
