@@ -34,8 +34,7 @@ import com.vortexwolf.chan.services.http.JsonReader;
 
 public class MakabaApiReader implements IJsonApiReader {
     static final String TAG = "MakabaApiReader";
-    //временный костыль
-    static final boolean MOBILEAPI = false;
+    static final boolean MOBILEAPI = true;
     
     private final HttpStreamReader mHttpStreamReader;
     private final JsonReader mJsonReader;
@@ -99,7 +98,7 @@ public class MakabaApiReader implements IJsonApiReader {
 
     @Override
     public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = this.formatPostsUri(boardName, threadNumber, fromNumber);
+        String uri = MOBILEAPI ? this.formatPostsUri(boardName, threadNumber, fromNumber) : this.formatThreadJsonUri(boardName, threadNumber);
 
         if (checkModified == false) {
             this.mHttpStreamReader.removeIfModifiedForUri(uri);
@@ -107,13 +106,8 @@ public class MakabaApiReader implements IJsonApiReader {
         
         MakabaPostInfo[] result = null;
         try {
-            if (MOBILEAPI) {
-                result = this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task);
-            } else {
-                uri = this.formatThreadJsonUri(boardName, threadNumber);
-                MakabaThreadsList res = this.mJsonReader.readData(uri, MakabaThreadsList.class, listener, task);
-                result = res.threads[0].posts;
-            }
+            result = MOBILEAPI ? this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task) :
+                this.mJsonReader.readData(uri, MakabaThreadsList.class, listener, task).threads[0].posts;
         } catch (JsonApiReaderException e) {
             MakabaError makabaError = null;
             try {
