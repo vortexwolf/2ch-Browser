@@ -63,7 +63,7 @@ public class ThreadPostUtils {
     }
 
     public static String getMoscowDateFromTimestamp(Context context, long timeInMiliseconds) {
-        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getTimeZone("GMT+4"));
+        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getTimeZone("GMT+3"));
     }
 
     public static String getLocalDateFromTimestamp(Context context, long timeInMiliseconds) {
