@@ -265,6 +265,7 @@ public class PostItemViewBuilder {
     }
 
     public void displayPopupDialog(final PostItemViewModel item, final Context activityContext, Theme theme, final Point coordinates) {
+        if (item == null) return;
         final View view = this.getView(item, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный

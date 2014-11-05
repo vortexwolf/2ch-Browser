@@ -1,11 +1,16 @@
 package com.vortexwolf.chan.common.utils;
 
+import java.util.concurrent.Executor;
+
+import com.vortexwolf.chan.common.library.MyLog;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.view.Display;
 import android.view.View;
@@ -102,5 +107,13 @@ public class CompatibilityUtilsImpl {
 
     public static void setDimAmount(Window window, float f) {
         window.setDimAmount(f);
+    }
+
+    public static void setSerialExecutor() {
+        try {
+            AsyncTask.class.getMethod("setDefaultExecutor", Executor.class).invoke(null, AsyncTask.SERIAL_EXECUTOR);
+        } catch (Exception e) {
+            MyLog.e("setDefaultExecutor", e);
+        }        
     }
 }
