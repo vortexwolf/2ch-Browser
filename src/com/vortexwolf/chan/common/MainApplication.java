@@ -63,6 +63,10 @@ public class MainApplication extends Application {
         if (Constants.SDK_VERSION >= 7) {
             MULTITOUCH_SUPPORT = CompatibilityUtilsImpl.hasMultitouchSupport(this.getPackageManager());
         }
+        
+        if (Constants.SDK_VERSION >= 19) {
+            CompatibilityUtilsImpl.setSerialExecutor();
+        }
 
         MyTracker tracker = new MyTracker(this);
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());

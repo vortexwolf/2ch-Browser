@@ -158,11 +158,13 @@ public class ImageGalleryActivity extends Activity {
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
             case R.id.share_link_menu_id:
-                Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
-                shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mCurrentImageModel.url.toString());
-                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mCurrentImageModel.url.toString());
-                this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
+                if (this.mCurrentImageModel != null && this.mCurrentImageModel.url != null) {
+                    Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
+                    shareLinkIntent.setType("text/plain");
+                    shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mCurrentImageModel.url.toString());
+                    shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mCurrentImageModel.url.toString());
+                    this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
+                }
                 break;
             case R.id.menu_search_tineye_id:
                 String tineyeSearchUrl = "http://www.tineye.com/search?url=" + this.mCurrentImageModel.url;

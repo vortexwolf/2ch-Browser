@@ -110,11 +110,11 @@ public class CloudflareCheckService {
     }
     
     public void stop() {
-        mLayout.removeView(mWebView);
-        mWebView.stopLoading();
-        mWebView.clearCache(true);
-        mWebView.destroy();
-        mWebView = null;
+        if (mWebView != null && mLayout != null) mLayout.removeView(mWebView);
+        if (mWebView != null) mWebView.stopLoading();
+        if (mWebView != null) mWebView.clearCache(true);
+        if (mWebView != null) mWebView.destroy();
+        if (mWebView != null) mWebView = null;
         isActive = false;
         MyLog.d(TAG, "Task finished");
     }
