@@ -1,10 +1,14 @@
 package com.vortexwolf.chan.common.controls;
 
+import java.lang.reflect.Field;
+
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.library.MyLog;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class ExtendedViewPager extends ViewPager {
@@ -19,13 +23,40 @@ public class ExtendedViewPager extends ViewPager {
     }
 
     private void init() {
-        /* Class sc = this.getClass().getSuperclass(); try { Field
-         * touchSlopField = sc.getDeclaredField("mTouchSlop");
-         * touchSlopField.setAccessible(true); int touchSlop =
-         * touchSlopField.getInt(this); touchSlopField.setInt(this, touchSlop *
-         * 3); } catch (Exception e) { MyLog.e("ExtendedViewPager", e); } */
+        Class sc = this.getClass().getSuperclass();
+        try {
+            Field touchSlopField = sc.getDeclaredField("mTouchSlop");
+            touchSlopField.setAccessible(true);
+            int touchSlop = touchSlopField.getInt(this);
+            touchSlopField.setInt(this, touchSlop * 3);
+        } catch (Exception e) {
+            MyLog.e("ExtendedViewPager", e);
+        }
     }
-
+    
+    /**
+     * Hacky fix for Issue #4 and
+     * http://code.google.com/p/android/issues/detail?id=18990
+     * <p/>
+     * ScaleGestureDetector seems to mess up the touch events, which means that
+     * ViewGroups which make use of onInterceptTouchEvent throw a lot of
+     * IllegalArgumentException: pointerIndex out of range.
+     * <p/>
+     * There's not much I can do in my code for now, but we can mask the result by
+     * just catching the problem and ignoring it.
+     *
+     * @author Chris Banes
+     */
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        try {
+            return super.onInterceptTouchEvent(ev);
+        } catch (IllegalArgumentException e) {
+            MyLog.e("ExtendedViewPager", e);
+            return false;
+        }
+    }
+    
     public void movePrevious() {
         int currentItem = this.getCurrentItem();
         if (currentItem > 0) {
