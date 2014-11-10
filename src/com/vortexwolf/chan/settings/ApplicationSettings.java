@@ -213,6 +213,10 @@ public class ApplicationSettings {
         if (method.equals(changeDomainMethodValue)) return Constants.VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN;
         return Constants.VIDEO_PREVIEW_METHOD_DEFAULT;
     }
+    
+    public boolean isMobileApi() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_mobileapi_key), true);
+    }
 
     public int getTheme() {
         final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_default_value);
