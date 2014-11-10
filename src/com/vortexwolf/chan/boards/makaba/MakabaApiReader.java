@@ -31,10 +31,10 @@ import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.JsonReader;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class MakabaApiReader implements IJsonApiReader {
     static final String TAG = "MakabaApiReader";
-    static final boolean MOBILEAPI = true;
     
     private final HttpStreamReader mHttpStreamReader;
     private final JsonReader mJsonReader;
@@ -98,6 +98,7 @@ public class MakabaApiReader implements IJsonApiReader {
 
     @Override
     public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        boolean MOBILEAPI = Factory.resolve(ApplicationSettings.class).isMobileApi();
         String uri = MOBILEAPI ? this.formatPostsUri(boardName, threadNumber, fromNumber) : this.formatThreadJsonUri(boardName, threadNumber);
 
         if (checkModified == false) {
