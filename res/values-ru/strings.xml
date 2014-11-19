@@ -147,7 +147,7 @@
     <string name="pref_multithumbnails_in_threads_summary">Отображать множественные вложения при предпросмотре тредов (на странице доски)</string>
     
     <string name="pref_mobileapi">Мобильный API</string>
-    <string name="pref_mobileapi_summary">mobile.fcgi</string>
+    <string name="pref_mobileapi_summary">Отключите для альтернативной загрузки тредов.</string>
     
     <string name="pref_use_https">Использовать HTTPS</string>
     <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>

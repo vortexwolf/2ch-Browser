@@ -14,24 +14,10 @@ import android.view.View;
 public class ExtendedViewPager extends ViewPager {
     public ExtendedViewPager(Context context) {
         super(context);
-        this.init();
     }
 
     public ExtendedViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.init();
-    }
-
-    private void init() {
-        Class sc = this.getClass().getSuperclass();
-        try {
-            Field touchSlopField = sc.getDeclaredField("mTouchSlop");
-            touchSlopField.setAccessible(true);
-            int touchSlop = touchSlopField.getInt(this);
-            touchSlopField.setInt(this, touchSlop * 3);
-        } catch (Exception e) {
-            MyLog.e("ExtendedViewPager", e);
-        }
     }
     
     /**

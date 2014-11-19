@@ -17,12 +17,14 @@ public class FavoritesDataSource {
             DvachSqlHelper.COLUMN_URL };
 
     private final DvachSqlHelper mDbHelper;
+    private final DvachUriParser mDvachUriParser;
 
     private SQLiteDatabase mDatabase;
     private boolean mModified = false;
 
-    public FavoritesDataSource(DvachSqlHelper dbHelper) {
+    public FavoritesDataSource(DvachSqlHelper dbHelper, DvachUriParser dvachUriParser) {
         this.mDbHelper = dbHelper;
+        this.mDvachUriParser = dvachUriParser;
     }
 
     public void open() throws SQLException {
@@ -72,14 +74,27 @@ public class FavoritesDataSource {
 
         return favorites;
     }
+    
+    public List<FavoritesEntity> getFavoriteThreads() {
+        List<FavoritesEntity> favorites = this.getAllFavorites();
+        List<FavoritesEntity> threadFavorites = new ArrayList<FavoritesEntity>();
 
-    public List<FavoritesEntity> getFavoriteBoards(DvachUriParser uriParser) {
+        for (FavoritesEntity f : favorites) {
+            if (!this.mDvachUriParser.isBoardUri(Uri.parse(f.getUrl()))) {
+                threadFavorites.add(f);
+            }
+        }
+
+        return threadFavorites;
+    }
+
+    public List<FavoritesEntity> getFavoriteBoards() {
         List<FavoritesEntity> favorites = this.getAllFavorites();
         List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
             Uri uri = Uri.parse(f.getUrl());
-            if (uriParser.isBoardUri(uri) && uriParser.getBoardPageNumber(uri) == 0) {
+            if (this.mDvachUriParser.isBoardUri(uri) && this.mDvachUriParser.getBoardPageNumber(uri) == 0) {
                 boardFavorites.add(f);
             }
         }

@@ -115,7 +115,7 @@ public class FavoritesFragment extends BaseListFragment {
 
         @Override
         protected List<FavoritesEntity> doInBackground(Void... arg0) {
-            List<FavoritesEntity> favorites = FavoritesFragment.this.mDatasource.getAllFavorites();
+            List<FavoritesEntity> favorites = FavoritesFragment.this.mDatasource.getFavoriteThreads();
             return favorites;
         }
 

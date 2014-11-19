@@ -141,7 +141,7 @@
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
     
     <string name="pref_mobileapi">Mobile API</string>
-    <string name="pref_mobileapi_summary">mobile.fcgi</string>
+    <string name="pref_mobileapi_summary">Disable for loading threads in different way.</string>
     
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>

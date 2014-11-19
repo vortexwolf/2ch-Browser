@@ -50,6 +50,14 @@ public class HistoryDataSource {
             }
         }
     }
+    
+    public void updateHistoryItem(String url, String title) {
+        ContentValues values = new ContentValues();
+        values.put(DvachSqlHelper.COLUMN_TITLE, StringUtils.emptyIfNull(title));
+        
+        this.mDatabase.update(TABLE, values, 
+                DvachSqlHelper.COLUMN_URL + " = ?", new String[] { url });
+    }
 
     public List<HistoryEntity> getAllHistory() {
         List<HistoryEntity> history = new ArrayList<HistoryEntity>();

@@ -31,6 +31,7 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
+import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
@@ -59,6 +60,7 @@ public class PostsListActivity extends BaseListActivity {
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
+    private final HistoryDataSource mHistoryDataSource = Factory.resolve(HistoryDataSource.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
@@ -225,6 +227,7 @@ public class PostsListActivity extends BaseListActivity {
 
         String tabTitle = title != null ? title : pageTitle;
         this.mTabModel.setTitle(tabTitle);
+        this.mHistoryDataSource.updateHistoryItem(this.mTabModel.getUri().toString(), tabTitle);
     }
 
     @Override
@@ -492,7 +495,9 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void showError(String error) {
-            if (error.startsWith("503")) error = "Error 503: it seems like Cloudflare check, open any board first.";
+            if (error != null && error.startsWith("503")) {
+                error = "Error 503: it seems like Cloudflare check, open any board first.";
+            }
             PostsListActivity.this.switchToErrorView(error);
         }
         
@@ -519,22 +524,22 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         public void updateData(String from, PostModel[] posts) {
             if (posts == null) {
-                AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
+                showToastIfVisible(PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
                 return;
             }
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
                 mSerializationService.serializePosts(mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
-                AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
+                showToastIfVisible(PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             } else {
-                AppearanceUtils.showToastMessage(PostsListActivity.this, PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
+                showToastIfVisible(PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
             }
         }
 
         @Override
         public void showUpdateError(String error) {
-            AppearanceUtils.showToastMessage(PostsListActivity.this, error);
+            showToastIfVisible(error);
         }
 
         @Override

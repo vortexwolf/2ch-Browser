@@ -133,7 +133,7 @@ public class PickBoardActivity extends ListActivity {
         }
 
         // add favorite boards
-        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards(this.mUriParser);
+        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
         for (FavoritesEntity f : favoriteBoards) {
             Uri uri = Uri.parse(f.getUrl());
             String boardName = this.mUriParser.getBoardName(uri);

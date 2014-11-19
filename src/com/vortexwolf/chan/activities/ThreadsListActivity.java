@@ -475,7 +475,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 if (ThreadsListActivity.this.mAdapter.getCount() == 0) {
                     this.showError(error);
                 } else {
-                    AppearanceUtils.showToastMessage(ThreadsListActivity.this, error);
+                    showToastIfVisible(error);
                 }
             }
         }

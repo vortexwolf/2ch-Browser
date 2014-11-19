@@ -36,11 +36,25 @@ public abstract class BaseListActivity extends ListActivity {
     private View mCaptchaView = null;
     private ViewType mCurrentView = null;
     
+    protected boolean mVisible = false;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.mVisible = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.mVisible = true;
     }
 
     /** Returns the layout resource Id associated with this activity */
@@ -123,6 +137,12 @@ public abstract class BaseListActivity extends ListActivity {
         // display captcha image
         DisplayImageUriTask task = new DisplayImageUriTask(captcha.getUrl(), captchaImage);
         task.execute();
+    }
+    
+    protected void showToastIfVisible(String message) {
+        if (this.mVisible) {
+            AppearanceUtils.showToastMessage(this, message);
+        }
     }
 
     /** Switches the page between the list view, loading view and error view */

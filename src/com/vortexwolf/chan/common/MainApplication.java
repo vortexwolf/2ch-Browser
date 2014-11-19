@@ -83,7 +83,7 @@ public class MainApplication extends Application {
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, new MakabaModelsMapper());
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
-        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
+        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper, uriParser);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
         BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
