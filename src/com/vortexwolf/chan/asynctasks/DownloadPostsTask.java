@@ -3,7 +3,6 @@ package com.vortexwolf.chan.asynctasks;
 import android.os.AsyncTask;
 import android.view.Window;
 
-import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;

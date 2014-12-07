@@ -1,36 +1,19 @@
 package com.vortexwolf.chan.services;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachSendPostMapper;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.MakabaSendPostMapper;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.exceptions.HttpRequestException;
-import com.vortexwolf.chan.exceptions.SendPostException;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
@@ -45,7 +28,6 @@ public class PostSender implements IPostSender {
     private final PostResponseParser mResponseParser;
     private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
-    private final DvachSendPostMapper mDvachSendPostMapper;
     private final MakabaSendPostMapper mMakabaSendPostMapper;
 
     public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings, HttpStringReader httpStringReader) {
@@ -55,18 +37,12 @@ public class PostSender implements IPostSender {
         this.mHttpStringReader = httpStringReader;
         this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
-        this.mDvachSendPostMapper = new DvachSendPostMapper();
         this.mMakabaSendPostMapper = new MakabaSendPostMapper();
     }
 
     @Override
     public SendPostResult sendPost(String boardName, SendPostModel entity) {
         SendPostResult result = new SendPostResult();
-
-        if (!ThreadPostUtils.isMakabaBoard(boardName)) {
-            result.error = "Wakaba is not supported.";
-            return result;
-        }
 
         if (boardName == null || entity == null) {
             result.error = this.mResources.getString(R.string.error_incorrect_argument);

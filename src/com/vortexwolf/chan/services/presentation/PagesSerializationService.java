@@ -2,8 +2,6 @@ package com.vortexwolf.chan.services.presentation;
 
 import java.io.File;
 
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
-import com.vortexwolf.chan.boards.dvach.models.DvachThreadInfo;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;

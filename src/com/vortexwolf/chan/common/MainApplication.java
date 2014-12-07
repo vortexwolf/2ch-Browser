@@ -4,18 +4,12 @@ import java.io.File;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Application;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
-import android.os.Build;
 
-import com.vortexwolf.chan.boards.dvach.DvachApiReader;
-import com.vortexwolf.chan.boards.dvach.DvachModelsMapper;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
@@ -29,7 +23,6 @@ import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.services.BitmapManager;
@@ -78,8 +71,6 @@ public class MainApplication extends Application {
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
         HttpBitmapReader httpBitmapReader = new HttpBitmapReader(httpBytesReader);
         JsonReader jsonApiReader = new JsonReader(this.getResources(), new ExtendedObjectMapper(), httpStreamReader);
-        DvachModelsMapper dvachModelsMapper = new DvachModelsMapper();
-        DvachApiReader dvachApiReader = new DvachApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, dvachModelsMapper);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, new MakabaModelsMapper());
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
@@ -102,7 +93,6 @@ public class MainApplication extends Application {
         container.register(HttpStringReader.class, httpStringReader);
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonReader.class, jsonApiReader);
-        container.register(DvachApiReader.class, dvachApiReader);
         container.register(MakabaApiReader.class, makabaApiReader);
         container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings, httpStringReader));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());

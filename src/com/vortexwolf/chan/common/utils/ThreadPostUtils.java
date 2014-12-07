@@ -40,13 +40,7 @@ public class ThreadPostUtils {
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
     private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг",
             "Сен", "Окт", "Ноя", "Дек" };
-
-    private static long sMaxVmHeap = Runtime.getRuntime().maxMemory() / 1024;
-    private static long sHeapPad = 1024;
     
-    private static final List<String> sWakabaBoards = Arrays.asList(new String[] { 
-        "f"
-    });
     private static final List<String> sExtendedBumpLimit = Arrays.asList(new String[] {
         "vg", "ukr", "wm", "mobi", "vn"
     });
@@ -199,16 +193,12 @@ public class ThreadPostUtils {
         return Constants.BUMP_LIMIT;
     }
     
-    public static boolean isMakabaBoard(String boardName) {
-        return sWakabaBoards.indexOf(boardName) == -1;
-    }
-    
     public static boolean isExtendedBumpLimit(String boardName) {
         return sExtendedBumpLimit.indexOf(boardName) != -1;
     }
     
     public static int getMaximumAttachments(String boardName) {
-        return ThreadPostUtils.isMakabaBoard(boardName) ? 4 : 1;
+        return 4;
     }
     
     public static void refreshAttachmentView(boolean isBusy, AttachmentInfo attachment, ThumbnailViewBag thumbnailView) {

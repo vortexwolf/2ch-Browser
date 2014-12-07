@@ -27,7 +27,7 @@ public class MakabaSendPostMapper {
     private static final String NAME = "name";
     private static final String SUBJECT = "subject";
     private static final String CAPTCHA_KEY = "captcha";
-    private static final String CAPTCHA_ANSWER = "captcha_value_id_06";
+    private static final String CAPTCHA_ANSWER = "captcha_value";
     private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" }; 
     
     public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model) {         

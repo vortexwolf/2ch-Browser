@@ -13,7 +13,6 @@ import android.text.style.URLSpan;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.MyLog;

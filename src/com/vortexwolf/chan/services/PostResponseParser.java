@@ -24,23 +24,10 @@ public class PostResponseParser {
             return result;
         }
 
-        if (ThreadPostUtils.isMakabaBoard(boardName)) {
-            String errorText = RegexUtils.getGroupValue(responseText, sMakabaErrorPattern, 1);
-            if (errorText != null) {
-                result.error = errorText;
-                return result;
-            }
-        } else {
-            Matcher centerMatcher = sCenterPattern.matcher(responseText);
-            while (centerMatcher.find() && centerMatcher.groupCount() > 0) {
-                String htmlText = RegexUtils.getGroupValue(centerMatcher.group(1), sErrorPattern, 1);
-                if (htmlText != null) {
-                    String text = MyHtml.fromHtml(htmlText).toString().replaceAll("\n", "");
-
-                    result.error = text;
-                    return result;
-                }
-            }
+        String errorText = RegexUtils.getGroupValue(responseText, sMakabaErrorPattern, 1);
+        if (errorText != null) {
+            result.error = errorText;
+            return result;
         }
 
         // Пусть будет true, т.к. если не нашел ошибку, то скорей всего

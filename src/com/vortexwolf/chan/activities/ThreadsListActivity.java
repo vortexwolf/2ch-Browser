@@ -22,28 +22,21 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.ThreadsListAdapter;
-import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadThreadsTask;
-import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
-import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
-import com.vortexwolf.chan.models.domain.CloudflareCaptchaModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
-import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
@@ -95,11 +88,7 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
         }
 
-        if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
-            this.mJsonReader = Factory.resolve(MakabaApiReader.class);
-        } else {
-            this.mJsonReader = Factory.resolve(DvachApiReader.class);
-        }
+        this.mJsonReader = Factory.resolve(MakabaApiReader.class);
         
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);

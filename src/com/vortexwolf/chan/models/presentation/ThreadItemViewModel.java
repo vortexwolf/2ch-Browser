@@ -3,9 +3,6 @@ package com.vortexwolf.chan.models.presentation;
 import android.content.res.Resources.Theme;
 import android.text.SpannableStringBuilder;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
-import com.vortexwolf.chan.boards.dvach.models.DvachThreadInfo;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;

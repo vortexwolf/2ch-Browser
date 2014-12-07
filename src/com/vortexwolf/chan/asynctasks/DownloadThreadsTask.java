@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.Window;
 
-import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;

@@ -1,10 +1,12 @@
 package com.vortexwolf.chan.common.controls;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.Layout;
 import android.text.style.LeadingMarginSpan.LeadingMarginSpan2;
 
+@SuppressLint("NewApi") 
 public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     private int margin;
     private int lines;

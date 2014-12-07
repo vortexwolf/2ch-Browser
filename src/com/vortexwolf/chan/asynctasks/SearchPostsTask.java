@@ -1,15 +1,12 @@
 package com.vortexwolf.chan.asynctasks;
 
 import android.os.AsyncTask;
-import android.view.Window;
 
-import com.vortexwolf.chan.boards.dvach.models.DvachFoundPostsList;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.interfaces.IListView;
-import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 
 public class SearchPostsTask extends AsyncTask<Void, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {

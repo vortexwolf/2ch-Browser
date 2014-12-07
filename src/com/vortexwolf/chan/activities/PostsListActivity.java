@@ -18,18 +18,15 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.PostsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadPostsTask;
-import com.vortexwolf.chan.boards.dvach.DvachApiReader;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -95,11 +92,7 @@ public class PostsListActivity extends BaseListActivity {
             this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
         }
         
-        if (ThreadPostUtils.isMakabaBoard(this.mBoardName)) {
-            this.mJsonReader = Factory.resolve(MakabaApiReader.class);
-        } else {
-            this.mJsonReader = Factory.resolve(DvachApiReader.class);
-        }
+        this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // Page title and new tab
         String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT)

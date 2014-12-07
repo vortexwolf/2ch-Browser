@@ -3,40 +3,26 @@ package com.vortexwolf.chan.services.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.models.DvachFoundPostsList;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
-import com.vortexwolf.chan.boards.dvach.models.DvachThreadsList;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.common.utils.ReplaceFilterInputStream;
-import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
-import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class JsonReader {
     static final String TAG = "JsonReader";

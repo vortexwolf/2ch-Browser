@@ -7,11 +7,8 @@ import java.util.List;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.models.DvachPostInfo;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 import com.vortexwolf.chan.models.domain.PostModel;
-import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostsViewModel {
 

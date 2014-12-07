@@ -1,6 +1,5 @@
 package com.vortexwolf.chan.interfaces;
 
-import com.vortexwolf.chan.boards.dvach.models.DvachPostsList;
 import com.vortexwolf.chan.models.domain.PostModel;
 
 public interface IPostsListView extends IListView<PostModel[]> {
