@@ -9,24 +9,20 @@ import com.vortexwolf.chan.models.presentation.ThreadImageModel;
 public class ThreadImagesService {
     private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<String, ArrayList<ThreadImageModel>>();
 
-    public void addThreadImage(String threadUrl, String imageUrl, double size, AttachmentInfo attachment) {
-        if (imageUrl == null && attachment == null) {
+    public void addThreadImage(String threadUrl, AttachmentInfo attachment) {
+        if (attachment == null || !attachment.isDisplayableInGallery()) {
             return;
         }
-
+        
         ArrayList<ThreadImageModel> imagesList = this.getOrCreateImagesList(threadUrl);
 
         ThreadImageModel model = new ThreadImageModel();
         model.position = imagesList.size() + 1;
-        model.url = imageUrl;
-        model.size = size;
+        model.url = attachment.getSourceUrl();
+        model.size = attachment.getSize();
         model.attachment = attachment;
 
         imagesList.add(model);
-    }
-    
-    public void addThreadImage(String threadUrl, String imageUrl, double size) {
-        this.addThreadImage(threadUrl, imageUrl, size, null);
     }
 
     public void clearThreadImages(String threadUrl) {

@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -21,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
@@ -184,7 +186,7 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void loadImage(ThreadImageModel model, ImageItemViewBag viewBag) {
-        if (model.attachment != null) {
+        if (!model.attachment.isDisplayableInGallery()) {
             this.setThumbnail(model.attachment, viewBag);
             return;
         }
@@ -212,6 +214,33 @@ public class ImageGalleryActivity extends Activity {
             this.mCurrentTask = new DownloadFileTask(this, uri, writeCachedFile, new ImageDownloadView(viewBag), false);
             this.mCurrentTask.execute();
         }
+    }
+    
+    private void setVideoFile(File file, ImageItemViewBag viewBag) {
+        VideoView videoView = new VideoView(this);
+        // API5: videoView.setZOrderOnTop(true);
+        videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
+
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                AppearanceUtils.showToastMessage(getApplicationContext(), "Error while playing the video.");
+                return true;
+            }
+        });
+        
+        videoView.setVideoPath(file.getAbsolutePath());
+        
+        viewBag.layout.removeAllViews();
+        viewBag.layout.addView(videoView);
+        
+        videoView.start();
     }
 
     private void setThumbnail(final AttachmentInfo attachment, ImageItemViewBag viewBag) {
@@ -246,8 +275,12 @@ public class ImageGalleryActivity extends Activity {
     }
     
     private void setImage(File file, ImageItemViewBag viewBag) {
-        AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
-
+        if (this.mCurrentImageModel.attachment.isImage()) {
+            AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
+        } else if (this.mCurrentImageModel.attachment.isVideo()) {
+            this.setVideoFile(file, viewBag);
+        }
+        
         this.mImageLoaded = true;
         this.mImageLoadedFile = file;
         this.updateOptionsMenu();

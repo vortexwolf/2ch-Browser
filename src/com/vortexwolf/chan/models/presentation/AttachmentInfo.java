@@ -86,6 +86,14 @@ public class AttachmentInfo {
     public boolean isImage() {
         return !StringUtils.isEmpty(this.mSourceExtension) && Constants.IMAGE_EXTENSIONS.contains(this.mSourceExtension);
     }
+    
+    public boolean isVideo() {
+        return "webm".equalsIgnoreCase(this.mSourceExtension);
+    }
+    
+    public boolean isDisplayableInGallery() {
+        return this.isImage() || this.isVideo();
+    }
 
     public String getThumbnailUrl() {
         return this.mThumbnailUrl;
