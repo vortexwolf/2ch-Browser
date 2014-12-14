@@ -25,7 +25,7 @@ import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.services.presentation.FlowTextHelper;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public class PostItemViewModel {
+public class PostItemViewModel implements IPostListEntity {
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
     private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?(?:title=\"(.+?)\")?.*?/>");
 
@@ -282,5 +282,9 @@ public class PostItemViewModel {
 
     public boolean isCommentFloat() {
         return this.isFloatImageComment;
+    }
+    
+    public boolean isListItemEnabled() {
+        return true;
     }
 }

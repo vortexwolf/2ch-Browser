@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
     android:gravity="center"
-    android:orientation="horizontal"
-    android:padding="5.0dip" >
+    android:orientation="horizontal">
 
     <ProgressBar
         style="?android:attr/progressBarStyleSmall"

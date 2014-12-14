@@ -35,8 +35,10 @@ import com.vortexwolf.chan.interfaces.IPostsListView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
+import com.vortexwolf.chan.models.presentation.IPostListEntity;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
+import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.ThreadImagesService;
@@ -196,7 +198,9 @@ public class PostsListActivity extends BaseListActivity {
         boolean isFirstTime = this.mAdapter.isEmpty();
 
         this.mAdapter.setAdapterData(posts);
-        this.updateTitle(this.mAdapter.getItem(0).getSubjectOrText());
+        
+        PostItemViewModel firstModel = (PostItemViewModel)this.mAdapter.getItem(0);
+        this.updateTitle(firstModel.getSubjectOrText());
 
         if (isFirstTime) {
             if (this.mPostNumber != null) {
@@ -294,19 +298,23 @@ public class PostsListActivity extends BaseListActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        PostItemViewModel item = this.mAdapter.getItem(info.position);
+        IPostListEntity item = this.mAdapter.getItem(info.position);
+        if (item instanceof StatusIndicatorEntity) {
+            return;
+        }
 
+        PostItemViewModel model = (PostItemViewModel)item;
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST, 0, this.getString(R.string.cmenu_reply_post));
-        if (!StringUtils.isEmpty(item.getSpannedComment().toString())) {
+        if (!StringUtils.isEmpty(model.getSpannedComment().toString())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST_QUOTE, 1, this.getString(R.string.cmenu_reply_post_quote));
         }
-        if (!StringUtils.isEmpty(item.getSpannedComment())) {
+        if (!StringUtils.isEmpty(model.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
         }
-        if (item.hasAttachment() && item.getAttachment(0).isFile()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(item.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
+        if (model.hasAttachment() && model.getAttachment(0).isFile()) {
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(model.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
         }
-        if (!StringUtils.isEmpty(item.getSpannedComment())) {
+        if (!StringUtils.isEmpty(model.getSpannedComment())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 4, this.getString(R.string.cmenu_share));
         }
     }
@@ -314,14 +322,19 @@ public class PostsListActivity extends BaseListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        PostItemViewModel info = this.mAdapter.getItem(menuInfo.position);
+        IPostListEntity adapterItem = this.mAdapter.getItem(menuInfo.position);
+        if (adapterItem instanceof StatusIndicatorEntity) {
+            return true;
+        }
+        
+        PostItemViewModel model = (PostItemViewModel) adapterItem;
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_REPLY_POST:
-                this.navigateToAddPostView(info.getNumber(), null);
+                this.navigateToAddPostView(model.getNumber(), null);
                 break;
             case Constants.CONTEXT_MENU_REPLY_POST_QUOTE:
-                this.navigateToAddPostView(info.getNumber(), info.getSpannedComment().toString());
+                this.navigateToAddPostView(model.getNumber(), model.getSpannedComment().toString());
                 break;
             case Constants.CONTEXT_MENU_COPY_TEXT:
                 View view = AppearanceUtils.getListItemAtPosition(this.getListView(), menuInfo.position);
@@ -330,14 +343,14 @@ public class PostsListActivity extends BaseListActivity {
                 if (CompatibilityUtils.isTextSelectable(vb.commentView)) {
                     vb.commentView.startSelection();
                 } else {
-                    CompatibilityUtils.copyText(this, "#" + info.getNumber(), info.getSpannedComment().toString());
+                    CompatibilityUtils.copyText(this, "#" + model.getNumber(), model.getSpannedComment().toString());
 
                     AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
                 }
                 break;
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
-                for (int i = 0; i < info.getAttachmentsNumber(); ++i) {
-                    AttachmentInfo attachment = info.getAttachment(i);
+                for (int i = 0; i < model.getAttachmentsNumber(); ++i) {
+                    AttachmentInfo attachment = model.getAttachment(i);
                     Uri fileUri = Uri.parse(attachment.getSourceUrl());
                     new DownloadFileTask(this, fileUri).execute();
                 }
@@ -345,8 +358,8 @@ public class PostsListActivity extends BaseListActivity {
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
                 shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getUri().toString() + "#" + info.getNumber());
-                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, info.getSpannedComment().toString());
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getUri().toString() + "#" + model.getNumber());
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, model.getSpannedComment().toString());
                 this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
                 break;
         }
@@ -406,7 +419,7 @@ public class PostsListActivity extends BaseListActivity {
         }
     }
 
-    protected void refresh() {
+    public void refresh() {
         this.refreshPosts(true);
     }
 
@@ -537,7 +550,7 @@ public class PostsListActivity extends BaseListActivity {
 
         @Override
         public void showUpdateLoading() {
-            PostsListActivity.this.mAdapter.setLoadingMore(true);
+            PostsListActivity.this.mAdapter.setUpdating(true);
         }
 
         @Override
@@ -545,7 +558,7 @@ public class PostsListActivity extends BaseListActivity {
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
             PostsListActivity.this.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
 
-            PostsListActivity.this.mAdapter.setLoadingMore(false);
+            PostsListActivity.this.mAdapter.setUpdating(false);
             PostsListActivity.this.mCurrentDownloadTask = null;
         }
     }
