@@ -134,11 +134,17 @@ public class ImageGalleryActivity extends Activity {
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
         MenuItem refreshMenuItem = this.mMenu.findItem(R.id.refresh_menu_id);
         MenuItem playVideoMenuItem = this.mMenu.findItem(R.id.play_video_menu_id);
+        MenuItem searchTineyeMenuItem = this.mMenu.findItem(R.id.menu_search_tineye_id);
+        MenuItem searchGoogleMenuItem = this.mMenu.findItem(R.id.menu_search_google_id);
+        MenuItem imageOpsMenuItem = this.mMenu.findItem(R.id.menu_image_operations_id);
 
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(!this.mImageLoaded);
         playVideoMenuItem.setVisible(this.mImageLoaded && this.mCurrentImageModel.attachment.isVideo());
+        searchTineyeMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+        searchGoogleMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+        imageOpsMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
     }
 
     @Override
@@ -222,12 +228,13 @@ public class ImageGalleryActivity extends Activity {
             this.mCurrentTask.execute();
         }
     }
-    
-    private boolean videoPlaying = false;
-    private void setVideoFile(final File file, ImageItemViewBag viewBag) {
+
+    private void setVideoFile(final File file, final ImageItemViewBag viewBag) {
         final VideoView videoView = new VideoView(this);
-        // API5: videoView.setZOrderOnTop(true);
         videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
+
+        viewBag.layout.removeAllViews();
+        viewBag.layout.addView(videoView);
 
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -238,38 +245,36 @@ public class ImageGalleryActivity extends Activity {
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                AppearanceUtils.showToastMessage(getApplicationContext(), "Error while playing the video.");
+                MyLog.e(TAG, "Error code: " + what);
+                viewBag.switchToErrorView(getString(R.string.error_video_playing));
                 return true;
             }
         });
-        
+
         videoView.setVideoPath(file.getAbsolutePath());
-        
-        viewBag.layout.removeAllViews();
-        viewBag.layout.addView(videoView);
-        
+
         viewBag.layout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!videoPlaying) {
+                if (!viewBag.isVideoPlaying) {
                     videoView.start();
-                    videoPlaying = true;
+                    viewBag.isVideoPlaying = true;
                 }
             }
         });
     }
-    
+
     static void playVideoExternal(File file, Context context) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(file), "video/*");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
-    
+
     private void setThumbnail(final AttachmentInfo attachment, ImageItemViewBag viewBag) {
         int thumbnailSize = (int) getResources().getDimension(R.dimen.thumbnail_size);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(thumbnailSize, thumbnailSize, Gravity.CENTER);
-        
+
         ImageView thumbnailView = new ImageView(this);
         thumbnailView.setLayoutParams(layoutParams);
         thumbnailView.setBackgroundColor(ImageGalleryActivity.this.mBackgroundColor);
@@ -281,7 +286,7 @@ public class ImageGalleryActivity extends Activity {
                 ThreadPostUtils.openExternalAttachment(attachment, ImageGalleryActivity.this);
             }
         });
-        
+
         String thumbnailUrl = attachment.getThumbnailUrl();
         if (thumbnailUrl != null) {
             BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
@@ -293,23 +298,23 @@ public class ImageGalleryActivity extends Activity {
                 thumbnailView.setImageResource(R.drawable.error_image);
             }
         }
-        
+
         AppearanceUtils.showToastMessage(this, getResources().getString(R.string.notification_video_thumbnail));
     }
-    
+
     private void setImage(File file, ImageItemViewBag viewBag) {
         if (this.mCurrentImageModel.attachment.isImage()) {
             AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
         } else if (this.mCurrentImageModel.attachment.isVideo()) {
             this.setVideoFile(file, viewBag);
         }
-        
+
         this.mImageLoaded = true;
         this.mImageLoadedFile = file;
         this.updateOptionsMenu();
     }
-    
-    
+
+
 
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
         private final LayoutInflater mInflater;
@@ -397,12 +402,10 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void showError(String error) {
-            this.mViewBag.layout.setVisibility(View.GONE);
-            this.mViewBag.loading.setVisibility(View.GONE);
-            this.mViewBag.error.setVisibility(View.VISIBLE);
-
-            TextView errorTextView = (TextView) this.mViewBag.error.findViewById(R.id.error_text);
-            errorTextView.setText(error != null ? error : ImageGalleryActivity.this.getString(R.string.error_unknown));
+            this.mViewBag.switchToErrorView(
+                error != null
+                ? error
+                : ImageGalleryActivity.this.getString(R.string.error_unknown));
         }
 
         @Override
@@ -415,6 +418,16 @@ public class ImageGalleryActivity extends Activity {
         FrameLayout layout;
         View loading;
         View error;
+
+        boolean isVideoPlaying = false;
+
+        public void switchToErrorView(String errorMessage) {
+            this.layout.setVisibility(View.GONE);
+            this.loading.setVisibility(View.GONE);
+            this.error.setVisibility(View.VISIBLE);
+
+            TextView errorTextView = (TextView) this.error.findViewById(R.id.error_text);
+            errorTextView.setText(errorMessage);
+        }
     }
-    
 }

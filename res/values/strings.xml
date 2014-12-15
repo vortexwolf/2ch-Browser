@@ -218,6 +218,9 @@ Possible Solutions:\n
 - Try to set the default domain name \"2ch.hk\" in Preferences\n
 - If you understand what\'s going on, you can change the preference\n
 \"Ignore SSL Certificate Errors\"</string>
+    <string name="error_video_playing">Cannot play the video file.
+\nSelect a menu item to open with an external player.
+    </string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code.</string>

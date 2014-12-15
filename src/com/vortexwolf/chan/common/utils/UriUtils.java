@@ -1,8 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.net.Uri;
 
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -18,19 +15,27 @@ public class UriUtils {
         return Uri.parse(url);
     }
 
-    public static boolean isImageUri(Uri uri) {        
+    public static boolean isImageUri(Uri uri) {
         if (uri == null) {
             return false;
         }
-        
+
         return RegexUtils.isImagePathString(uri.toString());
+    }
+
+    public static boolean isWebmUri(Uri uri) {
+        if (uri == null) {
+            return false;
+        }
+
+        return RegexUtils.getFileExtension(uri.toString()).equalsIgnoreCase("webm");
     }
 
     public static boolean isYoutubeUri(Uri uri) {
         if (uri == null) {
             return false;
         }
-        
+
         String host = uri.getHost();
         return host != null && host.endsWith("youtube.com");
     }
@@ -38,15 +43,15 @@ public class UriUtils {
     public static String formatYoutubeUri(String code) {
         return "http://www.youtube.com/watch?v=" + code;
     }
-    
+
     public static String formatYoutubeMobileUri(String code) {
         return "http://m.youtube.com/#/watch?v=" + code;
     }
-    
+
     public static String formatYoutubeThumbnailUri(String code) {
         return "http://img.youtube.com/vi/" + code + "/default.jpg";
     }
-    
+
     public static boolean areCookieDomainsEqual(String cookieDomain, String siteDomain) {
         if (!cookieDomain.startsWith(".")) {
             cookieDomain = "." + cookieDomain;
@@ -54,17 +59,17 @@ public class UriUtils {
         if (!siteDomain.startsWith(".")) {
             siteDomain = "." + siteDomain;
         }
-        
+
         return cookieDomain.equalsIgnoreCase(siteDomain);
     }
-    
+
     public static Uri createRefererUri(String boardName, String threadNumber) {
         DvachUriBuilder uriBuilder = Factory.resolve(DvachUriBuilder.class);
-        
+
         if(StringUtils.isEmpty(threadNumber) || threadNumber == Constants.ADD_THREAD_PARENT) {
             return uriBuilder.createBoardUri(boardName, 0);
         }
-        
+
         return Uri.parse(uriBuilder.createThreadUri(boardName, threadNumber));
     }
 }

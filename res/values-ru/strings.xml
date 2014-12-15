@@ -91,6 +91,7 @@
     <string name="menu_search_image_tineye">Поиск в TinEye</string>
     <string name="menu_search_image_google">Поиск в Google</string>
     <string name="menu_image_operations">Действия c изображением</string>
+    <string name="menu_play_video_external">Открыть во внешнем плеере</string>
     
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
@@ -109,7 +110,6 @@
     <string name="cmenu_hide_thread">Скрыть тред</string>
     <string name="cmenu_share">Поделиться</string>
     <string name="cmenu_open_thread">Открыть тред</string>
-    <string name="menu_play_video_external">Открыть во внешнем плеере</string>
 
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
@@ -226,7 +226,10 @@
 - Попробуйте установить в настройках домен по умолчанию \"2ch.hk\"\n
 - Если вы понимаете, что происходит, вы можете установить в настройках:\n
 \"Игнорировать ошибки SSL\"</string>
-
+    <string name="error_video_playing">Не удалось запустить видео.
+\nВыберите опцию в меню для открытия во внешнем плеере.
+    </string>
+    
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения.</string>
     <string name="warning_write_comment">Напишите что-нибудь в сообщении.</string>

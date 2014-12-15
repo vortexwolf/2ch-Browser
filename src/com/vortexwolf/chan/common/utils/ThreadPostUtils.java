@@ -1,6 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,24 +9,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Debug;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.activities.ImageGalleryActivity;
-import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.library.DialogDownloadFileView;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
@@ -40,11 +32,11 @@ public class ThreadPostUtils {
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
     private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг",
             "Сен", "Окт", "Ноя", "Дек" };
-    
+
     private static final List<String> sExtendedBumpLimit = Arrays.asList(new String[] {
         "vg", "ukr", "wm", "mobi", "vn"
     });
-    
+
     public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
@@ -88,7 +80,7 @@ public class ThreadPostUtils {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        
+
         cal.add(Calendar.HOUR, -4); // from GMT+4 to UTC
         int offset = TimeZone.getDefault().getOffset(cal.getTimeInMillis());
         cal.add(Calendar.MILLISECOND, offset);
@@ -111,7 +103,7 @@ public class ThreadPostUtils {
     public static boolean hasAttachment(PostModel item) {
         return item.getAttachments().size() > 0;
     }
-    
+
     public static int getAttachmentsNumber(PostModel item) {
         return item.getAttachments().size();
     }
@@ -121,7 +113,7 @@ public class ThreadPostUtils {
         String url = attachment.getSourceUrl();
         BrowserLauncher.launchExternalBrowser(context, url);
     }
-    
+
     public static void openAttachment(final AttachmentInfo attachment, final Context context) {
         if (attachment == null) {
             return;
@@ -148,39 +140,39 @@ public class ThreadPostUtils {
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
         } else {
-            if (!UriUtils.isImageUri(uri) && !attachment.isVideo()) {
-                openExternalAttachment(attachment, context);
-            } else {
+            if (attachment.isDisplayableInGallery()) {
                 BrowserLauncher.launchInternalBrowser(context, url);
+            } else {
+                openExternalAttachment(attachment, context);
             }
         }
     }
-    
+
     /** Будет отображать другим цветом посты после бамплимита */
     public static int getBumpLimitNumber(String boardName) {
         if (isExtendedBumpLimit(boardName)) return Constants.BUMP_LIMIT_EXTENDED;
         return Constants.BUMP_LIMIT;
     }
-    
+
     public static boolean isExtendedBumpLimit(String boardName) {
         return sExtendedBumpLimit.indexOf(boardName) != -1;
     }
-    
+
     public static int getMaximumAttachments(String boardName) {
         return 4;
     }
-    
+
     public static void refreshAttachmentView(boolean isBusy, AttachmentInfo attachment, ThumbnailViewBag thumbnailView) {
         if (attachment == null || attachment.isEmpty()) {
             thumbnailView.hide();
             return;
         }
-        
+
         thumbnailView.container.setVisibility(View.VISIBLE);
         thumbnailView.info.setText(attachment.getDescription());
         loadAttachmentImage(isBusy, attachment, thumbnailView.image);
     }
-    
+
     public static void setNonBusyAttachment(AttachmentInfo attachment, ImageView imageView) {
         if (ThreadPostUtils.shouldLoadFromWeb(attachment)) {
             ThreadPostUtils.loadAttachmentImage(false, attachment, imageView);
@@ -191,7 +183,7 @@ public class ThreadPostUtils {
         Uri thumbnailUrl = attachment.getThumbnailUrl() != null ? Uri.parse(attachment.getThumbnailUrl()) : null;
         // clear the image content
         imageView.setTag(thumbnailUrl);
-        imageView.setImageResource(android.R.color.transparent);         
+        imageView.setImageResource(android.R.color.transparent);
         imageView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,7 +191,7 @@ public class ThreadPostUtils {
                 ThreadPostUtils.openAttachment(attachment, v.getContext());
             }
         });
-        
+
         if (isBusy && shouldLoadFromWeb(attachment)) {
             return;
         }
@@ -226,19 +218,19 @@ public class ThreadPostUtils {
             }
         }
     }
-    
+
     private static boolean shouldLoadFromWeb(AttachmentInfo attachment) {
         if (attachment == null || attachment.isEmpty()) {
             return false;
         }
-        
+
         ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
         BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
-        
+
         String thumbnailUrl = attachment.getThumbnailUrl();
         return thumbnailUrl != null && settings.isLoadThumbnails() && !bitmapManager.isCached(thumbnailUrl);
     }
-    
+
     public static String getDefaultName(String board) {
         if (board.equals("fg")) return "уточка";
         if (board.equals("ukr")) return "Безосібний";

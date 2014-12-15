@@ -33,7 +33,7 @@ public class NavigationService {
             c = ThreadsListActivity.class;
         } else if (this.mUriParser.isThreadUri(uri)) {
             c = PostsListActivity.class;
-        } else if (UriUtils.isImageUri(uri)) {
+        } else if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {
             c = BrowserActivity.class;
         } else {
             c = PickBoardActivity.class;

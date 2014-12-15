@@ -24,11 +24,9 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
-import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.RegexUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.services.BrowserLauncher;
@@ -58,17 +56,18 @@ public class BrowserActivity extends Activity {
     private boolean mImageLoaded = false;
     private File mLoadedFile = null;
     private ViewType mViewType = null;
+    private boolean mVideoPlaying = false;
 
     private DownloadFileTask mCurrentTask = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
 
         this.setTheme(mSettings.getTheme());
-        
+
         if (mSettings.isLegacyImageViewer()) {
             this.setContentView(R.layout.browser);
             this.mMainView = this.findViewById(R.id.webview);
@@ -78,7 +77,7 @@ public class BrowserActivity extends Activity {
             this.setContentView(R.layout.image_gallery_item);
             this.mMainView = this.findViewById(R.id.image_layout);
         }
-        
+
         this.mLoadingView = this.findViewById(R.id.loading);
         this.mErrorView = this.findViewById(R.id.error);
 
@@ -174,12 +173,14 @@ public class BrowserActivity extends Activity {
             this.mCurrentTask.execute();
         }
     }
-    
-    private boolean videoPlaying = false;
+
     private void setVideoFile(final File file) {
         final VideoView videoView = new VideoView(this);
-        // API5: videoView.setZOrderOnTop(true);
         videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
+
+        ViewGroup layout = (ViewGroup)this.mMainView;
+        layout.removeAllViews();
+        layout.addView(videoView);
 
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -190,32 +191,29 @@ public class BrowserActivity extends Activity {
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                AppearanceUtils.showToastMessage(getApplicationContext(), "Error while playing the video.");
+                MyLog.e(TAG, "Error code: " + what);
+                switchToErrorView(getString(R.string.error_video_playing));
                 return true;
             }
         });
-        
+
         videoView.setVideoPath(file.getAbsolutePath());
-        
-        ViewGroup layout = (ViewGroup) mMainView.getParent();
-        layout.removeAllViews();
-        layout.addView(videoView);
-        
+
         layout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!videoPlaying) {
+                if (!mVideoPlaying) {
                     videoView.start();
-                    videoPlaying = true;
+                    mVideoPlaying = true;
                 }
             }
         });
     }
-    
+
     private void setImage(File file) {
         this.mLoadedFile = file;
 
-        if (RegexUtils.getFileExtension(this.mUri.toString()).equalsIgnoreCase("webm")) {
+        if (UriUtils.isWebmUri(this.mUri)) {
             setVideoFile(file);
         } else {
             if (this.mSettings.isLegacyImageViewer()) {
@@ -240,11 +238,17 @@ public class BrowserActivity extends Activity {
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
         MenuItem refreshMenuItem = this.mMenu.findItem(R.id.refresh_menu_id);
         MenuItem playVideoMenuItem = this.mMenu.findItem(R.id.play_video_menu_id);
+        MenuItem searchTineyeMenuItem = this.mMenu.findItem(R.id.menu_search_tineye_id);
+        MenuItem searchGoogleMenuItem = this.mMenu.findItem(R.id.menu_search_google_id);
+        MenuItem imageOpsMenuItem = this.mMenu.findItem(R.id.menu_image_operations_id);
 
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(this.mViewType == ViewType.ERROR);
-        playVideoMenuItem.setVisible(this.mImageLoaded && RegexUtils.getFileExtension(this.mUri.toString()).equalsIgnoreCase("webm"));
+        playVideoMenuItem.setVisible(this.mImageLoaded && UriUtils.isWebmUri(this.mUri));
+        searchTineyeMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
+        searchGoogleMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
+        imageOpsMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
     }
 
     private void switchToLoadingView() {
