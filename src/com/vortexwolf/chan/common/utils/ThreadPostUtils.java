@@ -118,39 +118,8 @@ public class ThreadPostUtils {
 
     public static void openExternalAttachment(final AttachmentInfo attachment, final Context context) {
         if (attachment == null) return;
-        boolean done = false;
         String url = attachment.getSourceUrl();
-        Uri uri = Uri.parse(url);
-        ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
-        
-        switch (settings.getVideoPreviewMethod()) {
-            case Constants.VIDEO_PREVIEW_METHOD_DOWNLOAD:
-                done = true;
-                new DownloadFileTask(context, uri, null, new DialogDownloadFileView(context){
-                    @Override
-                    public void showSuccess(File file) { play(file); }
-                    @Override
-                    public void showFileExists(File file) { play(file); }
-                    private void play(File file) {
-                        String type = "*/*";
-                        if ("webm".equalsIgnoreCase(attachment.getSourceExtension())) type = "video/*";
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.fromFile(file), type);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-                        context.startActivity(intent);
-                    }
-                }, true).execute();
-                break;
-            case Constants.VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN:
-                url = url.replace(settings.getDomainUri().toString(), "https://2ch.pm/");
-                break;
-            case Constants.VIDEO_PREVIEW_METHOD_DEFAULT:
-                break;
-            }
-        
-        if (!done) {
-            BrowserLauncher.launchExternalBrowser(context, url);
-        }
+        BrowserLauncher.launchExternalBrowser(context, url);
     }
     
     public static void openAttachment(final AttachmentInfo attachment, final Context context) {
@@ -179,7 +148,7 @@ public class ThreadPostUtils {
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
         } else {
-            if (!UriUtils.isImageUri(uri)) {
+            if (!UriUtils.isImageUri(uri) && !attachment.isVideo()) {
                 openExternalAttachment(attachment, context);
             } else {
                 BrowserLauncher.launchInternalBrowser(context, url);

@@ -1,12 +1,16 @@
 package com.vortexwolf.chan.services;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Browser;
 
 import com.vortexwolf.chan.activities.BrowserActivity;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 
 public class BrowserLauncher {
@@ -26,7 +30,7 @@ public class BrowserLauncher {
     public static void launchInternalBrowser(Context context, String url) {
         Uri uri = Uri.parse(url);
 
-        if (!UriUtils.isImageUri(uri)) {
+        if (!UriUtils.isImageUri(uri) && !RegexUtils.getFileExtension(url).equalsIgnoreCase("webm")) {
             launchExternalBrowser(context, url);
             return;
         }

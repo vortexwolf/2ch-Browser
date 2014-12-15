@@ -95,13 +95,6 @@
             	android:key="@string/pref_gif_preview_key" 
             	android:title="@string/pref_gif_preview" 
             	android:defaultValue="@string/pref_gif_preview_native_lib_value"/>
-        	<ListPreference
-            	android:entries="@array/pref_video_preview_choices" 
-            	android:entryValues="@array/pref_video_preview_values" 
-            	android:dialogTitle="@string/pref_video_preview" 
-            	android:key="@string/pref_video_preview_key" 
-            	android:title="@string/pref_video_preview" 
-            	android:defaultValue="@string/pref_video_preview_default_value"/>
         	<CheckBoxPreference
 				android:summary="@string/pref_disable_zoom_controls_summary"
 				android:key="@string/pref_disable_zoom_controls_key"

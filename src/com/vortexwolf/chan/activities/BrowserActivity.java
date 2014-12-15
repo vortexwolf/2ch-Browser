@@ -5,16 +5,20 @@ import java.io.File;
 import android.app.Activity;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
@@ -22,7 +26,9 @@ import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.services.BrowserLauncher;
@@ -112,6 +118,10 @@ public class BrowserActivity extends Activity {
             case R.id.open_browser_menu_id:
                 BrowserLauncher.launchExternalBrowser(this, this.mUri.toString());
                 break;
+            case R.id.play_video_menu_id:
+                File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
+                if (cachedFile.exists()) ImageGalleryActivity.playVideoExternal(cachedFile, this);
+                break;
             case R.id.save_menu_id:
                 new DownloadFileTask(this, this.mUri).execute();
                 break;
@@ -164,16 +174,57 @@ public class BrowserActivity extends Activity {
             this.mCurrentTask.execute();
         }
     }
+    
+    private boolean videoPlaying = false;
+    private void setVideoFile(final File file) {
+        final VideoView videoView = new VideoView(this);
+        // API5: videoView.setZOrderOnTop(true);
+        videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
 
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                AppearanceUtils.showToastMessage(getApplicationContext(), "Error while playing the video.");
+                return true;
+            }
+        });
+        
+        videoView.setVideoPath(file.getAbsolutePath());
+        
+        ViewGroup layout = (ViewGroup) mMainView.getParent();
+        layout.removeAllViews();
+        layout.addView(videoView);
+        
+        layout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!videoPlaying) {
+                    videoView.start();
+                    videoPlaying = true;
+                }
+            }
+        });
+    }
+    
     private void setImage(File file) {
         this.mLoadedFile = file;
 
-        if (this.mSettings.isLegacyImageViewer()) {
-            AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);
-            ((WebView)this.mMainView).loadUrl(Uri.fromFile(file).toString());
+        if (RegexUtils.getFileExtension(this.mUri.toString()).equalsIgnoreCase("webm")) {
+            setVideoFile(file);
         } else {
-            int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-            AppearanceUtils.setImage(file, this, (FrameLayout)mMainView, background);
+            if (this.mSettings.isLegacyImageViewer()) {
+                AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);
+                ((WebView)this.mMainView).loadUrl(Uri.fromFile(file).toString());
+            } else {
+                int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
+                AppearanceUtils.setImage(file, this, (FrameLayout)mMainView, background);
+            }
         }
 
         this.mImageLoaded = true;
@@ -188,10 +239,12 @@ public class BrowserActivity extends Activity {
         MenuItem saveMenuItem = this.mMenu.findItem(R.id.save_menu_id);
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
         MenuItem refreshMenuItem = this.mMenu.findItem(R.id.refresh_menu_id);
+        MenuItem playVideoMenuItem = this.mMenu.findItem(R.id.play_video_menu_id);
 
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(this.mViewType == ViewType.ERROR);
+        playVideoMenuItem.setVisible(this.mImageLoaded && RegexUtils.getFileExtension(this.mUri.toString()).equalsIgnoreCase("webm"));
     }
 
     private void switchToLoadingView() {

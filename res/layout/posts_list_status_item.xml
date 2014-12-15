@@ -7,7 +7,7 @@
         android:id="@+id/statusHintView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to refresh"
+        android:text="@string/tap_to_refresh"
         android:gravity="center"
         android:textColor="?android:textColorPrimary"
         android:textAppearance="?android:textAppearanceLarge" />

@@ -31,6 +31,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
@@ -132,10 +133,12 @@ public class ImageGalleryActivity extends Activity {
         MenuItem saveMenuItem = this.mMenu.findItem(R.id.save_menu_id);
         MenuItem shareMenuItem = this.mMenu.findItem(R.id.share_menu_id);
         MenuItem refreshMenuItem = this.mMenu.findItem(R.id.refresh_menu_id);
+        MenuItem playVideoMenuItem = this.mMenu.findItem(R.id.play_video_menu_id);
 
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(!this.mImageLoaded);
+        playVideoMenuItem.setVisible(this.mImageLoaded && this.mCurrentImageModel.attachment.isVideo());
     }
 
     @Override
@@ -152,6 +155,10 @@ public class ImageGalleryActivity extends Activity {
                 if (this.mCurrentImageViewBag != null) {
                     this.loadImage(this.mCurrentImageModel, this.mCurrentImageViewBag);
                 }
+                break;
+            case R.id.play_video_menu_id:
+                File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(Uri.parse(this.mCurrentImageModel.url));
+                if (cachedFile.exists()) playVideoExternal(cachedFile, this);
                 break;
             case R.id.share_menu_id:
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
@@ -216,8 +223,9 @@ public class ImageGalleryActivity extends Activity {
         }
     }
     
-    private void setVideoFile(File file, ImageItemViewBag viewBag) {
-        VideoView videoView = new VideoView(this);
+    private boolean videoPlaying = false;
+    private void setVideoFile(final File file, ImageItemViewBag viewBag) {
+        final VideoView videoView = new VideoView(this);
         // API5: videoView.setZOrderOnTop(true);
         videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
 
@@ -240,9 +248,24 @@ public class ImageGalleryActivity extends Activity {
         viewBag.layout.removeAllViews();
         viewBag.layout.addView(videoView);
         
-        videoView.start();
+        viewBag.layout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!videoPlaying) {
+                    videoView.start();
+                    videoPlaying = true;
+                }
+            }
+        });
     }
-
+    
+    static void playVideoExternal(File file, Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(file), "video/*");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+        context.startActivity(intent);
+    }
+    
     private void setThumbnail(final AttachmentInfo attachment, ImageItemViewBag viewBag) {
         int thumbnailSize = (int) getResources().getDimension(R.dimen.thumbnail_size);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(thumbnailSize, thumbnailSize, Gravity.CENTER);

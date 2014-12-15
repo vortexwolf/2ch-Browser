@@ -91,10 +91,6 @@ public class Constants {
     public static final int CONTEXT_MENU_OPEN_THREAD = 1014;
     public static final int CONTEXT_MENU_SEARCH_IMAGE_GOOGLE = 1015;
     
-    public static final int VIDEO_PREVIEW_METHOD_DEFAULT = 0;
-    public static final int VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN = 1;
-    public static final int VIDEO_PREVIEW_METHOD_DOWNLOAD = 2;
-    
     public static final int IMAGE_VIEW_WEB_VIEW = 0;
     public static final int IMAGE_VIEW_SUBSCALEVIEW = 1;
     

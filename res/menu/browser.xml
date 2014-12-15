@@ -6,6 +6,11 @@
         android:icon="@drawable/ic_menu_browser"
         android:title="@string/menu_open_browser"/>
     <item
+        android:id="@+id/play_video_menu_id"
+        android:icon="@android:drawable/ic_media_play"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_play_video_external"/>
+    <item
         android:id="@+id/save_menu_id"
         android:icon="?iconSave"
         android:showAsAction="ifRoom"

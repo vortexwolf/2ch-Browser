@@ -204,16 +204,6 @@ public class ApplicationSettings {
         return Constants.GIF_WEB_VIEW;
     }
     
-    public int getVideoPreviewMethod() {
-        final String defaultMethodValue = this.mResources.getString(R.string.pref_video_preview_default_value);
-        final String changeDomainMethodValue = this.mResources.getString(R.string.pref_video_preview_change_domain_value);
-        final String downloadMethodValue = this.mResources.getString(R.string.pref_video_preview_download_value);
-        String method = this.mSettings.getString(this.mResources.getString(R.string.pref_video_preview_key), defaultMethodValue);
-        if (method.equals(downloadMethodValue)) return Constants.VIDEO_PREVIEW_METHOD_DOWNLOAD;
-        if (method.equals(changeDomainMethodValue)) return Constants.VIDEO_PREVIEW_METHOD_CHANGE_DOMAIN;
-        return Constants.VIDEO_PREVIEW_METHOD_DEFAULT;
-    }
-    
     public boolean isMobileApi() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_mobileapi_key), true);
     }

@@ -33,7 +33,7 @@
     <string name="favorites">Избранное</string>    
     <string name="search_board_hint">Поиск</string>
     <string name="show_full_comment"><a href=''>Показать весь текст</a></string>
-    <string name="data_search_posts_title">Поиск /%1$s/: %2$s</string>
+    <string name="tap_to_refresh">Нажмите, чтобы обновить</string>
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -65,6 +65,7 @@
     <string name="data_add_thread_title">/%1$s/ - Новый тред</string>
     <string name="data_add_post_title">/%1$s/%2$s - Новое сообщение</string>
     <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string>
+    <string name="data_search_posts_title">Поиск /%1$s/: %2$s</string>
 
     <!-- Menus -->
     <string name="menu_pick_board">Форумы</string>
@@ -108,6 +109,7 @@
     <string name="cmenu_hide_thread">Скрыть тред</string>
     <string name="cmenu_share">Поделиться</string>
     <string name="cmenu_open_thread">Открыть тред</string>
+    <string name="menu_play_video_external">Открыть во внешнем плеере</string>
 
     <!-- Preferences -->
     <string name="pref_category_appearance">Интерфейс</string>
@@ -159,13 +161,6 @@
     
     <string name="pref_disable_zoom_controls">Отключить кнопки масштаба</string>
 	<string name="pref_disable_zoom_controls_summary">Отключить встроенные кнопки масштаба при просмотре изображений через WebView (только для Android 3 и выше)</string>
-
-    <string name="pref_video_preview">Способ просмотра видео</string>
-    <string-array name="pref_video_preview_choices">
-        <item>По умолчанию</item>
-        <item>Открывать с 2ch.pm</item>
-        <item>Загружать полностью и открывать локально</item>
-    </string-array>
     
     <string name="pref_gif_preview">Просмотрщик GIF файлов</string>
     <string-array name="pref_gif_preview_choices">
@@ -247,7 +242,7 @@
     <string name="notification_post_copied">Сообщение скопировано</string>
     <string name="notification_passcode_correct">Пасс-код был успешно проверен</string>
     <string name="notification_passcode_incorrect">Неверный пасс-код</string>
-    <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите...</string>
+    <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите…</string>
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
     <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
