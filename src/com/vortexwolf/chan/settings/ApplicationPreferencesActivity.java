@@ -41,8 +41,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
         this.addPreferencesFromResource(R.xml.preferences);
-
-        this.updateListSummary(R.string.pref_video_preview_key);
+        
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
         this.updateListSummary(R.string.pref_image_preview_key);
