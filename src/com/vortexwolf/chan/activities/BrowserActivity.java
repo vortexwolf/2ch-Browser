@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
@@ -176,7 +176,9 @@ public class BrowserActivity extends Activity {
 
     private void setVideoFile(final File file) {
         final VideoView videoView = new VideoView(this);
-        videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
+        FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(AppearanceUtils.MATCH_PARAMS);
+        lp2.gravity = Gravity.CENTER;
+        videoView.setLayoutParams(lp2);
 
         ViewGroup layout = (ViewGroup)this.mMainView;
         layout.removeAllViews();
@@ -198,16 +200,7 @@ public class BrowserActivity extends Activity {
         });
 
         videoView.setVideoPath(file.getAbsolutePath());
-
-        layout.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mVideoPlaying) {
-                    videoView.start();
-                    mVideoPlaying = true;
-                }
-            }
-        });
+        videoView.start();
     }
 
     private void setImage(File file) {

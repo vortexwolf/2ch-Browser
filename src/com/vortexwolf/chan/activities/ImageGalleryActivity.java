@@ -141,10 +141,12 @@ public class ImageGalleryActivity extends Activity {
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(!this.mImageLoaded);
-        playVideoMenuItem.setVisible(this.mImageLoaded && this.mCurrentImageModel.attachment.isVideo());
-        searchTineyeMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
-        searchGoogleMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
-        imageOpsMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+        if (this.mCurrentImageModel != null) {
+            playVideoMenuItem.setVisible(this.mImageLoaded && this.mCurrentImageModel.attachment.isVideo());
+            searchTineyeMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+            searchGoogleMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+            imageOpsMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+        }
     }
 
     @Override
@@ -231,7 +233,9 @@ public class ImageGalleryActivity extends Activity {
 
     private void setVideoFile(final File file, final ImageItemViewBag viewBag) {
         final VideoView videoView = new VideoView(this);
-        videoView.setLayoutParams(AppearanceUtils.MATCH_PARAMS);
+        FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(AppearanceUtils.MATCH_PARAMS);
+        lp2.gravity = Gravity.CENTER;
+        videoView.setLayoutParams(lp2);
 
         viewBag.layout.removeAllViews();
         viewBag.layout.addView(videoView);
@@ -252,16 +256,7 @@ public class ImageGalleryActivity extends Activity {
         });
 
         videoView.setVideoPath(file.getAbsolutePath());
-
-        viewBag.layout.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!viewBag.isVideoPlaying) {
-                    videoView.start();
-                    viewBag.isVideoPlaying = true;
-                }
-            }
-        });
+        videoView.start();
     }
 
     static void playVideoExternal(File file, Context context) {

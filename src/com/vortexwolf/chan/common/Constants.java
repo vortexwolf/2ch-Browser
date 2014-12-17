@@ -12,13 +12,13 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 
 public class Constants {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // Нужно не забыть отключить логгирование при выпуске приложения
     public static final boolean LOGGING = DEBUG;
-    
+
     public static final String ANALYTICS_KEY = "UA-28782631-2";
-    
+
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));
     public static final String GIF_IMAGE = "gif";
@@ -30,7 +30,7 @@ public class Constants {
 
     public static final String DEFAULT_DOWNLOAD_FOLDER = "/download/2ch Browser/";
 
-    // Иногда меняется (когда-то был 2ch.so), поэтому добавил в настройки. 
+    // Иногда меняется (когда-то был 2ch.so), поэтому добавил в настройки.
     public static final String DEFAULT_DOMAIN = "2ch.hk";
 
     // Для http-запросов
@@ -39,7 +39,7 @@ public class Constants {
     public static final String SAGE_EMAIL = "sage";
     public static final Charset UTF8_CHARSET = Charset.forName(HTTP.UTF_8);
     public static final String MULTIPART_BOUNDARY = "----WebKitFormBoundaryyD8qfvcSfpRMHx9M";
-    
+
     public static final String CF_CLEARANCE_COOKIE = "cf_clearance";
     public static final String USERCODE_COOKIE = "usercode";
 
@@ -90,10 +90,10 @@ public class Constants {
     public static final int CONTEXT_MENU_SHARE = 1013;
     public static final int CONTEXT_MENU_OPEN_THREAD = 1014;
     public static final int CONTEXT_MENU_SEARCH_IMAGE_GOOGLE = 1015;
-    
+
     public static final int IMAGE_VIEW_WEB_VIEW = 0;
     public static final int IMAGE_VIEW_SUBSCALEVIEW = 1;
-    
+
     public static final int GIF_WEB_VIEW = 0;
     public static final int GIF_NATIVE_LIB = 1;
 }
