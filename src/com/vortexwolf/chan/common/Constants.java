@@ -12,7 +12,7 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 
 public class Constants {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // Нужно не забыть отключить логгирование при выпуске приложения
     public static final boolean LOGGING = DEBUG;

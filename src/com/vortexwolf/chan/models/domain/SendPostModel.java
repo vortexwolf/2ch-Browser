@@ -3,7 +3,10 @@ package com.vortexwolf.chan.models.domain;
 import java.io.File;
 import java.util.List;
 
+import com.vortexwolf.chan.services.Recaptcha2;
+
 public class SendPostModel {
+    private Recaptcha2 mRecaptcha = null;
     private String mCaptchaKey;
     private String mCaptchaAnswer;
     private String mComment;
@@ -25,7 +28,24 @@ public class SendPostModel {
         this.mPolitics = politics;
         this.mName = name;
     }
-
+    
+    public SendPostModel(Recaptcha2 recaptcha, String captchaAnswer, String comment, boolean isSage, List<File> attachedFiles, String subject, String politics, String name) {
+        this((String)null, captchaAnswer, comment, isSage, attachedFiles, subject, politics, name);
+        this.mRecaptcha = recaptcha;
+    }
+    
+    public boolean isRecaptcha() {
+        return this.mRecaptcha != null;
+    }
+    
+    public void setRecaptcha(Recaptcha2 recaptcha) {
+        this.mRecaptcha = recaptcha;
+    }
+    
+    public Recaptcha2 getRecaptcha() {
+        return this.mRecaptcha;
+    }
+    
     public void setCaptchaKey(String captchaKey) {
         this.mCaptchaKey = captchaKey;
     }

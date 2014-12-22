@@ -58,6 +58,7 @@ import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.Recaptcha2;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
@@ -72,6 +73,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
+    private Recaptcha2 mRecaptcha2;
     private String mBoardName;
     private String mThreadNumber;
     private Uri mRefererUri;
@@ -342,7 +344,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         String name = this.mSettings.getName();
         String captchaKey = this.mCaptcha != null ? this.mCaptcha.getKey() : null;
-        SendPostModel pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
+        SendPostModel pe;
+        if (this.mRecaptcha2 != null) {
+            pe = new SendPostModel(this.mRecaptcha2, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
+        } else {
+            pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
+        }
         pe.setParentThread(this.mThreadNumber);
 
         // Отправляем
@@ -460,10 +467,27 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         this.mCaptcha = captcha;
+        this.mRecaptcha2 = null;
         this.mCaptchaBitmap = captchaImage;
         this.mCaptchaImageView.setImageBitmap(captchaImage);
 
         this.switchToCaptchaView(CaptchaViewType.IMAGE);
+        this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
+    }
+    
+    @Override
+    public void showCaptcha(Recaptcha2 captcha) {
+        this.mCaptchaImageView.setImageResource(android.R.color.transparent);
+        if (this.mCaptchaBitmap != null) {
+            this.mCaptchaBitmap.recycle();
+        }
+
+        this.mRecaptcha2 = captcha;
+        this.mCaptchaBitmap = captcha.bitmap;
+        this.mCaptchaImageView.setImageBitmap(captcha.bitmap);
+
+        this.switchToCaptchaView(CaptchaViewType.IMAGE);
+        this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
+import com.vortexwolf.chan.services.Recaptcha2;
 import com.vortexwolf.chan.services.RecaptchaService;
 import com.vortexwolf.chan.services.YandexCaptchaService;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
@@ -28,6 +29,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private boolean mSuccessPasscode = false;
     private boolean mFailPasscode = false;
     private CaptchaEntity mCaptcha;
+    private Recaptcha2 mRecaptcha2;
     private Bitmap mCaptchaImage;
     private String mUserError;
 
@@ -58,6 +60,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             this.mView.skipCaptcha(this.mSuccessPasscode, this.mFailPasscode);
         } else if (success && this.mCaptcha != null) {
             this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
+        } else if (success && this.mRecaptcha2 != null) {
+            this.mView.showCaptcha(this.mRecaptcha2);
         } else {
             this.mView.showCaptchaError(this.mUserError);
         }
@@ -82,8 +86,17 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             }
         }
 
-        if (this.mCaptcha == null || this.isCancelled()) {
+        if (this.isCancelled()) {
             return false;
+        }
+        if (this.mCaptcha == null) {
+            try {
+                this.mRecaptcha2 = new Recaptcha2();
+                return true;
+            } catch (Exception e) {
+                this.mUserError = e.getMessage();
+                return false;
+            }
         }
 
         try {

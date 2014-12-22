@@ -13,10 +13,13 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 
 public class MakabaSendPostMapper {
+    private static final String TAG = "MakabaSendPostMapper";
+    
     private static final Charset utf = Constants.UTF8_CHARSET;
     private static final String TASK = "task";
     private static final String BOARD = "board";
@@ -38,8 +41,18 @@ public class MakabaSendPostMapper {
         this.addStringValue(multipartEntity, THREAD, model.getParentThread());
         this.addStringValue(multipartEntity, USERCODE, userCode);
         this.addStringValue(multipartEntity, COMMENT, StringUtils.emptyIfNull(model.getComment()));
-        this.addStringValue(multipartEntity, CAPTCHA_KEY, model.getCaptchaKey());
-        this.addStringValue(multipartEntity, CAPTCHA_ANSWER, model.getCaptchaAnswer());
+        if (!model.isRecaptcha()) {
+            this.addStringValue(multipartEntity, CAPTCHA_KEY, model.getCaptchaKey());
+            this.addStringValue(multipartEntity, CAPTCHA_ANSWER, model.getCaptchaAnswer());
+        } else {
+            try {
+                this.addStringValue(multipartEntity, "captcha_type", "recaptcha");
+                this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptcha().getHash(model.getCaptchaAnswer()));
+            } catch (Exception e) {
+                MyLog.d(TAG, "can't check get recaptcha hash");
+                MyLog.e(TAG, e);
+            }
+        }
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());
         this.addStringValue(multipartEntity, NAME, model.getName());
         this.addStringValue(multipartEntity, EMAIL, model.isSage() ? Constants.SAGE_EMAIL : null);
