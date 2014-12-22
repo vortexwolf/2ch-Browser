@@ -112,11 +112,7 @@
             android:layout_height="wrap_content"
             layout="@layout/add_post_captcha_view" />
 
-        <Button
-            android:id="@+id/addpost_send_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/addpost_send_button" />
+
     </LinearLayout>
 
 </ScrollView>
