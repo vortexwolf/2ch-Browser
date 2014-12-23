@@ -45,6 +45,7 @@
         <activity android:name="com.vortexwolf.chan.activities.FilesListActivity" android:configChanges="keyboardHidden|orientation"></activity>
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksCompActivity" android:configChanges="keyboardHidden|orientation" android:noHistory="true"></activity>
+        <activity android:name="com.vortexwolf.chan.activities.NewRecaptchaActivity"></activity>
         <activity android:name="com.vortexwolf.chan.settings.ApplicationPreferencesActivity"></activity>		
     </application>
 </manifest>
