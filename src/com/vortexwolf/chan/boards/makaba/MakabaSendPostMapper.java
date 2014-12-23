@@ -47,7 +47,11 @@ public class MakabaSendPostMapper {
         } else {
             try {
                 this.addStringValue(multipartEntity, "captcha_type", "recaptcha");
-                this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptcha().getHash(model.getCaptchaAnswer()));
+                if (model.getRecaptchaHash() != null) {
+                    this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptchaHash());
+                } else {
+                    this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptcha().getHash(model.getCaptchaAnswer()));
+                }
             } catch (Exception e) {
                 MyLog.d(TAG, "can't check get recaptcha hash");
                 MyLog.e(TAG, e);

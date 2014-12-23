@@ -7,6 +7,7 @@ import com.vortexwolf.chan.services.Recaptcha2;
 
 public class SendPostModel {
     private Recaptcha2 mRecaptcha = null;
+    private String mRecaptchaHash = null;
     private String mCaptchaKey;
     private String mCaptchaAnswer;
     private String mComment;
@@ -36,6 +37,14 @@ public class SendPostModel {
     
     public boolean isRecaptcha() {
         return this.mRecaptcha != null;
+    }
+    
+    public void setRecaptchaHash(String hash) {
+        this.mRecaptchaHash = hash;
+    }
+    
+    public String getRecaptchaHash() {
+        return this.mRecaptchaHash;
     }
     
     public void setRecaptcha(Recaptcha2 recaptcha) {

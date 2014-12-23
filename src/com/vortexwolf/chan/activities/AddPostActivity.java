@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -97,6 +98,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private EditText mSubjectView;
     private Spinner mPoliticsView;
     private boolean isPoliticsBoard = false;
+    
+    private SendPostModel mCachedSendPostModel;
 
     // Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить
     // (после успешной отправки)
@@ -351,6 +354,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
         }
         pe.setParentThread(this.mThreadNumber);
+        this.mCachedSendPostModel = pe;
 
         // Отправляем
         this.sendPost(pe);
@@ -367,9 +371,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (this.mCurrentPostSendTask != null) {
             this.mCurrentPostSendTask.cancel(true);
         }
-
-        this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, pe);
-        this.mCurrentPostSendTask.execute();
+        if (this.mRecaptcha2 != null && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
+            Intent reIntent = new Intent(this, NewRecaptchaActivity.class);
+            startActivityForResult(reIntent, Constants.REQUEST_CODE_RECAPTCHA);
+        } else {
+            this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, pe);
+            this.mCurrentPostSendTask.execute();
+        }
     }
     
     @Override
@@ -486,8 +494,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaBitmap = captcha.bitmap;
         this.mCaptchaImageView.setImageBitmap(captcha.bitmap);
 
-        this.switchToCaptchaView(CaptchaViewType.IMAGE);
-        this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
+        if (Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
+            this.switchToCaptchaView(CaptchaViewType.SKIP);
+        } else {
+            this.switchToCaptchaView(CaptchaViewType.IMAGE);
+            this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
     }
 
     @Override
@@ -568,6 +580,21 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     //@SuppressLint("NewApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.REQUEST_CODE_RECAPTCHA) {
+            if (resultCode == NewRecaptchaActivity.OK) {
+                String hash = data.getStringExtra("hash");
+                if (hash != null && hash.length() != 0) {
+                    if (this.mCurrentPostSendTask != null) {
+                        this.mCurrentPostSendTask.cancel(true);
+                    }
+                    this.mCachedSendPostModel.setRecaptchaHash(hash);
+                    this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, this.mCachedSendPostModel);
+                    this.mCachedSendPostModel = null;
+                    this.mCurrentPostSendTask.execute();
+                }
+            }
+            return;
+        }
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case Constants.REQUEST_CODE_FILE_LIST_ACTIVITY:
