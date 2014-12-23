@@ -21,8 +21,8 @@ public class NewRecaptchaActivity extends Activity {
             "</form>";
     private final static String hashfilter = "g-recaptcha-response=";
     
-    public final static int OK = 0;
-    public final static int FAIL = 1;
+    public final static int OK = 1;
+    public final static int FAIL = 2;
     
     @SuppressLint("SetJavaScriptEnabled")
     @Override
