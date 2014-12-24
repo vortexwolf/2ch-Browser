@@ -195,6 +195,8 @@
     <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
     <string name="pref_legacy_image_viewer">Legacy image viewer</string>
     <string name="pref_legacy_image_viewer_summary">Do not use a gallery, open single images instead</string>
+    <string name="pref_external_video">External video player</string>
+    <string name="pref_external_video_summary">Use external video player for webm files</string>
 
     <!-- Errors -->
     <string name="error_send_post">An error has occurred while sending the post.</string>

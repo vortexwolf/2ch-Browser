@@ -140,11 +140,7 @@ public class ThreadPostUtils {
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
         } else {
-            if (attachment.isDisplayableInGallery()) {
-                BrowserLauncher.launchInternalBrowser(context, url);
-            } else {
-                openExternalAttachment(attachment, context);
-            }
+            BrowserLauncher.launchInternalBrowser(context, url);
         }
     }
 

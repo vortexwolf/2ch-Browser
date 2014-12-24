@@ -11,34 +11,47 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import android.graphics.Bitmap;
+
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
 import com.vortexwolf.chan.services.http.HttpStreamModel;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.HttpStringReader;
 
-import android.graphics.Bitmap;
-
 public class Recaptcha2 {
     private final static String recaptchaChallengeUrl = "http://www.google.com/recaptcha/api/challenge?k=6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz";
     private final static String recaptchaFallbackUrl = "http://www.google.com/recaptcha/api/fallback?k=6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz";
     private final static String recaptchaImageUrl = "http://www.google.com/recaptcha/api2/payload?c=";
-    
+
     public final Bitmap bitmap;
     private final String challenge;
-    
-    public Recaptcha2() throws Exception {
-        String response = Factory.resolve(HttpStringReader.class).fromUri(recaptchaChallengeUrl);
-        Matcher matcher = Pattern.compile("challenge.?:.?'([\\w-]+)'").matcher(response);
-        if (matcher.find() && matcher.groupCount() == 1) {
-            challenge = matcher.group(1);
-            bitmap = Factory.resolve(HttpBitmapReader.class).fromUri(recaptchaImageUrl+challenge);
-        } else throw new Exception("can't get recaptcha");
+
+    public Recaptcha2(Bitmap bitmap, String challenge) {
+        this.bitmap = bitmap;
+        this.challenge = challenge;
     }
-    
+
+    public static Recaptcha2 load() {
+        try {
+            String response = Factory.resolve(HttpStringReader.class).fromUri(recaptchaChallengeUrl);
+            Matcher matcher = Pattern.compile("challenge.?:.?'([\\w-]+)'").matcher(response);
+            if (matcher.find() && matcher.groupCount() == 1) {
+                String challenge = matcher.group(1);
+                Bitmap bitmap = Factory.resolve(HttpBitmapReader.class).fromUri(recaptchaImageUrl+challenge);
+                return new Recaptcha2(bitmap, challenge);
+            }
+        } catch (HttpRequestException e) {
+            return null;
+        }
+
+        return null;
+    }
+
     public String getHash(String answer) throws Exception {
         MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         entity.addPart("c", new StringBody(challenge, Constants.UTF8_CHARSET));

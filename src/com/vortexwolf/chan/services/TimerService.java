@@ -10,11 +10,15 @@ import com.vortexwolf.chan.common.library.MyLog;
 public class TimerService {
 
     private Timer mTimer = null;
-    private final Runnable mTask;
     private final Activity mActivity;
 
+    private Runnable mTask;
     private boolean mEnabled;
     private int mInterval;
+
+    public TimerService(int interval, Activity activity) {
+        this(true, interval, null, activity);
+    }
 
     public TimerService(boolean isEnabled, int interval, Runnable task, Activity activity) {
         this.mTask = task;
@@ -55,6 +59,13 @@ public class TimerService {
         this.mEnabled = isEnabled;
         this.mInterval = interval;
 
+        this.start();
+    }
+
+    public void runTask(Runnable task) {
+        this.mTask = task;
+
+        this.stop();
         this.start();
     }
 }

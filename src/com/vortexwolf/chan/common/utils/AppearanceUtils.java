@@ -1,8 +1,7 @@
 package com.vortexwolf.chan.common.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.util.Locale;
 
 import pl.droidsonroids.gif.GifDrawable;
 import android.app.Activity;
@@ -12,9 +11,8 @@ import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,22 +22,26 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.controls.TouchGifView;
-import com.vortexwolf.chan.common.controls.WebViewFixed;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.controls.TouchGifView;
+import com.vortexwolf.chan.common.controls.WebViewFixed;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
+import com.vortexwolf.chan.services.TimerService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AppearanceUtils {
 
     private static final String TAG = "AppearanceUtils";
-    
+
     public final static ViewGroup.LayoutParams MATCH_PARAMS = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
     public static void showToastMessage(Context context, String msg) {
@@ -135,7 +137,7 @@ public class AppearanceUtils {
             CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
         }
     }
-    
+
     public static void setScaleWebView(final WebView webView, final View layout, final File file, final Activity context) {
         Runnable callSetScaleWebView = new Runnable() {
             @Override
@@ -143,7 +145,7 @@ public class AppearanceUtils {
                 setPrivateScaleWebView(webView, layout, file, context);
             }
         };
-        
+
         Point resolution = getResolution(layout);
         if (resolution.equals(0, 0)) {
             // wait until the view is measured and its size is known
@@ -152,11 +154,11 @@ public class AppearanceUtils {
             callSetScaleWebView.run();
         }
     }
-    
+
     private static void setPrivateScaleWebView(WebView webView, View layout, File file, Activity context) {
         Point imageSize = getImageSize(file);
         Point resolution = getResolution(layout);
-        
+
         //MyLog.d(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
         double scaleX = (double)resolution.x / (double)imageSize.x;
         double scaleY = (double)resolution.y / (double)imageSize.y;
@@ -177,15 +179,15 @@ public class AppearanceUtils {
         webView.setInitialScale(scale);
         webView.setPadding(0, 0, 0, 0);
     }
-    
+
     private static Point getImageSize(File file) {
         return IoUtils.getImageSize(file);
     }
-    
+
     private static Point getResolution(View view) {
         return new Point(view.getWidth(), view.getHeight());
     }
-    
+
     public static int getThemeColor(Theme theme, int styleableId) {
         TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
         int color = a.getColor(styleableId, 0);
@@ -193,21 +195,21 @@ public class AppearanceUtils {
 
         return color;
     }
-    
+
     public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background) {
         setImage(file, context, layout, background, false);
     }
-    
+
     public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background, boolean forceWebView) {
         final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
         int gifMethod = forceWebView ? Constants.GIF_WEB_VIEW : mSettings.getGifView();
         int picMethod = forceWebView ? Constants.IMAGE_VIEW_WEB_VIEW : mSettings.getImageView();
-        
+
         boolean isDone = false;
-        
+
         layout.removeAllViews();
         System.gc();
-        
+
         try {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
                 if (gifMethod == Constants.GIF_NATIVE_LIB) {
@@ -224,7 +226,7 @@ public class AppearanceUtils {
                     layout.addView(gifView);
                     isDone = true;
                 }
-            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW 
+            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW
                     && Constants.SDK_VERSION >= 10
                     && !IoUtils.isNonStandardGrayscaleImage(file)) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
@@ -254,7 +256,55 @@ public class AppearanceUtils {
             wV.loadUrl(Uri.fromFile(file).toString());
         }
     }
-    
+
+    public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag) {
+        viewBag.layout.removeAllViews();
+        View container = LayoutInflater.from(context).inflate(R.layout.video_view, viewBag.layout);
+
+        final VideoView videoView = (VideoView)container.findViewById(R.id.video_view);
+        final TextView durationView = (TextView)container.findViewById(R.id.video_duration);
+
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(final MediaPlayer mp) {
+                mp.setLooping(true);
+
+                durationView.setText("00:00 / " + formatVideoTime(mp.getDuration()));
+
+                viewBag.timer = new TimerService(1, context);
+                viewBag.timer.runTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            durationView.setText(formatVideoTime(mp.getCurrentPosition()) +
+                                " / " + formatVideoTime(mp.getDuration()));
+                        } catch (Exception e) {
+                            viewBag.timer.stop();
+                        }
+                    }
+                });
+
+                mp.start();
+            }
+        });
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                MyLog.e(TAG, "Error code: " + what);
+                viewBag.switchToErrorView(context.getString(R.string.error_video_playing));
+                return true;
+            }
+        });
+
+        videoView.setVideoPath(file.getAbsolutePath());
+    }
+
+    private static String formatVideoTime(int milliseconds) {
+        int seconds = milliseconds / 1000 % 60;
+        int minutes = milliseconds / 60000;
+        return String.format(Locale.US, "%02d:%02d", minutes, seconds);
+    }
+
     public static void callWhenLoaded(final View view, final Runnable runnable){
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -264,7 +314,7 @@ public class AppearanceUtils {
                 } else {
                     CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
                 }
-                
+
                 runnable.run();
             }
         });

@@ -5,30 +5,26 @@ import java.io.File;
 import android.app.Activity;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
+import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -56,7 +52,6 @@ public class BrowserActivity extends Activity {
     private boolean mImageLoaded = false;
     private File mLoadedFile = null;
     private ViewType mViewType = null;
-    private boolean mVideoPlaying = false;
 
     private DownloadFileTask mCurrentTask = null;
 
@@ -119,7 +114,9 @@ public class BrowserActivity extends Activity {
                 break;
             case R.id.play_video_menu_id:
                 File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
-                if (cachedFile.exists()) ImageGalleryActivity.playVideoExternal(cachedFile, this);
+                if (cachedFile.exists()) {
+                    BrowserLauncher.playVideoExternal(cachedFile, this);
+                }
                 break;
             case R.id.save_menu_id:
                 new DownloadFileTask(this, this.mUri).execute();
@@ -129,7 +126,11 @@ public class BrowserActivity extends Activity {
                 break;
             case R.id.share_menu_id:
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
-                shareImageIntent.setType("image/jpeg");
+                if (UriUtils.isImageUri(this.mUri)) {
+                    shareImageIntent.setType("image/jpeg");
+                } else if (UriUtils.isWebmUri(this.mUri)) {
+                    shareImageIntent.setType("video/webm");
+                }
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(this.mLoadedFile));
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
@@ -174,40 +175,16 @@ public class BrowserActivity extends Activity {
         }
     }
 
-    private void setVideoFile(final File file) {
-        final VideoView videoView = new VideoView(this);
-        FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(AppearanceUtils.MATCH_PARAMS);
-        lp2.gravity = Gravity.CENTER;
-        videoView.setLayoutParams(lp2);
-
-        ViewGroup layout = (ViewGroup)this.mMainView;
-        layout.removeAllViews();
-        layout.addView(videoView);
-
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                MyLog.e(TAG, "Error code: " + what);
-                switchToErrorView(getString(R.string.error_video_playing));
-                return true;
-            }
-        });
-
-        videoView.setVideoPath(file.getAbsolutePath());
-        videoView.start();
-    }
-
     private void setImage(File file) {
         this.mLoadedFile = file;
 
         if (UriUtils.isWebmUri(this.mUri)) {
-            setVideoFile(file);
+            GalleryItemViewBag vb = new GalleryItemViewBag();
+            vb.layout = (FrameLayout)this.mMainView;
+            vb.loading = this.mLoadingView;
+            vb.error = this.mErrorView;
+
+            AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb);
         } else {
             if (this.mSettings.isLegacyImageViewer()) {
                 AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);

@@ -90,13 +90,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             return false;
         }
         if (this.mCaptcha == null) {
-            try {
-                this.mRecaptcha2 = new Recaptcha2();
-                return true;
-            } catch (Exception e) {
-                this.mUserError = e.getMessage();
-                return false;
-            }
+            this.mRecaptcha2 = Recaptcha2.load();
+            return true;
         }
 
         try {

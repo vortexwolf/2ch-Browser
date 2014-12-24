@@ -9,6 +9,7 @@
         <item name="iconBack">@drawable/ic_navigation_previous_item</item>
         <item name="iconForward">@drawable/ic_navigation_next_item</item>
         <item name="iconList">@drawable/ic_actionbar_tabs</item>
+        <item name="iconComputer">@drawable/ic_actionbar_computer</item>
         <item name="android:actionBarStyle">@style/HoloLight.ActionBar</item>
     </style>
 
@@ -20,6 +21,7 @@
         <item name="iconBack">@drawable/ic_navigation_previous_item_dark</item>
         <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
         <item name="iconList">@drawable/ic_actionbar_tabs_dark</item>
+        <item name="iconComputer">@drawable/ic_actionbar_computer_dark</item>
         <item name="android:actionBarStyle">@style/HoloDark.ActionBar</item>
     </style>
 

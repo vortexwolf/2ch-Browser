@@ -3,7 +3,6 @@ package com.vortexwolf.chan.models.presentation;
 import java.util.HashMap;
 
 import android.content.res.Resources;
-import android.net.Uri;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -11,13 +10,12 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfo {
     private static final HashMap<String, Integer> sDefaultThumbnails;
-    
+
     private final AttachmentModel mModel;
     private final String mBoardName;
     private final String mThreadNumber;
@@ -55,7 +53,7 @@ public class AttachmentInfo {
             this.mSourceExtension = null;
         }
     }
-    
+
     public String getThreadUrl() {
         return this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
     }
@@ -86,11 +84,11 @@ public class AttachmentInfo {
     public boolean isImage() {
         return !StringUtils.isEmpty(this.mSourceExtension) && Constants.IMAGE_EXTENSIONS.contains(this.mSourceExtension);
     }
-    
+
     public boolean isVideo() {
         return "webm".equalsIgnoreCase(this.mSourceExtension);
     }
-    
+
     public boolean isDisplayableInGallery() {
         return this.isImage() || this.isVideo();
     }

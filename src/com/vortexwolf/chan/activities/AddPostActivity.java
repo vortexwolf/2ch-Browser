@@ -71,7 +71,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
-    
+
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
     private Recaptcha2 mRecaptcha2;
@@ -98,13 +98,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private EditText mSubjectView;
     private Spinner mPoliticsView;
     private boolean isPoliticsBoard = false;
-    
+
     private SendPostModel mCachedSendPostModel;
 
     // Определяет, нужно ли сохранять пост (если не отправлен) или можно удалить
     // (после успешной отправки)
     private boolean mFinishedSuccessfully = false;
-    
+
     private boolean isRecaptcha = false;
     private CheckCloudflareTask mCheckCloudflareTask;
 
@@ -298,7 +298,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private void onSend() {
         // Собираем все заполненные поля
         String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
-        
+
         if (this.isRecaptcha) {
             this.showPostLoading();
             if (this.mCheckCloudflareTask != null) {
@@ -317,7 +317,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     AddPostActivity.this.hidePostLoading();
                     AddPostActivity.this.showError(message != null ? message : AddPostActivity.this.getString(R.string.error_cloudflare_recaptcha));
                     AddPostActivity.this.refreshCaptcha();
-                }  
+                }
             });
             mCheckCloudflareTask.execute();
             return;
@@ -363,7 +363,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private void setRecaptcha(boolean isRecaptcha) {
         this.isRecaptcha = isRecaptcha;
         this.mCaptchaAnswerView.setInputType(isRecaptcha ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_CLASS_NUMBER);
-        
+
     }
 
     private void sendPost(SendPostModel pe) {
@@ -379,7 +379,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mCurrentPostSendTask.execute();
         }
     }
-    
+
     @Override
     public void showSuccess(String redirectedPage) {
         AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_send_post_success));
@@ -406,7 +406,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.startsWith("Вы постите слишком быстро")) {
             this.refreshCaptcha();
         }
-        
+
         if (error.startsWith("503")) {
             String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
             new CloudflareCheckService(url, this, new ICloudflareCheckListener() {
@@ -426,7 +426,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.setRecaptcha(true);
             this.refreshCaptcha();
         }
-        
+
     }
 
     @Override
@@ -482,7 +482,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.switchToCaptchaView(CaptchaViewType.IMAGE);
         this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
     }
-    
+
     @Override
     public void showCaptcha(Recaptcha2 captcha) {
         this.mCaptchaImageView.setImageResource(android.R.color.transparent);
@@ -555,7 +555,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
                     break;
                 }
-                
+
                 Intent intent = new Intent(this, FilesListActivity.class);
                 if (this.hasAttachments()) {
                     intent.putExtra(FilesListActivity.EXTRA_CURRENT_FILE, this.getAttachments().get(0).file.getAbsolutePath());
@@ -567,7 +567,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
                     break;
                 }
-                
+
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
                 this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
@@ -630,7 +630,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 break;
             }
         }
-        
+
         this.mAttachedFiles[index] = fileModel;
         this.mAttachmentViews[index].show(fileModel, this.getResources());
     }
@@ -639,11 +639,11 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mAttachedFiles[index] = null;
         this.mAttachmentViews[index].hide();
     }
-    
+
     private boolean hasAttachments() {
         return this.getAttachments().size() > 0;
     }
-    
+
     private List<ImageFileModel> getAttachments() {
         ArrayList<ImageFileModel> attachments = new ArrayList<ImageFileModel>(4);
         for (ImageFileModel file : this.mAttachedFiles) {
@@ -651,16 +651,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 attachments.add(file);
             }
         }
-        
+
         return attachments;
     }
-    
+
     private List<File> getAttachedFiles() {
         ArrayList<File> files = new ArrayList<File>(4);
         for (ImageFileModel file : this.getAttachments()) {
             files.add(file.file);
         }
-        
+
         return files;
     }
 

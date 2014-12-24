@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -22,7 +21,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
@@ -31,12 +29,12 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
+import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
@@ -53,7 +51,7 @@ public class ImageGalleryActivity extends Activity {
 
     private String mThreadUri;
     private ThreadImageModel mCurrentImageModel;
-    private ImageItemViewBag mCurrentImageViewBag;
+    private GalleryItemViewBag mCurrentImageViewBag;
     private boolean mImageLoaded;
     private File mImageLoadedFile;
 
@@ -146,6 +144,11 @@ public class ImageGalleryActivity extends Activity {
             searchTineyeMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
             searchGoogleMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
             imageOpsMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+        } else {
+            playVideoMenuItem.setVisible(false);
+            searchTineyeMenuItem.setVisible(false);
+            searchGoogleMenuItem.setVisible(false);
+            imageOpsMenuItem.setVisible(false);
         }
     }
 
@@ -166,11 +169,17 @@ public class ImageGalleryActivity extends Activity {
                 break;
             case R.id.play_video_menu_id:
                 File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(Uri.parse(this.mCurrentImageModel.url));
-                if (cachedFile.exists()) playVideoExternal(cachedFile, this);
+                if (cachedFile.exists()) {
+                    BrowserLauncher.playVideoExternal(cachedFile, this);
+                }
                 break;
             case R.id.share_menu_id:
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
-                shareImageIntent.setType("image/jpeg");
+                if (this.mCurrentImageModel.attachment.isImage()) {
+                    shareImageIntent.setType("image/jpeg");
+                } else if (this.mCurrentImageModel.attachment.isVideo()) {
+                    shareImageIntent.setType("video/webm");
+                }
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(this.mImageLoadedFile));
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
@@ -200,8 +209,10 @@ public class ImageGalleryActivity extends Activity {
         return true;
     }
 
-    private void loadImage(ThreadImageModel model, ImageItemViewBag viewBag) {
-        if (!model.attachment.isDisplayableInGallery()) {
+    private void loadImage(ThreadImageModel model, GalleryItemViewBag viewBag) {
+        if (!model.attachment.isDisplayableInGallery() ||
+                (model.attachment.isVideo() && this.mApplicationSettings.isExternalVideoPlayer()) ||
+                (model.attachment.isVideo() && Constants.SDK_VERSION < 10)) {
             this.setThumbnail(model.attachment, viewBag);
             return;
         }
@@ -231,42 +242,7 @@ public class ImageGalleryActivity extends Activity {
         }
     }
 
-    private void setVideoFile(final File file, final ImageItemViewBag viewBag) {
-        final VideoView videoView = new VideoView(this);
-        FrameLayout.LayoutParams lp2 = new FrameLayout.LayoutParams(AppearanceUtils.MATCH_PARAMS);
-        lp2.gravity = Gravity.CENTER;
-        videoView.setLayoutParams(lp2);
-
-        viewBag.layout.removeAllViews();
-        viewBag.layout.addView(videoView);
-
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-            }
-        });
-        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                MyLog.e(TAG, "Error code: " + what);
-                viewBag.switchToErrorView(getString(R.string.error_video_playing));
-                return true;
-            }
-        });
-
-        videoView.setVideoPath(file.getAbsolutePath());
-        videoView.start();
-    }
-
-    static void playVideoExternal(File file, Context context) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), "video/*");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
-    private void setThumbnail(final AttachmentInfo attachment, ImageItemViewBag viewBag) {
+    private void setThumbnail(final AttachmentInfo attachment, GalleryItemViewBag viewBag) {
         int thumbnailSize = (int) getResources().getDimension(R.dimen.thumbnail_size);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(thumbnailSize, thumbnailSize, Gravity.CENTER);
 
@@ -297,11 +273,11 @@ public class ImageGalleryActivity extends Activity {
         AppearanceUtils.showToastMessage(this, getResources().getString(R.string.notification_video_thumbnail));
     }
 
-    private void setImage(File file, ImageItemViewBag viewBag) {
+    private void setImage(File file, GalleryItemViewBag viewBag) {
         if (this.mCurrentImageModel.attachment.isImage()) {
             AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
         } else if (this.mCurrentImageModel.attachment.isVideo()) {
-            this.setVideoFile(file, viewBag);
+            AppearanceUtils.setVideoFile(file, this, viewBag);
         }
 
         this.mImageLoaded = true;
@@ -323,7 +299,7 @@ public class ImageGalleryActivity extends Activity {
         protected View createView(int position) {
             View view = this.mInflater.inflate(R.layout.image_gallery_item, null);
 
-            ImageItemViewBag vb = new ImageItemViewBag();
+            GalleryItemViewBag vb = new GalleryItemViewBag();
             vb.layout = (FrameLayout) view.findViewById(R.id.image_layout);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
@@ -334,14 +310,14 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void onViewUnselected(int position, View view) {
-            ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
-            vb.layout.removeAllViews();
+            GalleryItemViewBag vb = (GalleryItemViewBag) view.getTag();
+            vb.clear();
         }
 
         @Override
         public void onViewSelected(int position, View view) {
             ThreadImageModel imageModel = this.getItem(position);
-            ImageItemViewBag vb = (ImageItemViewBag) view.getTag();
+            GalleryItemViewBag vb = (GalleryItemViewBag) view.getTag();
             ImageGalleryActivity.this.loadImage(imageModel, vb);
 
             ImageGalleryActivity.this.mImageText.setText((position + 1) + "/" + this.getCount() + " (" + imageModel.size + ImageGalleryActivity.this.getResources().getString(R.string.data_file_size_measure) + ")");
@@ -349,10 +325,10 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private class ImageDownloadView implements IDownloadFileView {
-        private final ImageItemViewBag mViewBag;
+        private final GalleryItemViewBag mViewBag;
         private double mMaxValue = -1;
 
-        public ImageDownloadView(ImageItemViewBag viewBag) {
+        public ImageDownloadView(GalleryItemViewBag viewBag) {
             this.mViewBag = viewBag;
         }
 
@@ -406,23 +382,6 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void showFileExists(File file) {
             ImageGalleryActivity.this.setImage(file, this.mViewBag);
-        }
-    }
-
-    private static class ImageItemViewBag {
-        FrameLayout layout;
-        View loading;
-        View error;
-
-        boolean isVideoPlaying = false;
-
-        public void switchToErrorView(String errorMessage) {
-            this.layout.setVisibility(View.GONE);
-            this.loading.setVisibility(View.GONE);
-            this.error.setVisibility(View.VISIBLE);
-
-            TextView errorTextView = (TextView) this.error.findViewById(R.id.error_text);
-            errorTextView.setText(errorMessage);
         }
     }
 }

@@ -203,6 +203,8 @@
     <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
     <string name="pref_file_cache_no_limit">Неограниченный кэш</string>
     <string name="pref_file_cache_no_limit_summary">Отменить ограничение на размер кэша в 25Мб</string>
+    <string name="pref_external_video">Внешний видеоплеер</string>
+    <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
     
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>

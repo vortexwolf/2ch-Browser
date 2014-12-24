@@ -100,11 +100,11 @@
 				android:key="@string/pref_disable_zoom_controls_key"
 				android:title="@string/pref_disable_zoom_controls"
 				android:defaultValue="false"/>
-        	<!-- <CheckBoxPreference
+        	<CheckBoxPreference
 	            android:defaultValue="false"
-            	android:key="@string/pref_kitkat_fix_key"
-            	android:summary="@string/pref_kitkat_fix_summary"
-            	android:title="@string/pref_kitkat_fix" /> -->
+            	android:key="@string/pref_external_video_key"
+            	android:summary="@string/pref_external_video_summary"
+            	android:title="@string/pref_external_video" />
         </PreferenceScreen>
 
         <CheckBoxPreference
