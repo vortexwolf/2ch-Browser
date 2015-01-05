@@ -13,7 +13,7 @@ public class ThreadImagesService {
         if (attachment == null || !attachment.isDisplayableInGallery()) {
             return;
         }
-        
+
         ArrayList<ThreadImageModel> imagesList = this.getOrCreateImagesList(threadUrl);
 
         ThreadImageModel model = new ThreadImageModel();
@@ -38,6 +38,10 @@ public class ThreadImagesService {
         }
 
         return (ArrayList<ThreadImageModel>) this.mThreadImages.get(threadUrl).clone();
+    }
+
+    public boolean hasThreadImages(String threadUrl) {
+        return this.mThreadImages.containsKey(threadUrl);
     }
 
     public boolean hasImage(String threadUrl, String imageUrl) {

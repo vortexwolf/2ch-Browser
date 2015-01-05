@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources.Theme;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -18,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,7 +45,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements IURLSpanClickListener, IBusyAdapter {
     private static final String TAG = "PostsListAdapter";
-    
+
     private static final int ITEM_VIEW_TYPE_POST = 0;
     private static final int ITEM_VIEW_TYPE_STATUS = 1;
 
@@ -68,7 +65,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private final ThreadImagesService mThreadImagesService;
     private final DvachUriParser mUriParser;
     private final ArrayList<PostModel> mOriginalPosts = new ArrayList<PostModel>();
-    
+
     private StatusItemViewBag mStatusView;
     private boolean mIsUpdating = false;
     private boolean mIsBusy = false;
@@ -98,10 +95,10 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     public View getView(int position, View convertView, ViewGroup parent) {
         final IPostListEntity item = this.getItem(position);
         View view;
-        
+
         if (item instanceof StatusIndicatorEntity) {
-            view = convertView != null 
-                    ? convertView 
+            view = convertView != null
+                    ? convertView
                     : this.mInflater.inflate(R.layout.posts_list_status_item, null);
 
             StatusItemViewBag vb = (StatusItemViewBag)view.getTag();
@@ -113,7 +110,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
                 view.setTag(vb);
             }
             this.mStatusView = vb;
-            
+
             this.mStatusView.setLoading(this.mIsUpdating);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -125,7 +122,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         else {
             PostItemViewModel model = (PostItemViewModel)item;
             view = this.mPostItemViewBuilder.getView(model, convertView, this.mIsBusy);
-    
+
             // cut long posts if necessary
             int maxPostHeight = this.mSettings.getLongPostsMaxHeight();
             if (maxPostHeight == 0 || model.isLongTextExpanded()) {
@@ -134,7 +131,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
                 this.mPostItemViewBuilder.setMaxHeight(view, maxPostHeight, this.mTheme);
             }
         }
-        
+
         return view;
     }
 
@@ -157,7 +154,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
 
             if (this.mSettings.isLinksInPopup()) {
                 this.mPostItemViewBuilder.displayPopupDialog(
-                        (PostItemViewModel)this.getItem(position), 
+                        (PostItemViewModel)this.getItem(position),
                         this.mActivity, this.mTheme,
                         Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(this.mActivity) ? getSpanCoordinates(v, span) : null);
             } else {
@@ -167,7 +164,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
             ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder).onClick(v, span, url);
         }
     }
-    
+
     private Point getSpanCoordinates(View widget, ClickableURLSpan span) {
         TextView parentTextView = (TextView) widget;
 
@@ -193,13 +190,13 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         // Update the rectangle position to his real position on screen
         int[] parentTextViewLocation = {0,0};
         parentTextView.getLocationOnScreen(parentTextViewLocation);
-        
+
         double parentTextViewTopAndBottomOffset = (
             parentTextViewLocation[1] -
             parentTextView.getScrollY() +
             parentTextView.getCompoundPaddingTop()
         );
-        
+
         Rect windowRect = new Rect();
         this.mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
         parentTextViewTopAndBottomOffset -= windowRect.top;
@@ -245,6 +242,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     public void setAdapterData(PostModel[] posts) {
         this.clear();
         this.mOriginalPosts.clear();
+        this.mThreadImagesService.clearThreadImages(this.mUri);
 
         List<PostItemViewModel> models = this.mPostsViewModel.addModels(Arrays.asList(posts), this.mTheme, this, this.mActivity.getResources());
         for (PostItemViewModel model : models) {
@@ -255,9 +253,9 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
 
             this.add(model);
         }
-        
+
         this.mOriginalPosts.addAll(Arrays.asList(posts));
-        
+
         this.add(this.mStatusViewModel);
     }
 
@@ -300,7 +298,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
 
             this.insert(model, this.getCount() - 1);
         }
-        
+
         this.mOriginalPosts.addAll(newPosts);
 
         // обновить все видимые элементы, чтобы правильно перерисовался список
@@ -338,7 +336,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
             }
         }
     }
-    
+
     public void setUpdating(boolean isUpdating) {
         this.mIsUpdating = isUpdating;
         if (this.mStatusView != null) {
@@ -353,8 +351,8 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
 
     @Override
     public int getItemViewType(int position) {
-        return this.getItem(position) instanceof StatusIndicatorEntity 
-                ? ITEM_VIEW_TYPE_STATUS 
+        return this.getItem(position) instanceof StatusIndicatorEntity
+                ? ITEM_VIEW_TYPE_STATUS
                 : ITEM_VIEW_TYPE_POST;
     }
 
@@ -381,13 +379,13 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
             PostsListAdapter.this.loadListImages();
         }
     }
-    
+
     private class StatusItemViewBag {
         public StatusIndicatorEntity model;
-        
+
         public View hintView;
         public View loadingView;
-        
+
         public void setLoading(boolean isLoading) {
             model.setLoading(isLoading);
             hintView.setVisibility(!isLoading ? View.VISIBLE : View.GONE);

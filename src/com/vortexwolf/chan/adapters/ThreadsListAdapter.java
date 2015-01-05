@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.EllipsizingTextView;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
@@ -19,6 +20,7 @@ import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
+import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
@@ -30,6 +32,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     private final ApplicationSettings mSettings;
     private final HiddenThreadsDataSource mHiddenThreadsDataSource;
     private final DvachUriBuilder mDvachUriBuilder;
+    private final ThreadImagesService mThreadImagesService;
 
     private final String mBoardName;
 
@@ -44,6 +47,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mSettings = settings;
         this.mHiddenThreadsDataSource = hiddenThreadsDataSource;
         this.mDvachUriBuilder = dvachUriBuilder;
+        this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     }
 
     @Override
@@ -94,14 +98,14 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
             vb.commentView = (EllipsizingTextView) view.findViewById(R.id.comment);
             vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
             vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
-            
+
             vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
             vb.thumbnailViews = new ThumbnailViewBag[4];
             vb.thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
             vb.thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
             vb.thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
             vb.thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
-            
+
             view.setTag(vb);
         }
 
@@ -133,6 +137,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         vb.repliesNumberView.setText(repliesText);
 
         // Обрабатываем прикрепленные файлы
+        String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, item.getNumber());
+        if (!this.mThreadImagesService.hasThreadImages(threadUrl)) {
+            for (int i = 0; i < 4; ++i) {
+                this.mThreadImagesService.addThreadImage(threadUrl, item.getAttachment(i));
+            }
+        }
+
         if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
             vb.multiThumbnailsView.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.hide();

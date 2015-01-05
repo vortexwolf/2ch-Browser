@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 
 public class FavoritesDataSource {
@@ -18,13 +19,15 @@ public class FavoritesDataSource {
 
     private final DvachSqlHelper mDbHelper;
     private final DvachUriParser mDvachUriParser;
+    private final DvachUriBuilder mDvachUriBuilder;
 
     private SQLiteDatabase mDatabase;
     private boolean mModified = false;
 
-    public FavoritesDataSource(DvachSqlHelper dbHelper, DvachUriParser dvachUriParser) {
+    public FavoritesDataSource(DvachSqlHelper dbHelper, DvachUriParser dvachUriParser, DvachUriBuilder dvachUriBuilder) {
         this.mDbHelper = dbHelper;
         this.mDvachUriParser = dvachUriParser;
+        this.mDvachUriBuilder = dvachUriBuilder;
     }
 
     public void open() throws SQLException {
@@ -44,10 +47,13 @@ public class FavoritesDataSource {
     }
 
     public void addToFavorites(String title, String url) {
-        if (!this.hasFavorites(url)) {
+        Uri uri = Uri.parse(url);
+        String path = uri.getPath();
+
+        if (!this.hasFavorites(path)) {
             ContentValues values = new ContentValues();
             values.put(DvachSqlHelper.COLUMN_TITLE, title);
-            values.put(DvachSqlHelper.COLUMN_URL, url);
+            values.put(DvachSqlHelper.COLUMN_URL, path);
 
             long insertId = this.mDatabase.insert(TABLE, null, values);
             this.mModified = true;
@@ -55,7 +61,10 @@ public class FavoritesDataSource {
     }
 
     public void removeFromFavorites(String url) {
-        this.mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_URL + " = ?", new String[] { url });
+        Uri uri = Uri.parse(url);
+        String path = uri.getPath();
+
+        this.mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_URL + " in (?, ?)", new String[] { url, path });
         this.mModified = true;
     }
 
@@ -74,7 +83,7 @@ public class FavoritesDataSource {
 
         return favorites;
     }
-    
+
     public List<FavoritesEntity> getFavoriteThreads() {
         List<FavoritesEntity> favorites = this.getAllFavorites();
         List<FavoritesEntity> threadFavorites = new ArrayList<FavoritesEntity>();
@@ -103,7 +112,12 @@ public class FavoritesDataSource {
     }
 
     public boolean hasFavorites(String url) {
-        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE + " where " + DvachSqlHelper.COLUMN_URL + " = ?", new String[] { url });
+        Uri uri = Uri.parse(url);
+        String path = uri.getPath();
+
+        Cursor cursor = this.mDatabase.rawQuery(
+                "select count(*) from " + TABLE +
+                " where " + DvachSqlHelper.COLUMN_URL + " in (?, ?)", new String[] { url, path });
 
         cursor.moveToFirst();
         long count = cursor.getLong(0);
@@ -120,7 +134,7 @@ public class FavoritesDataSource {
         FavoritesEntity result = new FavoritesEntity();
         result.setId(id);
         result.setTitle(title);
-        result.setUrl(url);
+        result.setUrl(this.mDvachUriBuilder.createUri(Uri.parse(url).getPath()).toString());
 
         return result;
     }

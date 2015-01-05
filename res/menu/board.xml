@@ -31,6 +31,9 @@
         android:id="@+id/menu_catalog_id"
         android:title="@string/menu_catalog"/>
     <item
+        android:id="@+id/add_remove_favorites_menu_id"
+        android:title="@string/menu_add_favorites"/>
+    <item
         android:id="@+id/preferences_menu_id"
         android:alphabeticShortcut="p"
         android:icon="@drawable/ic_menu_preferences"

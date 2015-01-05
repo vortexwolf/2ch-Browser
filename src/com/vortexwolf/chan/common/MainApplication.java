@@ -56,7 +56,7 @@ public class MainApplication extends Application {
         if (Constants.SDK_VERSION >= 7) {
             MULTITOUCH_SUPPORT = CompatibilityUtilsImpl.hasMultitouchSupport(this.getPackageManager());
         }
-        
+
         if (Constants.SDK_VERSION >= 19) {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
@@ -74,7 +74,7 @@ public class MainApplication extends Application {
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, dvachUriBuilder, httpStreamReader, new MakabaModelsMapper());
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
-        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper, uriParser);
+        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper, uriParser, dvachUriBuilder);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
         BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
@@ -119,7 +119,7 @@ public class MainApplication extends Application {
         if (!settings.isUnlimitedCache()) {
             cacheManager.trimCacheIfNeeded();
         }
-        
+
         httpClient.setCookie(settings.getCloudflareClearanceCookie());
         httpClient.setCookie(settings.getPassCodeCookie());
     }
@@ -128,7 +128,7 @@ public class MainApplication extends Application {
     public void onTerminate() {
         super.onTerminate();
     }
-    
+
     @Override
     public File getCacheDir() {
         // NOTE: this method is used in Android 2.2 and higher

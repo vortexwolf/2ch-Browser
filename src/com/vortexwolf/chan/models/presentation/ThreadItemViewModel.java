@@ -58,18 +58,18 @@ public class ThreadItemViewModel {
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mOpPost);
     }
-    
+
     public int getAttachmentsNumber() {
         return ThreadPostUtils.getAttachmentsNumber(this.mOpPost);
     }
-    
+
     public AttachmentInfo getAttachment(int index) {
         if(index >= this.getAttachmentsNumber()) {
             return null;
         }
-        
+
         if (this.mAttachments[index] == null) {
-            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mBoardName, this.mOpPost.getParentThread());
+            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mBoardName, this.mOpPost.getNumber());
         }
 
         return this.mAttachments[index];

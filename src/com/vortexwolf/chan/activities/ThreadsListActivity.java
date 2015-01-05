@@ -30,6 +30,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -58,6 +59,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
+    private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
     private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
@@ -77,10 +79,12 @@ public class ThreadsListActivity extends BaseListActivity {
     private String mBoardName;
     private int mPageNumber = 0;
 
+    private Menu mMenu;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         // Парсим код доски и номер страницы
         Uri data = this.getIntent().getData();
         if (data != null) {
@@ -89,7 +93,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
-        
+
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);
 
@@ -158,7 +162,7 @@ public class ThreadsListActivity extends BaseListActivity {
         // Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
         this.mNavigationBar.setVisibility(this.mPageNumber < 0 ? View.GONE : View.VISIBLE);
-        
+
         this.mCatalogBar = this.findViewById(R.id.threads_catalog_bar);
         this.mCatalogBar.setVisibility(this.mPageNumber < 0 ? View.VISIBLE : View.GONE);
 
@@ -186,7 +190,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber + 1);
             }
         });
-        
+
         Spinner filterSelect = (Spinner) this.findViewById(R.id.threads_filter_select);
         filterSelect.setSelection(-1-mPageNumber);
         filterSelect.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -247,6 +251,10 @@ public class ThreadsListActivity extends BaseListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.board, menu);
+
+        this.mMenu = menu;
+        this.updateOptionsMenu();
+
         return true;
     }
 
@@ -285,6 +293,17 @@ public class ThreadsListActivity extends BaseListActivity {
                 break;
             case R.id.menu_catalog_id:
                 this.navigateToBoardPageNumber(this.mBoardName, -1);
+                break;
+            case R.id.add_remove_favorites_menu_id:
+                String url = this.mTabModel.getUri().toString();
+                if (this.mFavoritesDatasource.hasFavorites(url)) {
+                    this.mFavoritesDatasource.removeFromFavorites(url);
+                } else {
+                    this.mFavoritesDatasource.addToFavorites(this.mTabModel.getTitle(), url);
+                }
+
+                this.updateOptionsMenu();
+
                 break;
         }
 
@@ -373,6 +392,19 @@ public class ThreadsListActivity extends BaseListActivity {
         outState.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
 
         super.onSaveInstanceState(outState);
+    }
+
+    private void updateOptionsMenu() {
+        if (this.mMenu == null) {
+            return;
+        }
+
+        MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
+        if (this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())) {
+            favoritesItem.setTitle(R.string.menu_remove_favorites);
+        } else {
+            favoritesItem.setTitle(R.string.menu_add_favorites);
+        }
     }
 
     private void navigateToAddThreadView() {
@@ -487,7 +519,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 }).start();
             }
         }
-        
+
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
             ThreadsListActivity.this.switchToCaptchaView(captcha);
