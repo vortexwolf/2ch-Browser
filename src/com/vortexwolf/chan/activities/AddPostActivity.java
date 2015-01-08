@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
+import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
@@ -45,6 +46,7 @@ import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
+import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
@@ -85,6 +87,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private SendPostTask mCurrentPostSendTask = null;
     private DownloadCaptchaTask mCurrentDownloadCaptchaTask = null;
+    private CheckPasscodeTask mCurrentCheckPasscodeTask = null;
 
     private TextView mCaptchaSkipView = null;
     private View mCaptchaLoadingView = null;
@@ -514,6 +517,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private void switchToCaptchaView(CaptchaViewType vt) {
         this.mCurrentCaptchaView = vt;
+        if (vt == null) {
+            return;
+        }
+
         switch (vt) {
             case LOADING:
                 this.mCaptchaImageView.setVisibility(View.GONE);
@@ -665,6 +672,23 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptcha() {
+        if (this.mCurrentCaptchaView == CaptchaViewType.SKIP) {
+            this.refreshCaptchaSkipView();
+        } else {
+            this.refreshCaptchaImageView();
+        }
+    }
+
+    private void refreshCaptchaSkipView() {
+        if (this.mCurrentCheckPasscodeTask != null) {
+            this.mCurrentCheckPasscodeTask.cancel(true);
+        }
+
+        this.mCurrentCheckPasscodeTask = new CheckPasscodeTask(new CheckPasscodeView());
+        this.mCurrentCheckPasscodeTask.execute();
+    }
+
+    private void refreshCaptchaImageView() {
         if (this.mCurrentDownloadCaptchaTask != null) {
             this.mCurrentDownloadCaptchaTask.cancel(true);
         }
@@ -731,6 +755,27 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
             editable.replace(selectionStart, selectionEnd, quotedText);
             this.mCommentView.setSelection(selectionStart + firstSymbol.length(), selectionEnd + diff);
+        }
+    }
+
+    private class CheckPasscodeView implements ICheckPasscodeView {
+        @Override
+        public void onPasscodeRemoved() {
+            AddPostActivity activity = AddPostActivity.this;
+            activity.switchToCaptchaView(null);
+            activity.refreshCaptcha();
+        }
+
+        @Override
+        public void onPasscodeChecked(boolean isSuccess) {
+            AddPostActivity activity = AddPostActivity.this;
+            if (isSuccess) {
+                AppearanceUtils.showToastMessage(activity, activity.getString(R.string.notification_passcode_correct));
+            } else {
+                AppearanceUtils.showToastMessage(activity, activity.getString(R.string.notification_passcode_incorrect));
+                activity.switchToCaptchaView(null);
+                activity.refreshCaptcha();
+            }
         }
     }
 }

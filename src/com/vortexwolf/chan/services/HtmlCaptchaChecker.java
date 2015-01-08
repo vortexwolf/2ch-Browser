@@ -27,8 +27,8 @@ public class HtmlCaptchaChecker {
 
     public CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode) {
         String checkUri = "makaba/captcha.fcgi";
-        if (usePasscode && !StringUtils.isEmpty(this.mApplicationSettings.getPassCodeValue())) {
-            checkUri += "?usercode=" + this.mApplicationSettings.getPassCodeValue();
+        if (usePasscode && !StringUtils.isEmpty(this.mApplicationSettings.getPasscodeCookieValue())) {
+            checkUri += "?usercode=" + this.mApplicationSettings.getPasscodeCookieValue();
         }
 
         Uri uri = this.mDvachUriBuilder.createUri(checkUri);

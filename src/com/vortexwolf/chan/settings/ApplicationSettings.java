@@ -53,8 +53,12 @@ public class ApplicationSettings {
         editor.commit();
     }
 
-    public String getPassCodeValue() {
+    public String getPasscodeCookieValue() {
         return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_cookie_key), null);
+    }
+
+    public String getPasscodeRaw() {
+        return this.mSettings.getString(this.mResources.getString(R.string.pref_passcode_key), null);
     }
 
     public BasicClientCookie getPassCodeCookie() {

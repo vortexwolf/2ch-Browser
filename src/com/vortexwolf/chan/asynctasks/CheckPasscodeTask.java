@@ -12,32 +12,33 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
-    private final Context mContext;
-    private final ApplicationSettings mSettings;
+    private final ICheckPasscodeView mCheckPasscodeView;
     private final String mPasscode;
     private final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
     private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
 
     private Cookie mUserCodeCookie = null;
 
-    public CheckPasscodeTask(Context context, ApplicationSettings settings, String passcode) {
-        this.mContext = context;
-        this.mSettings = settings;
+    public CheckPasscodeTask(ICheckPasscodeView view) {
+        this.mCheckPasscodeView = view;
+        this.mPasscode = this.mApplicationSettings.getPasscodeRaw();
+    }
+
+    public CheckPasscodeTask(ICheckPasscodeView view, String passcode) {
+        this.mCheckPasscodeView = view;
         this.mPasscode = passcode;
     }
 
@@ -63,7 +64,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
             for (Cookie c : cookies) {
-                if (c.getName().equals(Constants.USERCODE_COOKIE) && 
+                if (c.getName().equals(Constants.USERCODE_COOKIE) &&
                     UriUtils.areCookieDomainsEqual(c.getDomain(), mApplicationSettings.getDomainUri().getHost())) {
                     this.mUserCodeCookie = c;
                     break;
@@ -83,18 +84,21 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (StringUtils.isEmpty(this.mPasscode)) {
-            this.mSettings.clearPassCodeCookie();
+            this.mApplicationSettings.clearPassCodeCookie();
+            this.mCheckPasscodeView.onPasscodeRemoved();
             return;
         }
-        
+
         if (this.mUserCodeCookie != null) {
-            this.mSettings.savePassCodeCookie(this.mUserCodeCookie);
+            this.mApplicationSettings.savePassCodeCookie(this.mUserCodeCookie);
         }
 
-        if (StringUtils.emptyIfNull(result).equals("/b/")) {
-            AppearanceUtils.showToastMessage(this.mContext, this.mContext.getString(R.string.notification_passcode_correct));
+        boolean isSuccess = StringUtils.emptyIfNull(result).equals("/b/");
+        this.mCheckPasscodeView.onPasscodeChecked(isSuccess);
+        if (isSuccess) {
+            //AppearanceUtils.showToastMessage(this.mContext, this.mContext.getString(R.string.notification_passcode_correct));
         } else {
-            AppearanceUtils.showToastMessage(this.mContext, this.mContext.getString(R.string.notification_passcode_incorrect));
+            //AppearanceUtils.showToastMessage(this.mContext, this.mContext.getString(R.string.notification_passcode_incorrect));
         }
     }
 }

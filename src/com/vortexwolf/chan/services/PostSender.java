@@ -105,7 +105,7 @@ public class PostSender implements IPostSender {
         try {
             httpPost.setHeader("content-type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
 
-            String usercode = this.mApplicationSettings.getPassCodeValue();
+            String usercode = this.mApplicationSettings.getPasscodeCookieValue();
 
             HttpEntity entity = this.mMakabaSendPostMapper.mapModelToHttpEntity(boardName, usercode, postModel);
             httpPost.setEntity(entity);

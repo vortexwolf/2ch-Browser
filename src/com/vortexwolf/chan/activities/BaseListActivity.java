@@ -22,8 +22,6 @@ import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
-import com.vortexwolf.chan.models.domain.CloudflareCaptchaModel;
-import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public abstract class BaseListActivity extends ListActivity {
@@ -35,16 +33,16 @@ public abstract class BaseListActivity extends ListActivity {
     private View mErrorView = null;
     private View mCaptchaView = null;
     private ViewType mCurrentView = null;
-    
+
     protected boolean mVisible = false;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -59,7 +57,7 @@ public abstract class BaseListActivity extends ListActivity {
 
     /** Returns the layout resource Id associated with this activity */
     protected abstract int getLayoutId();
-    
+
     protected abstract void refresh();
 
     /** Reloads UI on the page */
@@ -75,7 +73,7 @@ public abstract class BaseListActivity extends ListActivity {
 
         this.switchToView(this.mCurrentView);
     }
-    
+
     /** Returns the main class of the application */
     protected MainApplication getMainApplication() {
         return (MainApplication) super.getApplication();
@@ -98,19 +96,19 @@ public abstract class BaseListActivity extends ListActivity {
         TextView errorTextView = (TextView) this.mErrorView.findViewById(R.id.error_text);
         errorTextView.setText(message != null ? message : this.getString(R.string.error_unknown));
     }
-    
+
     protected void switchToCaptchaView(final CaptchaEntity captcha) {
         if (this.mCaptchaView == null) {
             this.switchToErrorView("The captcha view is not designed yet.");
             return;
         }
-        
+
         this.switchToView(ViewType.CAPTCHA);
-        
+
         ImageView captchaImage = (ImageView) this.mCaptchaView.findViewById(R.id.cloudflare_captcha_image);
         final EditText captchaAnswer = (EditText) this.mCaptchaView.findViewById(R.id.cloudflare_captcha_input);
         final Button sendButton = (Button) this.mCaptchaView.findViewById(R.id.cloudflare_send_button);
-        
+
         captchaAnswer.setText("");
         captchaAnswer.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
@@ -118,14 +116,15 @@ public abstract class BaseListActivity extends ListActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(captchaAnswer.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
-                    
-                    sendButton.performClick();
+
+                    CheckCloudflareTask task = new CheckCloudflareTask(captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
+                    task.execute();
                     return true;
                 }
                 return false;
             }
         });
-        
+
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,12 +132,12 @@ public abstract class BaseListActivity extends ListActivity {
                 task.execute();
             }
         });
-        
+
         // display captcha image
         DisplayImageUriTask task = new DisplayImageUriTask(captcha.getUrl(), captchaImage);
         task.execute();
     }
-    
+
     protected void showToastIfVisible(String message) {
         if (this.mVisible) {
             AppearanceUtils.showToastMessage(this, message);
@@ -180,13 +179,13 @@ public abstract class BaseListActivity extends ListActivity {
                 break;
         }
     }
-    
+
     private void setCaptchaViewVisibility(int visibility) {
         if (this.mCaptchaView != null) {
             this.mCaptchaView.setVisibility(visibility);
         }
     }
-    
+
     private class CheckCaptchaView implements ICheckCaptchaView {
         @Override
         public void showSuccess() {
@@ -197,7 +196,7 @@ public abstract class BaseListActivity extends ListActivity {
         public void showError(String message) {
             message = message != null ? message : "Incorrect captcha.";
             AppearanceUtils.showToastMessage(getApplicationContext(), message);
-            
+
             BaseListActivity.this.refresh();
         }
     }
