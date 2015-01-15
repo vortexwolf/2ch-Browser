@@ -9,6 +9,7 @@ public class YandexCaptchaService {
         CaptchaEntity captcha = new CaptchaEntity();
         captcha.setKey(key);
         captcha.setUrl(IMAGE_URI + key);
+        captcha.setType(CaptchaEntity.Type.YANDEX);
         return captcha;
     }
 }

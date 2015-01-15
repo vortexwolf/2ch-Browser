@@ -48,8 +48,8 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
             this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this.mIsCheckModified, this, this);
             return true;
         } catch (HtmlNotJsonException he) {
-            if (RecaptchaService.isRecaptchaPage(he.getHtml())) {
-                this.mRecaptcha = RecaptchaService.loadCaptcha();
+            if (RecaptchaService.isCloudflareCaptchaPage(he.getHtml())) {
+                this.mRecaptcha = RecaptchaService.loadCloudflareCaptcha();
             }
             if (this.mRecaptcha == null) {
                 this.mUserError = he.getMessage();

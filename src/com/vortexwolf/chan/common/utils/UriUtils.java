@@ -15,6 +15,10 @@ public class UriUtils {
         return Uri.parse(url);
     }
 
+    public static Uri changeHttpsToHttp(Uri uri) {
+        return uri.buildUpon().scheme("http").build();
+    }
+
     public static boolean isImageUri(Uri uri) {
         if (uri == null) {
             return false;

@@ -2,9 +2,7 @@ package com.vortexwolf.chan.boards.makaba;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -16,10 +14,11 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.domain.SendPostModel;
+import com.vortexwolf.chan.services.RecaptchaService;
 
 public class MakabaSendPostMapper {
     private static final String TAG = "MakabaSendPostMapper";
-    
+
     private static final Charset utf = Constants.UTF8_CHARSET;
     private static final String TASK = "task";
     private static final String BOARD = "board";
@@ -31,11 +30,11 @@ public class MakabaSendPostMapper {
     private static final String SUBJECT = "subject";
     private static final String CAPTCHA_KEY = "captcha";
     private static final String CAPTCHA_ANSWER = "captcha_value";
-    private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" }; 
-    
-    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model) {         
+    private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" };
+
+    public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model) {
         MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
-        
+
         this.addStringValue(multipartEntity, TASK, "post");
         this.addStringValue(multipartEntity, BOARD, boardName);
         this.addStringValue(multipartEntity, THREAD, model.getParentThread());
@@ -50,7 +49,7 @@ public class MakabaSendPostMapper {
                 if (model.getRecaptchaHash() != null) {
                     this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptchaHash());
                 } else {
-                    this.addStringValue(multipartEntity, "g-recaptcha-response", model.getRecaptcha().getHash(model.getCaptchaAnswer()));
+                    this.addStringValue(multipartEntity, "g-recaptcha-response", RecaptchaService.getHash(model.getCaptchaKey(), model.getCaptchaAnswer()));
                 }
             } catch (Exception e) {
                 MyLog.d(TAG, "can't check get recaptcha hash");
@@ -60,20 +59,20 @@ public class MakabaSendPostMapper {
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());
         this.addStringValue(multipartEntity, NAME, model.getName());
         this.addStringValue(multipartEntity, EMAIL, model.isSage() ? Constants.SAGE_EMAIL : null);
-        
+
         List<File> files = model.getAttachedFiles();
         for (int i = 0; i < files.size(); i++) {
             multipartEntity.addPart(IMAGES[i], new FileBody(files.get(i)));
         }
-        
+
         // Only for /po and /test
         if (model.getPolitics() != null) {
             this.addStringValue(multipartEntity, "icon", model.getPolitics());
         }
-        
+
         return multipartEntity;
     }
-    
+
     private void addStringValue(MultipartEntity entity, String key, String value) {
         try {
             if (value != null) {

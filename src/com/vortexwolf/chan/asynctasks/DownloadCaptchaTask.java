@@ -11,7 +11,6 @@ import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
-import com.vortexwolf.chan.services.Recaptcha2;
 import com.vortexwolf.chan.services.RecaptchaService;
 import com.vortexwolf.chan.services.YandexCaptchaService;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
@@ -24,29 +23,22 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
     private final DvachUriParser mUriParser;
+    private final boolean mCfRecaptcha;
 
     private boolean mCanSkip = false;
     private boolean mSuccessPasscode = false;
     private boolean mFailPasscode = false;
     private CaptchaEntity mCaptcha;
-    private Recaptcha2 mRecaptcha2;
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    private boolean isRecaptcha = false;
-
-    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri) {
+    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, boolean isCfRecaptcha) {
         this.mView = view;
         this.mRefererUri = refererUri;
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
         this.mUriParser = Factory.resolve(DvachUriParser.class);
-    }
-
-    public DownloadCaptchaTask(ICaptchaView view, boolean isRecaptcha) {
-        this(view, null);
-
-        this.isRecaptcha = isRecaptcha;
+        this.mCfRecaptcha = isCfRecaptcha;
     }
 
     @Override
@@ -60,8 +52,6 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             this.mView.skipCaptcha(this.mSuccessPasscode, this.mFailPasscode);
         } else if (success && this.mCaptcha != null) {
             this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
-        } else if (success && this.mRecaptcha2 != null) {
-            this.mView.showCaptcha(this.mRecaptcha2);
         } else {
             this.mView.showCaptchaError(this.mUserError);
         }
@@ -69,8 +59,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        if (isRecaptcha) {
-            this.mCaptcha = RecaptchaService.loadCaptcha();
+        if (this.mCfRecaptcha) {
+            this.mCaptcha = RecaptchaService.loadCloudflareCaptcha();
         } else {
             HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
             this.mCanSkip = result.canSkip;
@@ -81,17 +71,16 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
                 return true;
             }
+
             if (captchaKey != null) {
                 this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
+            } else {
+                this.mCaptcha = RecaptchaService.loadPostingRecaptcha();
             }
         }
 
         if (this.isCancelled()) {
             return false;
-        }
-        if (this.mCaptcha == null) {
-            this.mRecaptcha2 = Recaptcha2.load();
-            return true;
         }
 
         try {

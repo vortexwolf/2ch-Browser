@@ -9,21 +9,19 @@ import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.net.Uri;
+import android.os.AsyncTask;
+
 import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.exceptions.HttpRequestException;
-import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
-
-import android.net.Uri;
-import android.os.AsyncTask;
 
 public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     public static final String TAG = "CheckCloudflareTask";
@@ -50,9 +48,10 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {
         try {
             this.mHttpClient.removeCookie(Constants.CF_CLEARANCE_COOKIE);
-            
+
             String uriPath = CHECK_URL_PATH + "?recaptcha_challenge_field=" + this.mCaptcha.getKey() + "&recaptcha_response_field=" + URLEncoder.encode(this.mCaptchaAnswer, Constants.UTF8_CHARSET.name());
             Uri checkUri = mDvachUriBuilder.createUri(uriPath);
+            checkUri = UriUtils.changeHttpsToHttp(checkUri); // because https returns error 400
 
             HttpGet request = mHttpStreamReader.createRequest(checkUri.toString(), null);
             HttpClientParams.setRedirecting(request.getParams(), false);
@@ -61,7 +60,7 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
 
             List<Cookie> cookies = mHttpClient.getCookieStore().getCookies();
             for (Cookie cookie : cookies) {
-                if (Constants.CF_CLEARANCE_COOKIE.equals(cookie.getName()) && 
+                if (Constants.CF_CLEARANCE_COOKIE.equals(cookie.getName()) &&
                     UriUtils.areCookieDomainsEqual(cookie.getDomain(), mApplicationSettings.getDomainUri().getHost())) {
                     mApplicationSettings.saveCloudflareClearanceCookie(cookie);
                     return true;

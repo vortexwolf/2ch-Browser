@@ -1,48 +1,87 @@
 package com.vortexwolf.chan.services;
 
-import java.util.regex.Matcher;
+import java.io.InputStream;
 import java.util.regex.Pattern;
 
-import android.net.Uri;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.ExtendedHttpClient;
+import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
-import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
+import com.vortexwolf.chan.services.http.HttpStreamModel;
+import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.services.http.HttpStringReader;
 
 public class RecaptchaService {
-    private static final Uri API_URI = Uri.parse("http://www.google.com/recaptcha/api/noscript?k=6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog");
-    private static final Pattern imgReg = Pattern.compile("<img .*?src=\"(.+?)\"");
-    private static final Pattern chalReg = Pattern.compile("id=\"recaptcha_challenge_field\" value=\"(.*?)\"");
+    private static final String CLOUDFLARE_CHECK_KEY = "6LeT6gcAAAAAAAZ_yDmTMqPH57dJQZdQcu6VFqog";
+    private static final String SEND_POST_KEY = "6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz";
+    private static final String RECAPTCHA_CHALLENGE_URI = "http://www.google.com/recaptcha/api/challenge?k=";
+    private static final String FALLBACK_URI = "http://www.google.com/recaptcha/api/fallback?k=";
+    private static final String IMAGE_URI = "http://www.google.com/recaptcha/api2/payload?c=";
 
-    public static boolean isRecaptchaPage(String html) {
-        return html.contains(API_URI.getPath() + "?" + API_URI.getQuery());
+    private static final Pattern jsChallengePattern = Pattern.compile("challenge.?:.?'([\\w-]+)'");
+
+
+    public static boolean isCloudflareCaptchaPage(String html) {
+        return html.contains(CLOUDFLARE_CHECK_KEY);
     }
-    
-    public static CaptchaEntity loadCaptcha() {
+
+    public static CaptchaEntity loadCloudflareCaptcha() {
+        return loadRecaptcha(CLOUDFLARE_CHECK_KEY, CaptchaEntity.Type.RECAPTCHA_CF);
+    }
+
+    public static CaptchaEntity loadPostingRecaptcha() {
+        return loadRecaptcha(SEND_POST_KEY, CaptchaEntity.Type.RECAPTCHA_POST);
+    }
+
+    public static CaptchaEntity loadRecaptcha(String key, CaptchaEntity.Type type) {
         try {
-            String html = Factory.resolve(HttpStringReader.class).fromUri(API_URI.toString());
-            CaptchaEntity captcha = getCaptcha(html);
+            String response = Factory.resolve(HttpStringReader.class).fromUri(RECAPTCHA_CHALLENGE_URI + key);
+            CaptchaEntity captcha = getCaptchaFromJavascript(response, type);
             return captcha;
         } catch (HttpRequestException e) {
             return null;
         }
     }
 
-    private static CaptchaEntity getCaptcha(String html) {
-        String challenge = RegexUtils.getGroupValue(html, chalReg, 1);
-        String imageUrl = RegexUtils.getGroupValue(html, imgReg, 1);
-        if (challenge == null || imageUrl == null) {
+    private static CaptchaEntity getCaptchaFromJavascript(String js, CaptchaEntity.Type type) {
+        String challenge = RegexUtils.getGroupValue(js, jsChallengePattern, 1);
+        if (challenge == null) {
             return null;
         }
-        
-        imageUrl = "http://google.com/recaptcha/api/" + imageUrl;
 
         CaptchaEntity captcha = new CaptchaEntity();
         captcha.setKey(challenge);
-        captcha.setUrl(imageUrl);
+        captcha.setUrl(IMAGE_URI + challenge);
+        captcha.setType(type);
         return captcha;
+    }
+
+    public static String getHash(String challenge, String answer) throws Exception {
+        MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
+        entity.addPart("c", new StringBody(challenge, Constants.UTF8_CHARSET));
+        entity.addPart("response", new StringBody(answer, Constants.UTF8_CHARSET));
+
+        HttpStreamModel httpStreamModel = null;
+        try {
+            httpStreamModel = Factory.resolve(HttpStreamReader.class).fromUri(FALLBACK_URI + SEND_POST_KEY, null, entity, null, null);
+            InputStream stream = httpStreamModel.stream;
+            String response = IoUtils.convertStreamToString(stream);
+            Document document = Jsoup.parseBodyFragment(response);
+            Elements verificationToken = document.select("div.fbc-verification-token textarea");
+            String hash = verificationToken.text();
+            return hash;
+        } finally {
+            ExtendedHttpClient.releaseRequestResponse(httpStreamModel.request, httpStreamModel.response);
+        }
     }
 }

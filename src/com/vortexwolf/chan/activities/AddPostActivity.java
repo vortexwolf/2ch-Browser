@@ -52,6 +52,7 @@ import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
+import com.vortexwolf.chan.models.domain.CaptchaEntity.Type;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.presentation.AddAttachmentViewBag;
 import com.vortexwolf.chan.models.presentation.CaptchaViewType;
@@ -61,7 +62,6 @@ import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MyTracker;
-import com.vortexwolf.chan.services.Recaptcha2;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
@@ -76,7 +76,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
-    private Recaptcha2 mRecaptcha2;
     private String mBoardName;
     private String mThreadNumber;
     private Uri mRefererUri;
@@ -108,7 +107,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     // (после успешной отправки)
     private boolean mFinishedSuccessfully = false;
 
-    private boolean isRecaptcha = false;
+    private boolean mCfRecaptcha = false;
     private CheckCloudflareTask mCheckCloudflareTask;
 
     @Override
@@ -302,7 +301,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         // Собираем все заполненные поля
         String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
 
-        if (this.isRecaptcha) {
+        if (this.mCfRecaptcha) {
+            // Check the cloudflare captcha and then show a posting captcha
             this.showPostLoading();
             if (this.mCheckCloudflareTask != null) {
                 this.mCheckCloudflareTask.cancel(true);
@@ -311,14 +311,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 @Override
                 public void showSuccess() {
                     AddPostActivity.this.hidePostLoading();
-                    AddPostActivity.this.setRecaptcha(false);
+                    AddPostActivity.this.setCfRecaptcha(false);
                     AddPostActivity.this.refreshCaptcha();
                 }
 
                 @Override
                 public void showError(String message) {
                     AddPostActivity.this.hidePostLoading();
-                    AddPostActivity.this.showError(message != null ? message : AddPostActivity.this.getString(R.string.error_cloudflare_recaptcha));
+                    AddPostActivity.this.showError(message != null ? message : AddPostActivity.this.getString(R.string.error_cloudflare_recaptcha), false);
                     AddPostActivity.this.refreshCaptcha();
                 }
             });
@@ -349,13 +349,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         String name = this.mSettings.getName();
-        String captchaKey = this.mCaptcha != null ? this.mCaptcha.getKey() : null;
-        SendPostModel pe;
-        if (this.mRecaptcha2 != null) {
-            pe = new SendPostModel(this.mRecaptcha2, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
-        } else {
-            pe = new SendPostModel(captchaKey, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
-        }
+        SendPostModel pe = new SendPostModel(this.mCaptcha, captchaAnswer, comment, isSage, this.getAttachedFiles(), subject, politics, name);
         pe.setParentThread(this.mThreadNumber);
         this.mCachedSendPostModel = pe;
 
@@ -363,18 +357,18 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.sendPost(pe);
     }
 
-    private void setRecaptcha(boolean isRecaptcha) {
-        this.isRecaptcha = isRecaptcha;
-        this.mCaptchaAnswerView.setInputType(isRecaptcha ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_CLASS_NUMBER);
-
+    private void setCfRecaptcha(boolean isCfRecaptcha) {
+        this.mCfRecaptcha = isCfRecaptcha;
+        this.mCaptchaAnswerView.setInputType(isCfRecaptcha ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_CLASS_NUMBER);
     }
 
     private void sendPost(SendPostModel pe) {
-
         if (this.mCurrentPostSendTask != null) {
             this.mCurrentPostSendTask.cancel(true);
         }
-        if (this.mRecaptcha2 != null && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
+        if (this.mCaptcha != null
+                && this.mCaptcha.getType() == Type.RECAPTCHA_POST
+                && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
             Intent reIntent = new Intent(this, NewRecaptchaActivity.class);
             startActivityForResult(reIntent, Constants.REQUEST_CODE_RECAPTCHA);
         } else {
@@ -402,9 +396,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     @Override
-    public void showError(String error) {
+    public void showError(String error, boolean isRecaptcha) {
         error = error != null ? error : this.getString(R.string.error_send_post);
         AppearanceUtils.showToastMessage(this, error);
+
+        if (isRecaptcha) {
+            this.setCfRecaptcha(true);
+            this.refreshCaptcha();
+        }
 
         if (error.startsWith("Ошибка: Неверный код подтверждения.") || error.startsWith("Капча невалидна") || error.startsWith("Вы постите слишком быстро")) {
             this.refreshCaptcha();
@@ -425,11 +424,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 }
             }).start();
         }
-        if (error.equals(this.getString(R.string.notification_cloudflare_recaptcha))) {
-            this.setRecaptcha(true);
-            this.refreshCaptcha();
-        }
-
     }
 
     @Override
@@ -478,30 +472,18 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         this.mCaptcha = captcha;
-        this.mRecaptcha2 = null;
         this.mCaptchaBitmap = captchaImage;
         this.mCaptchaImageView.setImageBitmap(captchaImage);
 
-        this.switchToCaptchaView(CaptchaViewType.IMAGE);
-        this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
-    }
-
-    @Override
-    public void showCaptcha(Recaptcha2 captcha) {
-        this.mCaptchaImageView.setImageResource(android.R.color.transparent);
-        if (this.mCaptchaBitmap != null) {
-            this.mCaptchaBitmap.recycle();
-        }
-
-        this.mRecaptcha2 = captcha;
-        this.mCaptchaBitmap = captcha.bitmap;
-        this.mCaptchaImageView.setImageBitmap(captcha.bitmap);
-
-        if (Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
+        if (captcha.getType() == Type.RECAPTCHA_POST && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
             this.switchToCaptchaView(CaptchaViewType.SKIP);
         } else {
             this.switchToCaptchaView(CaptchaViewType.IMAGE);
-            this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
+            if (captcha.getType() == Type.YANDEX) {
+                this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
+            } else {
+                this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
+            }
         }
     }
 
@@ -695,11 +677,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        if (!this.isRecaptcha) {
-            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri);
-        } else {
-            this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, true);
-        }
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mCfRecaptcha);
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

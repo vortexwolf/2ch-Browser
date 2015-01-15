@@ -65,7 +65,7 @@ public class PostSender implements IPostSender {
 
             if (statusCode == 403) {
                 String html = this.mHttpStringReader.fromResponse(response);
-                if (RecaptchaService.isRecaptchaPage(html)) {
+                if (RecaptchaService.isCloudflareCaptchaPage(html)) {
                     result.isRecaptcha = true;
                     result.error = this.mResources.getString(R.string.notification_cloudflare_recaptcha);
                     return result;

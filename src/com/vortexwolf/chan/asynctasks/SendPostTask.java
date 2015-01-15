@@ -1,18 +1,12 @@
 package com.vortexwolf.chan.asynctasks;
 
-import android.content.res.Resources;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IPostSender;
-import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
-import com.vortexwolf.chan.services.RecaptchaService;
 
 public class SendPostTask extends AsyncTask<Void, Long, SendPostResult> {
 
@@ -50,8 +44,8 @@ public class SendPostTask extends AsyncTask<Void, Long, SendPostResult> {
         this.mView.hidePostLoading();
         if (result.isSuccess) {
             this.mView.showSuccess(result.location);
-        } else {            
-            this.mView.showError(result.error);
+        } else {
+            this.mView.showError(result.error, result.isRecaptcha);
         }
     }
 }

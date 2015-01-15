@@ -3,12 +3,9 @@ package com.vortexwolf.chan.models.domain;
 import java.io.File;
 import java.util.List;
 
-import com.vortexwolf.chan.services.Recaptcha2;
-
 public class SendPostModel {
-    private Recaptcha2 mRecaptcha = null;
     private String mRecaptchaHash = null;
-    private String mCaptchaKey;
+    private CaptchaEntity mCaptcha;
     private String mCaptchaAnswer;
     private String mComment;
     private boolean mIsSage;
@@ -19,8 +16,8 @@ public class SendPostModel {
     private String mVideo;
     private String mParentThread;
 
-    public SendPostModel(String captchaKey, String captchaAnswer, String comment, boolean isSage, List<File> attachedFiles, String subject, String politics, String name) {
-        this.mCaptchaKey = captchaKey;
+    public SendPostModel(CaptchaEntity captcha, String captchaAnswer, String comment, boolean isSage, List<File> attachedFiles, String subject, String politics, String name) {
+        this.mCaptcha = captcha;
         this.mCaptchaAnswer = captchaAnswer;
         this.mComment = comment;
         this.mIsSage = isSage;
@@ -29,42 +26,26 @@ public class SendPostModel {
         this.mPolitics = politics;
         this.mName = name;
     }
-    
-    public SendPostModel(Recaptcha2 recaptcha, String captchaAnswer, String comment, boolean isSage, List<File> attachedFiles, String subject, String politics, String name) {
-        this((String)null, captchaAnswer, comment, isSage, attachedFiles, subject, politics, name);
-        this.mRecaptcha = recaptcha;
-    }
-    
+
     public boolean isRecaptcha() {
-        return this.mRecaptcha != null;
+        return this.mCaptcha != null
+                && this.mCaptcha.getType() == CaptchaEntity.Type.RECAPTCHA_POST;
     }
-    
+
     public void setRecaptchaHash(String hash) {
         this.mRecaptchaHash = hash;
     }
-    
+
     public String getRecaptchaHash() {
         return this.mRecaptchaHash;
-    }
-    
-    public void setRecaptcha(Recaptcha2 recaptcha) {
-        this.mRecaptcha = recaptcha;
-    }
-    
-    public Recaptcha2 getRecaptcha() {
-        return this.mRecaptcha;
-    }
-    
-    public void setCaptchaKey(String captchaKey) {
-        this.mCaptchaKey = captchaKey;
-    }
-
-    public String getCaptchaKey() {
-        return this.mCaptchaKey;
     }
 
     public void setCaptchaAnswer(String captchaAnswer) {
         this.mCaptchaAnswer = captchaAnswer;
+    }
+
+    public String getCaptchaKey() {
+        return this.mCaptcha != null ? this.mCaptcha.getKey() : null;
     }
 
     public String getCaptchaAnswer() {

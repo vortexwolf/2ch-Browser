@@ -113,7 +113,7 @@
     <string name="pref_homepage_summary">Change the start page</string>
     <string name="pref_homepage_hint">Enter a board code</string>
     <string name="pref_load_thumbnails">Display thumbnails</string>
-    <string name="pref_load_thumbnails_summary">Disable to save internet traffic</string>
+    <string name="pref_load_thumbnails_summary">Disable to reduce web traffic</string>
     <string name="pref_download_path">Downloads folder</string>
     <string name="pref_download_path_hint">/download/2ch Browser/</string>
     <string name="pref_download_path_summary">Change a folder where images should be saved</string>
@@ -143,7 +143,7 @@
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
     
     <string name="pref_mobileapi">Mobile API</string>
-    <string name="pref_mobileapi_summary">Disable for loading threads in different way.</string>
+    <string name="pref_mobileapi_summary">Enable to load only new posts instead of reloading a whole thread</string>
     
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>

@@ -2,7 +2,6 @@ package com.vortexwolf.chan.boards.dvach;
 
 import android.net.Uri;
 
-import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 

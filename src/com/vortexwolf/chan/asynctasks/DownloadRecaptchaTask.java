@@ -35,7 +35,7 @@ public class DownloadRecaptchaTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        this.mRecaptcha = RecaptchaService.loadCaptcha();
+        this.mRecaptcha = RecaptchaService.loadCloudflareCaptcha();
         if (this.mRecaptcha == null) {
             this.mUserError = "Error while loading the captcha page.";
             return false;

@@ -93,7 +93,7 @@ public class PostsListActivity extends BaseListActivity {
             this.mPostNumber = data.getFragment();
             this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
         }
-        
+
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // Page title and new tab
@@ -198,9 +198,10 @@ public class PostsListActivity extends BaseListActivity {
         boolean isFirstTime = this.mAdapter.isEmpty();
 
         this.mAdapter.setAdapterData(posts);
-        
-        PostItemViewModel firstModel = (PostItemViewModel)this.mAdapter.getItem(0);
-        this.updateTitle(firstModel.getSubjectOrText());
+        if (posts.length > 0) {
+            PostItemViewModel firstModel = (PostItemViewModel)this.mAdapter.getItem(0);
+            this.updateTitle(firstModel.getSubjectOrText());
+        }
 
         if (isFirstTime) {
             if (this.mPostNumber != null) {
@@ -242,7 +243,7 @@ public class PostsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(), 
+                Intent openTabsIntent = new Intent(this.getApplicationContext(),
                         Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
                 openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
                 this.startActivity(openTabsIntent);
@@ -326,7 +327,7 @@ public class PostsListActivity extends BaseListActivity {
         if (adapterItem instanceof StatusIndicatorEntity) {
             return true;
         }
-        
+
         PostItemViewModel model = (PostItemViewModel) adapterItem;
 
         switch (item.getItemId()) {
@@ -477,7 +478,6 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private class PostsReaderListener implements IPostsListView {
-
         @Override
         public Context getApplicationContext() {
             return PostsListActivity.this.getApplicationContext();
@@ -506,7 +506,7 @@ public class PostsListActivity extends BaseListActivity {
             }
             PostsListActivity.this.switchToErrorView(error);
         }
-        
+
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
             // TODO: replace by captcha view

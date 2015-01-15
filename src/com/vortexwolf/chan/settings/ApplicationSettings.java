@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.settings;
 
+import java.io.File;
+
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
@@ -7,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import com.vortexwolf.chan.R;
@@ -92,10 +95,12 @@ public class ApplicationSettings {
         return position;
     }
 
-    public String getDownloadPath() {
+    public File getDownloadDirectory() {
         String path = this.mSettings.getString(this.mResources.getString(R.string.pref_download_path_key), null);
 
-        return !StringUtils.isEmptyOrWhiteSpace(path) ? path : Constants.DEFAULT_DOWNLOAD_FOLDER;
+        String dir = !StringUtils.isEmptyOrWhiteSpace(path) ? path : Constants.DEFAULT_DOWNLOAD_FOLDER;
+        dir = dir.startsWith("/storage") ? dir : Environment.getExternalStorageDirectory() + dir;
+        return new File(dir);
     }
 
     public String getName() {

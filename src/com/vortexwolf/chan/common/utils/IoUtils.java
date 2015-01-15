@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +11,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpEntity;
 
-import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -20,10 +18,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.BaseColumns;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 
@@ -191,7 +187,7 @@ public class IoUtils {
     public static File getSaveFilePath(Uri uri, ApplicationSettings settings) {
         String fileName = uri.getLastPathSegment();
 
-        File dir = new File(Environment.getExternalStorageDirectory(), settings.getDownloadPath());
+        File dir = settings.getDownloadDirectory();
         dir.mkdirs();
         File file = new File(dir, fileName);
 
@@ -283,10 +279,10 @@ public class IoUtils {
         if (Constants.SDK_VERSION < 19) {
             return false;
         }
-        
+
         return CompatibilityUtilsImpl.isDocumentUri(context, uri);
     }
-    
+
     public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
@@ -327,7 +323,7 @@ public class IoUtils {
     public static long convertMbToBytes(double mb) {
         return (long) (mb * 1024 * 1024);
     }
-    
+
     public static String convertHttpEntityToString(HttpEntity entity){
         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int)entity.getContentLength());
         try {
@@ -335,18 +331,18 @@ public class IoUtils {
         } catch (IOException e) {
             return null;
         }
-        
+
         String str = new String(out.toByteArray());
         return str;
     }
-    
+
     public static Point getImageSize(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         return new Point(options.outWidth, options.outHeight);
     }
-    
+
     public static Bitmap readBitmapFromFile(File file, double maxDimension) {
         int scale = 1;
         Point size = getImageSize(file);
@@ -359,11 +355,11 @@ public class IoUtils {
         // Decode with inSampleSize
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inSampleSize = scale;
-        
+
         Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), o);
         return b;
     }
-    
+
     private static byte[] getJpegInfoBytes(File file){
         FileInputStream fis = null;
         byte[] bytes = null;
@@ -372,7 +368,7 @@ public class IoUtils {
             if (fis.read() != 255 || fis.read() != 216) {
                 return null; // not JPEG
             }
-            
+
             while (fis.read() == 255) {
                 int marker = fis.read();
                 int len = fis.read() << 8 | fis.read();
@@ -381,7 +377,7 @@ public class IoUtils {
                 if (marker >= 192 && marker <= 207 && marker != 196 && marker != 200 && marker != 204) {
                     bytes = new byte[len - 2];
                     fis.read(bytes, 0, bytes.length);
-                    break;    
+                    break;
                 } else {
                     fis.skip(len - 2);
                 }
@@ -391,28 +387,28 @@ public class IoUtils {
         } finally {
             IoUtils.closeStream(fis);
         }
-        
+
         return bytes;
     }
-    
+
     public static boolean isNonStandardGrayscaleImage(File file) {
         byte[] bytes = IoUtils.getJpegInfoBytes(file);
         if (bytes == null) {
             return false;
         }
-        
+
         // read subsampling information
         byte numberF = bytes[5]; // byte #6
         String[] samplings = new String[numberF];
 
         for (int i = 0; i < numberF; i++) {
             int hv = bytes[7 + i * numberF]; // byte #8, #10...
-            
+
             int h = hv >> 4;
             int v = hv & 0x0F;
             samplings[i] = h + "x" + v;
         }
-        
-        return samplings.length == 1 && !samplings[0].equals("1x1"); 
+
+        return samplings.length == 1 && !samplings[0].equals("1x1");
     }
 }
