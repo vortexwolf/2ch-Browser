@@ -148,7 +148,7 @@ public class JsonReader {
     private InputStream createStreamForParsing(byte[] bytes, IJsonProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
         InputStream memoryStream = IoUtils.modifyInputStream(new ByteArrayInputStream(bytes), listener.getContentLength(), listener, task);
         Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
-        replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x5C});
+        replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x6E});
         memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
 
         return memoryStream;
