@@ -63,7 +63,7 @@ public class BrowserActivity extends Activity {
 
         this.setTheme(mSettings.getTheme());
 
-        if (mSettings.isLegacyImageViewer()) {
+        if (this.mSettings.isLegacyImageViewer() || this.mSettings.isExternalVideoPlayer()) {
             this.setContentView(R.layout.browser);
             this.mMainView = this.findViewById(R.id.webview);
             int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
@@ -178,7 +178,11 @@ public class BrowserActivity extends Activity {
     private void setImage(File file) {
         this.mLoadedFile = file;
 
-        if (UriUtils.isWebmUri(this.mUri)) {
+        if (this.mSettings.isLegacyImageViewer() || this.mSettings.isExternalVideoPlayer()) {
+            AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);
+            ((WebView)this.mMainView).loadUrl(Uri.fromFile(file).toString());
+        }
+        else if (UriUtils.isWebmUri(this.mUri)) {
             GalleryItemViewBag vb = new GalleryItemViewBag();
             vb.layout = (FrameLayout)this.mMainView;
             vb.loading = this.mLoadingView;
@@ -186,13 +190,8 @@ public class BrowserActivity extends Activity {
 
             AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb);
         } else {
-            if (this.mSettings.isLegacyImageViewer()) {
-                AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);
-                ((WebView)this.mMainView).loadUrl(Uri.fromFile(file).toString());
-            } else {
-                int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-                AppearanceUtils.setImage(file, this, (FrameLayout)mMainView, background);
-            }
+            int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
+            AppearanceUtils.setImage(file, this, (FrameLayout)mMainView, background);
         }
 
         this.mImageLoaded = true;

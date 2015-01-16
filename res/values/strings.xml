@@ -10,7 +10,7 @@
     <string name="addpost_subject_hint">Subject</string>
     <string name="addpost_captcha_can_skip">Send without confirmation</string>
     <string name="addpost_captcha_can_skip_passcode">You have a passcode</string>
-    <string name="addpost_captcha_fail_passcode">Bad passcode, relogin in settings</string>
+    <string name="addpost_captcha_fail_passcode">Bad passcode, refresh the captcha</string>
     <string name="addpost_captcha_hint">Confirmation code</string>
     <string name="addpost_send_button">Send</string>
     <string name="addpost_refresh_button">Refresh</string>
@@ -23,16 +23,15 @@
     <string name="tabs_bookmarks">Favorites</string>
     <string name="tabs_history">History</string>
     <string name="addpost_politics_prompt">Political preferences</string>
-    <string name="addpost_politics_default">Polit. preferences (No)</string>
+    <string name="addpost_politics_default">No Icon</string>
     <string name="share_via">Share via</string>
-    <string name="attach_youtube_hint">http://youtube.com/watch?v=code or just a code</string>
-    <string name="attach_youtube_title">Add youtube video</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="favorites">Favorites</string>
     <string name="search_board_hint">Search</string>
     <string name="show_full_comment"><a href=''>Show the full text</a></string>
     <string name="tap_to_refresh">Tap to refresh</string>
+    <string name="send_post_again">Send your post again</string>
     
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -118,7 +117,7 @@
     <string name="pref_download_path_hint">/download/2ch Browser/</string>
     <string name="pref_download_path_summary">Change a folder where images should be saved</string>
     <string name="pref_download_background">Download images in background</string>
-    <string name="pref_download_background_summary">The progress dialog will not be displayed and the downloading cannot be cancelled</string>
+    <string name="pref_download_background_summary">The progress dialog will not be displayed</string>
     <string name="pref_name">Name</string>
     <string name="pref_name_summary">Leave it blank</string>
     <string name="pref_name_hint">Anonymous</string>
@@ -126,9 +125,9 @@
     <string name="pref_domain_summary">Reserved domains: 2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so</string>
     <string name="pref_domain_hint">2ch.hk or 85.17.28.149</string>
     <string name="pref_display_post_date">Time of posts</string>
-    <string name="pref_display_post_date_summary">Enable to display the time of each post</string>
+    <string name="pref_display_post_date_summary">Display the time of each post</string>
     <string name="pref_convert_post_date">Show local time</string>
-    <string name="pref_convert_post_date_summary">Enable to display your local time instead of Moscow time</string>
+    <string name="pref_convert_post_date_summary">Display your local time instead of Moscow time</string>
     <string name="pref_popup_link">Popup links</string>
     <string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
     <string name="pref_display_name">Names</string>
@@ -143,7 +142,7 @@
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
     
     <string name="pref_mobileapi">Mobile API</string>
-    <string name="pref_mobileapi_summary">Enable to load only new posts instead of reloading a whole thread</string>
+    <string name="pref_mobileapi_summary">Load only new posts without reloading the whole thread</string>
     
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>
@@ -151,7 +150,7 @@
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
     
     <string name="pref_extended_preferences">Image Gallery Preferences</string>
-    <string name="pref_extended_preferences_summary">Page with extra preferences of image viewing</string>
+    <string name="pref_extended_preferences_summary">Image and video viewer preferences</string>
     
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
@@ -192,9 +191,9 @@
     <string name="pref_display_all_boards">Boards list</string>
     <string name="pref_display_all_boards_summary">Show unmoderated boards</string>
     <string name="pref_passcode">Passcode</string>
-    <string name="pref_passcode_summary">A passcode for skipping captcha, site admins give them to some people</string>
+    <string name="pref_passcode_summary">A passcode for skipping captcha</string>
     <string name="pref_legacy_image_viewer">Legacy image viewer</string>
-    <string name="pref_legacy_image_viewer_summary">Do not use a gallery, open single images instead</string>
+    <string name="pref_legacy_image_viewer_summary">Do not use the gallery, open single images instead</string>
     <string name="pref_external_video">External video player</string>
     <string name="pref_external_video_summary">Use external video player for webm files</string>
 

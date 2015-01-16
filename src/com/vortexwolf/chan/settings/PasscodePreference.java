@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 
 public class PasscodePreference extends EditTextPreference {
@@ -38,12 +39,13 @@ public class PasscodePreference extends EditTextPreference {
         }
 
         @Override
-        public void onPasscodeChecked(boolean isSuccess) {
+        public void onPasscodeChecked(boolean isSuccess, String errorMessage) {
             Context context = PasscodePreference.this.getContext();
             if (isSuccess) {
                 AppearanceUtils.showToastMessage(context, context.getString(R.string.notification_passcode_correct));
             } else {
-                AppearanceUtils.showToastMessage(context, context.getString(R.string.notification_passcode_incorrect));
+                String error = !StringUtils.isEmpty(errorMessage) ? errorMessage : context.getString(R.string.notification_passcode_incorrect);
+                AppearanceUtils.showToastMessage(context, error);
             }
         }
     }

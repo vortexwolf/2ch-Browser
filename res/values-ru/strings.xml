@@ -24,16 +24,15 @@
     <string name="tabs_bookmarks">Закладки</string>
     <string name="tabs_history">История</string>
     <string name="addpost_politics_prompt">Политические предпочтения</string>
-    <string name="addpost_politics_default">Полит. предпочтения (Нет)</string>
+    <string name="addpost_politics_default">Без иконки</string>
     <string name="share_via">Способ отправки</string>
-    <string name="attach_youtube_hint">http://youtube.com/watch?v=code или просто код</string>
-    <string name="attach_youtube_title">Добавить youtube видео</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="favorites">Избранное</string>    
     <string name="search_board_hint">Поиск</string>
     <string name="show_full_comment"><a href=''>Показать весь текст</a></string>
     <string name="tap_to_refresh">Нажмите, чтобы обновить</string>
+    <string name="send_post_again">Отправьте сообщение еще раз</string>
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
