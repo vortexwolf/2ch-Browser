@@ -16,24 +16,19 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 
 import android.content.res.Resources;
-import android.net.Uri;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
-import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HttpStreamReader {
     public static final String TAG = "HttpStreamReader";
@@ -56,13 +51,17 @@ public class HttpStreamReader {
     }
 
     public HttpStreamModel fromUri(String uri, Header[] customHeaders, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
+        return this.fromUri(uri, true, customHeaders, listener, task);
+    }
+
+    public HttpStreamModel fromUri(String uri, boolean checkModified, Header[] customHeaders, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
         HttpGet request = null;
         HttpResponse response = null;
         InputStream stream = null;
         boolean wasNotModified = false;
 
         try {
-            request = this.createPrivateRequest(uri, customHeaders);
+            request = this.createPrivateRequest(uri, checkModified, customHeaders);
             response = this.getPrivateResponse(request);
 
             StatusLine status = response.getStatusLine();
@@ -87,13 +86,13 @@ public class HttpStreamReader {
 
         return result;
     }
-    
+
     public HttpStreamModel fromUri(String uri, Header[] customHeaders, HttpEntity entity, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
         List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
         HttpPost request = null;
         HttpResponse response = null;
         InputStream stream = null;
-        
+
         try {
             request = this.createRequest(uri, headersList, entity);
             try {
@@ -103,19 +102,19 @@ public class HttpStreamReader {
             } catch (Exception e) {
                 throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
             }
-            
+
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
                 throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
             } else {
                 stream = this.fromResponse(response, listener, task);
             }
-            
+
         } catch (HttpRequestException e) {
             ExtendedHttpClient.releaseRequestResponse(request, response);
             throw e;
         }
-        
+
         HttpStreamModel result = new HttpStreamModel();
         result.stream = stream;
         result.request = request;
@@ -164,7 +163,7 @@ public class HttpStreamReader {
 
         return request;
     }
-    
+
     public HttpPost createRequest(String uri, List<Header> customHeaders, HttpEntity entity) throws IllegalArgumentException {
         HttpPost request = null;
         try {
@@ -183,7 +182,7 @@ public class HttpStreamReader {
         }
         return request;
     }
-    
+
     public HttpResponse getResponse(HttpRequestBase request) throws IOException {
         HttpResponse response = null;
         IOException responseException = null;
@@ -216,10 +215,10 @@ public class HttpStreamReader {
         return response;
     }
 
-    private HttpGet createPrivateRequest(String uri, Header[] customHeaders) throws HttpRequestException {
+    private HttpGet createPrivateRequest(String uri, boolean checkModified, Header[] customHeaders) throws HttpRequestException {
         List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
 
-        if (this.mIfModifiedMap.containsKey(uri)) {
+        if (checkModified && this.mIfModifiedMap.containsKey(uri)) {
             headersList.add(new BasicHeader("If-Modified-Since", this.mIfModifiedMap.get(uri)));
         }
 

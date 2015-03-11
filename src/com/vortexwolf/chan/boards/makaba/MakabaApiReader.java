@@ -1,16 +1,15 @@
 package com.vortexwolf.chan.boards.makaba;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
+import org.codehaus.jackson.JsonNode;
 
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.models.MakabaError;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
@@ -19,7 +18,6 @@ import com.vortexwolf.chan.boards.makaba.models.MakabaThreadsListCatalog;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
@@ -29,45 +27,46 @@ import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.services.IconsList;
-import com.vortexwolf.chan.services.http.HttpStreamReader;
-import com.vortexwolf.chan.services.http.JsonReader;
+import com.vortexwolf.chan.services.http.JsonHttpReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class MakabaApiReader implements IJsonApiReader {
     static final String TAG = "MakabaApiReader";
-    
-    private final HttpStreamReader mHttpStreamReader;
-    private final JsonReader mJsonReader;
-    private final DvachUriBuilder mDvachUriBuilder;
+
+    private final JsonHttpReader mJsonReader;
+    private final MakabaUriBuilder mMakabaUriBuilder;
     private final MakabaModelsMapper mMakabaModelsMapper;
-    
-    public MakabaApiReader(JsonReader jsonReader, DvachUriBuilder dvachUriBuilder, HttpStreamReader httpStreamReader, MakabaModelsMapper makabaModelsMapper) {
+    private final Resources mResources;
+    private final ApplicationSettings mApplicationSettings;
+
+    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUriBuilder makabaUriBuilder, Resources resources, ApplicationSettings applicationSettings) {
         this.mJsonReader = jsonReader;
-        this.mDvachUriBuilder = dvachUriBuilder;
-        this.mHttpStreamReader = httpStreamReader;
         this.mMakabaModelsMapper = makabaModelsMapper;
+        this.mMakabaUriBuilder = makabaUriBuilder;
+        this.mResources = resources;
+        this.mApplicationSettings = applicationSettings;
     }
-    
+
     @Override
     public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        if (page < 0) return readCatalog(boardName, page, checkModified, listener, task);
-        String uri = this.formatThreadsUri(boardName, page);
-
-        if (checkModified == false) {
-            this.mHttpStreamReader.removeIfModifiedForUri(uri);
+        if (page < 0) {
+            return readCatalog(boardName, page, checkModified, listener, task);
         }
-        
-        MakabaThreadsList result = this.mJsonReader.readData(uri, MakabaThreadsList.class, listener, task);
-        if (result == null) {
+
+        String uri = this.mMakabaUriBuilder.getPageUrlApi(boardName, page);
+
+        JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
+        if (json == null) {
             return null;
         }
-        
+
+        MakabaThreadsList result = this.parseDataOrThrowError(json, MakabaThreadsList.class);
         setIcons(result, boardName);
-        
+
         ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
         return models;
     }
-    
+
     private void setIcons(MakabaThreadsList source, String boardName) {
         try {
             if (source.enable_icons == 1) {
@@ -79,61 +78,46 @@ public class MakabaApiReader implements IJsonApiReader {
             } else Factory.resolve(IconsList.class).setData(boardName, null);
         } catch (Exception e) { MyLog.e(TAG, e); }
     }
-    
+
     private ThreadModel[] readCatalog(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = mDvachUriBuilder.createBoardUri(boardName, page).toString() + "&json=1";
-        
-        if (checkModified == false) {
-            this.mHttpStreamReader.removeIfModifiedForUri(uri);
-        }
-        
-        MakabaThreadsListCatalog result = this.mJsonReader.readData(uri, MakabaThreadsListCatalog.class, listener, task);
-        if (result == null) {
+        String uri = this.mMakabaUriBuilder.getCatalogUrlApi(boardName, -1 - page);
+
+        JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
+        if (json == null) {
             return null;
         }
-        
+
+        MakabaThreadsListCatalog result = this.parseDataOrThrowError(json, MakabaThreadsListCatalog.class);
         ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
         return models;
     }
 
     @Override
     public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        boolean MOBILEAPI = Factory.resolve(ApplicationSettings.class).isMobileApi();
-        String uri = MOBILEAPI ? this.formatPostsUri(boardName, threadNumber, fromNumber) : this.formatThreadJsonUri(boardName, threadNumber);
+        String uri = this.mApplicationSettings.isMobileApi()
+                ? this.mMakabaUriBuilder.getThreadUrlExtendedApi(boardName, threadNumber, fromNumber)
+                : this.mMakabaUriBuilder.getThreadUrlApi(boardName, threadNumber);
 
-        if (checkModified == false) {
-            this.mHttpStreamReader.removeIfModifiedForUri(uri);
-        }
-        
-        MakabaPostInfo[] result = null;
-        try {
-            result = MOBILEAPI ? this.mJsonReader.readData(uri, MakabaPostInfo[].class, listener, task) :
-                this.mJsonReader.readData(uri, MakabaThreadsList.class, listener, task).threads[0].posts;
-        } catch (JsonApiReaderException e) {
-            MakabaError makabaError = null;
-            try {
-                makabaError = this.mJsonReader.readData(uri, MakabaError.class, listener, task);
-            } catch (Exception ex) {
-                MyLog.e(TAG, ex);
-            }
-            if (makabaError != null) {
-                String error = makabaError.code == -404 ? "404" : Integer.toString(makabaError.code);
-                if (makabaError.error != null) error += ": " + makabaError.error;
-                throw new JsonApiReaderException(error);
-            } else throw e;
-        }
-        if (result == null) {
+        JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
+        if (json == null) {
             return null;
         }
-        
-        PostModel[] models = this.mMakabaModelsMapper.mapPostModels(result);
+
+        MakabaPostInfo[] data = null;
+        if (this.mApplicationSettings.isMobileApi()) {
+            data = this.parseDataOrThrowError(json, MakabaPostInfo[].class);
+        } else {
+            data = this.parseDataOrThrowError(json, MakabaThreadsList.class).threads[0].posts;
+        }
+
+        PostModel[] models = this.mMakabaModelsMapper.mapPostModels(data);
         return models;
     }
 
     @Override
     public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = this.mDvachUriBuilder.createUri("/makaba/makaba.fcgi").toString();
-        
+        String uri = this.mMakabaUriBuilder.getSearchUrlApi();
+
         MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         try {
             entity.addPart("task", new StringBody("search", Constants.UTF8_CHARSET));
@@ -143,29 +127,30 @@ public class MakabaApiReader implements IJsonApiReader {
         } catch (UnsupportedEncodingException e) {
             MyLog.e(TAG, e);
         }
-        
-        MakabaFoundPostsList result = this.mJsonReader.readData(uri, MakabaFoundPostsList.class, listener, task, true, entity);
-        if (result == null) {
+
+        JsonNode json = this.mJsonReader.postData(uri, listener, task, entity);
+        if (json == null) {
             return null;
         }
 
+        MakabaFoundPostsList result = this.parseDataOrThrowError(json, MakabaFoundPostsList.class);
         SearchPostListModel model = this.mMakabaModelsMapper.mapSearchPostListModel(result);
         return model;
     }
-    
-    private String formatThreadsUri(String boardName, int page) {
-        String pageName = page == 0 ? "index" : String.valueOf(page);
 
-        return this.mDvachUriBuilder.createBoardUri(boardName, pageName + ".json").toString();
-    }
+    private <T> T parseDataOrThrowError(JsonNode json, Class<T> valueType) throws JsonApiReaderException {
+        T result = this.mJsonReader.convertValue(json, valueType);
+        if (result != null) {
+            return result;
+        }
 
-    private String formatPostsUri(String boardName, String threadId, String fromId) {
-        String path = String.format("/makaba/mobile.fcgi?task=get_thread&board=%s&thread=%s&num=%s", boardName, threadId, !StringUtils.isEmpty(fromId) ? fromId : threadId);
-        return this.mDvachUriBuilder.createUri(path).toString();
-    }
-    
-    private String formatThreadJsonUri(String boardName, String threadId) {
-        String path = String.format("/%s/res/%s.json", boardName, threadId);
-        return this.mDvachUriBuilder.createUri(path).toString();
+        MakabaError makabaError = this.mJsonReader.convertValue(json, MakabaError.class);
+        if (makabaError != null) {
+            String errorCode = makabaError.code == -404 ? "404" : String.valueOf(makabaError.code);
+            String errorMessage = makabaError.error != null ? ": " + makabaError.error : "";
+            throw new JsonApiReaderException(errorCode + errorMessage);
+        }
+
+        throw new JsonApiReaderException(this.mResources.getString(R.string.error_json_parse));
     }
 }

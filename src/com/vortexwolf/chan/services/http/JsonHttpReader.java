@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -24,64 +25,76 @@ import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 
-public class JsonReader {
-    static final String TAG = "JsonReader";
+public class JsonHttpReader {
+    private static final String TAG = JsonHttpReader.class.getSimpleName();
     private final Resources mResources;
     private final ObjectMapper mObjectMapper;
     private final HttpStreamReader mHttpStreamReader;
 
-    public JsonReader(Resources resources, ObjectMapper mapper, HttpStreamReader httpStreamReader) {
+    public JsonHttpReader(Resources resources, ObjectMapper mapper, HttpStreamReader httpStreamReader) {
         this.mResources = resources;
         this.mObjectMapper = mapper;
         this.mHttpStreamReader = httpStreamReader;
     }
 
-    public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        return this.readData(url, valueType, listener, task, false, null);
+    public JsonNode readData(String url, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        return this.readData(url, checkModified, listener, task, false, null);
     }
-    
-    public <T> T readData(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws JsonApiReaderException, HtmlNotJsonException {
-        T result = null;
-        boolean parseSuccess = false;
-        boolean wasCancelled = false;
 
-        for (int i = 0; i < 2; i++) {
-            try {
-                result = this.tryReadAndParse(url, valueType, listener, task, isPostRequest, entity);
-                parseSuccess = true;
-                break;
-            } catch (HttpRequestException e) {
-                throw new JsonApiReaderException(e.getMessage());
-            } catch (HtmlNotJsonException e) {
-                throw e;
-            } catch (CancelTaskException e) {
-                wasCancelled = true;
-                break;
-            } catch (JsonParseException e) {
-                // try to load once again
-                continue;
-            } catch (Exception e) {
-                MyLog.e(TAG, e);
-                break;
+    public JsonNode postData(String url, IJsonProgressChangeListener listener, ICancelled task, HttpEntity entity) throws JsonApiReaderException, HtmlNotJsonException {
+        return this.readData(url, false, listener, task, true, entity);
+    }
+
+    public <T> T convertValue(JsonNode map, Class<T> valueType) {
+        try {
+            return this.mObjectMapper.convertValue(map, valueType);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private JsonNode readData(String url, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws JsonApiReaderException, HtmlNotJsonException {
+        JsonNode result = null;
+        boolean returnSuccess = false;
+
+        try {
+            for (int i = 0; i < 2; i++) {
+                try {
+                    result = this.tryRead(url, checkModified, listener, task, isPostRequest, entity);
+                    returnSuccess = true;
+                    break;
+                } catch (JsonParseException e) {
+                    // try to load once again
+                    if (listener != null) {
+                        listener.indeterminateProgress();
+                    }
+                    checkModified = false;
+                }
             }
+        } catch (CancelTaskException e) {
+            returnSuccess = true;
+        } catch (HtmlNotJsonException e) {
+            throw e;
+        } catch (Exception e) {
+            MyLog.e(TAG, e);
+            throw new JsonApiReaderException(e.getMessage());
         }
 
-        if (task != null && task.isCancelled()) {
-            wasCancelled = true;
-        }
-
-        if (!parseSuccess && !wasCancelled) {
+        if (!returnSuccess) {
             throw new JsonApiReaderException(this.mResources.getString(R.string.error_json_parse));
         }
 
         return result;
     }
 
-    private <T> T tryReadAndParse(String url, Class<T> valueType, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws HttpRequestException, CancelTaskException, IOException, HtmlNotJsonException {
+    private JsonNode tryRead(String url, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task, boolean isPostRequest, HttpEntity entity) throws HttpRequestException, CancelTaskException, IOException, HtmlNotJsonException {
         HttpStreamModel streamModel = null;
         try {
-            if (isPostRequest) streamModel = this.mHttpStreamReader.fromUri(url, null, entity, listener, task);
-            else streamModel = this.mHttpStreamReader.fromUri(url, null, listener, task);
+            if (isPostRequest) {
+                streamModel = this.mHttpStreamReader.fromUri(url, null, entity, listener, task);
+            } else {
+                streamModel = this.mHttpStreamReader.fromUri(url, checkModified, null, listener, task);
+            }
 
             if (streamModel.notModifiedResult || streamModel.stream == null) {
                 throw new CancelTaskException();
@@ -104,25 +117,8 @@ public class JsonReader {
 
             InputStream memoryStream = this.createStreamForParsing(bytes, listener, task);
 
-            try {
-                T result = this.mObjectMapper.readValue(memoryStream, valueType);
-                return result;
-            } catch (JsonParseException e) {
-                if (task != null && task.isCancelled()) {
-                    throw new CancelTaskException();
-                }
-
-                MyLog.e(TAG, e);
-                MyLog.v(TAG, "Read json once again");
-
-                this.mHttpStreamReader.removeIfModifiedForUri(url);
-
-                if (listener != null) {
-                    listener.indeterminateProgress();
-                }
-
-                throw e;
-            }
+            JsonNode result = this.mObjectMapper.readValue(memoryStream, JsonNode.class);
+            return result;
         } finally {
             if (streamModel != null) {
                 ExtendedHttpClient.releaseRequestResponse(streamModel.request, streamModel.response);

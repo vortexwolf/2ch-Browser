@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.content.res.Resources;
 import android.net.Uri;
 
@@ -76,8 +74,7 @@ public class DownloadFileService {
     private void saveFromUri(Uri uri, File to, IProgressChangeListener listener, ICancelled task) throws HttpRequestException, IOException {
         HttpStreamModel streamModel = null;
         try {
-            this.mHttpStreamReader.removeIfModifiedForUri(uri.toString());
-            streamModel = this.mHttpStreamReader.fromUri(uri.toString(), null, listener, task);
+            streamModel = this.mHttpStreamReader.fromUri(uri.toString(), false, null, listener, task);
 
             this.saveStream(streamModel.stream, to);
         } finally {
