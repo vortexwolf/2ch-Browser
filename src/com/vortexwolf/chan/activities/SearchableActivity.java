@@ -3,7 +3,6 @@ package com.vortexwolf.chan.activities;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -19,48 +18,51 @@ import android.widget.ListView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.FoundPostsListAdapter;
 import com.vortexwolf.chan.asynctasks.SearchPostsTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
-import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class SearchableActivity extends BaseListActivity {
     private static final String TAG = "SearchableActivity";
 
     private IJsonApiReader mJsonReader;
-    private final ApplicationSettings mApplciationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-    private final DvachUriBuilder mDvachUriBuilder = Factory.getContainer().resolve(DvachUriBuilder.class);
     private final FoundPostsListener mFoundPostsListener = new FoundPostsListener();
+    private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
+    private IUrlBuilder mUrlBuilder;
 
     private FoundPostsListAdapter mAdapter = null;
     private SearchPostsTask mCurrentTask = null;
 
     private String mSearchQuery = null;
     private String mBoardName = null;
+    private String mWebsite;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
-        
+
         this.resetUI();
 
         this.handleIntent(this.getIntent());
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
 
         Factory.getContainer().resolve(MyTracker.class).setBoardVar(this.mBoardName);
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
@@ -107,7 +109,7 @@ public class SearchableActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.navigateToThreads(this.mBoardName);
+                this.navigateToThreads();
                 break;
             case R.id.menu_search_id:
                 this.onSearchRequested();
@@ -163,21 +165,17 @@ public class SearchableActivity extends BaseListActivity {
         return true;
     }
 
-    private void navigateToThreads(String boardName) {
-        Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.createBoardUri(boardName, 0));
-        this.startActivity(i);
+    private void navigateToThreads() {
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, 0, false);
     }
 
     private void navigateToThread(String threadNumber, String postNumber) {
-        Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-        i.setData(Uri.parse(this.mDvachUriBuilder.createPostUri(this.mBoardName, threadNumber, postNumber)));
-
-        this.startActivity(i);
+        this.mNavigationService.navigateThread(this, null, this.mWebsite, this.mBoardName, threadNumber, null, postNumber, false);
     }
 
     private void navigateToAddPostView(String postNumber, String threadNumber, String postComment) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);
 
@@ -195,6 +193,7 @@ public class SearchableActivity extends BaseListActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             this.mSearchQuery = intent.getStringExtra(SearchManager.QUERY);
             Bundle b = intent.getBundleExtra(SearchManager.APP_DATA);
+            this.mWebsite = b.getString(Constants.EXTRA_WEBSITE);
             this.mBoardName = b.getString(Constants.EXTRA_BOARD_NAME);
 
             this.setAdapter(this.mBoardName);
@@ -203,7 +202,7 @@ public class SearchableActivity extends BaseListActivity {
     }
 
     private void setAdapter(String boardName) {
-        this.mAdapter = new FoundPostsListAdapter(this, boardName, this.mApplciationSettings, this.getTheme(), this.mDvachUriBuilder);
+        this.mAdapter = new FoundPostsListAdapter(this, this.mWebsite, boardName, this.getTheme());
         this.setListAdapter(this.mAdapter);
 
         if (Integer.valueOf(Build.VERSION.SDK) > 7) {
@@ -244,7 +243,7 @@ public class SearchableActivity extends BaseListActivity {
             if (postsListModel == null) {
                 return;
             }
-            
+
             PostModel[] posts = postsListModel.getPosts();
             if (posts != null) {
                 SearchableActivity.this.mAdapter.setAdapterData(posts);
@@ -261,7 +260,7 @@ public class SearchableActivity extends BaseListActivity {
         public void showError(String error) {
             SearchableActivity.this.switchToErrorView(error);
             if (error != null && error.startsWith("503")) {
-                String url = mDvachUriBuilder.createUri("/makaba/posting.fcgi").toString();
+                String url = mUrlBuilder.getPostingUrlHtml();
                 new CloudflareCheckService(url, SearchableActivity.this, new ICloudflareCheckListener(){
                     public void onSuccess() {
                         refresh();
@@ -275,7 +274,7 @@ public class SearchableActivity extends BaseListActivity {
                 }).start();
             }
         }
-        
+
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
             // TODO: replace by captcha view

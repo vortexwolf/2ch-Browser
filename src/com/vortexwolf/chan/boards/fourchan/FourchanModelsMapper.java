@@ -1,11 +1,14 @@
 package com.vortexwolf.chan.boards.fourchan;
 
+import java.util.Locale;
+
 import com.vortexwolf.chan.boards.fourchan.models.FourchanPostInfo;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadInfo;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadsList;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
+import com.vortexwolf.chan.models.domain.BadgeModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
@@ -42,9 +45,10 @@ public class FourchanModelsMapper {
         PostModel model = new PostModel();
         model.setNumber(source.number + "");
         model.setName(source.name);
+        model.setBadge(this.mapBadge(source.country, source.countryName));
         model.setSubject(MyHtml.fromHtml(StringUtils.emptyIfNull(source.subject)).toString());
         model.setComment(source.comment);
-        model.setEmail("");
+        model.setSage(false);
         model.setTrip(source.trip);
         model.setOp(false);
         if (source.renamedFileName != null) {
@@ -64,6 +68,17 @@ public class FourchanModelsMapper {
         model.setImageWidth(file.fileWidth);
         model.setImageHeight(file.fileHeight);
 
+        return model;
+    }
+
+    private BadgeModel mapBadge(String country, String countryName) {
+        if (StringUtils.isEmpty(country)) {
+            return null;
+        }
+
+        BadgeModel model = new BadgeModel();
+        model.source = String.format("country/%s.gif", country.toLowerCase(Locale.US));
+        model.title = countryName;
         return model;
     }
 }

@@ -7,27 +7,25 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
 
 public class FavoritesDataSource {
     private static final String TABLE = DvachSqlHelper.TABLE_FAVORITES;
-    private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_TITLE,
-            DvachSqlHelper.COLUMN_URL };
+    private static final String[] ALL_COLUMNS = {
+        DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
+        DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER,
+        DvachSqlHelper.COLUMN_TITLE
+    };
 
     private final DvachSqlHelper mDbHelper;
-    private final DvachUriParser mDvachUriParser;
-    private final DvachUriBuilder mDvachUriBuilder;
 
     private SQLiteDatabase mDatabase;
     private boolean mModified = false;
 
-    public FavoritesDataSource(DvachSqlHelper dbHelper, DvachUriParser dvachUriParser, DvachUriBuilder dvachUriBuilder) {
+    public FavoritesDataSource(DvachSqlHelper dbHelper) {
         this.mDbHelper = dbHelper;
-        this.mDvachUriParser = dvachUriParser;
-        this.mDvachUriBuilder = dvachUriBuilder;
     }
 
     public void open() throws SQLException {
@@ -46,25 +44,29 @@ public class FavoritesDataSource {
         this.mModified = false;
     }
 
-    public void addToFavorites(String title, String url) {
-        Uri uri = Uri.parse(url);
-        String path = uri.getPath();
-
-        if (!this.hasFavorites(path)) {
+    public void addToFavorites(String website, String board, String thread, String title) {
+        if (!this.hasFavorites(website, board, thread)) {
             ContentValues values = new ContentValues();
+            values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
+            values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
+            values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, StringUtils.emptyIfNull(thread));
             values.put(DvachSqlHelper.COLUMN_TITLE, title);
-            values.put(DvachSqlHelper.COLUMN_URL, path);
 
-            long insertId = this.mDatabase.insert(TABLE, null, values);
-            this.mModified = true;
+            try {
+                this.mDatabase.insertOrThrow(TABLE, null, values);
+                this.mModified = true;
+            } catch (Exception e) {
+                MyLog.e("FavoritesDataSource", e);
+            }
         }
     }
 
-    public void removeFromFavorites(String url) {
-        Uri uri = Uri.parse(url);
-        String path = uri.getPath();
-
-        this.mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_URL + " in (?, ?)", new String[] { url, path });
+    public void removeFromFavorites(String website, String board, String thread) {
+        this.mDatabase.delete(TABLE,
+                DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+                new String[] { website, board, StringUtils.emptyIfNull(thread) });
         this.mModified = true;
     }
 
@@ -89,7 +91,7 @@ public class FavoritesDataSource {
         List<FavoritesEntity> threadFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
-            if (!this.mDvachUriParser.isBoardUri(Uri.parse(f.getUrl()))) {
+            if (!StringUtils.isEmpty(f.getThread())) {
                 threadFavorites.add(f);
             }
         }
@@ -102,8 +104,7 @@ public class FavoritesDataSource {
         List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
-            Uri uri = Uri.parse(f.getUrl());
-            if (this.mDvachUriParser.isBoardUri(uri) && this.mDvachUriParser.getBoardPageNumber(uri) == 0) {
+            if (StringUtils.isEmpty(f.getThread())) {
                 boardFavorites.add(f);
             }
         }
@@ -111,13 +112,13 @@ public class FavoritesDataSource {
         return boardFavorites;
     }
 
-    public boolean hasFavorites(String url) {
-        Uri uri = Uri.parse(url);
-        String path = uri.getPath();
-
+    public boolean hasFavorites(String website, String board, String thread) {
         Cursor cursor = this.mDatabase.rawQuery(
                 "select count(*) from " + TABLE +
-                " where " + DvachSqlHelper.COLUMN_URL + " in (?, ?)", new String[] { url, path });
+                " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+                new String[] { website, board, StringUtils.emptyIfNull(thread) });
 
         cursor.moveToFirst();
         long count = cursor.getLong(0);
@@ -127,14 +128,21 @@ public class FavoritesDataSource {
     }
 
     private FavoritesEntity createFavoritesEntity(Cursor c) {
-        return this.createFavoritesEntity(c.getLong(0), c.getString(1), c.getString(2));
+        long id = c.getLong(c.getColumnIndex(DvachSqlHelper.COLUMN_ID));
+        String website = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_WEBSITE));
+        String board = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_BOARD_NAME));
+        String thread = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_THREAD_NUMBER));
+        String title = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_TITLE));
+        return this.createFavoritesEntity(id, website, board, thread, title);
     }
 
-    private FavoritesEntity createFavoritesEntity(long id, String title, String url) {
+    private FavoritesEntity createFavoritesEntity(long id, String website, String board, String thread, String title) {
         FavoritesEntity result = new FavoritesEntity();
         result.setId(id);
+        result.setWebsite(website);
+        result.setBoard(board);
+        result.setThread(thread);
         result.setTitle(title);
-        result.setUrl(this.mDvachUriBuilder.createUri(Uri.parse(url).getPath()).toString());
 
         return result;
     }

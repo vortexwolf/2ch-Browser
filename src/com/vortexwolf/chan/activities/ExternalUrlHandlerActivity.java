@@ -14,7 +14,7 @@ public class ExternalUrlHandlerActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         NavigationService navigationService = Factory.resolve(NavigationService.class);
-        navigationService.navigate(this.getIntent().getData(), this.getApplicationContext(), null, Intent.FLAG_ACTIVITY_NEW_TASK);
+        navigationService.navigate(this.getIntent().getData(), this.getApplicationContext(), Intent.FLAG_ACTIVITY_NEW_TASK, false);
 
         this.finish();
     }

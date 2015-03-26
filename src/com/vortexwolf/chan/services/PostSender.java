@@ -9,39 +9,36 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.makaba.MakabaSendPostMapper;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.interfaces.IPostSender;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.http.HttpStringReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public class PostSender implements IPostSender {
+public class PostSender {
     private static final String TAG = "PostSender";
     private final DefaultHttpClient mHttpClient;
     private final Resources mResources;
     private final HttpStringReader mHttpStringReader;
     private final PostResponseParser mResponseParser;
-    private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
     private final MakabaSendPostMapper mMakabaSendPostMapper;
 
-    public PostSender(DefaultHttpClient client, Resources resources, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings, HttpStringReader httpStringReader) {
+    public PostSender(DefaultHttpClient client, Resources resources, ApplicationSettings settings, HttpStringReader httpStringReader) {
         this.mHttpClient = client;
         this.mResources = resources;
         this.mResponseParser = new PostResponseParser();
         this.mHttpStringReader = httpStringReader;
-        this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
         this.mMakabaSendPostMapper = new MakabaSendPostMapper();
     }
 
-    @Override
-    public SendPostResult sendPost(String boardName, SendPostModel entity) {
+    public SendPostResult sendPost(String website, String boardName, SendPostModel entity) {
         SendPostResult result = new SendPostResult();
 
         if (boardName == null || entity == null) {
@@ -49,7 +46,8 @@ public class PostSender implements IPostSender {
             return result;
         }
 
-        String uri = this.mDvachUriBuilder.createUri("/makaba/posting.fcgi?json=1").toString();
+        IUrlBuilder urlBuilder = Websites.getUrlBuilder(website);
+        String uri = urlBuilder.getPostingUrlApi();
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
 
         HttpPost httpPost = null;

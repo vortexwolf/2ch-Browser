@@ -2,7 +2,6 @@ package com.vortexwolf.chan.activities;
 
 import java.util.List;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -22,6 +21,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.db.HistoryEntity;
@@ -74,8 +74,11 @@ public class HistoryFragment extends BaseListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         HistoryEntity item = this.mAdapter.getItem(position);
-
-        this.mNavigationService.navigate(Uri.parse(item.getUrl()), this.getActivity());
+        if (StringUtils.isEmpty(item.getThread())) {
+            this.mNavigationService.navigateBoardPage(this.getActivity(), null, item.getWebsite(), item.getBoard(), 0, true);
+        } else {
+            this.mNavigationService.navigateThread(this.getActivity(), null, item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, true);
+        }
     }
 
     @Override
@@ -111,10 +114,10 @@ public class HistoryFragment extends BaseListFragment {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = model.getUrl();
+                String uri = model.buildUrl();
                 CompatibilityUtils.copyText(this.getActivity(), uri, uri);
 
-                AppearanceUtils.showToastMessage(this.getActivity(), model.getUrl());
+                AppearanceUtils.showToastMessage(this.getActivity(), uri);
                 return true;
             }
         }

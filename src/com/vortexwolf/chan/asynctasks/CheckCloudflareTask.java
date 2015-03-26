@@ -12,13 +12,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -27,10 +27,10 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     public static final String TAG = "CheckCloudflareTask";
     public static final String CHECK_URL_PATH = "cdn-cgi/l/chk_captcha";
 
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
     private final HttpStreamReader mHttpStreamReader = Factory.resolve(HttpStreamReader.class);
     private final ExtendedHttpClient mHttpClient = (ExtendedHttpClient)Factory.resolve(DefaultHttpClient.class);
+    private IUrlBuilder mUrlBuilder;
 
     private final CaptchaEntity mCaptcha;
     private final String mCaptchaAnswer;
@@ -49,9 +49,8 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
         try {
             this.mHttpClient.removeCookie(Constants.CF_CLEARANCE_COOKIE);
 
-            String uriPath = CHECK_URL_PATH + "?recaptcha_challenge_field=" + this.mCaptcha.getKey() + "&recaptcha_response_field=" + URLEncoder.encode(this.mCaptchaAnswer, Constants.UTF8_CHARSET.name());
-            Uri checkUri = mDvachUriBuilder.createUri(uriPath);
-            checkUri = UriUtils.changeHttpsToHttp(checkUri); // because https returns error 400
+            String url = this.mUrlBuilder.getCloudflareCheckUrl(this.mCaptcha.getKey(), URLEncoder.encode(this.mCaptchaAnswer, Constants.UTF8_CHARSET.name()));
+            Uri checkUri = UriUtils.changeHttpsToHttp(Uri.parse(url)); // because https returns error 400
 
             HttpGet request = mHttpStreamReader.createRequest(checkUri.toString(), null);
             HttpClientParams.setRedirecting(request.getParams(), false);

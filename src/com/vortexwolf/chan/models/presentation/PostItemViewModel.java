@@ -12,32 +12,33 @@ import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
-import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.models.domain.BadgeModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.services.presentation.FlowTextHelper;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewModel implements IPostListEntity {
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
-    private static final Pattern sBadgePattern = Pattern.compile("<img.+?src=\"(.+?)\".+?(?:title=\"(.+?)\")?.*?/>");
 
+    private final String mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final int mPosition;
     private final PostModel mModel;
     private final Theme mTheme;
     private final IURLSpanClickListener mUrlListener;
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final Resources mResources = Factory.resolve(Resources.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    private final IUrlBuilder mUrlBuilder;
 
     private final SpannableStringBuilder mSpannedComment;
     private SpannableStringBuilder mCachedReferencesString = null;
@@ -53,16 +54,18 @@ public class PostItemViewModel implements IPostListEntity {
     private boolean mHasUrlSpans = false;
     private boolean mIsLongTextExpanded = false;
 
-    public PostItemViewModel(String boardName, String threadNumber, int position, PostModel model, Theme theme, IURLSpanClickListener listener) {
+    public PostItemViewModel(String website, String boardName, String threadNumber, int position, PostModel model, Theme theme, IURLSpanClickListener listener) {
         this.mModel = model;
         this.mTheme = theme;
         this.mUrlListener = listener;
         this.mPosition = position;
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
 
         this.parseReferences();
-        this.mBadge = this.parseBadgeFromIcon();
+        this.mBadge = this.mModel.getBadge();
         this.mSpannedComment = this.createSpannedComment();
     }
 
@@ -73,23 +76,6 @@ public class PostItemViewModel implements IPostListEntity {
         }
 
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50);
-    }
-    
-    private BadgeModel parseBadgeFromIcon() {
-        String icon = this.mModel.getIcon();
-        if (StringUtils.isEmpty(icon)) {
-            return null;
-        }
-        
-        String[] imgGroups = RegexUtils.getGroupValues(icon, sBadgePattern);
-        if (imgGroups == null) {
-            return null;
-        }
-        
-        BadgeModel model = new BadgeModel();
-        model.source = imgGroups[1];
-        model.title = imgGroups[2];
-        return model;
     }
 
     private void parseReferences() {
@@ -114,7 +100,7 @@ public class PostItemViewModel implements IPostListEntity {
         }
 
         String fixedComment = HtmlUtils.fixHtmlTags(this.mModel.getComment());
-        SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
+        SpannableStringBuilder builder = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme, this.mUrlBuilder);
 
         URLSpan[] urlSpans = builder.getSpans(0, builder.length(), URLSpan.class);
         if (urlSpans.length > 0) {
@@ -145,7 +131,7 @@ public class PostItemViewModel implements IPostListEntity {
     public String getNumber() {
         return this.mModel.getNumber();
     }
-    
+
     public BadgeModel getBadge() {
         return this.mBadge;
     }
@@ -158,19 +144,19 @@ public class PostItemViewModel implements IPostListEntity {
     public String getName() {
         return this.mModel.getName();
     }
-    
+
     public String getTrip() {
         return this.mModel.getTrip();
     }
-    
+
     public String getSubject() {
         return StringUtils.emptyIfNull(this.mModel.getSubject());
     }
-    
+
     public boolean isSage() {
-        return "mailto:sage".equals(this.mModel.getEmail());
+        return this.mModel.getSage();
     }
-    
+
     public boolean isOp() {
         return this.mModel.isOp();
     }
@@ -178,7 +164,7 @@ public class PostItemViewModel implements IPostListEntity {
     public boolean hasAttachment() {
         return ThreadPostUtils.hasAttachment(this.mModel);
     }
-    
+
     public int getAttachmentsNumber() {
         return this.mModel.getAttachments().size();
     }
@@ -187,9 +173,9 @@ public class PostItemViewModel implements IPostListEntity {
         if(index >= this.getAttachmentsNumber()) {
             return null;
         }
-        
+
         if (this.mAttachments[index] == null) {
-            this.mAttachments[index] = new AttachmentInfo(this.mModel.getAttachments().get(index), this.mBoardName, this.mThreadNumber);
+            this.mAttachments[index] = new AttachmentInfo(this.mModel.getAttachments().get(index), this.mWebsite, this.mBoardName, this.mThreadNumber);
         }
 
         return this.mAttachments[index];
@@ -255,9 +241,7 @@ public class PostItemViewModel implements IPostListEntity {
         while (iterator.hasNext()) {
             String refNumber = iterator.next();
 
-            String refUrl = this.mDvachUriBuilder.createPostUri(this.mBoardName, this.mThreadNumber, refNumber);
-            // String htmlLink = String.format("<a href=\"%s\">%s</a>", refUrl,
-            // "&gt;&gt;" + refNumber);
+            String refUrl = this.mUrlBuilder.getPostUrlHtml(this.mBoardName, this.mThreadNumber, refNumber);
             sb.append("<a href=\"" + refUrl + "\">" + "&gt;&gt;" + refNumber + "</a>");
 
             if (iterator.hasNext()) {
@@ -283,7 +267,7 @@ public class PostItemViewModel implements IPostListEntity {
     public boolean isCommentFloat() {
         return this.isFloatImageComment;
     }
-    
+
     public boolean isListItemEnabled() {
         return true;
     }

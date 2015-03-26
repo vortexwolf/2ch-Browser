@@ -34,12 +34,12 @@ public class MakabaApiReader implements IJsonApiReader {
     static final String TAG = "MakabaApiReader";
 
     private final JsonHttpReader mJsonReader;
-    private final MakabaUriBuilder mMakabaUriBuilder;
+    private final MakabaUrlBuilder mMakabaUriBuilder;
     private final MakabaModelsMapper mMakabaModelsMapper;
     private final Resources mResources;
     private final ApplicationSettings mApplicationSettings;
 
-    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUriBuilder makabaUriBuilder, Resources resources, ApplicationSettings applicationSettings) {
+    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUrlBuilder makabaUriBuilder, Resources resources, ApplicationSettings applicationSettings) {
         this.mJsonReader = jsonReader;
         this.mMakabaModelsMapper = makabaModelsMapper;
         this.mMakabaUriBuilder = makabaUriBuilder;

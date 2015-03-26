@@ -8,17 +8,17 @@ import com.vortexwolf.chan.services.SqlCreateTableScriptBuilder;
 
 public class DvachSqlHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "dvach.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     public static final String TABLE_HISTORY = "history";
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_HIDDEN_THREADS = "hiddenThreads";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_URL = "url";
     public static final String COLUMN_CREATED = "created";
-    public static final String COLUMN_BOARD_NAME = "boardName";
-    public static final String COLUMN_THREAD_NUMBER = "threadNumber";
+    public static final String COLUMN_BOARD_NAME = "board";
+    public static final String COLUMN_THREAD_NUMBER = "thread";
+    public static final String COLUMN_WEBSITE = "website";
 
     private static final SqlCreateTableScriptBuilder mHistorySqlBuilder = new SqlCreateTableScriptBuilder(TABLE_HISTORY);
     private static final SqlCreateTableScriptBuilder mFavoritesSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_FAVORITES);
@@ -30,18 +30,17 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createHistoryTableSql = mHistorySqlBuilder.addPrimaryKey(COLUMN_ID).addColumn(COLUMN_TITLE, "text", false).addColumn(COLUMN_URL, "text", false).addColumn(COLUMN_CREATED, "long", false).toSql();
-        db.execSQL(createHistoryTableSql);
-
-        String createFavoritesTableSql = mFavoritesSqlBuilder.addPrimaryKey(COLUMN_ID).addColumn(COLUMN_TITLE, "text", false).addColumn(COLUMN_URL, "text", false).toSql();
-        db.execSQL(createFavoritesTableSql);
-
+        this.createHistoryTable(db);
+        this.createFavoritesTable(db);
         this.createHiddenThreadsTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 4) {
+        if (newVersion >= 5) {
+            this.drop(db);
+            this.onCreate(db);
+        } else if (newVersion == 4) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HIDDEN_THREADS);
             this.createHiddenThreadsTable(db);
         }
@@ -54,7 +53,35 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
     }
 
     private void createHiddenThreadsTable(SQLiteDatabase db) {
-        String sql = mHiddenThreadsSqlBuilder.addPrimaryKey(COLUMN_ID).addColumn(COLUMN_BOARD_NAME, "text", false).addColumn(COLUMN_THREAD_NUMBER, "integer", false).toSql();
+        String sql = mHiddenThreadsSqlBuilder
+                .addPrimaryKey(COLUMN_ID)
+                .addColumn(COLUMN_WEBSITE, "text", false)
+                .addColumn(COLUMN_BOARD_NAME, "text", false)
+                .addColumn(COLUMN_THREAD_NUMBER, "integer", false)
+                .toSql();
         db.execSQL(sql);
+    }
+
+    private void createHistoryTable(SQLiteDatabase db) {
+        String createHistoryTableSql = mHistorySqlBuilder
+                .addPrimaryKey(COLUMN_ID)
+                .addColumn(COLUMN_WEBSITE, "text", false)
+                .addColumn(COLUMN_BOARD_NAME, "text", false)
+                .addColumn(COLUMN_THREAD_NUMBER, "text", false)
+                .addColumn(COLUMN_TITLE, "text", true)
+                .addColumn(COLUMN_CREATED, "long", false)
+                .toSql();
+        db.execSQL(createHistoryTableSql);
+    }
+
+    private void createFavoritesTable(SQLiteDatabase db) {
+        String createFavoritesTableSql = mFavoritesSqlBuilder
+                .addPrimaryKey(COLUMN_ID)
+                .addColumn(COLUMN_WEBSITE, "text", false)
+                .addColumn(COLUMN_BOARD_NAME, "text", false)
+                .addColumn(COLUMN_THREAD_NUMBER, "text", false)
+                .addColumn(COLUMN_TITLE, "text", true)
+                .toSql();
+        db.execSQL(createFavoritesTableSql);
     }
 }

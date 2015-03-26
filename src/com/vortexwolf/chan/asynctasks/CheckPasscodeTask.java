@@ -16,7 +16,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
@@ -24,14 +23,15 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final ICheckPasscodeView mCheckPasscodeView;
     private final String mPasscode;
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
     private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
+    private IUrlBuilder mUrlBuilder;
 
     private Cookie mUserCodeCookie = null;
     private String mErrorMessage = null;
@@ -51,8 +51,8 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpPost post = null;
         HttpResponse response = null;
         try {
-            Uri uri = this.mDvachUriBuilder.createUri("/makaba/makaba.fcgi");
-            post = new HttpPost(uri.toString());
+            String url = this.mUrlBuilder.getPasscodeCheckUrl();
+            post = new HttpPost(url);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
             nameValuePairs.add(new BasicNameValuePair("task", "auth"));
@@ -74,7 +74,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
             List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
             for (Cookie c : cookies) {
                 if (c.getName().equals(Constants.USERCODE_COOKIE) &&
-                    UriUtils.areCookieDomainsEqual(c.getDomain(), uri.getHost())) {
+                    UriUtils.areCookieDomainsEqual(c.getDomain(), Uri.parse(url).getHost())) {
                     this.mUserCodeCookie = c;
                     break;
                 }

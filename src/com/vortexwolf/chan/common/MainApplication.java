@@ -10,11 +10,11 @@ import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
-import com.vortexwolf.chan.boards.makaba.MakabaUriBuilder;
+import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
+import com.vortexwolf.chan.boards.makaba.MakabaUrlParser;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.ExtendedObjectMapper;
 import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
@@ -25,7 +25,6 @@ import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
-import com.vortexwolf.chan.interfaces.IPostSender;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
@@ -65,9 +64,9 @@ public class MainApplication extends Application {
         MyTracker tracker = new MyTracker(this);
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
-        DvachUriBuilder dvachUriBuilder = new DvachUriBuilder(settings);
-        MakabaUriBuilder makabaUriBuilder = new MakabaUriBuilder(settings);
+        MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder(settings);
         DvachUriParser uriParser = new DvachUriParser();
+        MakabaUrlParser makabaUriParser = new MakabaUrlParser();
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
@@ -76,19 +75,19 @@ public class MainApplication extends Application {
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, this.getResources(), settings);
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
-        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper, uriParser, dvachUriBuilder);
+        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
         BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
         HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), this.getResources(), httpBitmapReader);
-        NavigationService navigationService = new NavigationService(uriParser);
+        NavigationService navigationService = new NavigationService();
         DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpStreamReader);
 
         Container container = Factory.getContainer();
         container.register(Resources.class, this.getResources());
-        container.register(DvachUriBuilder.class, dvachUriBuilder);
         container.register(DvachUriParser.class, uriParser);
-        container.register(MakabaUriBuilder.class, makabaUriBuilder);
+        container.register(MakabaUrlParser.class, makabaUriParser);
+        container.register(MakabaUrlBuilder.class, makabaUriBuilder);
         container.register(ApplicationSettings.class, settings);
         container.register(DefaultHttpClient.class, httpClient);
         container.register(HttpStreamReader.class, httpStreamReader);
@@ -97,7 +96,7 @@ public class MainApplication extends Application {
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonHttpReader.class, jsonApiReader);
         container.register(MakabaApiReader.class, makabaApiReader);
-        container.register(IPostSender.class, new PostSender(httpClient, this.getResources(), dvachUriBuilder, settings, httpStringReader));
+        container.register(PostSender.class, new PostSender(httpClient, this.getResources(), settings, httpStringReader));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());
         container.register(NavigationService.class, navigationService);
         container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
@@ -112,7 +111,7 @@ public class MainApplication extends Application {
         container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
         container.register(DownloadFileService.class, downloadFileService);
         container.register(ThreadImagesService.class, new ThreadImagesService());
-        container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, dvachUriBuilder, settings));
+        container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, settings));
         container.register(IconsList.class, new IconsList());
 
         historyDataSource.open();

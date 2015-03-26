@@ -3,7 +3,6 @@ package com.vortexwolf.chan.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -23,11 +22,10 @@ import android.widget.TextView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.ThreadsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadThreadsTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
@@ -36,6 +34,7 @@ import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
@@ -44,6 +43,7 @@ import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
 import com.vortexwolf.chan.services.presentation.PagesSerializationService;
@@ -61,10 +61,10 @@ public class ThreadsListActivity extends BaseListActivity {
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
-    private final DvachUriParser mDvachUriParser = Factory.resolve(DvachUriParser.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
+    private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private PostItemViewBuilder mPostItemViewBuilder;
+    private IUrlBuilder mUrlBuilder;
 
     private DownloadThreadsTask mCurrentDownloadTask = null;
     private ThreadsListAdapter mAdapter = null;
@@ -76,6 +76,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private View mCatalogBar;
 
     private OpenTabModel mTabModel;
+    private String mWebsite;
     private String mBoardName;
     private int mPageNumber = 0;
 
@@ -86,16 +87,16 @@ public class ThreadsListActivity extends BaseListActivity {
         super.onCreate(savedInstanceState);
 
         // Парсим код доски и номер страницы
-        Uri data = this.getIntent().getData();
-        if (data != null) {
-            this.mBoardName = mDvachUriParser.getBoardName(data);
-            this.mPageNumber = mDvachUriParser.getBoardPageNumber(data);
-        }
+        Bundle extras = this.getIntent().getExtras();
+        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
+        this.mPageNumber = extras.getInt(Constants.EXTRA_BOARD_PAGE, 0);
 
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mWebsite, this.mBoardName, null, this.mSettings);
 
         // Заголовок страницы
         String pageTitle = this.mPageNumber > 0
@@ -106,7 +107,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.setTitle(pageTitle);
 
         // Сохраняем во вкладках
-        OpenTabModel tabModel = new OpenTabModel(this.mBoardName, this.mDvachUriBuilder.createBoardUri(this.mBoardName, this.mPageNumber));
+        OpenTabModel tabModel = new OpenTabModel(this.mWebsite, this.mBoardName, this.mPageNumber, null, null);
         this.mTabModel = this.mOpenTabsManager.add(tabModel);
 
         this.resetUI();
@@ -180,14 +181,14 @@ public class ThreadsListActivity extends BaseListActivity {
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber - 1);
+                ThreadsListActivity.this.navigateToPageNumber(ThreadsListActivity.this.mPageNumber - 1);
             }
         });
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ThreadsListActivity.this.navigateToBoardPageNumber(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber + 1);
+                ThreadsListActivity.this.navigateToPageNumber(ThreadsListActivity.this.mPageNumber + 1);
             }
         });
 
@@ -211,7 +212,7 @@ public class ThreadsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new ThreadsListAdapter(this, this.mBoardName, this.mSettings, this.getTheme(), this.mHiddenThreadsDataSource, this.mDvachUriBuilder);
+        this.mAdapter = new ThreadsListAdapter(this, this.mWebsite, this.mBoardName, this.getTheme());
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -240,6 +241,7 @@ public class ThreadsListActivity extends BaseListActivity {
     @Override
     public boolean onSearchRequested() {
         Bundle data = new Bundle();
+        data.putString(Constants.EXTRA_WEBSITE, this.mWebsite);
         data.putString(Constants.EXTRA_BOARD_NAME, this.mBoardName);
 
         this.startSearch(null, false, data, false);
@@ -262,23 +264,28 @@ public class ThreadsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(),
-                        Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
-                openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
+                Class<? extends Activity> tabsActivity = Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class;
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), tabsActivity);
+
+                String currentUrl = this.mUrlBuilder.getPageUrlHtml(this.mBoardName, this.mPageNumber);
+                openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, currentUrl);
                 this.startActivity(openTabsIntent);
                 break;
             case R.id.pick_board_menu_id:
             case android.R.id.home:
-                // Start new activity
-                Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
-                pickBoardIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                this.startActivity(pickBoardIntent);
+                this.mNavigationService.navigateBoardList(this, this.mWebsite, true);
                 break;
             case R.id.refresh_menu_id:
                 this.refresh();
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.createBoardUri(this.mBoardName, this.mPageNumber).toString());
+                String browserUrl = null;
+                if (this.mPageNumber < 0) {
+                    browserUrl = this.mUrlBuilder.getCatalogUrlHtml(this.mBoardName, -1 - this.mPageNumber);
+                } else {
+                    browserUrl = this.mUrlBuilder.getPageUrlHtml(this.mBoardName, this.mPageNumber);
+                }
+                BrowserLauncher.launchExternalBrowser(this, browserUrl);
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -292,14 +299,13 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.onSearchRequested();
                 break;
             case R.id.menu_catalog_id:
-                this.navigateToBoardPageNumber(this.mBoardName, -1);
+                this.navigateToCatalog(this.mBoardName, -1);
                 break;
             case R.id.add_remove_favorites_menu_id:
-                String url = this.mTabModel.getUri().toString();
-                if (this.mFavoritesDatasource.hasFavorites(url)) {
-                    this.mFavoritesDatasource.removeFromFavorites(url);
+                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, null)) {
+                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, this.mBoardName, null);
                 } else {
-                    this.mFavoritesDatasource.addToFavorites(this.mTabModel.getTitle(), url);
+                    this.mFavoritesDatasource.addToFavorites(this.mWebsite, this.mBoardName, null, this.mTabModel.getTitle());
                 }
 
                 this.updateOptionsMenu();
@@ -334,7 +340,7 @@ public class ThreadsListActivity extends BaseListActivity {
         ThreadItemViewModel info = this.mAdapter.getItem(position);
 
         if (info.isHidden()) {
-            this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mBoardName, info.getNumber());
+            this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mWebsite, this.mBoardName, info.getNumber());
             info.setHidden(false);
             this.mAdapter.notifyDataSetChanged();
         } else {
@@ -365,19 +371,16 @@ public class ThreadsListActivity extends BaseListActivity {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_ANSWER: {
-                Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
-                addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
-                addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, info.getNumber());
-                this.startActivity(addPostIntent);
+                this.navigateToAddPostView(info.getNumber());
                 return true;
             }
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
-                PostItemViewModel postModel = new PostItemViewModel(this.mBoardName, info.getNumber(), Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
+                PostItemViewModel postModel = new PostItemViewModel(this.mWebsite, this.mBoardName, info.getNumber(), Constants.OP_POST_POSITION, info.getOpPost(), this.getTheme(), ClickListenersFactory.getDefaultSpanClickListener(this.mUrlBuilder));
                 this.mPostItemViewBuilder.displayPopupDialog(postModel, this, this.getTheme(), null);
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
-                this.mHiddenThreadsDataSource.addToHiddenThreads(this.mBoardName, info.getNumber());
+                this.mHiddenThreadsDataSource.addToHiddenThreads(this.mWebsite, this.mBoardName, info.getNumber());
                 info.setHidden(true);
                 this.mAdapter.notifyDataSetChanged();
                 return true;
@@ -400,7 +403,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
-        if (this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())) {
+        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, null)) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);
         } else {
             favoritesItem.setTitle(R.string.menu_add_favorites);
@@ -409,10 +412,20 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToAddThreadView() {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, Constants.ADD_THREAD_PARENT);
 
         this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+    }
+
+    private void navigateToAddPostView(String threadNumber) {
+        Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
+        addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
+        addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);
+
+        this.startActivity(addPostIntent);
     }
 
     private void navigateToThread(String threadNumber) {
@@ -420,19 +433,19 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     private void navigateToThread(String threadNumber, String threadSubject) {
-        Intent i = new Intent(this.getApplicationContext(), PostsListActivity.class);
-        i.setData(Uri.parse(this.mDvachUriBuilder.createThreadUri(this.mBoardName, threadNumber)));
-        if (threadSubject != null) {
-            i.putExtra(Constants.EXTRA_THREAD_SUBJECT, threadSubject);
-        }
-
-        this.startActivity(i);
+        this.mNavigationService.navigateThread(this, null, this.mWebsite, this.mBoardName, threadNumber, threadSubject, null, false);
     }
 
-    private void navigateToBoardPageNumber(String boardCode, int pageNumber) {
-        Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.createBoardUri(boardCode, pageNumber));
-        this.startActivity(i);
+    // TODO: rewrite without using getPageUrl
+    private void navigateToCatalog(String boardCode, int filter) {
+        AppearanceUtils.showToastMessage(this, "Catalog is not implemented.");
+        /*Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
+        i.setData(Uri.parse(this.mMakabaUriBuilder.getPageUrlHtml(boardCode, filter)));
+        this.startActivity(i);*/
+    }
+
+    private void navigateToPageNumber(int pageNumber) {
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, pageNumber, false);
     }
 
     protected void refresh() {
@@ -505,7 +518,7 @@ public class ThreadsListActivity extends BaseListActivity {
         public void showError(String error) {
             ThreadsListActivity.this.switchToErrorView(error);
             if (error != null && error.startsWith("503")) {
-                String url = mDvachUriBuilder.createBoardUri(mBoardName, mPageNumber).toString();
+                String url = mUrlBuilder.getPageUrlHtml(mBoardName, mPageNumber);
                 new CloudflareCheckService(url, ThreadsListActivity.this, new ICloudflareCheckListener(){
                     public void onSuccess() {
                         refresh();

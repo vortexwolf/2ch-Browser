@@ -2,12 +2,12 @@ package com.vortexwolf.chan.activities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -22,22 +22,23 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.BoardsListAdapter;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.presentation.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -47,14 +48,15 @@ public class PickBoardActivity extends ListActivity {
 
     public static final String TAG = "PickBoardActivity";
 
-    private static final Pattern boardCodePattern = Pattern.compile("^/?\\w+/?$");
+    private static final Pattern boardCodePattern = Pattern.compile("^\\w+$");
 
     private MyTracker mTracker = Factory.resolve(MyTracker.class);
     private FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    private DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
-    private DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
+    private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
+    private IUrlBuilder mUrlBuilder;
 
+    private String mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
 
@@ -64,15 +66,20 @@ public class PickBoardActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        this.mWebsite = this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE);
+        if (StringUtils.isEmpty(this.mWebsite)) {
+            this.mWebsite = Websites.DVACH;
+        }
+
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
 
+        // TODO: add Default Website to the settings and navigate to it
         if (this.mSettings.getStartPage() != null && Intent.ACTION_MAIN.equals(this.getIntent().getAction())) {
-            Intent openBoard = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-            openBoard.setData(this.mDvachUriBuilder.createBoardUri(this.mSettings.getStartPage()));
-            openBoard.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(openBoard);
-            this.finish();
-            return;
+            if (this.navigateBoard(this.mSettings.getStartPage())) {
+                this.finish();
+                return;
+            }
         }
 
         this.resetUI();
@@ -135,8 +142,7 @@ public class PickBoardActivity extends ListActivity {
         // add favorite boards
         List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
         for (FavoritesEntity f : favoriteBoards) {
-            Uri uri = Uri.parse(f.getUrl());
-            String boardName = this.mUriParser.getBoardName(uri);
+            String boardName = f.getBoard();
             adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
         }
     }
@@ -182,7 +188,7 @@ public class PickBoardActivity extends ListActivity {
             @Override
             public void onClick(View v) {
                 String enteredBoard = pickBoardInput.getText().toString().trim();
-                PickBoardActivity.this.returnBoard(enteredBoard);
+                PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
             }
         });
 
@@ -191,7 +197,7 @@ public class PickBoardActivity extends ListActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     String enteredBoard = pickBoardInput.getText().toString().trim();
-                    PickBoardActivity.this.returnBoard(enteredBoard);
+                    PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
                     return true;
                 }
                 return false;
@@ -203,7 +209,7 @@ public class PickBoardActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         BoardEntity item = (BoardEntity) this.mAdapter.getItem(position);
-        this.returnBoard(item.getCode());
+        this.checkAndNavigateBoard(item.getCode());
     }
 
     @Override
@@ -215,7 +221,7 @@ public class PickBoardActivity extends ListActivity {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
 
-        if (!this.mFavoritesDatasource.hasFavorites(this.mDvachUriBuilder.createBoardUri(item.getCode()).toString())) {
+        if (!this.mFavoritesDatasource.hasFavorites(this.mWebsite, item.getCode(), null)) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
@@ -229,7 +235,7 @@ public class PickBoardActivity extends ListActivity {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = this.mDvachUriBuilder.createBoardUri(model.getCode()).toString();
+                String uri = this.mUrlBuilder.getPageUrlHtml(model.getCode(), 0);
 
                 CompatibilityUtils.copyText(this, uri, uri);
 
@@ -270,6 +276,7 @@ public class PickBoardActivity extends ListActivity {
                     @Override
                     public void onClick(DialogInterface d, int which) {
                         String boardCode = dialog.getText();
+                        boardCode = fixSlashes(boardCode);
                         boolean success = PickBoardActivity.this.validateBoardCode(boardCode);
 
                         if (success) {
@@ -288,7 +295,7 @@ public class PickBoardActivity extends ListActivity {
                 this.startActivity(preferencesIntent);
                 break;
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(), 
+                Intent openTabsIntent = new Intent(this.getApplicationContext(),
                         Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
                 this.startActivity(openTabsIntent);
                 break;
@@ -297,28 +304,31 @@ public class PickBoardActivity extends ListActivity {
         return true;
     }
 
-    private void returnBoard(String boardCode) {
-        if (!this.validateBoardCode(boardCode)) {
+    private void checkAndNavigateBoard(String boardCode) {
+        boardCode = this.fixSlashes(boardCode);
+
+        if (!navigateBoard(boardCode)) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_enter_board));
             return;
         }
+    }
 
-        boardCode = this.fixSlashes(boardCode);
+    private boolean navigateBoard(String boardCode) {
+        if (!this.validateBoardCode(boardCode)) {
+            return false;
+        }
 
-        Intent intent = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        intent.setData(this.mDvachUriBuilder.createBoardUri(boardCode));
-        this.startActivity(intent);
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, boardCode, 0, false);
+        return true;
     }
 
     private void addToFavorites(String boardCode) {
-        String uri = this.mDvachUriBuilder.createBoardUri(boardCode).toString();
-        this.mFavoritesDatasource.addToFavorites(boardCode, uri);
+        this.mFavoritesDatasource.addToFavorites(this.mWebsite, boardCode, null, null);
         this.mAdapter.addItemToFavoritesSection(boardCode, this.findBoardByCode(boardCode));
     }
 
     private void removeFromFavorites(BoardEntity model) {
-        String uri = this.mDvachUriBuilder.createBoardUri(model.getCode()).toString();
-        this.mFavoritesDatasource.removeFromFavorites(uri);
+        this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, model.getCode(), null);
         this.mAdapter.removeItemFromFavoritesSection(model);
     }
 
@@ -331,7 +341,7 @@ public class PickBoardActivity extends ListActivity {
     }
 
     private String fixSlashes(String boardCode) {
-        String result = boardCode.replaceAll("/", "").toLowerCase();
+        String result = boardCode.replaceAll("/", "").toLowerCase(Locale.US);
 
         return result;
     }

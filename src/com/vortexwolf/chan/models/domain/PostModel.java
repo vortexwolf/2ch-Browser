@@ -6,19 +6,19 @@ import java.util.List;
 
 public class PostModel implements Serializable {
     private static final long serialVersionUID = 3897934462057089443L;
-    
+
     private String number;
     private String name;
     private String subject;
     private String comment;
-    private String email;
+    private boolean sage;
     private String trip;
-    private String icon;
+    private BadgeModel badge;
     private boolean op;
     private long timestamp;
     private String parentThread;
     private ArrayList<AttachmentModel> attachments = new ArrayList<AttachmentModel>();
-    
+
     public String getNumber() {
         return number;
     }
@@ -43,11 +43,11 @@ public class PostModel implements Serializable {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public String getEmail() {
-        return email;
+    public boolean getSage() {
+        return sage;
     }
-    public void setEmail(String email) {
-        this.email = email;
+    public void setSage(boolean sage) {
+        this.sage = sage;
     }
     public String getTrip() {
         return trip;
@@ -55,11 +55,11 @@ public class PostModel implements Serializable {
     public void setTrip(String trip) {
         this.trip = trip;
     }
-    public String getIcon() {
-        return icon;
+    public BadgeModel getBadge() {
+        return badge;
     }
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setBadge(BadgeModel icon) {
+        this.badge = icon;
     }
     public boolean isOp() {
         return op;
@@ -79,7 +79,7 @@ public class PostModel implements Serializable {
     public void setParentThread(String parentThread) {
         this.parentThread = parentThread;
     }
-    
+
     public void addAttachment(AttachmentModel model) {
         this.attachments.add(model);
     }

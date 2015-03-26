@@ -5,26 +5,26 @@ import java.util.HashMap;
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
-import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfo {
     private static final HashMap<String, Integer> sDefaultThumbnails;
 
     private final AttachmentModel mModel;
+    private final String mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final boolean mIsEmpty;
     private final String mImageUrl;
     private final String mThumbnailUrl;
     private final String mSourceExtension;
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
-    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    private IUrlBuilder mUrlBuilder;
 
     static {
         sDefaultThumbnails = new HashMap<String, Integer>();
@@ -33,10 +33,12 @@ public class AttachmentInfo {
         sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
     }
 
-    public AttachmentInfo(AttachmentModel item, String boardName, String threadNumber) {
+    public AttachmentInfo(AttachmentModel item, String website, String boardName, String threadNumber) {
         this.mModel = item;
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
 
         SourceWithThumbnailModel urls = this.getUrls();
         if (urls != null) {
@@ -55,7 +57,7 @@ public class AttachmentInfo {
     }
 
     public String getThreadUrl() {
-        return this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
+        return this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
     }
 
     public String getSourceUrl() {
@@ -134,18 +136,16 @@ public class AttachmentInfo {
         String imageUrl = this.mModel.getPath();
         String imageThumbnail = this.mModel.getThumbnailUrl();
         if (!StringUtils.isEmpty(imageUrl)) {
-            model.imageUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardName, imageUrl).toString();
+            model.imageUrl = this.mUrlBuilder.getImageUrl(this.mBoardName, imageUrl);
         }
         if (!StringUtils.isEmpty(imageThumbnail)) {
-            model.thumbnailUrl = this.mDvachUriBuilder.createBoardUri(this.mBoardName, imageThumbnail).toString();
-        }
-        // Если выше вызвался любой из двух if, значт прикреплен какой-то файл,
-        // а не видео
-        if (model.imageUrl != null || model.thumbnailUrl != null) {
-            return model;
+            model.thumbnailUrl = this.mUrlBuilder.getThumbnailUrl(this.mBoardName, imageThumbnail);
         }
 
-        return null;
+        if (model.imageUrl == null && model.thumbnailUrl == null) {
+            return null;
+        }
+        return model;
     }
 
     private class SourceWithThumbnailModel {

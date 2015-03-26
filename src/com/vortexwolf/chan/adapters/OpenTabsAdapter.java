@@ -41,8 +41,8 @@ public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
         TextView urlView = (TextView) view.findViewById(R.id.tabs_item_url);
         ImageView deleteButton = (ImageView) view.findViewById(R.id.tabs_item_delete);
 
-        titleView.setText(item.getTitle());
-        urlView.setText(item.getUri().toString());
+        titleView.setText(item.getTitleOrDefault());
+        urlView.setText(item.buildUrl());
 
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override

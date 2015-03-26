@@ -3,8 +3,8 @@ package com.vortexwolf.chan.services.presentation;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.net.Uri;
 
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
@@ -25,13 +25,13 @@ public class OpenTabsManager implements IOpenTabsManager {
     public OpenTabModel add(OpenTabModel newTab) {
         // Не добавляем, если уже добавлено
         for (OpenTabModel openTab : this.mTabs) {
-            if (openTab.getUri().equals(newTab.getUri())) {
+            if (openTab.isEqualTo(newTab)) {
                 return openTab;
             }
         }
 
         this.mTabs.add(0, newTab);
-        this.mDataSource.addHistory(newTab.getTitle(), newTab.getUri().toString());
+        this.mDataSource.addHistory(newTab.getWebsite(), newTab.getBoard(), newTab.getThread(), newTab.getTitle());
 
         return newTab;
     }
@@ -54,12 +54,16 @@ public class OpenTabsManager implements IOpenTabsManager {
 
     @Override
     public void navigate(OpenTabModel tab, Activity activity) {
-        this.mNavigationService.navigate(tab.getUri(), activity);
+        if (StringUtils.isEmpty(tab.getThread())) {
+            this.mNavigationService.navigateBoardPage(activity, null, tab.getWebsite(), tab.getBoard(), 0, true);
+        } else {
+            this.mNavigationService.navigateThread(activity, null, tab.getWebsite(), tab.getBoard(), tab.getThread(), tab.getTitle(), null, true);
+        }
     }
 
-    public OpenTabModel getByUri(Uri uri) {
+    public OpenTabModel getByUri(String website, String board, String thread, int page) {
         for (OpenTabModel model : this.mTabs) {
-            if (model.getUri().equals(uri)) {
+            if (model.isEqualTo(website, board, thread, page)) {
                 return model;
             }
         }

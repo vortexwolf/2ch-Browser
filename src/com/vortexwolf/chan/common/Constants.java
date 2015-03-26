@@ -65,6 +65,7 @@ public class Constants {
 
     // Extra-параметры для передачи в объект Intent
     public static final String EXTRA_BOARD_NAME = "ExtraBoardName";
+    public static final String EXTRA_BOARD_PAGE = "ExtraBoardPage";
     public static final String EXTRA_THREAD_NUMBER = "ExtraThreadNumber";
     public static final String EXTRA_THREAD_SUBJECT = "ExtraThreadSubject";
     public static final String EXTRA_POST_NUMBER = "ExtraPostNumber";
@@ -74,6 +75,7 @@ public class Constants {
     public static final String EXTRA_CURRENT_URL = "ExtraCurrentUrl";
     public static final String EXTRA_PREFER_DESERIALIZED = "ExtraPreferDeserialized";
     public static final String EXTRA_THREAD_URL = "ExtraThreadUrl";
+    public static final String EXTRA_WEBSITE = "ExtraWebsite";
 
     // Идентификаторы для контекстного меню
     public static final int CONTEXT_MENU_ANSWER = 1001;

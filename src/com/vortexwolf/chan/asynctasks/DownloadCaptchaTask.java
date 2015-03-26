@@ -19,6 +19,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private static final String TAG = "DownloadCaptchaTask";
 
     private final ICaptchaView mView;
+    private final String mWebsite;
     private final Uri mRefererUri;
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
@@ -32,8 +33,9 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, Uri refererUri, boolean isCfRecaptcha) {
+    public DownloadCaptchaTask(ICaptchaView view, String website, Uri refererUri, boolean isCfRecaptcha) {
         this.mView = view;
+        this.mWebsite = website;
         this.mRefererUri = refererUri;
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
@@ -62,7 +64,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         if (this.mCfRecaptcha) {
             this.mCaptcha = RecaptchaService.loadCloudflareCaptcha();
         } else {
-            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mRefererUri, true);
+            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mRefererUri);
             this.mCanSkip = result.canSkip;
             this.mSuccessPasscode = result.successPassCode;
             this.mFailPasscode = result.failPassCode;

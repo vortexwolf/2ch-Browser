@@ -5,9 +5,14 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.vortexwolf.chan.common.library.MyLog;
+
 public class HiddenThreadsDataSource {
     private static final String TABLE = DvachSqlHelper.TABLE_HIDDEN_THREADS;
-    private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_THREAD_NUMBER, DvachSqlHelper.COLUMN_BOARD_NAME };
+    /*private static final String[] ALL_COLUMNS = {
+        DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
+        DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER
+    };*/
 
     private final DvachSqlHelper mDbHelper;
 
@@ -25,23 +30,34 @@ public class HiddenThreadsDataSource {
         this.mDbHelper.close();
     }
 
-    public void addToHiddenThreads(String boardName, String threadNumber) {
-        if (!this.isHidden(boardName, threadNumber)) {
+    public void addToHiddenThreads(String website, String board, String thread) {
+        if (!this.isHidden(website, board, thread)) {
             ContentValues values = new ContentValues();
-            values.put(DvachSqlHelper.COLUMN_BOARD_NAME, boardName);
-            values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, threadNumber);
-            this.mDatabase.insert(TABLE, null, values);
+            values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
+            values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
+            values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, thread);
+            try {
+                this.mDatabase.insertOrThrow(TABLE, null, values);
+            } catch (Exception e) {
+                MyLog.e("HiddenThreadsDataSource", e);
+            }
         }
     }
 
-    public void removeFromHiddenThreads(String boardName, String threadNumber) {
-        this.mDatabase.delete(TABLE, DvachSqlHelper.COLUMN_BOARD_NAME + " = ? AND " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?", new String[] {
-                boardName, threadNumber });
+    public void removeFromHiddenThreads(String website, String board, String thread) {
+        this.mDatabase.delete(TABLE,
+            DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+            " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+            " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+            new String[] { website, board, thread });
     }
 
-    public boolean isHidden(String boardName, String threadNumber) {
-        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE + " where " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ? AND " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?", new String[] {
-                boardName, threadNumber });
+    public boolean isHidden(String website, String board, String thread) {
+        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE +
+                " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+                new String[] { website, board, thread });
 
         cursor.moveToFirst();
         long count = cursor.getLong(0);

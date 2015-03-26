@@ -41,10 +41,10 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
             view.setTag(vb);
         }
 
-        vb.titleView.setText(item.getTitle());
-        vb.urlView.setText(item.getUrl());
+        vb.titleView.setText(item.getTitleOrDefault());
+        vb.urlView.setText(item.buildUrl());
 
-        boolean isInFavorites = this.mFavoritesDataSource.hasFavorites(item.getUrl());
+        boolean isInFavorites = this.mFavoritesDataSource.hasFavorites(item.getWebsite(), item.getBoard(), item.getThread());
         vb.starView.setOnCheckedChangeListener(null);
         vb.starView.setChecked(isInFavorites);
 
@@ -52,9 +52,9 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    HistoryAdapter.this.mFavoritesDataSource.addToFavorites(item.getTitle(), item.getUrl());
+                    HistoryAdapter.this.mFavoritesDataSource.addToFavorites(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle());
                 } else {
-                    HistoryAdapter.this.mFavoritesDataSource.removeFromFavorites(item.getUrl());
+                    HistoryAdapter.this.mFavoritesDataSource.removeFromFavorites(item.getWebsite(), item.getBoard(), item.getThread());
                 }
             }
         });

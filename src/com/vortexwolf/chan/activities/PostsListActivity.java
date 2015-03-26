@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,11 +19,10 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.PostsListAdapter;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadPostsTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
@@ -32,6 +32,7 @@ import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
@@ -41,6 +42,7 @@ import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.TimerService;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
@@ -57,13 +59,13 @@ public class PostsListActivity extends BaseListActivity {
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
-    private final DvachUriBuilder mDvachUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final HistoryDataSource mHistoryDataSource = Factory.resolve(HistoryDataSource.class);
     private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
-    private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
+    private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
 
+    private IUrlBuilder mUrlBuilder;
     private PostsListAdapter mAdapter = null;
     private DownloadPostsTask mCurrentDownloadTask = null;
     private TimerService mAutoRefreshTimer = null;
@@ -72,10 +74,10 @@ public class PostsListActivity extends BaseListActivity {
     private SettingsEntity mCurrentSettings;
 
     private OpenTabModel mTabModel;
+    private String mWebsite;
     private String mBoardName;
     private String mThreadNumber;
-    private String mUri;
-    private String mPostNumber = null;
+    private String mPostNumber;
 
     private Menu mMenu;
 
@@ -86,22 +88,21 @@ public class PostsListActivity extends BaseListActivity {
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
 
         // Парсим код доски и номер страницы
-        Uri data = this.getIntent().getData();
-        if (data != null) {
-            this.mBoardName = this.mUriParser.getBoardName(data);
-            this.mThreadNumber = this.mUriParser.getThreadNumber(data);
-            this.mPostNumber = data.getFragment();
-            this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
-        }
+        Bundle extras = this.getIntent().getExtras();
+        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
+        this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
+        this.mPostNumber = extras.getString(Constants.EXTRA_POST_NUMBER);
 
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // Page title and new tab
-        String pageSubject = this.getIntent().hasExtra(Constants.EXTRA_THREAD_SUBJECT)
-                ? this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_SUBJECT)
+        String pageSubject = extras != null
+                ? StringUtils.nullIfEmpty(extras.getString(Constants.EXTRA_THREAD_SUBJECT))
                 : null;
 
-        OpenTabModel tabModel = new OpenTabModel(pageSubject, Uri.parse(this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber)));
+        OpenTabModel tabModel = new OpenTabModel(this.mWebsite, this.mBoardName, 0, this.mThreadNumber, pageSubject);
         this.mTabModel = this.mOpenTabsManager.add(tabModel);
 
         this.updateTitle(pageSubject);
@@ -131,7 +132,8 @@ public class PostsListActivity extends BaseListActivity {
     protected void onDestroy() {
         this.mAutoRefreshTimer.stop();
 
-        this.mThreadImagesService.clearThreadImages(this.mUri);
+        String uri = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
+        this.mThreadImagesService.clearThreadImages(uri);
 
         super.onDestroy();
     }
@@ -180,7 +182,7 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void setAdapter(Bundle savedInstanceState) {
-        this.mAdapter = new PostsListAdapter(this, this.mBoardName, this.mThreadNumber, this.mSettings, this.getTheme(), this.getListView(), this.mDvachUriBuilder, this.mThreadImagesService, this.mUriParser);
+        this.mAdapter = new PostsListAdapter(this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.getTheme(), this.getListView());
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
@@ -225,7 +227,7 @@ public class PostsListActivity extends BaseListActivity {
 
         String tabTitle = title != null ? title : pageTitle;
         this.mTabModel.setTitle(tabTitle);
-        this.mHistoryDataSource.updateHistoryItem(this.mTabModel.getUri().toString(), tabTitle);
+        this.mHistoryDataSource.updateHistoryItem(this.mWebsite, this.mBoardName, this.mThreadNumber, tabTitle);
     }
 
     @Override
@@ -243,22 +245,21 @@ public class PostsListActivity extends BaseListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.tabs_menu_id:
-                Intent openTabsIntent = new Intent(this.getApplicationContext(),
-                        Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class);
-                openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, this.mTabModel.getUri().toString());
+                Class<? extends Activity> tabsActivity = Constants.SDK_VERSION >= 4 ? TabsHistoryBookmarksActivity.class : TabsHistoryBookmarksCompActivity.class;
+                Intent openTabsIntent = new Intent(this.getApplicationContext(), tabsActivity);
+
+                String currentUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
+                openTabsIntent.putExtra(Constants.EXTRA_CURRENT_URL, currentUrl);
                 this.startActivity(openTabsIntent);
                 break;
             case R.id.refresh_menu_id:
                 this.refresh();
                 break;
             case R.id.pick_board_menu_id:
-                // Start new activity
-                Intent pickBoardIntent = new Intent(this.getApplicationContext(), PickBoardActivity.class);
-                pickBoardIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                this.startActivity(pickBoardIntent);
+                this.mNavigationService.navigateBoardList(this, this.mWebsite, true);
                 break;
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber));
+                BrowserLauncher.launchExternalBrowser(this, this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber));
                 break;
             case R.id.preferences_menu_id:
                 // Start new activity
@@ -269,25 +270,26 @@ public class PostsListActivity extends BaseListActivity {
                 this.navigateToAddPostView(null, null);
                 break;
             case R.id.share_menu_id:
+                String shareUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
+
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("text/plain");
                 i.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getTitle());
-                i.putExtra(Intent.EXTRA_TEXT, this.mTabModel.getUri().toString());
+                i.putExtra(Intent.EXTRA_TEXT, shareUrl);
                 this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
                 break;
             case R.id.add_remove_favorites_menu_id:
-                String url = this.mTabModel.getUri().toString();
-                if (this.mFavoritesDatasource.hasFavorites(url)) {
-                    this.mFavoritesDatasource.removeFromFavorites(url);
+                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber)) {
+                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber);
                 } else {
-                    this.mFavoritesDatasource.addToFavorites(this.mTabModel.getTitle(), url);
+                    this.mFavoritesDatasource.addToFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber, this.mTabModel.getTitle());
                 }
 
                 this.updateOptionsMenu();
 
                 break;
             case android.R.id.home:
-                this.navigateToThreads(this.mBoardName);
+                this.navigateToThreads();
                 break;
         }
 
@@ -359,7 +361,7 @@ public class PostsListActivity extends BaseListActivity {
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
                 shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mTabModel.getUri().toString() + "#" + model.getNumber());
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mBoardName + ", post #" + model.getNumber());
                 shareLinkIntent.putExtra(Intent.EXTRA_TEXT, model.getSpannedComment().toString());
                 this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
                 break;
@@ -381,7 +383,7 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
-        if (this.mFavoritesDatasource.hasFavorites(this.mTabModel.getUri().toString())) {
+        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber)) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);
         } else {
             favoritesItem.setTitle(R.string.menu_add_favorites);
@@ -390,6 +392,7 @@ public class PostsListActivity extends BaseListActivity {
 
     private void navigateToAddPostView(String postNumber, String postComment) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, this.mThreadNumber);
 
@@ -403,10 +406,8 @@ public class PostsListActivity extends BaseListActivity {
         this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
 
-    private void navigateToThreads(String boardName) {
-        Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(this.mDvachUriBuilder.createBoardUri(boardName, 0));
-        this.startActivity(i);
+    private void navigateToThreads() {
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, 0, false);
     }
 
     @Override

@@ -22,9 +22,10 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.activities.PostsListActivity;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
@@ -32,14 +33,15 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.IPostListEntity;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.PostsViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
+import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
-import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -50,6 +52,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private static final int ITEM_VIEW_TYPE_STATUS = 1;
 
     private final LayoutInflater mInflater;
+    private final String mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final String mUri;
@@ -60,7 +63,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private final ListView mListView;
     private final PostsListActivity mActivity;
     private final PostItemViewBuilder mPostItemViewBuilder;
-    private final DvachUriBuilder mDvachUriBuilder;
+    private final IUrlBuilder mUrlBuilder;
     private final Timer mLoadImagesTimer;
     private final ThreadImagesService mThreadImagesService;
     private final DvachUriParser mUriParser;
@@ -71,24 +74,25 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private boolean mIsBusy = false;
     private LoadImagesTimerTask mCurrentLoadImagesTask;
 
-    public PostsListAdapter(PostsListActivity activity, String boardName, String threadNumber, ApplicationSettings settings, Theme theme, ListView listView, DvachUriBuilder dvachUriBuilder, ThreadImagesService threadImagesService, DvachUriParser uriParser) {
+    public PostsListAdapter(PostsListActivity activity, String website, String boardName, String threadNumber, Theme theme, ListView listView) {
         super(activity.getApplicationContext(), 0);
 
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mInflater = LayoutInflater.from(activity);
         this.mTheme = theme;
-        this.mPostsViewModel = new PostsViewModel(boardName, threadNumber);
+        this.mPostsViewModel = new PostsViewModel(website, boardName, threadNumber);
         this.mStatusViewModel = new StatusIndicatorEntity();
-        this.mSettings = settings;
+        this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mListView = listView;
         this.mActivity = activity;
-        this.mDvachUriBuilder = dvachUriBuilder;
-        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivity, this.mBoardName, this.mThreadNumber, this.mSettings, this.mDvachUriBuilder);
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivity, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mSettings);
         this.mLoadImagesTimer = new Timer();
-        this.mThreadImagesService = threadImagesService;
-        this.mUriParser = uriParser;
-        this.mUri = this.mDvachUriBuilder.createThreadUri(this.mBoardName, this.mThreadNumber);
+        this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
+        this.mUriParser = Factory.resolve(DvachUriParser.class);
+        this.mUri = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
     }
 
     @Override
@@ -161,7 +165,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
                 this.mListView.setSelection(position);
             }
         } else {
-            ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder).onClick(v, span, url);
+            BrowserLauncher.launchExternalBrowser(v.getContext(), this.mUrlBuilder.makeAbsolute(url));
         }
     }
 

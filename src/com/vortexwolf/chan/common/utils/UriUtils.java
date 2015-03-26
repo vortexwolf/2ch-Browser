@@ -2,9 +2,8 @@ package com.vortexwolf.chan.common.utils;
 
 import android.net.Uri;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 
 public class UriUtils {
 
@@ -67,13 +66,11 @@ public class UriUtils {
         return cookieDomain.equalsIgnoreCase(siteDomain);
     }
 
-    public static Uri createRefererUri(String boardName, String threadNumber) {
-        DvachUriBuilder uriBuilder = Factory.resolve(DvachUriBuilder.class);
-
+    public static Uri createRefererUri(IUrlBuilder builder, String boardName, String threadNumber) {
         if(StringUtils.isEmpty(threadNumber) || threadNumber == Constants.ADD_THREAD_PARENT) {
-            return uriBuilder.createBoardUri(boardName, 0);
+            return Uri.parse(builder.getPageUrlHtml(boardName, 0));
         }
 
-        return Uri.parse(uriBuilder.createThreadUri(boardName, threadNumber));
+        return Uri.parse(builder.getThreadUrlHtml(boardName, threadNumber));
     }
 }

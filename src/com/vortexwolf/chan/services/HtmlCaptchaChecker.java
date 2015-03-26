@@ -5,40 +5,30 @@ import org.apache.http.message.BasicHeader;
 
 import android.net.Uri;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
-import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;
-    private final DvachUriBuilder mDvachUriBuilder;
     private final ApplicationSettings mApplicationSettings;
 
-    public HtmlCaptchaChecker(IHttpStringReader httpStringReader, DvachUriBuilder dvachUriBuilder, ApplicationSettings settings) {
+    public HtmlCaptchaChecker(IHttpStringReader httpStringReader, ApplicationSettings settings) {
         this.mHttpStringReader = httpStringReader;
-        this.mDvachUriBuilder = dvachUriBuilder;
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(Uri refererUri) {
-        return this.canSkipCaptcha(refererUri, true);
-    }
-
-    public CaptchaResult canSkipCaptcha(Uri refererUri, boolean usePasscode) {
-        String checkUri = "makaba/captcha.fcgi";
-        if (usePasscode && !StringUtils.isEmpty(this.mApplicationSettings.getPasscodeCookieValue())) {
-            checkUri += "?usercode=" + this.mApplicationSettings.getPasscodeCookieValue();
-        }
-
-        Uri uri = this.mDvachUriBuilder.createUri(checkUri);
+    public CaptchaResult canSkipCaptcha(String website, Uri refererUri) {
+        IUrlBuilder urlBuilder = Websites.getUrlBuilder(website);
+        String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(this.mApplicationSettings.getPasscodeCookieValue());
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it
         Header[] extraHeaders = new Header[] { new BasicHeader("Referer", refererUri.toString()) };
 
         CaptchaResult result;
         try {
-            String captchaBlock = this.mHttpStringReader.fromUri(uri.toString(), extraHeaders);
+            String captchaBlock = this.mHttpStringReader.fromUri(checkUrl, extraHeaders);
             result = this.checkHtmlBlock(captchaBlock);
         } catch (Exception e) {
             result = this.createEmptyResult();

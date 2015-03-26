@@ -12,6 +12,7 @@ import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
@@ -19,11 +20,11 @@ import com.vortexwolf.chan.services.http.JsonHttpReader;
 
 public class FourchanApiReader implements IJsonApiReader {
     private final JsonHttpReader mJsonReader;
-    private final FourchanUriBuilder mFourchanUriBuilder;
+    private final IUrlBuilder mFourchanUriBuilder;
     private final FourchanModelsMapper mFourchanModelsMapper;
     private final Resources mResources;
 
-    public FourchanApiReader(JsonHttpReader jsonReader, FourchanUriBuilder uriBuilder, FourchanModelsMapper modelsMapper, Resources resources) {
+    public FourchanApiReader(JsonHttpReader jsonReader, IUrlBuilder uriBuilder, FourchanModelsMapper modelsMapper, Resources resources) {
         this.mJsonReader = jsonReader;
         this.mFourchanUriBuilder = uriBuilder;
         this.mFourchanModelsMapper = modelsMapper;

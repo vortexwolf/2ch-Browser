@@ -22,9 +22,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
@@ -35,7 +35,8 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.models.presentation.BadgeModel;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.models.domain.BadgeModel;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
@@ -45,22 +46,24 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class PostItemViewBuilder {
     private final LayoutInflater mInflater;
     private final BitmapManager mBitmapManager = Factory.resolve(BitmapManager.class);
+    private final String mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final Context mAppContext;
     private final ApplicationSettings mSettings;
     private final WindowManager mWindowManager;
-    private final DvachUriBuilder mDvachUriBuilder;
+    private final IUrlBuilder mUrlBuilder;
     private static Boolean isTablet = null;
 
-    public PostItemViewBuilder(Context context, String boardName, String threadNumber, ApplicationSettings settings, DvachUriBuilder dvachUriBuilder) {
+    public PostItemViewBuilder(Context context, String website, String boardName, String threadNumber, ApplicationSettings settings) {
         this.mAppContext = context.getApplicationContext();
         this.mInflater = LayoutInflater.from(context);
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mSettings = settings;
         this.mWindowManager = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
-        this.mDvachUriBuilder = dvachUriBuilder;
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
@@ -85,14 +88,14 @@ public class PostItemViewBuilder {
             vb.badgeView = view.findViewById(R.id.badge_view);
             vb.badgeImage = (ImageView) view.findViewById(R.id.badge_image);
             vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
-            
+
             vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
             vb.thumbnailViews = new ThumbnailViewBag[4];
             vb.thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
             vb.thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
             vb.thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
             vb.thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
-            
+
             view.setTag(vb);
         }
 
@@ -122,36 +125,36 @@ public class PostItemViewBuilder {
         String name = item.getName();
         String trip = item.getTrip();
         String subject = item.getSubject();
-        
+
         if (isTablet == null) isTablet = Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(mAppContext);
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
             if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
                 name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
             }
-            vb.postNameView.setText(MyHtml.fromHtml(name, HtmlUtils.sImageGetter, null));
+            vb.postNameView.setText(MyHtml.fromHtml(name, null, null));
             vb.postNameView.setVisibility(View.VISIBLE);
         } else {
             vb.postNameView.setVisibility(View.GONE);
         }
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(trip)) {
-            vb.postTripView.setText(MyHtml.fromHtml(trip, HtmlUtils.sImageGetter, null));
+            vb.postTripView.setText(MyHtml.fromHtml(trip, null, null));
             vb.postTripView.setVisibility(View.VISIBLE);
         } else {
             vb.postTripView.setVisibility(View.GONE);
         }
         if (!StringUtils.isEmptyOrWhiteSpace(subject)) {
-            vb.postSubjectView.setText(MyHtml.fromHtml(subject, HtmlUtils.sImageGetter, null));
+            vb.postSubjectView.setText(MyHtml.fromHtml(subject, null, null));
             vb.postSubjectView.setVisibility(View.VISIBLE);
         } else {
             vb.postSubjectView.setVisibility(View.GONE);
         }
-        
+
         if (item.isSage()) {
             vb.postSageView.setVisibility(View.VISIBLE);
         } else {
             vb.postSageView.setVisibility(View.GONE);
         }
-        
+
         if (item.isOp()) {
             vb.postOpView.setVisibility(View.VISIBLE);
         } else {
@@ -169,12 +172,12 @@ public class PostItemViewBuilder {
         // Обрабатываем прикрепленные файлы
         if (item.getAttachmentsNumber() == 1) {
             vb.multiThumbnailsView.setVisibility(View.GONE);
-            
+
             ThreadPostUtils.refreshAttachmentView(isBusy, item.getAttachment(0), vb.singleThumbnailView);
         } else if (item.getAttachmentsNumber() > 1) {
             vb.multiThumbnailsView.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.hide();
-            
+
             for (int i = 0; i < 4; ++i) {
                 ThreadPostUtils.refreshAttachmentView(isBusy, item.getAttachment(i), vb.thumbnailViews[i]);
             }
@@ -209,7 +212,7 @@ public class PostItemViewBuilder {
             vb.badgeView.setVisibility(View.VISIBLE);
             vb.badgeTitle.setText(badge.title);
 
-            Uri uri = this.mDvachUriBuilder.adjustRelativeUri(Uri.parse(badge.source));
+            Uri uri = Uri.parse(this.mUrlBuilder.getIconUrl(badge.source));
             this.mBitmapManager.fetchBitmapOnThread(uri, vb.badgeImage, false, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
@@ -286,7 +289,7 @@ public class PostItemViewBuilder {
         currentDialog.setCanceledOnTouchOutside(true);
         currentDialog.setContentView(view);
         currentDialog.show();
-        
+
         if (coordinates != null)
             AppearanceUtils.callWhenLoaded(view, new Runnable(){
                 @Override
@@ -311,7 +314,7 @@ public class PostItemViewBuilder {
                     }
                     gravity |= gravityLeft ? Gravity.LEFT : Gravity.RIGHT;
                     gravity |= gravityTop ? Gravity.TOP : Gravity.BOTTOM;
-                    
+
                     //нужен новый диалог, т.к. в противном случае неправильно определяются координаты следующей ссылки
                     ((ViewGroup) view.getParent()).removeView(view);
                     currentDialog.hide();
@@ -337,7 +340,7 @@ public class PostItemViewBuilder {
         if (item == null || vb == null) {
             return;
         }
-        
+
         if (item.getAttachmentsNumber() == 1) {
             ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
         } else if (item.getAttachmentsNumber() > 1) {
@@ -365,7 +368,7 @@ public class PostItemViewBuilder {
         public View badgeView;
         public ImageView badgeImage;
         public TextView badgeTitle;
-        
+
         public View multiThumbnailsView;
         public ThumbnailViewBag[] thumbnailViews;
     }

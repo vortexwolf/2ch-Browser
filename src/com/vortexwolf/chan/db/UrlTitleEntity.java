@@ -1,9 +1,15 @@
 package com.vortexwolf.chan.db;
 
+import com.vortexwolf.chan.common.Websites;
+import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
+
 public class UrlTitleEntity {
     private long id;
+    private String website;
+    private String board;
+    private String thread;
     private String title;
-    private String url;
 
     public void setId(long id) {
         this.id = id;
@@ -11,6 +17,14 @@ public class UrlTitleEntity {
 
     public long getId() {
         return this.id;
+    }
+
+    public String getWebsite() {
+        return this.website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public void setTitle(String title) {
@@ -21,16 +35,38 @@ public class UrlTitleEntity {
         return this.title;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public String getBoard() {
+        return board;
     }
 
-    public String getUrl() {
-        return this.url;
+    public void setBoard(String board) {
+        this.board = board;
     }
 
-    @Override
-    public String toString() {
-        return this.id + " " + this.title;
+    public String getThread() {
+        return thread;
+    }
+
+    public void setThread(String thread) {
+        this.thread = thread;
+    }
+
+    public String buildUrl() {
+        IUrlBuilder builder = Websites.getUrlBuilder(this.website);
+        if (StringUtils.isEmpty(this.thread)) {
+            return builder.getPageUrlHtml(this.board, 0);
+        } else {
+            return builder.getThreadUrlHtml(this.board, this.thread);
+        }
+    }
+
+    public String getTitleOrDefault() {
+        if (!StringUtils.isEmpty(this.title)) {
+            return this.title;
+        } else if (StringUtils.isEmpty(this.thread)) {
+            return this.board;
+        } else {
+            return this.board + "/" + this.thread;
+        }
     }
 }

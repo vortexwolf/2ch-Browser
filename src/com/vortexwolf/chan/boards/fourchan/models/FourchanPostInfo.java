@@ -44,4 +44,10 @@ public class FourchanPostInfo {
 
     @JsonProperty("h")
     public int fileHeight;
+
+    @JsonProperty("country")
+    public String country;
+
+    @JsonProperty("country_name")
+    public String countryName;
 }

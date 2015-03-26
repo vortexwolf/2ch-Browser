@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
+import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -20,24 +22,25 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IBusyAdapter {
 
     private final LayoutInflater mInflater;
+    private final String mWebsite;
     private final String mBoardName;
     private final PostItemViewBuilder mPostItemViewBuilder;
     private final ApplicationSettings mSettings;
     private final Theme mTheme;
-    private final DvachUriBuilder mDvachUriBuilder;
+    private final IUrlBuilder mUrlBuilder;
 
     private boolean mIsBusy = false;
 
-    public FoundPostsListAdapter(Context context, String boardName, ApplicationSettings settings, Theme theme, DvachUriBuilder dvachUriBuilder) {
+    public FoundPostsListAdapter(Context context, String website, String boardName, Theme theme) {
         super(context.getApplicationContext(), 0);
 
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mInflater = LayoutInflater.from(context);
-        this.mSettings = settings;
+        this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mTheme = theme;
-        this.mDvachUriBuilder = dvachUriBuilder;
-
-        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mBoardName, null, this.mSettings, this.mDvachUriBuilder);
+        this.mUrlBuilder = Websites.getUrlBuilder(website);
+        this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mWebsite, this.mBoardName, null, this.mSettings);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
                     attachment.setPath(image.substring(image.indexOf("/") + 1, image.length()));
                 }
             }
-            PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, item.getParentThread(), this.getCount(), item, this.mTheme, ClickListenersFactory.getDefaultSpanClickListener(this.mDvachUriBuilder));
+            PostItemViewModel viewModel = new PostItemViewModel(this.mWebsite, this.mBoardName, item.getParentThread(), this.getCount(), item, this.mTheme, ClickListenersFactory.getDefaultSpanClickListener(this.mUrlBuilder));
             this.add(viewModel);
         }
     }

@@ -58,7 +58,7 @@ public class OpenTabsFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         OpenTabModel item = this.mAdapter.getItem(position);
-        if (item.getUri().equals(this.mCurrentUri)) {
+        if (item.buildUrl().equals(this.mCurrentUri)) {
             this.getActivity().finish();
         } else {
             this.mTabsManager.navigate(item, this.getActivity());
@@ -93,7 +93,7 @@ public class OpenTabsFragment extends ListFragment {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
 
-        if (!this.mFavoritesDatasource.hasFavorites(item.getUri().toString())) {
+        if (!this.mFavoritesDatasource.hasFavorites(item.getWebsite(), item.getBoard(), item.getThread())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
@@ -107,18 +107,18 @@ public class OpenTabsFragment extends ListFragment {
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = model.getUri().toString();
+                String uri = model.buildUrl();
 
                 CompatibilityUtils.copyText(this.getActivity(), uri, uri);
                 AppearanceUtils.showToastMessage(this.getActivity(), uri);
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
-                this.mFavoritesDatasource.addToFavorites(model.getTitle(), model.getUri().toString());
+                this.mFavoritesDatasource.addToFavorites(model.getWebsite(), model.getBoard(), model.getThread(), model.getTitle());
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                this.mFavoritesDatasource.removeFromFavorites(model.getUri().toString());
+                this.mFavoritesDatasource.removeFromFavorites(model.getWebsite(), model.getBoard(), model.getThread());
                 return true;
             }
         }

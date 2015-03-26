@@ -3,13 +3,16 @@ package com.vortexwolf.chan.models.presentation;
 import android.content.res.Resources.Theme;
 import android.text.SpannableStringBuilder;
 
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class ThreadItemViewModel {
+    private final String mWebsite;
     private final String mBoardName;
     private final Theme mTheme;
     private final PostModel mOpPost;
@@ -20,11 +23,14 @@ public class ThreadItemViewModel {
     private AttachmentInfo[] mAttachments = new AttachmentInfo[4];
     private boolean mEllipsized = false;
     private boolean mHidden = false;
+    private IUrlBuilder mUrlBuilder;
 
-    public ThreadItemViewModel(String boardName, ThreadModel model, Theme theme) {
+    public ThreadItemViewModel(String website, String boardName, ThreadModel model, Theme theme) {
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mTheme = theme;
 
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mOpPost = model.getPosts()[0];
         this.mReplyCount = model.getReplyCount();
         this.mImageCount = model.getImageCount();
@@ -38,7 +44,7 @@ public class ThreadItemViewModel {
 
     private SpannableStringBuilder createSpannedComment() {
         String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
-        SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme);
+        SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme, this.mUrlBuilder);
         return spanned;
     }
 
@@ -69,7 +75,7 @@ public class ThreadItemViewModel {
         }
 
         if (this.mAttachments[index] == null) {
-            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mBoardName, this.mOpPost.getNumber());
+            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mWebsite, this.mBoardName, this.mOpPost.getNumber());
         }
 
         return this.mAttachments[index];

@@ -34,10 +34,10 @@ import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.IoUtils;
@@ -50,7 +50,7 @@ import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
-import com.vortexwolf.chan.interfaces.IPostSender;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.CaptchaEntity.Type;
 import com.vortexwolf.chan.models.domain.SendPostModel;
@@ -67,15 +67,15 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
 
-    private final IPostSender mPostSender = Factory.resolve(IPostSender.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final IDraftPostsStorage mDraftPostsStorage = Factory.resolve(IDraftPostsStorage.class);
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
-    private final DvachUriBuilder mUriBuilder = Factory.resolve(DvachUriBuilder.class);
     private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
+    private IUrlBuilder mUrlBuilder;
 
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
+    private String mWebsite;
     private String mBoardName;
     private String mThreadNumber;
     private Uri mRefererUri;
@@ -116,11 +116,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         // Парсим название борды и номер треда
         Bundle extras = this.getIntent().getExtras();
-        if (extras != null) {
-            this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
-            this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
-            this.mRefererUri = UriUtils.createRefererUri(this.mBoardName, this.mThreadNumber);
-        }
+        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
+        this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
+
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mRefererUri = UriUtils.createRefererUri(this.mUrlBuilder, this.mBoardName, this.mThreadNumber);
 
         this.resetUI();
 
@@ -372,7 +373,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             Intent reIntent = new Intent(this, NewRecaptchaActivity.class);
             startActivityForResult(reIntent, Constants.REQUEST_CODE_RECAPTCHA);
         } else {
-            this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, pe);
+            this.mCurrentPostSendTask = new SendPostTask(this, this, this.mWebsite, this.mBoardName, this.mThreadNumber, pe);
             this.mCurrentPostSendTask.execute();
         }
     }
@@ -410,7 +411,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         }
 
         if (error.startsWith("503")) {
-            String url = Factory.resolve(DvachUriBuilder.class).createUri("/makaba/posting.fcgi").toString();
+            String url = this.mUrlBuilder.getPostingUrlHtml();
             new CloudflareCheckService(url, this, new ICloudflareCheckListener() {
                 public void onSuccess() {
                     refreshCaptcha();
@@ -577,7 +578,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                         this.mCurrentPostSendTask.cancel(true);
                     }
                     this.mCachedSendPostModel.setRecaptchaHash(hash);
-                    this.mCurrentPostSendTask = new SendPostTask(this.mPostSender, this, this, this.mBoardName, this.mThreadNumber, this.mCachedSendPostModel);
+                    this.mCurrentPostSendTask = new SendPostTask(this, this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mCachedSendPostModel);
                     this.mCachedSendPostModel = null;
                     this.mCurrentPostSendTask.execute();
                 }
@@ -677,7 +678,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mRefererUri, this.mCfRecaptcha);
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mWebsite, this.mRefererUri, this.mCfRecaptcha);
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

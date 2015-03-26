@@ -4,18 +4,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.StringUtils;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
+
 public class HistoryDataSource {
     private static final String TABLE = DvachSqlHelper.TABLE_HISTORY;
-    private static final String[] ALL_COLUMNS = { DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_TITLE,
-            DvachSqlHelper.COLUMN_URL, DvachSqlHelper.COLUMN_CREATED };
+    private static final String[] ALL_COLUMNS = {
+        DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
+        DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER,
+        DvachSqlHelper.COLUMN_TITLE, DvachSqlHelper.COLUMN_CREATED
+    };
+    private static final int QUERY_LIMIT = 200;
 
     private final DvachSqlHelper mDbHelper;
 
@@ -33,36 +37,41 @@ public class HistoryDataSource {
         this.mDbHelper.close();
     }
 
-    public void addHistory(String title, String url) {
+    public void addHistory(String website, String board, String thread, String title) {
         long currentTime = new Date().getTime();
 
         // добавляю только если не было такой же ссылки последние 24 часа
-        if (!this.hasHistoryLastDay(url, currentTime)) {
+        if (!this.hasHistoryLastDay(website, board, thread, currentTime)) {
             ContentValues values = new ContentValues();
-            values.put(DvachSqlHelper.COLUMN_TITLE, StringUtils.emptyIfNull(title));
-            values.put(DvachSqlHelper.COLUMN_URL, url);
+            values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
+            values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
+            values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, StringUtils.emptyIfNull(thread));
+            values.put(DvachSqlHelper.COLUMN_TITLE, title);
             values.put(DvachSqlHelper.COLUMN_CREATED, currentTime);
 
             try {
-                long insertId = this.mDatabase.insertOrThrow(TABLE, null, values);
+                this.mDatabase.insertOrThrow(TABLE, null, values);
             } catch (Exception e) {
                 MyLog.e("HistoryDataSource", e);
             }
         }
     }
-    
-    public void updateHistoryItem(String url, String title) {
+
+    public void updateHistoryItem(String website, String board, String thread, String title) {
         ContentValues values = new ContentValues();
-        values.put(DvachSqlHelper.COLUMN_TITLE, StringUtils.emptyIfNull(title));
-        
-        this.mDatabase.update(TABLE, values, 
-                DvachSqlHelper.COLUMN_URL + " = ?", new String[] { url });
+        values.put(DvachSqlHelper.COLUMN_TITLE, title);
+
+        this.mDatabase.update(TABLE, values,
+                DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+                new String[] { website, board, StringUtils.emptyIfNull(thread) });
     }
 
     public List<HistoryEntity> getAllHistory() {
         List<HistoryEntity> history = new ArrayList<HistoryEntity>();
 
-        Cursor cursor = this.mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", "200");
+        Cursor cursor = this.mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", QUERY_LIMIT + "");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             HistoryEntity he = this.createHistoryEntity(cursor);
@@ -79,10 +88,15 @@ public class HistoryDataSource {
         this.mDatabase.delete(TABLE, null, null);
     }
 
-    private boolean hasHistoryLastDay(String url, long currentTime) {
+    private boolean hasHistoryLastDay(String website, String board, String thread, long currentTime) {
         long dayAgo = currentTime - 24 * 3600 * 1000;
 
-        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE + " where " + DvachSqlHelper.COLUMN_URL + " = ? and " + DvachSqlHelper.COLUMN_CREATED + " > " + dayAgo, new String[] { url });
+        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE +
+                " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?" +
+                " and " + DvachSqlHelper.COLUMN_CREATED + " > " + dayAgo,
+                new String[] { website, board, StringUtils.emptyIfNull(thread) });
 
         cursor.moveToFirst();
         long count = cursor.getLong(0);
@@ -92,14 +106,21 @@ public class HistoryDataSource {
     }
 
     private HistoryEntity createHistoryEntity(Cursor c) {
-        return this.createHistoryEntity(c.getLong(0), c.getString(1), c.getString(2));
+        long id = c.getLong(c.getColumnIndex(DvachSqlHelper.COLUMN_ID));
+        String website = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_WEBSITE));
+        String board = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_BOARD_NAME));
+        String thread = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_THREAD_NUMBER));
+        String title = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_TITLE));
+        return this.createHistoryEntity(id, website, board, thread, title);
     }
 
-    private HistoryEntity createHistoryEntity(long id, String title, String url) {
+    private HistoryEntity createHistoryEntity(long id, String website, String board, String thread, String title) {
         HistoryEntity result = new HistoryEntity();
         result.setId(id);
+        result.setWebsite(website);
+        result.setBoard(board);
+        result.setThread(thread);
         result.setTitle(title);
-        result.setUrl(url);
 
         return result;
     }

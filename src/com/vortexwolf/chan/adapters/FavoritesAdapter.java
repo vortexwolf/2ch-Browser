@@ -32,8 +32,8 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
         TextView urlView = (TextView) view.findViewById(R.id.tabs_item_url);
         ImageView deleteButton = (ImageView) view.findViewById(R.id.tabs_item_delete);
 
-        titleView.setText(item.getTitle());
-        urlView.setText(item.getUrl());
+        titleView.setText(item.getTitleOrDefault());
+        urlView.setText(item.buildUrl());
 
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +46,7 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
     }
 
     public void removeItem(FavoritesEntity item) {
-        this.mFavoritesDataSource.removeFromFavorites(item.getUrl());
+        this.mFavoritesDataSource.removeFromFavorites(item.getWebsite(), item.getBoard(), item.getThread());
         this.mFavoritesDataSource.resetModifiedState();
         this.remove(item);
     }

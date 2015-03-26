@@ -9,42 +9,71 @@ import com.vortexwolf.chan.activities.BrowserActivity;
 import com.vortexwolf.chan.activities.PickBoardActivity;
 import com.vortexwolf.chan.activities.PostsListActivity;
 import com.vortexwolf.chan.activities.ThreadsListActivity;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.interfaces.IUrlParser;
 
 public class NavigationService {
-    private final DvachUriParser mUriParser;
 
-    public NavigationService(DvachUriParser uriParser) {
-        this.mUriParser = uriParser;
+    public NavigationService() {
     }
 
-    public void navigate(Uri uri, Context context) {
-        Bundle extras = new Bundle();
-        extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
+    public void navigate(Uri uri, Context context, Integer flags, boolean preferDeserialized) {
+        String website = Websites.fromUri(uri);
+        IUrlParser urlParser = Websites.getUrlParser(website);
 
-        this.navigate(uri, context, extras, null);
-    }
-
-    public void navigate(Uri uri, Context context, Bundle extras, Integer flags) {
-        Class c;
-        if (this.mUriParser.isBoardUri(uri)) {
-            c = ThreadsListActivity.class;
-        } else if (this.mUriParser.isThreadUri(uri)) {
-            c = PostsListActivity.class;
+        if (urlParser.isBoardUri(uri)) {
+            this.navigateBoardPage(context, null, website, urlParser.getBoardName(uri), urlParser.getBoardPageNumber(uri), preferDeserialized);
+        } else if (urlParser.isThreadUri(uri)) {
+            this.navigateThread(context, null, website, urlParser.getBoardName(uri), urlParser.getThreadNumber(uri), null, urlParser.getPostNumber(uri), preferDeserialized);
         } else if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {
-            c = BrowserActivity.class;
+            this.navigateActivity(context, BrowserActivity.class, uri, null, flags);
         } else {
-            c = PickBoardActivity.class;
+            this.navigateBoardList(context, website, false);
+        }
+    }
+
+    public void navigateBoardPage(Context context, Bundle extras, String website, String board, int page, boolean preferDeserialized) {
+        extras = extras != null ? extras : new Bundle();
+        extras.putString(Constants.EXTRA_WEBSITE, website);
+        extras.putString(Constants.EXTRA_BOARD_NAME, board);
+        extras.putInt(Constants.EXTRA_BOARD_PAGE, page);
+        if (preferDeserialized) {
+            extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
         }
 
-        this.navigateActivity(context, c, uri, extras, flags);
+        this.navigateActivity(context, ThreadsListActivity.class, null, extras, null);
     }
 
-    private void navigateActivity(Context context, Class<?> activityClass, Uri uri, Bundle extras, Integer flags) {
+    public void navigateThread(Context context, Bundle extras, String website, String board, String thread, String subject, String post, boolean preferDeserialized) {
+        extras = extras != null ? extras : new Bundle();
+        extras.putString(Constants.EXTRA_WEBSITE, website);
+        extras.putString(Constants.EXTRA_BOARD_NAME, board);
+        extras.putString(Constants.EXTRA_THREAD_NUMBER, thread);
+        extras.putString(Constants.EXTRA_THREAD_SUBJECT, subject);
+        extras.putString(Constants.EXTRA_POST_NUMBER, post);
+        if (preferDeserialized) {
+            extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
+        }
+
+        this.navigateActivity(context, PostsListActivity.class, null, extras, null);
+    }
+
+    public void navigateBoardList(Context context, String website, boolean flagNoHistory) {
+        Bundle extras = new Bundle();
+        extras.putString(Constants.EXTRA_WEBSITE, website);
+
+        Integer flags = flagNoHistory ? Intent.FLAG_ACTIVITY_NO_HISTORY : null;
+
+        this.navigateActivity(context, PickBoardActivity.class, null, extras, flags);
+    }
+
+    private void navigateActivity(Context context, Class<?> activityClass, Uri data, Bundle extras, Integer flags) {
         Intent i = new Intent(context.getApplicationContext(), activityClass);
-        i.setData(uri);
+        if (data != null) {
+            i.setData(data);
+        }
         if (extras != null) {
             i.putExtras(extras);
         }

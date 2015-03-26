@@ -10,13 +10,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.EllipsizingTextView;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
+import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
@@ -31,22 +32,24 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     private final Theme mTheme;
     private final ApplicationSettings mSettings;
     private final HiddenThreadsDataSource mHiddenThreadsDataSource;
-    private final DvachUriBuilder mDvachUriBuilder;
     private final ThreadImagesService mThreadImagesService;
+    private IUrlBuilder mUrlBuilder;
 
+    private final String mWebsite;
     private final String mBoardName;
 
     private boolean mIsBusy = false;
 
-    public ThreadsListAdapter(Context context, String boardName, ApplicationSettings settings, Theme theme, HiddenThreadsDataSource hiddenThreadsDataSource, DvachUriBuilder dvachUriBuilder) {
+    public ThreadsListAdapter(Context context, String website, String boardName, Theme theme) {
         super(context.getApplicationContext(), 0);
 
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mTheme = theme;
         this.mInflater = LayoutInflater.from(context);
-        this.mSettings = settings;
-        this.mHiddenThreadsDataSource = hiddenThreadsDataSource;
-        this.mDvachUriBuilder = dvachUriBuilder;
+        this.mSettings = Factory.resolve(ApplicationSettings.class);
+        this.mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
+        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     }
 
@@ -137,7 +140,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         vb.repliesNumberView.setText(repliesText);
 
         // Обрабатываем прикрепленные файлы
-        String threadUrl = this.mDvachUriBuilder.createThreadUri(this.mBoardName, item.getNumber());
+        String threadUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, item.getNumber());
         if (!this.mThreadImagesService.hasThreadImages(threadUrl)) {
             for (int i = 0; i < 4; ++i) {
                 this.mThreadImagesService.addThreadImage(threadUrl, item.getAttachment(i));
@@ -164,8 +167,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.clear();
 
         for (ThreadModel ti : threads) {
-            ThreadItemViewModel model = new ThreadItemViewModel(this.mBoardName, ti, this.mTheme);
-            boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mBoardName, model.getNumber());
+            ThreadItemViewModel model = new ThreadItemViewModel(this.mWebsite, this.mBoardName, ti, this.mTheme);
+            boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mWebsite, this.mBoardName, model.getNumber());
             model.setHidden(isHidden);
 
             this.add(model);

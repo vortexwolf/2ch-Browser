@@ -14,11 +14,13 @@ public class PostsViewModel {
 
     private final HashMap<String, PostItemViewModel> mViewModels = new HashMap<String, PostItemViewModel>();
     private String mLastPostNumber = null;
-    
+
+    private final String mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
-    
-    public PostsViewModel(String boardName, String threadNumber) {
+
+    public PostsViewModel(String website, String boardName, String threadNumber) {
+        this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
     }
@@ -38,7 +40,7 @@ public class PostsViewModel {
     }
 
     private PostItemViewModel addModel(PostModel item, Theme theme, IURLSpanClickListener listener) {
-        PostItemViewModel viewModel = new PostItemViewModel(this.mBoardName, this.mThreadNumber, this.mViewModels.size(), item, theme, listener);
+        PostItemViewModel viewModel = new PostItemViewModel(this.mWebsite, this.mBoardName, this.mThreadNumber, this.mViewModels.size(), item, theme, listener);
         this.mViewModels.put(viewModel.getNumber(), viewModel);
 
         this.mLastPostNumber = viewModel.getNumber();
@@ -54,7 +56,7 @@ public class PostsViewModel {
             PostItemViewModel model = this.addModel(item, theme, listener);
             result.add(model);
         }
-        
+
         return result;
     }
 
