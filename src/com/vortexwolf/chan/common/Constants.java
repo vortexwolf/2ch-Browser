@@ -76,6 +76,7 @@ public class Constants {
     public static final String EXTRA_PREFER_DESERIALIZED = "ExtraPreferDeserialized";
     public static final String EXTRA_THREAD_URL = "ExtraThreadUrl";
     public static final String EXTRA_WEBSITE = "ExtraWebsite";
+    public static final String EXTRA_CATALOG = "ExtraCatalog";
 
     // Идентификаторы для контекстного меню
     public static final int CONTEXT_MENU_ANSWER = 1001;

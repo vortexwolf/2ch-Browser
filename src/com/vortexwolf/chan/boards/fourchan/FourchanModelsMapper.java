@@ -1,7 +1,11 @@
 package com.vortexwolf.chan.boards.fourchan;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
+import com.vortexwolf.chan.boards.fourchan.models.FourchanCatalogPage;
+import com.vortexwolf.chan.boards.fourchan.models.FourchanCatalogThread;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanPostInfo;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadInfo;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadsList;
@@ -67,6 +71,35 @@ public class FourchanModelsMapper {
         model.setImageSize(file.fileSize);
         model.setImageWidth(file.fileWidth);
         model.setImageHeight(file.fileHeight);
+
+        return model;
+    }
+
+    public ThreadModel[] mapCatalog(FourchanCatalogPage[] pages) {
+        ArrayList<ThreadModel> threads = new ArrayList<ThreadModel>();
+        for (FourchanCatalogPage page : pages) {
+            threads.addAll(Arrays.asList(this.mapCatalogPage(page)));
+        }
+
+        return threads.toArray(new ThreadModel[threads.size()]);
+    }
+
+    public ThreadModel[] mapCatalogPage(FourchanCatalogPage page) {
+        ThreadModel[] result = new ThreadModel[page.threads.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = this.mapCatalogThread(page.threads[i]);
+        }
+
+        return result;
+    }
+
+    public ThreadModel mapCatalogThread(FourchanCatalogThread thread) {
+        ThreadModel model = new ThreadModel();
+        model.setReplyCount(thread.postsCount);
+        model.setImageCount(thread.filesCount);
+
+        PostModel postModel = this.mapPostModel(thread);
+        model.setPosts(new PostModel[] { postModel });
 
         return model;
     }

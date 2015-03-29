@@ -78,7 +78,9 @@ public class ThreadsListActivity extends BaseListActivity {
     private OpenTabModel mTabModel;
     private String mWebsite;
     private String mBoardName;
-    private int mPageNumber = 0;
+    private int mPageNumber;
+    private boolean mIsCatalog;
+    private int mCatalogFilter = 0;
 
     private Menu mMenu;
 
@@ -91,6 +93,7 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mPageNumber = extras.getInt(Constants.EXTRA_BOARD_PAGE, 0);
+        this.mIsCatalog = extras.getBoolean(Constants.EXTRA_CATALOG);
 
         this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
@@ -99,11 +102,11 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mPostItemViewBuilder = new PostItemViewBuilder(this, this.mWebsite, this.mBoardName, null, this.mSettings);
 
         // Заголовок страницы
-        String pageTitle = this.mPageNumber > 0
+        String pageTitle = this.mIsCatalog
+                ? String.format(this.getString(R.string.data_board_title_catalog), this.mBoardName)
+                : this.mPageNumber > 0
                 ? String.format(this.getString(R.string.data_board_title_with_page), this.mBoardName, this.mPageNumber)
-                : this.mPageNumber == 0
-                ? String.format(this.getString(R.string.data_board_title), this.mBoardName)
-                : String.format(this.getString(R.string.data_board_title_catalog), this.mBoardName);
+                : String.format(this.getString(R.string.data_board_title), this.mBoardName);
         this.setTitle(pageTitle);
 
         // Сохраняем во вкладках
@@ -162,10 +165,10 @@ public class ThreadsListActivity extends BaseListActivity {
 
         // Панель навигации по страницам
         this.mNavigationBar = this.findViewById(R.id.threads_navigation_bar);
-        this.mNavigationBar.setVisibility(this.mPageNumber < 0 ? View.GONE : View.VISIBLE);
+        this.mNavigationBar.setVisibility(this.mIsCatalog ? View.GONE : View.VISIBLE);
 
         this.mCatalogBar = this.findViewById(R.id.threads_catalog_bar);
-        this.mCatalogBar.setVisibility(this.mPageNumber < 0 ? View.VISIBLE : View.GONE);
+        this.mCatalogBar.setVisibility(this.mIsCatalog ? View.VISIBLE : View.GONE);
 
         TextView pageNumberView = (TextView) this.findViewById(R.id.threads_page_number);
         pageNumberView.setText(String.valueOf(this.mPageNumber));
@@ -193,13 +196,13 @@ public class ThreadsListActivity extends BaseListActivity {
         });
 
         Spinner filterSelect = (Spinner) this.findViewById(R.id.threads_filter_select);
-        filterSelect.setSelection(-1-mPageNumber);
+        filterSelect.setSelection(this.mCatalogFilter);
         filterSelect.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (ThreadsListActivity.this.mPageNumber != -1-position) {
-                    ThreadsListActivity.this.mPageNumber = -1-position;
-                    ThreadsListActivity.this.refreshThreads(false);
+                if (mCatalogFilter != position) {
+                    mCatalogFilter = position;
+                    refreshThreads(false);
                 }
             }
             @Override
@@ -220,7 +223,7 @@ public class ThreadsListActivity extends BaseListActivity {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        boolean preferDeserialized = this.getIntent().hasExtra(Constants.EXTRA_PREFER_DESERIALIZED) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+        boolean preferDeserialized = this.getIntent().getBooleanExtra(Constants.EXTRA_PREFER_DESERIALIZED, false) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
 
         if (preferDeserialized) {
             new LoadThreadsTask().execute();
@@ -279,9 +282,9 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.refresh();
                 break;
             case R.id.open_browser_menu_id:
-                String browserUrl = null;
-                if (this.mPageNumber < 0) {
-                    browserUrl = this.mUrlBuilder.getCatalogUrlHtml(this.mBoardName, -1 - this.mPageNumber);
+                String browserUrl;
+                if (this.mIsCatalog) {
+                    browserUrl = this.mUrlBuilder.getCatalogUrlHtml(this.mBoardName, this.mCatalogFilter);
                 } else {
                     browserUrl = this.mUrlBuilder.getPageUrlHtml(this.mBoardName, this.mPageNumber);
                 }
@@ -299,7 +302,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.onSearchRequested();
                 break;
             case R.id.menu_catalog_id:
-                this.navigateToCatalog(this.mBoardName, -1);
+                this.navigateToCatalog();
                 break;
             case R.id.add_remove_favorites_menu_id:
                 if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, null)) {
@@ -436,12 +439,8 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mNavigationService.navigateThread(this, null, this.mWebsite, this.mBoardName, threadNumber, threadSubject, null, false);
     }
 
-    // TODO: rewrite without using getPageUrl
-    private void navigateToCatalog(String boardCode, int filter) {
-        AppearanceUtils.showToastMessage(this, "Catalog is not implemented.");
-        /*Intent i = new Intent(this.getApplicationContext(), ThreadsListActivity.class);
-        i.setData(Uri.parse(this.mMakabaUriBuilder.getPageUrlHtml(boardCode, filter)));
-        this.startActivity(i);*/
+    private void navigateToCatalog() {
+        this.mNavigationService.navigateCatalog(this, this.mWebsite, this.mBoardName);
     }
 
     private void navigateToPageNumber(int pageNumber) {
@@ -457,17 +456,19 @@ public class ThreadsListActivity extends BaseListActivity {
             this.mCurrentDownloadTask.cancel(true);
         }
 
-        if (this.mBoardName != null) {
-            this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mPageNumber, checkModified, this.mJsonReader);
-            this.mCurrentDownloadTask.execute();
-        }
+        int pageNumberOrFilter = this.mIsCatalog ? this.mCatalogFilter : this.mPageNumber;
+        this.mCurrentDownloadTask = new DownloadThreadsTask(this, this.mThreadsReaderListener, this.mBoardName, this.mIsCatalog, pageNumberOrFilter, checkModified, this.mJsonReader);
+        this.mCurrentDownloadTask.execute();
     }
 
     private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadModel[]> {
         @Override
         protected ThreadModel[] doInBackground(Void... arg0) {
-            ThreadModel[] threads = mSerializationService.deserializeThreads(mBoardName, mPageNumber);
-            return threads;
+            if (!mIsCatalog) {
+                ThreadModel[] threads = mSerializationService.deserializeThreads(mWebsite, mBoardName, mPageNumber);
+                return threads;
+            }
+            return null;
         }
 
         @Override
@@ -502,7 +503,9 @@ public class ThreadsListActivity extends BaseListActivity {
         @Override
         public void setData(ThreadModel[] threads) {
             if (threads != null && threads.length > 0) {
-                ThreadsListActivity.this.mSerializationService.serializeThreads(ThreadsListActivity.this.mBoardName, ThreadsListActivity.this.mPageNumber, threads);
+                if (!mIsCatalog) {
+                    mSerializationService.serializeThreads(mWebsite, mBoardName, mPageNumber, threads);
+                }
                 ThreadsListActivity.this.setAdapterData(threads);
             } else {
                 String error = ThreadsListActivity.this.getString(R.string.error_list_empty);

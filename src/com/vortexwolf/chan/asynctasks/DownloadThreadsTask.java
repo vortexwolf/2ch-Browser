@@ -21,8 +21,9 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     private final IJsonApiReader mJsonReader;
     private final IListView<ThreadModel[]> mView;
     private final String mBoard;
-    private final int mPageNumber;
+    private final int mPageNumberOrFilter;
     private final boolean mIsCheckModified;
+    private final boolean mIsCatalog;
 
     private ThreadModel[] mThreadsList = null;
     private String mUserError = null;
@@ -32,12 +33,13 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     private long mProgressOffset = 0;
     private double mProgressScale = 1;
 
-    public DownloadThreadsTask(Activity activity, IListView<ThreadModel[]> view, String board, int pageNumber, boolean checkModified, IJsonApiReader jsonReader) {
+    public DownloadThreadsTask(Activity activity, IListView<ThreadModel[]> view, String board, boolean isCatalog, int pageNumberOrFilter, boolean checkModified, IJsonApiReader jsonReader) {
         this.mActivity = activity;
         this.mJsonReader = jsonReader;
         this.mView = view;
         this.mBoard = board;
-        this.mPageNumber = pageNumber;
+        this.mIsCatalog = isCatalog;
+        this.mPageNumberOrFilter = pageNumberOrFilter;
         this.mIsCheckModified = checkModified;
     }
 
@@ -45,7 +47,11 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
     protected Boolean doInBackground(Void... params) {
         // Читаем по ссылке json-объект со списком тредов
         try {
-            this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumber, this.mIsCheckModified, this, this);
+            if (this.mIsCatalog) {
+                this.mThreadsList = this.mJsonReader.readCatalog(this.mBoard, this.mPageNumberOrFilter, this, this);
+            } else {
+                this.mThreadsList = this.mJsonReader.readThreadsList(this.mBoard, this.mPageNumberOrFilter, this.mIsCheckModified, this, this);
+            }
             return true;
         } catch (HtmlNotJsonException he) {
             if (RecaptchaService.isCloudflareCaptchaPage(he.getHtml())) {

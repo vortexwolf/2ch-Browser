@@ -69,6 +69,15 @@ public class NavigationService {
         this.navigateActivity(context, PickBoardActivity.class, null, extras, flags);
     }
 
+    public void navigateCatalog(Context context, String website, String board) {
+        Bundle extras = new Bundle();
+        extras.putString(Constants.EXTRA_WEBSITE, website);
+        extras.putString(Constants.EXTRA_BOARD_NAME, board);
+        extras.putBoolean(Constants.EXTRA_CATALOG, true);
+
+        this.navigateActivity(context, ThreadsListActivity.class, null, extras, null);
+    }
+
     private void navigateActivity(Context context, Class<?> activityClass, Uri data, Bundle extras, Integer flags) {
         Intent i = new Intent(context.getApplicationContext(), activityClass);
         if (data != null) {

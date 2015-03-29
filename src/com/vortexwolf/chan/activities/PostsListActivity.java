@@ -450,7 +450,7 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         protected PostModel[] doInBackground(Void... arg0) {
             // Пробуем десериализовать в любом случае
-            PostModel[] posts = PostsListActivity.this.mSerializationService.deserializePosts(PostsListActivity.this.mBoardName, PostsListActivity.this.mThreadNumber);
+            PostModel[] posts = mSerializationService.deserializePosts(mWebsite, mBoardName, mThreadNumber);
             return posts;
         }
 
@@ -493,7 +493,7 @@ public class PostsListActivity extends BaseListActivity {
         public void setData(PostModel[] posts) {
             if (posts != null && posts.length > 0) {
                 PostsListActivity.this.setAdapterData(posts);
-                mSerializationService.serializePosts(mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
+                mSerializationService.serializePosts(mWebsite, mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
             } else {
                 PostsListActivity.this.mAdapter.clear();
                 this.showError(PostsListActivity.this.getString(R.string.error_list_empty));
@@ -537,7 +537,7 @@ public class PostsListActivity extends BaseListActivity {
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
-                mSerializationService.serializePosts(mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
+                mSerializationService.serializePosts(mWebsite, mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
                 showToastIfVisible(PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             } else {
                 showToastIfVisible(PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));

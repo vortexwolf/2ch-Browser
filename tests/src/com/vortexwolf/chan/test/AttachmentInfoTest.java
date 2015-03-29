@@ -4,13 +4,13 @@ import android.app.Instrumentation;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriBuilder;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfoTest extends InstrumentationTestCase {
 
+    private final String mWebsite = "2ch";
     private final String mBoardCode = "test";
     private final String mThreadNumber = "123456";
 
@@ -21,7 +21,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase {
 
     public void testEmptyAttachment() {
         AttachmentModel model = new AttachmentModel();
-        AttachmentInfo info = new AttachmentInfo(model, this.mBoardCode, this.mThreadNumber);
+        AttachmentInfo info = new AttachmentInfo(model, this.mWebsite, this.mBoardCode, this.mThreadNumber);
 
         assertTrue(info.isEmpty());
         assertEquals(info.getDescription(), "");
@@ -35,7 +35,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase {
         AttachmentModel model = new AttachmentModel();
         model.setPath("src/123.mp3");
         model.setImageSize(9000);
-        AttachmentInfo info = new AttachmentInfo(model, this.mBoardCode, this.mThreadNumber);
+        AttachmentInfo info = new AttachmentInfo(model, this.mWebsite, this.mBoardCode, this.mThreadNumber);
 
         assertFalse(info.isEmpty());
         assertEquals(info.getDescription(), "9000KB");
@@ -50,7 +50,7 @@ public class AttachmentInfoTest extends InstrumentationTestCase {
         model.setPath("src/123.jpg");
         model.setThumbnailUrl("thumb/123s.jpg");
         model.setImageSize(9000);
-        AttachmentInfo info = new AttachmentInfo(model, this.mBoardCode, this.mThreadNumber);
+        AttachmentInfo info = new AttachmentInfo(model, this.mWebsite, this.mBoardCode, this.mThreadNumber);
 
         assertFalse(info.isEmpty());
         assertEquals(info.getDescription(), "9000KB");

@@ -19,40 +19,40 @@ public class PagesSerializationService {
         this.mSerializationService = serializationService;
     }
 
-    public void serializeThreads(String boardName, int pageNumber, ThreadModel[] threads) {
-        File file = this.getBoardFilePath(boardName, pageNumber);
+    public void serializeThreads(String website, String boardName, int pageNumber, ThreadModel[] threads) {
+        File file = this.getBoardFilePath(website, boardName, pageNumber);
 
         this.mSerializationService.serializeObject(file, threads);
     }
 
-    public void serializePosts(String boardName, String threadNumber, PostModel[] posts) {
-        File file = this.getThreadFilePath(boardName, threadNumber);
+    public void serializePosts(String website, String boardName, String threadNumber, PostModel[] posts) {
+        File file = this.getThreadFilePath(website, boardName, threadNumber);
 
         this.mSerializationService.serializeObject(file, posts);
     }
 
-    public ThreadModel[] deserializeThreads(String boardName, int pageNumber) {
-        File file = this.getBoardFilePath(boardName, pageNumber);
+    public ThreadModel[] deserializeThreads(String website, String boardName, int pageNumber) {
+        File file = this.getBoardFilePath(website, boardName, pageNumber);
 
         ThreadModel[] threads = (ThreadModel[]) this.mSerializationService.deserializeObject(file);
 
         return threads;
     }
     
-    public PostModel[] deserializePosts(String boardName, String threadNumber) {
-        File file = this.getThreadFilePath(boardName, threadNumber);
+    public PostModel[] deserializePosts(String website, String boardName, String threadNumber) {
+        File file = this.getThreadFilePath(website, boardName, threadNumber);
 
         PostModel[] posts = (PostModel[]) this.mSerializationService.deserializeObject(file);
 
         return posts;
     }
 
-    private File getBoardFilePath(String boardName, int pageNumber) {
-        return this.getFilePath(boardName + "_page" + pageNumber);
+    private File getBoardFilePath(String website, String boardName, int pageNumber) {
+        return this.getFilePath(website + "_" + boardName + "_page" + pageNumber);
     }
 
-    private File getThreadFilePath(String boardName, String threadNumber) {
-        return this.getFilePath(boardName + "_thread" + threadNumber);
+    private File getThreadFilePath(String website, String boardName, String threadNumber) {
+        return this.getFilePath(website + "_" + boardName + "_thread" + threadNumber);
     }
 
     private File getFilePath(String fileName) {

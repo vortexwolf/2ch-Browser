@@ -48,11 +48,21 @@ public class MakabaApiReader implements IJsonApiReader {
     }
 
     @Override
-    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        if (page < 0) {
-            return readCatalog(boardName, page, checkModified, listener, task);
+    public ThreadModel[] readCatalog(String boardName, int filter, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        String uri = this.mMakabaUriBuilder.getCatalogUrlApi(boardName, filter);
+
+        JsonNode json = this.mJsonReader.readData(uri, false, listener, task);
+        if (json == null) {
+            return null;
         }
 
+        MakabaThreadsListCatalog result = this.parseDataOrThrowError(json, MakabaThreadsListCatalog.class);
+        ThreadModel[] models = this.mMakabaModelsMapper.mapCatalog(result);
+        return models;
+    }
+
+    @Override
+    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.mMakabaUriBuilder.getPageUrlApi(boardName, page);
 
         JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
@@ -77,19 +87,6 @@ public class MakabaApiReader implements IJsonApiReader {
                 Factory.resolve(IconsList.class).setData(boardName, icons);
             } else Factory.resolve(IconsList.class).setData(boardName, null);
         } catch (Exception e) { MyLog.e(TAG, e); }
-    }
-
-    private ThreadModel[] readCatalog(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = this.mMakabaUriBuilder.getCatalogUrlApi(boardName, -1 - page);
-
-        JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
-        if (json == null) {
-            return null;
-        }
-
-        MakabaThreadsListCatalog result = this.parseDataOrThrowError(json, MakabaThreadsListCatalog.class);
-        ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
-        return models;
     }
 
     @Override

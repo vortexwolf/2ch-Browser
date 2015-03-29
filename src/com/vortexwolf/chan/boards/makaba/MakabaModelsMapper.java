@@ -46,7 +46,7 @@ public class MakabaModelsMapper {
         return model;
     }
 
-    public ThreadModel[] mapThreadModels(MakabaThreadsListCatalog source){
+    public ThreadModel[] mapCatalog(MakabaThreadsListCatalog source){
         ThreadModel[] result = new ThreadModel[source.threads.length];
         for (int i = 0; i < result.length; i++) {
             ThreadModel model = new ThreadModel();

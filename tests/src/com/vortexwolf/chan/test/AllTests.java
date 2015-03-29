@@ -14,7 +14,6 @@ public class AllTests {
         suite.addTestSuite(HtmlUtilsTest.class);
         suite.addTestSuite(HtmlCaptchaCheckerTest.class);
         suite.addTestSuite(ThreadPostUtilsTest.class);
-        suite.addTestSuite(DvachUriBuilderTest.class);
         //$JUnit-END$
         return suite;
     }

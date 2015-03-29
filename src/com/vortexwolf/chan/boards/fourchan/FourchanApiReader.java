@@ -5,6 +5,7 @@ import org.codehaus.jackson.JsonNode;
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.fourchan.models.FourchanCatalogPage;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadInfo;
 import com.vortexwolf.chan.boards.fourchan.models.FourchanThreadsList;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
@@ -29,6 +30,20 @@ public class FourchanApiReader implements IJsonApiReader {
         this.mFourchanUriBuilder = uriBuilder;
         this.mFourchanModelsMapper = modelsMapper;
         this.mResources = resources;
+    }
+
+    @Override
+    public ThreadModel[] readCatalog(String boardName, int filter, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        String uri = this.mFourchanUriBuilder.getCatalogUrlApi(boardName, filter);
+
+        JsonNode json = this.mJsonReader.readData(uri, false, listener, task);
+        if (json == null) {
+            return null;
+        }
+
+        FourchanCatalogPage[] result = parseDataOrThrowError(json, FourchanCatalogPage[].class);
+        ThreadModel[] models = this.mFourchanModelsMapper.mapCatalog(result);
+        return models;
     }
 
     @Override
