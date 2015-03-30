@@ -10,7 +10,6 @@ import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
@@ -65,7 +64,6 @@ public class MainApplication extends Application {
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder(settings);
-        DvachUriParser uriParser = new DvachUriParser();
         MakabaUrlParser makabaUriParser = new MakabaUrlParser();
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());
@@ -85,7 +83,6 @@ public class MainApplication extends Application {
 
         Container container = Factory.getContainer();
         container.register(Resources.class, this.getResources());
-        container.register(DvachUriParser.class, uriParser);
         container.register(MakabaUrlParser.class, makabaUriParser);
         container.register(MakabaUrlBuilder.class, makabaUriBuilder);
         container.register(ApplicationSettings.class, settings);

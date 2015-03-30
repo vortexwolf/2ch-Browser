@@ -34,7 +34,6 @@ import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
 import com.vortexwolf.chan.asynctasks.DownloadCaptchaTask;
 import com.vortexwolf.chan.asynctasks.SendPostTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
@@ -51,6 +50,7 @@ import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IUrlParser;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.CaptchaEntity.Type;
 import com.vortexwolf.chan.models.domain.SendPostModel;
@@ -70,7 +70,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final IDraftPostsStorage mDraftPostsStorage = Factory.resolve(IDraftPostsStorage.class);
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
-    private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
+    private IUrlParser mUrlParser;
     private IUrlBuilder mUrlBuilder;
 
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
@@ -78,7 +78,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private String mWebsite;
     private String mBoardName;
     private String mThreadNumber;
-    private Uri mRefererUri;
     private CaptchaViewType mCurrentCaptchaView = null;
     private Bitmap mCaptchaBitmap;
     private boolean mCaptchaPasscodeSuccess;
@@ -121,7 +120,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
 
         this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
-        this.mRefererUri = UriUtils.createRefererUri(this.mUrlBuilder, this.mBoardName, this.mThreadNumber);
+        this.mUrlParser = Websites.getUrlParser(this.mWebsite);
 
         this.resetUI();
 
@@ -172,7 +171,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.refreshCaptcha();
         }
 
-        if (Constants.ADD_THREAD_PARENT.equals(this.mThreadNumber)) {
+        if (StringUtils.isEmpty(this.mThreadNumber)) {
             this.setTitle(String.format(this.getString(R.string.data_add_thread_title), this.mBoardName));
             this.mSubjectView.setVisibility(View.VISIBLE);
         } else {
@@ -336,7 +335,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         boolean isSage = this.mSageCheckBox.isChecked();
 
-        if (this.mThreadNumber.equals(Constants.ADD_THREAD_PARENT) && !this.hasAttachments()) {
+        if (StringUtils.isEmpty(this.mThreadNumber) && !this.hasAttachments()) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }
@@ -384,7 +383,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         // return back to the list of posts
         String redirectedThreadNumber = null;
         if (redirectedPage != null) {
-            redirectedThreadNumber = this.mUriParser.getThreadNumber(Uri.parse(redirectedPage));
+            redirectedThreadNumber = this.mUrlParser.getThreadNumber(Uri.parse(redirectedPage));
         }
 
         this.mFinishedSuccessfully = true;
@@ -678,7 +677,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mWebsite, this.mRefererUri, this.mCfRecaptcha);
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mCfRecaptcha);
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

@@ -49,13 +49,6 @@ public class Constants {
 
     public static final int OP_POST_POSITION = 0;
 
-    public static final int YOUTUBE_CODE_LENGTH = 11;
-
-    // Вторая буква обязательно на кириллице, вот такой вот прикол
-    public static final String ADD_POST_FORM_TASK = "pоst";
-    // Если добавляем новый тред, а не пост
-    public static final String ADD_THREAD_PARENT = "";
-
     // Request-коды для запуска метода startActivityForResult
     public static final int REQUEST_CODE_PICK_BOARD_ACTIVITY = 0;
     public static final int REQUEST_CODE_FILE_LIST_ACTIVITY = 1;

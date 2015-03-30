@@ -66,11 +66,11 @@ public class UriUtils {
         return cookieDomain.equalsIgnoreCase(siteDomain);
     }
 
-    public static Uri createRefererUri(IUrlBuilder builder, String boardName, String threadNumber) {
-        if(StringUtils.isEmpty(threadNumber) || threadNumber == Constants.ADD_THREAD_PARENT) {
-            return Uri.parse(builder.getPageUrlHtml(boardName, 0));
+    public static String getBoardOrThreadUrl(IUrlBuilder builder, String boardName, String threadNumber) {
+        if(StringUtils.isEmpty(threadNumber)) {
+            return builder.getPageUrlHtml(boardName, 0);
         }
 
-        return Uri.parse(builder.getThreadUrlHtml(boardName, threadNumber));
+        return builder.getThreadUrlHtml(boardName, threadNumber);
     }
 }

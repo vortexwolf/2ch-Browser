@@ -417,7 +417,7 @@ public class ThreadsListActivity extends BaseListActivity {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
         addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
-        addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, Constants.ADD_THREAD_PARENT);
+        addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, "");
 
         this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }

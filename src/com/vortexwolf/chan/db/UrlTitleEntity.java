@@ -2,6 +2,7 @@ package com.vortexwolf.chan.db;
 
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 
 public class UrlTitleEntity {
@@ -53,11 +54,7 @@ public class UrlTitleEntity {
 
     public String buildUrl() {
         IUrlBuilder builder = Websites.getUrlBuilder(this.website);
-        if (StringUtils.isEmpty(this.thread)) {
-            return builder.getPageUrlHtml(this.board, 0);
-        } else {
-            return builder.getThreadUrlHtml(this.board, this.thread);
-        }
+        return UriUtils.getBoardOrThreadUrl(builder, this.board, this.thread);
     }
 
     public String getTitleOrDefault() {

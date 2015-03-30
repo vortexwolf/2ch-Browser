@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
@@ -20,10 +20,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     private final ICaptchaView mView;
     private final String mWebsite;
-    private final Uri mRefererUri;
+    private final String mBoardName;
+    private final String mThreadNumber;
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
-    private final DvachUriParser mUriParser;
     private final boolean mCfRecaptcha;
 
     private boolean mCanSkip = false;
@@ -33,13 +33,13 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, String website, Uri refererUri, boolean isCfRecaptcha) {
+    public DownloadCaptchaTask(ICaptchaView view, String website, String boardName, String threadNumber, boolean isCfRecaptcha) {
         this.mView = view;
         this.mWebsite = website;
-        this.mRefererUri = refererUri;
+        this.mBoardName = boardName;
+        this.mThreadNumber = threadNumber;
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
-        this.mUriParser = Factory.resolve(DvachUriParser.class);
         this.mCfRecaptcha = isCfRecaptcha;
     }
 
@@ -64,13 +64,13 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         if (this.mCfRecaptcha) {
             this.mCaptcha = RecaptchaService.loadCloudflareCaptcha();
         } else {
-            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mRefererUri);
+            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mBoardName, this.mThreadNumber);
             this.mCanSkip = result.canSkip;
             this.mSuccessPasscode = result.successPassCode;
             this.mFailPasscode = result.failPassCode;
             String captchaKey = result.captchaKey;
 
-            if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !this.mUriParser.isBoardUri(this.mRefererUri)) {
+            if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !StringUtils.isEmpty(this.mThreadNumber)) {
                 return true;
             }
 

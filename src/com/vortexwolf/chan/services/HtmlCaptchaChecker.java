@@ -6,6 +6,7 @@ import org.apache.http.message.BasicHeader;
 import android.net.Uri;
 
 import com.vortexwolf.chan.common.Websites;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -19,12 +20,13 @@ public class HtmlCaptchaChecker {
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(String website, Uri refererUri) {
+    public CaptchaResult canSkipCaptcha(String website, String board, String thread) {
         IUrlBuilder urlBuilder = Websites.getUrlBuilder(website);
         String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(this.mApplicationSettings.getPasscodeCookieValue());
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it
-        Header[] extraHeaders = new Header[] { new BasicHeader("Referer", refererUri.toString()) };
+        String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, board, thread);
+        Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
 
         CaptchaResult result;
         try {

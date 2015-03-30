@@ -18,8 +18,8 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
@@ -39,7 +39,6 @@ public class BrowserActivity extends Activity {
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ICacheDirectoryManager mCacheDirectoryManager = Factory.resolve(ICacheDirectoryManager.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    private final DvachUriParser mUriParser = Factory.resolve(DvachUriParser.class);
 
     private View mMainView = null;
     private View mLoadingView = null;
@@ -82,7 +81,12 @@ public class BrowserActivity extends Activity {
 
         this.loadImage();
 
-        this.mTracker.setBoardVar(mUriParser.getBoardName(this.mUri));
+        String website = Websites.fromUri(this.mUri);
+        if (website != null) {
+            this.mTracker.setBoardVar(Websites.getUrlParser(website).getBoardName(this.mUri));
+        } else {
+            this.mTracker.setBoardVar("");
+        }
         this.mTracker.trackActivityView(TAG);
     }
 

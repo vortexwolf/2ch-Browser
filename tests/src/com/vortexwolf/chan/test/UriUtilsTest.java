@@ -3,7 +3,7 @@ package com.vortexwolf.chan.test;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
+import com.vortexwolf.chan.boards.makaba.MakabaUrlParser;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 
@@ -16,7 +16,7 @@ public class UriUtilsTest extends InstrumentationTestCase {
     private static final String threadUriB = "http://2-ch.so/b/res/1000.html";
     private static final String postUriPr = "http://2-ch.so/pr/res/2000.html#222";
     
-    private DvachUriParser mParser = new DvachUriParser();
+    private MakabaUrlParser mParser = new MakabaUrlParser();
 
     public void testGetBoardName() {        
         Uri uri = Uri.parse(boardUriVg);

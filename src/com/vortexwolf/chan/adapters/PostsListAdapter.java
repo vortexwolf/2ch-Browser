@@ -22,7 +22,6 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.activities.PostsListActivity;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
@@ -34,6 +33,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IUrlParser;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.IPostListEntity;
@@ -66,7 +66,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private final IUrlBuilder mUrlBuilder;
     private final Timer mLoadImagesTimer;
     private final ThreadImagesService mThreadImagesService;
-    private final DvachUriParser mUriParser;
+    private final IUrlParser mUrlParser;
     private final ArrayList<PostModel> mOriginalPosts = new ArrayList<PostModel>();
 
     private StatusItemViewBag mStatusView;
@@ -91,7 +91,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivity, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mSettings);
         this.mLoadImagesTimer = new Timer();
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
-        this.mUriParser = Factory.resolve(DvachUriParser.class);
+        this.mUrlParser = Websites.getUrlParser(this.mWebsite);
         this.mUri = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
     }
 
@@ -143,7 +143,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     public void onClick(View v, ClickableURLSpan span, String url) {
 
         Uri uri = Uri.parse(url);
-        String pageName = this.mUriParser.getThreadNumber(uri);
+        String pageName = this.mUrlParser.getThreadNumber(uri);
 
         // Если ссылка указывает на этот тред - перескакиваем на нужный пост,
         // иначе открываем в браузере

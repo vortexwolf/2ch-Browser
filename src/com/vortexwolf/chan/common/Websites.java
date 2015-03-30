@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import android.net.Uri;
 
 import com.vortexwolf.chan.boards.fourchan.FourchanUrlBuilder;
+import com.vortexwolf.chan.boards.fourchan.FourchanUrlParser;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlParser;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
@@ -43,8 +44,7 @@ public class Websites {
         if (DVACH.equals(website)) {
             return Factory.resolve(MakabaUrlParser.class);
         } else if (FOURCHAN.equals(website)) {
-            // TODO: implement
-            //return Factory.resolve(FourchanUriParser.class);
+            return Factory.resolve(FourchanUrlParser.class);
         }
 
         return null;

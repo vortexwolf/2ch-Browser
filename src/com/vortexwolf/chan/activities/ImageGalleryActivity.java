@@ -24,9 +24,9 @@ import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
-import com.vortexwolf.chan.boards.dvach.DvachUriParser;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
@@ -70,7 +70,6 @@ public class ImageGalleryActivity extends Activity {
         this.mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
         this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
         this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        DvachUriParser uriParser = Factory.resolve(DvachUriParser.class);
 
         String imageUrl = this.getIntent().getData().toString();
         this.mThreadUri = this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_URL);
@@ -108,7 +107,12 @@ public class ImageGalleryActivity extends Activity {
             }
         });
 
-        Factory.resolve(MyTracker.class).setBoardVar(uriParser.getBoardName(Uri.parse(imageUrl)));
+        String website = Websites.fromUri(Uri.parse(imageUrl));
+        if (website != null) {
+            Factory.resolve(MyTracker.class).setBoardVar(Websites.getUrlParser(website).getBoardName(Uri.parse(imageUrl)));
+        } else {
+            Factory.resolve(MyTracker.class).setBoardVar("");
+        }
         Factory.resolve(MyTracker.class).trackActivityView(TAG);
     }
 

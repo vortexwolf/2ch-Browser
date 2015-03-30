@@ -3,6 +3,7 @@ package com.vortexwolf.chan.models.presentation;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 
 public class OpenTabModel {
@@ -56,11 +57,7 @@ public class OpenTabModel {
 
     public String buildUrl() {
         IUrlBuilder builder = Websites.getUrlBuilder(this.mWebsite);
-        if (StringUtils.isEmpty(this.mThread)) {
-            return builder.getPageUrlHtml(this.mBoard, this.mPage);
-        } else {
-            return builder.getThreadUrlHtml(this.mBoard, this.mThread);
-        }
+        return UriUtils.getBoardOrThreadUrl(builder, this.mBoard, this.mThread);
     }
 
     public String getTitleOrDefault() {
