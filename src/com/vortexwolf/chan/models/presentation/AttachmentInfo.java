@@ -11,13 +11,14 @@ import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 
 public class AttachmentInfo {
     private static final HashMap<String, Integer> sDefaultThumbnails;
 
     private final AttachmentModel mModel;
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final boolean mIsEmpty;
@@ -33,12 +34,12 @@ public class AttachmentInfo {
         sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
     }
 
-    public AttachmentInfo(AttachmentModel item, String website, String boardName, String threadNumber) {
+    public AttachmentInfo(AttachmentModel item, IWebsite website, String boardName, String threadNumber) {
         this.mModel = item;
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
 
         SourceWithThumbnailModel urls = this.getUrls();
         if (urls != null) {

@@ -35,6 +35,7 @@ import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
@@ -76,7 +77,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private View mCatalogBar;
 
     private OpenTabModel mTabModel;
-    private String mWebsite;
+    private IWebsite mWebsite;
     private String mBoardName;
     private int mPageNumber;
     private boolean mIsCatalog;
@@ -90,12 +91,12 @@ public class ThreadsListActivity extends BaseListActivity {
 
         // Парсим код доски и номер страницы
         Bundle extras = this.getIntent().getExtras();
-        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mPageNumber = extras.getInt(Constants.EXTRA_BOARD_PAGE, 0);
         this.mIsCatalog = extras.getBoolean(Constants.EXTRA_CATALOG);
 
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
@@ -244,7 +245,7 @@ public class ThreadsListActivity extends BaseListActivity {
     @Override
     public boolean onSearchRequested() {
         Bundle data = new Bundle();
-        data.putString(Constants.EXTRA_WEBSITE, this.mWebsite);
+        data.putString(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         data.putString(Constants.EXTRA_BOARD_NAME, this.mBoardName);
 
         this.startSearch(null, false, data, false);
@@ -276,7 +277,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 break;
             case R.id.pick_board_menu_id:
             case android.R.id.home:
-                this.mNavigationService.navigateBoardList(this, this.mWebsite, true);
+                this.mNavigationService.navigateBoardList(this, this.mWebsite.name(), true);
                 break;
             case R.id.refresh_menu_id:
                 this.refresh();
@@ -305,10 +306,10 @@ public class ThreadsListActivity extends BaseListActivity {
                 this.navigateToCatalog();
                 break;
             case R.id.add_remove_favorites_menu_id:
-                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, null)) {
-                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, this.mBoardName, null);
+                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite.name(), this.mBoardName, null)) {
+                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite.name(), this.mBoardName, null);
                 } else {
-                    this.mFavoritesDatasource.addToFavorites(this.mWebsite, this.mBoardName, null, this.mTabModel.getTitle());
+                    this.mFavoritesDatasource.addToFavorites(this.mWebsite.name(), this.mBoardName, null, this.mTabModel.getTitle());
                 }
 
                 this.updateOptionsMenu();
@@ -343,7 +344,7 @@ public class ThreadsListActivity extends BaseListActivity {
         ThreadItemViewModel info = this.mAdapter.getItem(position);
 
         if (info.isHidden()) {
-            this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mWebsite, this.mBoardName, info.getNumber());
+            this.mHiddenThreadsDataSource.removeFromHiddenThreads(this.mWebsite.name(), this.mBoardName, info.getNumber());
             info.setHidden(false);
             this.mAdapter.notifyDataSetChanged();
         } else {
@@ -383,7 +384,7 @@ public class ThreadsListActivity extends BaseListActivity {
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
-                this.mHiddenThreadsDataSource.addToHiddenThreads(this.mWebsite, this.mBoardName, info.getNumber());
+                this.mHiddenThreadsDataSource.addToHiddenThreads(this.mWebsite.name(), this.mBoardName, info.getNumber());
                 info.setHidden(true);
                 this.mAdapter.notifyDataSetChanged();
                 return true;
@@ -406,7 +407,7 @@ public class ThreadsListActivity extends BaseListActivity {
         }
 
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
-        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, null)) {
+        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite.name(), this.mBoardName, null)) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);
         } else {
             favoritesItem.setTitle(R.string.menu_add_favorites);
@@ -415,7 +416,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToAddThreadView() {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
-        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, "");
 
@@ -424,7 +425,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void navigateToAddPostView(String threadNumber) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
-        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);
 
@@ -436,15 +437,15 @@ public class ThreadsListActivity extends BaseListActivity {
     }
 
     private void navigateToThread(String threadNumber, String threadSubject) {
-        this.mNavigationService.navigateThread(this, null, this.mWebsite, this.mBoardName, threadNumber, threadSubject, null, false);
+        this.mNavigationService.navigateThread(this, null, this.mWebsite.name(), this.mBoardName, threadNumber, threadSubject, null, false);
     }
 
     private void navigateToCatalog() {
-        this.mNavigationService.navigateCatalog(this, this.mWebsite, this.mBoardName);
+        this.mNavigationService.navigateCatalog(this, this.mWebsite.name(), this.mBoardName);
     }
 
     private void navigateToPageNumber(int pageNumber) {
-        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, pageNumber, false);
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite.name(), this.mBoardName, pageNumber, false);
     }
 
     protected void refresh() {
@@ -465,7 +466,7 @@ public class ThreadsListActivity extends BaseListActivity {
         @Override
         protected ThreadModel[] doInBackground(Void... arg0) {
             if (!mIsCatalog) {
-                ThreadModel[] threads = mSerializationService.deserializeThreads(mWebsite, mBoardName, mPageNumber);
+                ThreadModel[] threads = mSerializationService.deserializeThreads(mWebsite.name(), mBoardName, mPageNumber);
                 return threads;
             }
             return null;
@@ -504,7 +505,7 @@ public class ThreadsListActivity extends BaseListActivity {
         public void setData(ThreadModel[] threads) {
             if (threads != null && threads.length > 0) {
                 if (!mIsCatalog) {
-                    mSerializationService.serializeThreads(mWebsite, mBoardName, mPageNumber, threads);
+                    mSerializationService.serializeThreads(mWebsite.name(), mBoardName, mPageNumber, threads);
                 }
                 ThreadsListActivity.this.setAdapterData(threads);
             } else {

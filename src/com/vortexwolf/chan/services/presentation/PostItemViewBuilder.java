@@ -36,6 +36,7 @@ import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.BadgeModel;
 import com.vortexwolf.chan.models.presentation.FloatImageModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -46,7 +47,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class PostItemViewBuilder {
     private final LayoutInflater mInflater;
     private final BitmapManager mBitmapManager = Factory.resolve(BitmapManager.class);
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final Context mAppContext;
@@ -55,7 +56,7 @@ public class PostItemViewBuilder {
     private final IUrlBuilder mUrlBuilder;
     private static Boolean isTablet = null;
 
-    public PostItemViewBuilder(Context context, String website, String boardName, String threadNumber, ApplicationSettings settings) {
+    public PostItemViewBuilder(Context context, IWebsite website, String boardName, String threadNumber, ApplicationSettings settings) {
         this.mAppContext = context.getApplicationContext();
         this.mInflater = LayoutInflater.from(context);
         this.mWebsite = website;
@@ -63,7 +64,7 @@ public class PostItemViewBuilder {
         this.mThreadNumber = threadNumber;
         this.mSettings = settings;
         this.mWindowManager = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {

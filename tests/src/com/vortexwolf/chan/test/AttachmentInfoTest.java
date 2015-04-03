@@ -4,13 +4,15 @@ import android.app.Instrumentation;
 import android.net.Uri;
 import android.test.InstrumentationTestCase;
 
+import com.vortexwolf.chan.boards.makaba.MakabaWebsite;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AttachmentInfoTest extends InstrumentationTestCase {
 
-    private final String mWebsite = "2ch";
+    private final IWebsite mWebsite = new MakabaWebsite();
     private final String mBoardCode = "test";
     private final String mThreadNumber = "123456";
 

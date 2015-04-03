@@ -9,6 +9,7 @@ import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HtmlCaptchaChecker {
@@ -20,8 +21,8 @@ public class HtmlCaptchaChecker {
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(String website, String board, String thread) {
-        IUrlBuilder urlBuilder = Websites.getUrlBuilder(website);
+    public CaptchaResult canSkipCaptcha(IWebsite website, String board, String thread) {
+        IUrlBuilder urlBuilder = website.getUrlBuilder();
         String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(this.mApplicationSettings.getPasscodeCookieValue());
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it

@@ -14,6 +14,7 @@ import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlParser;
+import com.vortexwolf.chan.boards.makaba.MakabaWebsite;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.ExtendedObjectMapper;
 import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
@@ -63,15 +64,12 @@ public class MainApplication extends Application {
         MyTracker tracker = new MyTracker(this);
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
-        MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder(settings);
-        MakabaUrlParser makabaUriParser = new MakabaUrlParser();
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
         HttpBitmapReader httpBitmapReader = new HttpBitmapReader(httpBytesReader);
         JsonHttpReader jsonApiReader = new JsonHttpReader(this.getResources(), new ExtendedObjectMapper(), httpStreamReader);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
-        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, this.getResources(), settings);
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
@@ -80,11 +78,15 @@ public class MainApplication extends Application {
         HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), this.getResources(), httpBitmapReader);
         NavigationService navigationService = new NavigationService();
         DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpStreamReader);
+        MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder(settings);
+        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, this.getResources(), settings);
 
         Container container = Factory.getContainer();
         container.register(Resources.class, this.getResources());
-        container.register(MakabaUrlParser.class, makabaUriParser);
+        container.register(MakabaWebsite.class, new MakabaWebsite());
+        container.register(MakabaUrlParser.class, new MakabaUrlParser());
         container.register(MakabaUrlBuilder.class, makabaUriBuilder);
+        container.register(MakabaApiReader.class, makabaApiReader);
         container.register(ApplicationSettings.class, settings);
         container.register(DefaultHttpClient.class, httpClient);
         container.register(HttpStreamReader.class, httpStreamReader);
@@ -92,7 +94,6 @@ public class MainApplication extends Application {
         container.register(HttpStringReader.class, httpStringReader);
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonHttpReader.class, jsonApiReader);
-        container.register(MakabaApiReader.class, makabaApiReader);
         container.register(PostSender.class, new PostSender(httpClient, this.getResources(), settings, httpStringReader));
         container.register(IDraftPostsStorage.class, new DraftPostsStorage());
         container.register(NavigationService.class, navigationService);

@@ -93,7 +93,7 @@ public class OpenTabsFragment extends ListFragment {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
 
-        if (!this.mFavoritesDatasource.hasFavorites(item.getWebsite(), item.getBoard(), item.getThread())) {
+        if (!this.mFavoritesDatasource.hasFavorites(item.getWebsite().name(), item.getBoard(), item.getThread())) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
@@ -102,6 +102,10 @@ public class OpenTabsFragment extends ListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if (!this.getUserVisibleHint()) {
+            return false;
+        }
+
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         OpenTabModel model = this.mAdapter.getItem(menuInfo.position);
 
@@ -114,11 +118,11 @@ public class OpenTabsFragment extends ListFragment {
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
-                this.mFavoritesDatasource.addToFavorites(model.getWebsite(), model.getBoard(), model.getThread(), model.getTitle());
+                this.mFavoritesDatasource.addToFavorites(model.getWebsite().name(), model.getBoard(), model.getThread(), model.getTitle());
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                this.mFavoritesDatasource.removeFromFavorites(model.getWebsite(), model.getBoard(), model.getThread());
+                this.mFavoritesDatasource.removeFromFavorites(model.getWebsite().name(), model.getBoard(), model.getThread());
                 return true;
             }
         }

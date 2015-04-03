@@ -24,6 +24,7 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
@@ -81,9 +82,9 @@ public class BrowserActivity extends Activity {
 
         this.loadImage();
 
-        String website = Websites.fromUri(this.mUri);
+        IWebsite website = Websites.fromUri(this.mUri);
         if (website != null) {
-            this.mTracker.setBoardVar(Websites.getUrlParser(website).getBoardName(this.mUri));
+            this.mTracker.setBoardVar(website.getUrlParser().getBoardName(this.mUri));
         } else {
             this.mTracker.setBoardVar("");
         }

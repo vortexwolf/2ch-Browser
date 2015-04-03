@@ -53,7 +53,7 @@ public class UrlTitleEntity {
     }
 
     public String buildUrl() {
-        IUrlBuilder builder = Websites.getUrlBuilder(this.website);
+        IUrlBuilder builder = Websites.fromName(this.website).getUrlBuilder();
         return UriUtils.getBoardOrThreadUrl(builder, this.board, this.thread);
     }
 

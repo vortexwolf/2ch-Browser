@@ -18,6 +18,7 @@ import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
@@ -35,12 +36,12 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     private final ThreadImagesService mThreadImagesService;
     private IUrlBuilder mUrlBuilder;
 
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
 
     private boolean mIsBusy = false;
 
-    public ThreadsListAdapter(Context context, String website, String boardName, Theme theme) {
+    public ThreadsListAdapter(Context context, IWebsite website, String boardName, Theme theme) {
         super(context.getApplicationContext(), 0);
 
         this.mWebsite = website;
@@ -49,7 +50,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     }
 
@@ -168,7 +169,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
         for (ThreadModel ti : threads) {
             ThreadItemViewModel model = new ThreadItemViewModel(this.mWebsite, this.mBoardName, ti, this.mTheme);
-            boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mWebsite, this.mBoardName, model.getNumber());
+            boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mWebsite.name(), this.mBoardName, model.getNumber());
             model.setHidden(isHidden);
 
             this.add(model);

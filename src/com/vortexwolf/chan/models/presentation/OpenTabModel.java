@@ -5,9 +5,10 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 
 public class OpenTabModel {
-    private String mWebsite;
+    private IWebsite mWebsite;
     private String mBoard;
     private int mPage;
     private String mThread;
@@ -15,7 +16,7 @@ public class OpenTabModel {
 
     private AppearanceUtils.ListViewPosition mPosition;
 
-    public OpenTabModel(String website, String board, int page, String thread, String title) {
+    public OpenTabModel(IWebsite website, String board, int page, String thread, String title) {
         this.mWebsite = website;
         this.mBoard = board;
         this.mPage = page;
@@ -31,7 +32,7 @@ public class OpenTabModel {
         this.mTitle = title;
     }
 
-    public String getWebsite() {
+    public IWebsite getWebsite() {
         return this.mWebsite;
     }
 
@@ -56,7 +57,7 @@ public class OpenTabModel {
     }
 
     public String buildUrl() {
-        IUrlBuilder builder = Websites.getUrlBuilder(this.mWebsite);
+        IUrlBuilder builder = this.mWebsite.getUrlBuilder();
         return UriUtils.getBoardOrThreadUrl(builder, this.mBoard, this.mThread);
     }
 
@@ -74,8 +75,8 @@ public class OpenTabModel {
         return isEqualTo(tab.mWebsite, tab.mBoard, tab.mThread, tab.mPage);
     }
 
-    public boolean isEqualTo(String website, String board, String thread, int page) {
-        return StringUtils.areEqual(this.mWebsite, website) &&
+    public boolean isEqualTo(IWebsite website, String board, String thread, int page) {
+        return StringUtils.areEqual(this.mWebsite.name(), website.name()) &&
                 StringUtils.areEqual(this.mBoard, board) &&
                 StringUtils.areEqual(this.mThread, thread) &&
                 this.mPage == page;

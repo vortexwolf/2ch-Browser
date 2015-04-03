@@ -9,6 +9,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.RecaptchaService;
@@ -19,7 +20,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private static final String TAG = "DownloadCaptchaTask";
 
     private final ICaptchaView mView;
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final HttpBitmapReader mHttpBitmapReader;
@@ -33,7 +34,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, String website, String boardName, String threadNumber, boolean isCfRecaptcha) {
+    public DownloadCaptchaTask(ICaptchaView view, IWebsite website, String boardName, String threadNumber, boolean isCfRecaptcha) {
         this.mView = view;
         this.mWebsite = website;
         this.mBoardName = boardName;

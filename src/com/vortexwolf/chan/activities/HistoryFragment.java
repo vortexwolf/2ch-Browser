@@ -109,6 +109,10 @@ public class HistoryFragment extends BaseListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if (!this.getUserVisibleHint()) {
+            return false;
+        }
+
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         HistoryEntity model = this.mAdapter.getItem(menuInfo.position);
 

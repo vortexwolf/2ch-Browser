@@ -33,6 +33,7 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
@@ -107,9 +108,9 @@ public class ImageGalleryActivity extends Activity {
             }
         });
 
-        String website = Websites.fromUri(Uri.parse(imageUrl));
+        IWebsite website = Websites.fromUri(Uri.parse(imageUrl));
         if (website != null) {
-            Factory.resolve(MyTracker.class).setBoardVar(Websites.getUrlParser(website).getBoardName(Uri.parse(imageUrl)));
+            Factory.resolve(MyTracker.class).setBoardVar(website.getUrlParser().getBoardName(Uri.parse(imageUrl)));
         } else {
             Factory.resolve(MyTracker.class).setBoardVar("");
         }

@@ -13,6 +13,7 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlParser;
+import com.vortexwolf.chan.interfaces.IWebsite;
 
 public class NavigationService {
 
@@ -20,17 +21,17 @@ public class NavigationService {
     }
 
     public void navigate(Uri uri, Context context, Integer flags, boolean preferDeserialized) {
-        String website = Websites.fromUri(uri);
-        IUrlParser urlParser = Websites.getUrlParser(website);
+        IWebsite website = Websites.fromUri(uri);
+        IUrlParser urlParser = website.getUrlParser();
 
         if (urlParser.isBoardUri(uri)) {
-            this.navigateBoardPage(context, null, website, urlParser.getBoardName(uri), urlParser.getBoardPageNumber(uri), preferDeserialized);
+            this.navigateBoardPage(context, null, website.name(), urlParser.getBoardName(uri), urlParser.getBoardPageNumber(uri), preferDeserialized);
         } else if (urlParser.isThreadUri(uri)) {
-            this.navigateThread(context, null, website, urlParser.getBoardName(uri), urlParser.getThreadNumber(uri), null, urlParser.getPostNumber(uri), preferDeserialized);
+            this.navigateThread(context, null, website.name(), urlParser.getBoardName(uri), urlParser.getThreadNumber(uri), null, urlParser.getPostNumber(uri), preferDeserialized);
         } else if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {
             this.navigateActivity(context, BrowserActivity.class, uri, null, flags);
         } else {
-            this.navigateBoardList(context, website, false);
+            this.navigateBoardList(context, website.name(), false);
         }
     }
 

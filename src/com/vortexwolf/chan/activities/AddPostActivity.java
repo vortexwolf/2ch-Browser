@@ -42,7 +42,6 @@ import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
@@ -51,6 +50,7 @@ import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IUrlParser;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.CaptchaEntity.Type;
 import com.vortexwolf.chan.models.domain.SendPostModel;
@@ -75,7 +75,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
     private CaptchaEntity mCaptcha;
-    private String mWebsite;
+    private IWebsite mWebsite;
     private String mBoardName;
     private String mThreadNumber;
     private CaptchaViewType mCurrentCaptchaView = null;
@@ -115,12 +115,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         // Парсим название борды и номер треда
         Bundle extras = this.getIntent().getExtras();
-        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
 
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
-        this.mUrlParser = Websites.getUrlParser(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
+        this.mUrlParser = this.mWebsite.getUrlParser();
 
         this.resetUI();
 

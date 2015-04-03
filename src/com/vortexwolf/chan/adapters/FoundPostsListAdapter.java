@@ -12,6 +12,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
@@ -22,7 +23,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> implements IBusyAdapter {
 
     private final LayoutInflater mInflater;
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final PostItemViewBuilder mPostItemViewBuilder;
     private final ApplicationSettings mSettings;
@@ -31,7 +32,7 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
 
     private boolean mIsBusy = false;
 
-    public FoundPostsListAdapter(Context context, String website, String boardName, Theme theme) {
+    public FoundPostsListAdapter(Context context, IWebsite website, String boardName, Theme theme) {
         super(context.getApplicationContext(), 0);
 
         this.mWebsite = website;
@@ -39,7 +40,7 @@ public class FoundPostsListAdapter extends ArrayAdapter<PostItemViewModel> imple
         this.mInflater = LayoutInflater.from(context);
         this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mTheme = theme;
-        this.mUrlBuilder = Websites.getUrlBuilder(website);
+        this.mUrlBuilder = website.getUrlBuilder();
         this.mPostItemViewBuilder = new PostItemViewBuilder(context, this.mWebsite, this.mBoardName, null, this.mSettings);
     }
 

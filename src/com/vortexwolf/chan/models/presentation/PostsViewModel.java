@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.PostModel;
 
 public class PostsViewModel {
@@ -15,11 +16,11 @@ public class PostsViewModel {
     private final HashMap<String, PostItemViewModel> mViewModels = new HashMap<String, PostItemViewModel>();
     private String mLastPostNumber = null;
 
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
 
-    public PostsViewModel(String website, String boardName, String threadNumber) {
+    public PostsViewModel(IWebsite website, String boardName, String threadNumber) {
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IPostSendView;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.PostSender;
@@ -15,12 +16,12 @@ public class SendPostTask extends AsyncTask<Void, Long, SendPostResult> {
     private final IPostSendView mView;
     private final ICaptchaView mCaptchaView;
 
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final SendPostModel mEntity;
 
-    public SendPostTask(IPostSendView view, ICaptchaView captchaView, String website, String boardName, String threadNumber, SendPostModel entity) {
+    public SendPostTask(IPostSendView view, ICaptchaView captchaView, IWebsite website, String boardName, String threadNumber, SendPostModel entity) {
         this.mView = view;
         this.mCaptchaView = captchaView;
 

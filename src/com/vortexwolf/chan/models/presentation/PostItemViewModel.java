@@ -21,6 +21,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.BadgeModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.services.presentation.FlowTextHelper;
@@ -29,7 +30,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 public class PostItemViewModel implements IPostListEntity {
     private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
 
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final int mPosition;
@@ -54,7 +55,7 @@ public class PostItemViewModel implements IPostListEntity {
     private boolean mHasUrlSpans = false;
     private boolean mIsLongTextExpanded = false;
 
-    public PostItemViewModel(String website, String boardName, String threadNumber, int position, PostModel model, Theme theme, IURLSpanClickListener listener) {
+    public PostItemViewModel(IWebsite website, String boardName, String threadNumber, int position, PostModel model, Theme theme, IURLSpanClickListener listener) {
         this.mModel = model;
         this.mTheme = theme;
         this.mUrlListener = listener;
@@ -62,7 +63,7 @@ public class PostItemViewModel implements IPostListEntity {
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
 
         this.parseReferences();
         this.mBadge = this.mModel.getBadge();

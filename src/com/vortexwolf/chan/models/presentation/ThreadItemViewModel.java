@@ -8,11 +8,12 @@ import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
 
 public class ThreadItemViewModel {
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final Theme mTheme;
     private final PostModel mOpPost;
@@ -25,12 +26,12 @@ public class ThreadItemViewModel {
     private boolean mHidden = false;
     private IUrlBuilder mUrlBuilder;
 
-    public ThreadItemViewModel(String website, String boardName, ThreadModel model, Theme theme) {
+    public ThreadItemViewModel(IWebsite website, String boardName, ThreadModel model, Theme theme) {
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mTheme = theme;
 
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mOpPost = model.getPosts()[0];
         this.mReplyCount = model.getReplyCount();
         this.mImageCount = model.getImageCount();

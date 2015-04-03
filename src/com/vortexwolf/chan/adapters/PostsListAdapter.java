@@ -34,6 +34,7 @@ import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IUrlParser;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.IPostListEntity;
@@ -52,7 +53,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private static final int ITEM_VIEW_TYPE_STATUS = 1;
 
     private final LayoutInflater mInflater;
-    private final String mWebsite;
+    private final IWebsite mWebsite;
     private final String mBoardName;
     private final String mThreadNumber;
     private final String mUri;
@@ -74,7 +75,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private boolean mIsBusy = false;
     private LoadImagesTimerTask mCurrentLoadImagesTask;
 
-    public PostsListAdapter(PostsListActivity activity, String website, String boardName, String threadNumber, Theme theme, ListView listView) {
+    public PostsListAdapter(PostsListActivity activity, IWebsite website, String boardName, String threadNumber, Theme theme, ListView listView) {
         super(activity.getApplicationContext(), 0);
 
         this.mWebsite = website;
@@ -87,11 +88,11 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mListView = listView;
         this.mActivity = activity;
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mPostItemViewBuilder = new PostItemViewBuilder(this.mActivity, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mSettings);
         this.mLoadImagesTimer = new Timer();
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
-        this.mUrlParser = Websites.getUrlParser(this.mWebsite);
+        this.mUrlParser = this.mWebsite.getUrlParser();
         this.mUri = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
     }
 

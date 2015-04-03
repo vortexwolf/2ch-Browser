@@ -15,6 +15,7 @@ import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.http.HttpStringReader;
@@ -38,7 +39,7 @@ public class PostSender {
         this.mMakabaSendPostMapper = new MakabaSendPostMapper();
     }
 
-    public SendPostResult sendPost(String website, String boardName, SendPostModel entity) {
+    public SendPostResult sendPost(IWebsite website, String boardName, SendPostModel entity) {
         SendPostResult result = new SendPostResult();
 
         if (boardName == null || entity == null) {
@@ -46,7 +47,7 @@ public class PostSender {
             return result;
         }
 
-        IUrlBuilder urlBuilder = Websites.getUrlBuilder(website);
+        IUrlBuilder urlBuilder = website.getUrlBuilder();
         String uri = urlBuilder.getPostingUrlApi();
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
 

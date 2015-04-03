@@ -94,6 +94,10 @@ public class FavoritesFragment extends BaseListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if (!this.getUserVisibleHint()) {
+            return false;
+        }
+
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         FavoritesEntity model = this.mAdapter.getItem(menuInfo.position);
 

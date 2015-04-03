@@ -34,6 +34,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.presentation.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
@@ -56,7 +57,7 @@ public class PickBoardActivity extends ListActivity {
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private IUrlBuilder mUrlBuilder;
 
-    private String mWebsite;
+    private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
 
@@ -66,12 +67,12 @@ public class PickBoardActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mWebsite = this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE);
-        if (StringUtils.isEmpty(this.mWebsite)) {
-            this.mWebsite = Websites.DVACH;
+        this.mWebsite = Websites.fromName(this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE));
+        if (this.mWebsite == null) {
+            this.mWebsite = Websites.getDefault();
         }
 
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
 
         // TODO: add Default Website to the settings and navigate to it
@@ -221,7 +222,7 @@ public class PickBoardActivity extends ListActivity {
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, this.getString(R.string.cmenu_copy_url));
 
-        if (!this.mFavoritesDatasource.hasFavorites(this.mWebsite, item.getCode(), null)) {
+        if (!this.mFavoritesDatasource.hasFavorites(this.mWebsite.name(), item.getCode(), null)) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, this.getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, this.getString(R.string.cmenu_remove_from_favorites));
@@ -318,17 +319,17 @@ public class PickBoardActivity extends ListActivity {
             return false;
         }
 
-        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, boardCode, 0, false);
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite.name(), boardCode, 0, false);
         return true;
     }
 
     private void addToFavorites(String boardCode) {
-        this.mFavoritesDatasource.addToFavorites(this.mWebsite, boardCode, null, null);
+        this.mFavoritesDatasource.addToFavorites(this.mWebsite.name(), boardCode, null, null);
         this.mAdapter.addItemToFavoritesSection(boardCode, this.findBoardByCode(boardCode));
     }
 
     private void removeFromFavorites(BoardEntity model) {
-        this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, model.getCode(), null);
+        this.mFavoritesDatasource.removeFromFavorites(this.mWebsite.name(), model.getCode(), null);
         this.mAdapter.removeItemFromFavoritesSection(model);
     }
 

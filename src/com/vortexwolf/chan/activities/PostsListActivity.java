@@ -33,6 +33,7 @@ import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
@@ -74,7 +75,7 @@ public class PostsListActivity extends BaseListActivity {
     private SettingsEntity mCurrentSettings;
 
     private OpenTabModel mTabModel;
-    private String mWebsite;
+    private IWebsite mWebsite;
     private String mBoardName;
     private String mThreadNumber;
     private String mPostNumber;
@@ -89,12 +90,12 @@ public class PostsListActivity extends BaseListActivity {
 
         // Парсим код доски и номер страницы
         Bundle extras = this.getIntent().getExtras();
-        this.mWebsite = extras.getString(Constants.EXTRA_WEBSITE);
+        this.mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
         this.mPostNumber = extras.getString(Constants.EXTRA_POST_NUMBER);
 
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // Page title and new tab
@@ -227,7 +228,7 @@ public class PostsListActivity extends BaseListActivity {
 
         String tabTitle = title != null ? title : pageTitle;
         this.mTabModel.setTitle(tabTitle);
-        this.mHistoryDataSource.updateHistoryItem(this.mWebsite, this.mBoardName, this.mThreadNumber, tabTitle);
+        this.mHistoryDataSource.updateHistoryItem(this.mWebsite.name(), this.mBoardName, this.mThreadNumber, tabTitle);
     }
 
     @Override
@@ -256,7 +257,7 @@ public class PostsListActivity extends BaseListActivity {
                 this.refresh();
                 break;
             case R.id.pick_board_menu_id:
-                this.mNavigationService.navigateBoardList(this, this.mWebsite, true);
+                this.mNavigationService.navigateBoardList(this, this.mWebsite.name(), true);
                 break;
             case R.id.open_browser_menu_id:
                 BrowserLauncher.launchExternalBrowser(this, this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber));
@@ -279,10 +280,10 @@ public class PostsListActivity extends BaseListActivity {
                 this.startActivity(Intent.createChooser(i, this.getString(R.string.share_via)));
                 break;
             case R.id.add_remove_favorites_menu_id:
-                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber)) {
-                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber);
+                if (this.mFavoritesDatasource.hasFavorites(this.mWebsite.name(), this.mBoardName, this.mThreadNumber)) {
+                    this.mFavoritesDatasource.removeFromFavorites(this.mWebsite.name(), this.mBoardName, this.mThreadNumber);
                 } else {
-                    this.mFavoritesDatasource.addToFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber, this.mTabModel.getTitle());
+                    this.mFavoritesDatasource.addToFavorites(this.mWebsite.name(), this.mBoardName, this.mThreadNumber, this.mTabModel.getTitle());
                 }
 
                 this.updateOptionsMenu();
@@ -383,7 +384,7 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         MenuItem favoritesItem = this.mMenu.findItem(R.id.add_remove_favorites_menu_id);
-        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite, this.mBoardName, this.mThreadNumber)) {
+        if (this.mFavoritesDatasource.hasFavorites(this.mWebsite.name(), this.mBoardName, this.mThreadNumber)) {
             favoritesItem.setTitle(R.string.menu_remove_favorites);
         } else {
             favoritesItem.setTitle(R.string.menu_add_favorites);
@@ -392,7 +393,7 @@ public class PostsListActivity extends BaseListActivity {
 
     private void navigateToAddPostView(String postNumber, String postComment) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
-        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, this.mThreadNumber);
 
@@ -407,7 +408,7 @@ public class PostsListActivity extends BaseListActivity {
     }
 
     private void navigateToThreads() {
-        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, 0, false);
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite.name(), this.mBoardName, 0, false);
     }
 
     @Override
@@ -450,7 +451,7 @@ public class PostsListActivity extends BaseListActivity {
         @Override
         protected PostModel[] doInBackground(Void... arg0) {
             // Пробуем десериализовать в любом случае
-            PostModel[] posts = mSerializationService.deserializePosts(mWebsite, mBoardName, mThreadNumber);
+            PostModel[] posts = mSerializationService.deserializePosts(mWebsite.name(), mBoardName, mThreadNumber);
             return posts;
         }
 
@@ -493,7 +494,7 @@ public class PostsListActivity extends BaseListActivity {
         public void setData(PostModel[] posts) {
             if (posts != null && posts.length > 0) {
                 PostsListActivity.this.setAdapterData(posts);
-                mSerializationService.serializePosts(mWebsite, mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
+                mSerializationService.serializePosts(mWebsite.name(), mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
             } else {
                 PostsListActivity.this.mAdapter.clear();
                 this.showError(PostsListActivity.this.getString(R.string.error_list_empty));
@@ -537,7 +538,7 @@ public class PostsListActivity extends BaseListActivity {
 
             int addedCount = PostsListActivity.this.mAdapter.updateAdapterData(from, posts);
             if (addedCount != 0) {
-                mSerializationService.serializePosts(mWebsite, mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
+                mSerializationService.serializePosts(mWebsite.name(), mBoardName, mThreadNumber, mAdapter.getOriginalPosts());
                 showToastIfVisible(PostsListActivity.this.getResources().getQuantityString(R.plurals.data_new_posts_quantity, addedCount, addedCount));
             } else {
                 showToastIfVisible(PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));

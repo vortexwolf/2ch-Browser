@@ -29,6 +29,7 @@ import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
@@ -51,7 +52,7 @@ public class SearchableActivity extends BaseListActivity {
 
     private String mSearchQuery = null;
     private String mBoardName = null;
-    private String mWebsite;
+    private IWebsite mWebsite;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class SearchableActivity extends BaseListActivity {
         this.resetUI();
 
         this.handleIntent(this.getIntent());
-        this.mUrlBuilder = Websites.getUrlBuilder(this.mWebsite);
+        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
 
         Factory.getContainer().resolve(MyTracker.class).setBoardVar(this.mBoardName);
         Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
@@ -166,16 +167,16 @@ public class SearchableActivity extends BaseListActivity {
     }
 
     private void navigateToThreads() {
-        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite, this.mBoardName, 0, false);
+        this.mNavigationService.navigateBoardPage(this, null, this.mWebsite.name(), this.mBoardName, 0, false);
     }
 
     private void navigateToThread(String threadNumber, String postNumber) {
-        this.mNavigationService.navigateThread(this, null, this.mWebsite, this.mBoardName, threadNumber, null, postNumber, false);
+        this.mNavigationService.navigateThread(this, null, this.mWebsite.name(), this.mBoardName, threadNumber, null, postNumber, false);
     }
 
     private void navigateToAddPostView(String postNumber, String threadNumber, String postComment) {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
-        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, threadNumber);
 
@@ -193,7 +194,7 @@ public class SearchableActivity extends BaseListActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             this.mSearchQuery = intent.getStringExtra(SearchManager.QUERY);
             Bundle b = intent.getBundleExtra(SearchManager.APP_DATA);
-            this.mWebsite = b.getString(Constants.EXTRA_WEBSITE);
+            this.mWebsite = Websites.fromName(b.getString(Constants.EXTRA_WEBSITE));
             this.mBoardName = b.getString(Constants.EXTRA_BOARD_NAME);
 
             this.setAdapter(this.mBoardName);
