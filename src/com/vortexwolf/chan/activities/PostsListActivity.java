@@ -530,7 +530,7 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         @Override
-        public void updateData(String from, PostModel[] posts) {
+        public void updateData(int from, PostModel[] posts) {
             if (posts == null) {
                 showToastIfVisible(PostsListActivity.this.getResources().getString(R.string.notification_no_new_posts));
                 return;

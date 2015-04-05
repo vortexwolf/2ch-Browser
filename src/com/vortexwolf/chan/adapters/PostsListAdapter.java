@@ -239,7 +239,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     }
 
     /** Возвращает номер последнего сообщения */
-    public String getLastPostNumber() {
+    public int getLastPostNumber() {
         return this.mPostsViewModel.getLastPostNumber();
     }
 
@@ -278,18 +278,11 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         this.mListView.setSelection(position);
     }
 
-    public int updateAdapterData(String from, PostModel[] posts) {
-        Integer lastPostNumber;
-        try {
-            lastPostNumber = !StringUtils.isEmpty(from) ? Integer.valueOf(from) : 0;
-        } catch (NumberFormatException e) {
-            lastPostNumber = 0;
-        }
-
+    public int updateAdapterData(int from, PostModel[] posts) {
         ArrayList<PostModel> newPosts = new ArrayList<PostModel>();
         for (PostModel pi : posts) {
             Integer currentNumber = !StringUtils.isEmpty(pi.getNumber()) ? Integer.parseInt(pi.getNumber()) : 0;
-            if (currentNumber > lastPostNumber) {
+            if (currentNumber > from) {
                 newPosts.add(pi);
             }
         }

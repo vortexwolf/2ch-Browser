@@ -90,9 +90,10 @@ public class MakabaApiReader implements IJsonApiReader {
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
-        String uri = this.mApplicationSettings.isMobileApi()
-                ? this.mMakabaUriBuilder.getThreadUrlExtendedApi(boardName, threadNumber, fromNumber)
+    public PostModel[] readPostsList(String boardName, String threadNumber, int fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+        boolean isExtendedUrl = this.mApplicationSettings.isMobileApi() && fromNumber != 0;
+        String uri = isExtendedUrl
+                ? this.mMakabaUriBuilder.getThreadUrlExtendedApi(boardName, threadNumber, fromNumber + "")
                 : this.mMakabaUriBuilder.getThreadUrlApi(boardName, threadNumber);
 
         JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
@@ -101,7 +102,7 @@ public class MakabaApiReader implements IJsonApiReader {
         }
 
         MakabaPostInfo[] data = null;
-        if (this.mApplicationSettings.isMobileApi()) {
+        if (isExtendedUrl) {
             data = this.parseDataOrThrowError(json, MakabaPostInfo[].class);
         } else {
             data = this.parseDataOrThrowError(json, MakabaThreadsList.class).threads[0].posts;

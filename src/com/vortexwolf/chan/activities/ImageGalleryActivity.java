@@ -31,6 +31,7 @@ import com.vortexwolf.chan.common.controls.ExtendedViewPager;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IWebsite;
@@ -73,10 +74,16 @@ public class ImageGalleryActivity extends Activity {
         this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
 
         String imageUrl = this.getIntent().getData().toString();
-        this.mThreadUri = this.getIntent().getExtras().getString(Constants.EXTRA_THREAD_URL);
+        this.mThreadUri = this.getIntent().getStringExtra(Constants.EXTRA_THREAD_URL);
 
         // get the current image
         ArrayList<ThreadImageModel> images = this.mThreadImagesService.getImagesList(this.mThreadUri);
+        if (images.size() == 0) {
+            // it happens if the activity was killed because of low memory and then reloaded with empty data
+            ThreadImageModel singleImage = new ThreadImageModel();
+            singleImage.url = imageUrl;
+            images.add(singleImage);
+        }
         ThreadImageModel currentImage = this.mThreadImagesService.getImageByUrl(images, imageUrl);
         int imagePosition = images.indexOf(currentImage);
 
@@ -145,10 +152,12 @@ public class ImageGalleryActivity extends Activity {
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(!this.mImageLoaded);
         if (this.mCurrentImageModel != null) {
-            playVideoMenuItem.setVisible(this.mImageLoaded && this.mCurrentImageModel.attachment.isVideo());
-            searchTineyeMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
-            searchGoogleMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
-            imageOpsMenuItem.setVisible(this.mCurrentImageModel.attachment.isImage());
+            boolean isImageUrl = UriUtils.isImageUri(Uri.parse(this.mCurrentImageModel.url));
+            boolean isVideoUrl = UriUtils.isWebmUri(Uri.parse(this.mCurrentImageModel.url));
+            playVideoMenuItem.setVisible(this.mImageLoaded && isVideoUrl);
+            searchTineyeMenuItem.setVisible(isImageUrl);
+            searchGoogleMenuItem.setVisible(isImageUrl);
+            imageOpsMenuItem.setVisible(isImageUrl);
         } else {
             playVideoMenuItem.setVisible(false);
             searchTineyeMenuItem.setVisible(false);
@@ -179,23 +188,26 @@ public class ImageGalleryActivity extends Activity {
                 }
                 break;
             case R.id.share_menu_id:
+                if (this.mImageLoadedFile == null) {
+                    break;
+                }
+                Uri fileUri = Uri.fromFile(this.mImageLoadedFile);
+
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
-                if (this.mCurrentImageModel.attachment.isImage()) {
+                if (UriUtils.isImageUri(fileUri)) {
                     shareImageIntent.setType("image/jpeg");
-                } else if (this.mCurrentImageModel.attachment.isVideo()) {
+                } else if (UriUtils.isWebmUri(fileUri)) {
                     shareImageIntent.setType("video/webm");
                 }
-                shareImageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(this.mImageLoadedFile));
+                shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
             case R.id.share_link_menu_id:
-                if (this.mCurrentImageModel != null && this.mCurrentImageModel.url != null) {
-                    Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
-                    shareLinkIntent.setType("text/plain");
-                    shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mCurrentImageModel.url.toString());
-                    shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mCurrentImageModel.url.toString());
-                    this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
-                }
+                Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
+                shareLinkIntent.setType("text/plain");
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mCurrentImageModel.url.toString());
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, this.mCurrentImageModel.url.toString());
+                this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
                 break;
             case R.id.menu_search_tineye_id:
                 String tineyeSearchUrl = "http://www.tineye.com/search?url=" + this.mCurrentImageModel.url;
@@ -215,10 +227,12 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void loadImage(ThreadImageModel model, GalleryItemViewBag viewBag) {
-        if (!model.attachment.isDisplayableInGallery() ||
-                (model.attachment.isVideo() && this.mApplicationSettings.isExternalVideoPlayer()) ||
-                (model.attachment.isVideo() && Constants.SDK_VERSION < 10)) {
-            this.setThumbnail(model.attachment, viewBag);
+        if (UriUtils.isWebmUri(Uri.parse(model.url)) && this.mApplicationSettings.isExternalVideoPlayer()) {
+            if (model.attachment != null) {
+                this.setThumbnail(model.attachment, viewBag);
+            } else {
+                viewBag.switchToErrorView(this.getString(R.string.error_video_playing));
+            }
             return;
         }
         if (this.mCurrentTask != null) {
@@ -279,9 +293,9 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void setImage(File file, GalleryItemViewBag viewBag) {
-        if (this.mCurrentImageModel.attachment.isImage()) {
+        if (UriUtils.isImageUri(Uri.fromFile(file))) {
             AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
-        } else if (this.mCurrentImageModel.attachment.isVideo()) {
+        } else if (UriUtils.isWebmUri(Uri.fromFile(file))) {
             AppearanceUtils.setVideoFile(file, this, viewBag);
         }
 

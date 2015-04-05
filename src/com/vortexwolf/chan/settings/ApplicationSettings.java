@@ -194,7 +194,7 @@ public class ApplicationSettings {
     }
 
     public boolean isExternalVideoPlayer() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_external_video_key), false);
+        return Constants.SDK_VERSION < 10 || this.mSettings.getBoolean(this.mResources.getString(R.string.pref_external_video_key), false);
     }
 
     public int getImageView() {

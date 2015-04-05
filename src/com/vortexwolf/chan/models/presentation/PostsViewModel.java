@@ -14,7 +14,7 @@ import com.vortexwolf.chan.models.domain.PostModel;
 public class PostsViewModel {
 
     private final HashMap<String, PostItemViewModel> mViewModels = new HashMap<String, PostItemViewModel>();
-    private String mLastPostNumber = null;
+    private int mLastPostNumber = 0;
 
     private final IWebsite mWebsite;
     private final String mBoardName;
@@ -44,7 +44,7 @@ public class PostsViewModel {
         PostItemViewModel viewModel = new PostItemViewModel(this.mWebsite, this.mBoardName, this.mThreadNumber, this.mViewModels.size(), item, theme, listener);
         this.mViewModels.put(viewModel.getNumber(), viewModel);
 
-        this.mLastPostNumber = viewModel.getNumber();
+        this.mLastPostNumber = Math.max(Integer.parseInt(viewModel.getNumber()), this.mLastPostNumber);
 
         this.processReferences(viewModel);
 
@@ -64,7 +64,7 @@ public class PostsViewModel {
     /**
      * Возвращает номер последнего сообщения в треде
      */
-    public String getLastPostNumber() {
+    public int getLastPostNumber() {
         return this.mLastPostNumber;
     }
 }

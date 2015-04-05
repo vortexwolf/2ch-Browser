@@ -9,7 +9,7 @@ import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
 import com.vortexwolf.chan.interfaces.IPostsListView;
 import com.vortexwolf.chan.models.domain.PostModel;
 
-public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {
+public class DownloadPostsTask extends AsyncTask<Integer, Long, Boolean> implements IJsonProgressChangeListener, ICancelled {
 
     static final String TAG = "DownloadPostsTask";
 
@@ -20,7 +20,7 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     private final boolean mIsPartialLoading;
     private final boolean mIsCheckModified;
 
-    private String mLoadAfterPost = null;
+    private int mLoadAfterPost = 0;
     private PostModel[] mPostsList = null;
     private String mUserError = null;
 
@@ -39,12 +39,10 @@ public class DownloadPostsTask extends AsyncTask<String, Long, Boolean> implemen
     }
 
     @Override
-    protected Boolean doInBackground(String... params) {
+    protected Boolean doInBackground(Integer... params) {
 
         if (params.length > 0) {
             this.mLoadAfterPost = params[0];
-        } else {
-            this.mLoadAfterPost = null;
         }
 
         // Читаем по ссылке json-объект со списком постов

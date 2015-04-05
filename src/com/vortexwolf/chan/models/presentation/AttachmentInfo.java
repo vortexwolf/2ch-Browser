@@ -3,6 +3,7 @@ package com.vortexwolf.chan.models.presentation;
 import java.util.HashMap;
 
 import android.content.res.Resources;
+import android.net.Uri;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
@@ -10,6 +11,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
@@ -85,11 +87,11 @@ public class AttachmentInfo {
     }
 
     public boolean isImage() {
-        return !StringUtils.isEmpty(this.mSourceExtension) && Constants.IMAGE_EXTENSIONS.contains(this.mSourceExtension);
+        return this.mImageUrl != null && UriUtils.isImageUri(Uri.parse(this.mImageUrl));
     }
 
     public boolean isVideo() {
-        return "webm".equalsIgnoreCase(this.mSourceExtension);
+        return this.mImageUrl != null && UriUtils.isWebmUri(Uri.parse(this.mImageUrl));
     }
 
     public boolean isDisplayableInGallery() {

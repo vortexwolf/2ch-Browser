@@ -9,10 +9,10 @@ public interface IPostsListView extends IListView<PostModel[]> {
      * 
      * @param from
      *            Пост, с которого начинается список ответов
-     * @param list
+     * @param posts
      *            Список ответов
      */
-    void updateData(String from, PostModel[] posts);
+    void updateData(int from, PostModel[] posts);
 
     /**
      * Вызывается в случае ошибки при частичном обновлении

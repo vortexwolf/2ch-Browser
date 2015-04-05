@@ -61,7 +61,7 @@ public class FourchanApiReader implements IJsonApiReader {
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, String fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public PostModel[] readPostsList(String boardName, String threadNumber, int fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.mFourchanUriBuilder.getThreadUrlApi(boardName, threadNumber);
 
         JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
