@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.EllipsizingTextView;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
@@ -25,6 +27,9 @@ import com.vortexwolf.chan.models.presentation.ThumbnailViewBag;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
@@ -34,14 +39,16 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     private final ApplicationSettings mSettings;
     private final HiddenThreadsDataSource mHiddenThreadsDataSource;
     private final ThreadImagesService mThreadImagesService;
-    private IUrlBuilder mUrlBuilder;
-
+    private final ListView mListView;
+    private final IUrlBuilder mUrlBuilder;
+    private final Timer mLoadImagesTimer = new Timer();
     private final IWebsite mWebsite;
     private final String mBoardName;
 
+    private LoadImagesTimerTask mCurrentLoadImagesTask;
     private boolean mIsBusy = false;
 
-    public ThreadsListAdapter(Context context, IWebsite website, String boardName, Theme theme) {
+    public ThreadsListAdapter(Context context, IWebsite website, String boardName, Theme theme, ListView listView) {
         super(context.getApplicationContext(), 0);
 
         this.mWebsite = website;
@@ -52,6 +59,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         this.mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
+        this.mListView = listView;
     }
 
     @Override
@@ -177,31 +185,52 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
     }
 
     @Override
-    public void setBusy(boolean isBusy, AbsListView view) {
-        boolean prevBusy = this.mIsBusy;
-        this.mIsBusy = isBusy;
+    public void setBusy(boolean value, AbsListView view) {
+        if (this.mCurrentLoadImagesTask != null) {
+            this.mCurrentLoadImagesTask.cancel();
+        }
 
-        if (prevBusy == true && isBusy == false) {
-            int count = view.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View v = view.getChildAt(i);
-                int position = view.getPositionForView(v);
+        if (this.mIsBusy == true && value == false) {
+            this.mCurrentLoadImagesTask = new LoadImagesTimerTask();
+            this.mLoadImagesTimer.schedule(this.mCurrentLoadImagesTask, 500);
+        }
 
-                if (this.getItemViewType(position) == ITEM_VIEW_TYPE_HIDDEN_THREAD) {
-                    continue;
-                }
+        this.mIsBusy = value;
+    }
 
-                ViewBag vb = (ViewBag) v.getTag();
+    private void loadListImages() {
+        int count = this.mListView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View v = this.mListView.getChildAt(i);
+            int position = this.mListView.getPositionForView(v);
 
-
-                if (mSettings.isMultiThumbnailsInThreads() && this.getItem(position).getAttachmentsNumber() > 1) {
-                    for (int j = 0; j < 4; ++j) {
-                        ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(j), vb.thumbnailViews[j].image);
-                    }
-                } else if (this.getItem(position).getAttachmentsNumber() >= 1) {
-                    ThreadPostUtils.setNonBusyAttachment(this.getItem(position).getAttachment(0), vb.singleThumbnailView.image);
-                }
+            if (this.getItemViewType(position) == ITEM_VIEW_TYPE_HIDDEN_THREAD) {
+                continue;
             }
+
+            ViewBag vb = (ViewBag) v.getTag();
+            ThreadItemViewModel item = this.getItem(position);
+            if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
+                for (int j = 0; j < 4; ++j) {
+                    ThreadPostUtils.setNonBusyAttachment(item.getAttachment(j), vb.thumbnailViews[j].image);
+                }
+            } else if (item.getAttachmentsNumber() >= 1) {
+                ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
+            }
+        }
+    }
+
+    private class LoadImagesTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            ThreadsListAdapter.this.mListView.post(new LoadImagesRunnable());
+        }
+    }
+
+    private class LoadImagesRunnable implements Runnable {
+        @Override
+        public void run() {
+            ThreadsListAdapter.this.loadListImages();
         }
     }
 

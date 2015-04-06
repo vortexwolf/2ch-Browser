@@ -1,17 +1,16 @@
 package com.vortexwolf.chan.services;
 
-import java.io.File;
-
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public class CacheDirectoryManager implements ICacheDirectoryManager {
+import java.io.File;
+
+public class CacheDirectoryManager {
     private static final String TAG = "CacheManager";
 
     private final String mPackageName;
@@ -28,17 +27,14 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         this.mExternalCacheDir = this.getExternalCachePath();
     }
 
-    @Override
     public File getInternalCacheDir() {
         return this.mInternalCacheDir;
     }
 
-    @Override
     public File getExternalCacheDir() {
         return this.mExternalCacheDir;
     }
 
-    @Override
     public File getCurrentCacheDirectory() {
         File currentDirectory;
 
@@ -55,17 +51,14 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         return currentDirectory;
     }
 
-    @Override
     public File getThumbnailsCacheDirectory() {
         return this.getCacheDirectory("thumbnails");
     }
 
-    @Override
     public File getPagesCacheDirectory() {
         return this.getCacheDirectory("pages");
     }
 
-    @Override
     public File getImagesCacheDirectory() {
         return this.getCacheDirectory("images");
     }
@@ -79,7 +72,6 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         return file;
     }
 
-    @Override
     public File getCachedImageFileForWrite(Uri uri) {
         String fileName = uri.getLastPathSegment();
 
@@ -88,7 +80,6 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         return cachedFile;
     }
 
-    @Override
     public File getCachedImageFileForRead(Uri uri) {
         File cachedFile = this.getCachedImageFileForWrite(uri);
         if (!cachedFile.exists()) {
@@ -98,7 +89,6 @@ public class CacheDirectoryManager implements ICacheDirectoryManager {
         return cachedFile;
     }
 
-    @Override
     public void trimCacheIfNeeded() {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override

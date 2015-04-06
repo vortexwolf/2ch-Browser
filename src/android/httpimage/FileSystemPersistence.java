@@ -11,7 +11,7 @@ import android.graphics.BitmapFactory;
 
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 
 /**
  * File system implementation of persistent storage for downloaded images.
@@ -22,10 +22,10 @@ public class FileSystemPersistence implements BitmapCache {
 
     private static final String TAG = "ThumbnailFSPersistent";
 
-    private final ICacheDirectoryManager mCacheManager;
+    private final CacheDirectoryManager mCacheManager;
     private final File mBaseDir;
 
-    public FileSystemPersistence(ICacheDirectoryManager cacheManager) {
+    public FileSystemPersistence(CacheDirectoryManager cacheManager) {
         this.mCacheManager = cacheManager;
 
         this.mBaseDir = cacheManager.getThumbnailsCacheDirectory();

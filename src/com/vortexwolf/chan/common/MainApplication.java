@@ -22,9 +22,6 @@ import com.vortexwolf.chan.db.DvachSqlHelper;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
-import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
@@ -95,11 +92,11 @@ public class MainApplication extends Application {
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonHttpReader.class, jsonApiReader);
         container.register(PostSender.class, new PostSender(httpClient, this.getResources(), settings, httpStringReader));
-        container.register(IDraftPostsStorage.class, new DraftPostsStorage());
+        container.register(DraftPostsStorage.class, new DraftPostsStorage());
         container.register(NavigationService.class, navigationService);
-        container.register(IOpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
+        container.register(OpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
         container.register(MyTracker.class, tracker);
-        container.register(ICacheDirectoryManager.class, cacheManager);
+        container.register(CacheDirectoryManager.class, cacheManager);
         container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
         container.register(HttpImageManager.class, imageManager);
@@ -132,6 +129,6 @@ public class MainApplication extends Application {
     @Override
     public File getCacheDir() {
         // NOTE: this method is used in Android 2.2 and higher
-        return Factory.getContainer().resolve(ICacheDirectoryManager.class).getCurrentCacheDirectory();
+        return Factory.getContainer().resolve(CacheDirectoryManager.class).getCurrentCacheDirectory();
     }
 }

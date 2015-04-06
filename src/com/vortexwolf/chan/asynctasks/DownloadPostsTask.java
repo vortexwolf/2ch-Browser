@@ -40,7 +40,6 @@ public class DownloadPostsTask extends AsyncTask<Integer, Long, Boolean> impleme
 
     @Override
     protected Boolean doInBackground(Integer... params) {
-
         if (params.length > 0) {
             this.mLoadAfterPost = params[0];
         }

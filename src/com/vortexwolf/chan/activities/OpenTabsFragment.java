@@ -19,13 +19,13 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
+import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 
 public class OpenTabsFragment extends ListFragment {
 
     private OpenTabsAdapter mAdapter;
-    private IOpenTabsManager mTabsManager;
+    private OpenTabsManager mTabsManager;
     private FavoritesDataSource mFavoritesDatasource;
 
     private Uri mCurrentUri;
@@ -34,7 +34,7 @@ public class OpenTabsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mTabsManager = Factory.getContainer().resolve(IOpenTabsManager.class);
+        this.mTabsManager = Factory.getContainer().resolve(OpenTabsManager.class);
         this.mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
 
         Bundle extras = this.getArguments();

@@ -32,7 +32,6 @@ import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
@@ -40,6 +39,7 @@ import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -48,7 +48,7 @@ public class ImageGalleryActivity extends Activity {
     public static final String TAG = "ImageGalleryActivity";
 
     private ThreadImagesService mThreadImagesService;
-    private ICacheDirectoryManager mCacheDirectoryManager;
+    private CacheDirectoryManager mCacheDirectoryManager;
     private ApplicationSettings mApplicationSettings;
 
     private String mThreadUri;
@@ -70,7 +70,7 @@ public class ImageGalleryActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
 
         this.mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
-        this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+        this.mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
         this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
 
         String imageUrl = this.getIntent().getData().toString();

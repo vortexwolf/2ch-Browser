@@ -33,7 +33,6 @@ import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IListView;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
@@ -47,6 +46,7 @@ import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 import com.vortexwolf.chan.services.presentation.PagesSerializationService;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
@@ -62,7 +62,7 @@ public class ThreadsListActivity extends BaseListActivity {
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
-    private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
+    private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
@@ -216,7 +216,7 @@ public class ThreadsListActivity extends BaseListActivity {
             return;
         }
 
-        this.mAdapter = new ThreadsListAdapter(this, this.mWebsite, this.mBoardName, this.getTheme());
+        this.mAdapter = new ThreadsListAdapter(this, this.mWebsite, this.mBoardName, this.getTheme(), this.getListView());
         this.setListAdapter(this.mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки

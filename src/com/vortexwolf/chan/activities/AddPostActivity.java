@@ -46,7 +46,6 @@ import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
-import com.vortexwolf.chan.interfaces.IDraftPostsStorage;
 import com.vortexwolf.chan.interfaces.IPostSendView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IUrlParser;
@@ -62,13 +61,14 @@ import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MyTracker;
+import com.vortexwolf.chan.services.presentation.DraftPostsStorage;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
 
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    private final IDraftPostsStorage mDraftPostsStorage = Factory.resolve(IDraftPostsStorage.class);
+    private final DraftPostsStorage mDraftPostsStorage = Factory.resolve(DraftPostsStorage.class);
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private IUrlParser mUrlParser;
     private IUrlBuilder mUrlBuilder;

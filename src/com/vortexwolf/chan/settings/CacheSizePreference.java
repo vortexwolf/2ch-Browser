@@ -10,7 +10,7 @@ import android.util.AttributeSet;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.IoUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 
 public class CacheSizePreference extends Preference {
     private final File mExternalCacheDir;
@@ -21,7 +21,7 @@ public class CacheSizePreference extends Preference {
     public CacheSizePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        ICacheDirectoryManager cacheManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+        CacheDirectoryManager cacheManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
         this.mExternalCacheDir = cacheManager.getExternalCacheDir();
         this.mInternalCacheDir = cacheManager.getInternalCacheDir();
 

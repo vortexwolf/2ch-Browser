@@ -29,9 +29,9 @@ import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.db.HistoryEntity;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.services.NavigationService;
+import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class TabsHistoryBookmarksCompActivity extends Activity {
@@ -71,7 +71,7 @@ public class TabsHistoryBookmarksCompActivity extends Activity {
     void openTabs() {
         setTitle(getString(R.string.tabs_opentabs));
 
-        final IOpenTabsManager mTabsManager = Factory.getContainer().resolve(IOpenTabsManager.class);
+        final OpenTabsManager mTabsManager = Factory.getContainer().resolve(OpenTabsManager.class);
         final OpenTabsAdapter mAdapter = new OpenTabsAdapter(this, mTabsManager.getOpenTabs(), mTabsManager);
 
         ListView view = new ListView(this);

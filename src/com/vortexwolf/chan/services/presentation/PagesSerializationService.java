@@ -1,20 +1,20 @@
 package com.vortexwolf.chan.services.presentation;
 
-import java.io.File;
-
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.SerializationService;
+
+import java.io.File;
 
 public class PagesSerializationService {
 
     private static final String sExtension = ".2ch";
 
-    private final ICacheDirectoryManager mCacheManager;
+    private final CacheDirectoryManager mCacheManager;
     private final SerializationService mSerializationService;
 
-    public PagesSerializationService(ICacheDirectoryManager cacheManager, SerializationService serializationService) {
+    public PagesSerializationService(CacheDirectoryManager cacheManager, SerializationService serializationService) {
         this.mCacheManager = cacheManager;
         this.mSerializationService = serializationService;
     }

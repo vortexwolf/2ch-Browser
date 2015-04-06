@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.asynctasks;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,21 +8,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.activities.SearchableActivity;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.BackgroundDownloadFileView;
 import com.vortexwolf.chan.common.library.DialogDownloadFileView;
 import com.vortexwolf.chan.common.library.SingleMediaScanner;
 import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.exceptions.DownloadFileException;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.http.DownloadFileService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.io.File;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancelled, IProgressChangeListener {
     public static final String TAG = "DownloadFileTask";
@@ -34,7 +33,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private final Uri mFrom;
     private final ApplicationSettings mSettings;
     private final IDownloadFileView mProgressView;
-    private final ICacheDirectoryManager mCacheDirectoryManager;
+    private final CacheDirectoryManager mCacheDirectoryManager;
     private final boolean mUpdateGallery;
     private boolean retry = true; //after cloudflare check
 
@@ -45,7 +44,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     {
         this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
         this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        this.mCacheDirectoryManager = Factory.getContainer().resolve(ICacheDirectoryManager.class);
+        this.mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
     }
 
     public DownloadFileTask(Context context, Uri from) {

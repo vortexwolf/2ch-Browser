@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 
 public class IconsList {
     private static final String fileName = "politics_icons";
@@ -14,7 +13,7 @@ public class IconsList {
             
     private HashMap<String, String[]> data;
     private SerializationService mSerializationService = new SerializationService();
-    private ICacheDirectoryManager mCacheManager = Factory.resolve(ICacheDirectoryManager.class);
+    private CacheDirectoryManager mCacheManager = Factory.resolve(CacheDirectoryManager.class);
     
     public IconsList() {
         try {

@@ -22,11 +22,11 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.interfaces.ICacheDirectoryManager;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.services.BrowserLauncher;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -38,7 +38,7 @@ public class BrowserActivity extends Activity {
     }
 
     private final MyTracker mTracker = Factory.resolve(MyTracker.class);
-    private final ICacheDirectoryManager mCacheDirectoryManager = Factory.resolve(ICacheDirectoryManager.class);
+    private final CacheDirectoryManager mCacheDirectoryManager = Factory.resolve(CacheDirectoryManager.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
 
     private View mMainView = null;

@@ -30,7 +30,6 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IPostsListView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
@@ -47,6 +46,7 @@ import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.TimerService;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
+import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 import com.vortexwolf.chan.services.presentation.PagesSerializationService;
 import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
@@ -62,7 +62,7 @@ public class PostsListActivity extends BaseListActivity {
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private final HistoryDataSource mHistoryDataSource = Factory.resolve(HistoryDataSource.class);
-    private final IOpenTabsManager mOpenTabsManager = Factory.resolve(IOpenTabsManager.class);
+    private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
     private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
 

@@ -6,12 +6,11 @@ import android.app.Activity;
 
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.HistoryDataSource;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.services.NavigationService;
 
-public class OpenTabsManager implements IOpenTabsManager {
+public class OpenTabsManager {
     private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
 
     private final HistoryDataSource mDataSource;
@@ -22,7 +21,6 @@ public class OpenTabsManager implements IOpenTabsManager {
         this.mNavigationService = navigationService;
     }
 
-    @Override
     public OpenTabModel add(OpenTabModel newTab) {
         // Не добавляем, если уже добавлено
         for (OpenTabModel openTab : this.mTabs) {
@@ -38,22 +36,18 @@ public class OpenTabsManager implements IOpenTabsManager {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public ArrayList<OpenTabModel> getOpenTabs() {
         return (ArrayList<OpenTabModel>) this.mTabs.clone();
     }
 
-    @Override
     public void remove(OpenTabModel tab) {
         this.mTabs.remove(tab);
     }
 
-    @Override
     public void removeAll() {
         this.mTabs.clear();
     }
 
-    @Override
     public void navigate(OpenTabModel tab, Activity activity) {
         if (StringUtils.isEmpty(tab.getThread())) {
             this.mNavigationService.navigateBoardPage(activity, null, tab.getWebsite().name(), tab.getBoard(), 0, true);

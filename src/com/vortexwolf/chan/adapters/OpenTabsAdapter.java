@@ -11,14 +11,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.interfaces.IOpenTabsManager;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
+import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 
 public class OpenTabsAdapter extends ArrayAdapter<OpenTabModel> {
     private final LayoutInflater mInflater;
-    private final IOpenTabsManager mOpenTabsManager;
+    private final OpenTabsManager mOpenTabsManager;
 
-    public OpenTabsAdapter(Context context, ArrayList<OpenTabModel> items, IOpenTabsManager openTabsManager) {
+    public OpenTabsAdapter(Context context, ArrayList<OpenTabModel> items, OpenTabsManager openTabsManager) {
         super(context.getApplicationContext(), 0, items);
         this.mInflater = LayoutInflater.from(context);
         this.mOpenTabsManager = openTabsManager;
