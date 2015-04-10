@@ -4,6 +4,15 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" 
     android:background="?activityRootBackground">
+
+    <ProgressBar
+        android:id="@+id/page_progress_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="false"
+        android:visibility="gone"
+        android:max="100" />
     
     <com.vortexwolf.chan.common.controls.ExtendedViewPager
         android:id="@+id/view_pager"

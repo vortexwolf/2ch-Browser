@@ -1,28 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="?activityRootBackground" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:background="?activityRootBackground">
 
-    <com.vortexwolf.chan.common.controls.WebViewFixed
-        android:id="@+id/webview"
+    <ProgressBar
+        android:id="@+id/page_progress_bar"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="4dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="false"
+        android:visibility="gone"
+        android:max="100" />
 
     <include
-        android:id="@+id/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        layout="@layout/loading"
+        android:id="@+id/image_gallery_item_container"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        layout="@layout/image_gallery_item"
         android:visibility="gone" />
 
-    <include
-        android:id="@+id/error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        layout="@layout/error"
-        android:visibility="gone" />
+    <FrameLayout
+        android:id="@+id/webview_container"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1">
 
-</FrameLayout>
+        <com.vortexwolf.chan.common.controls.WebViewFixed
+            android:id="@+id/webview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+        <include
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/loading"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            layout="@layout/error"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</LinearLayout>

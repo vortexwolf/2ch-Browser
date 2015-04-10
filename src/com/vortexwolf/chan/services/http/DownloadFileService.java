@@ -54,7 +54,7 @@ public class DownloadFileService {
         } catch (FileNotFoundException e) {
             MyLog.e(TAG, e);
             wasCancelled = true;
-            throw new DownloadFileException(this.mResources.getString(R.string.error_download_no_space_sdcard));
+            throw new DownloadFileException(this.mResources.getString(R.string.error_download_sdcard));
         } catch (HttpRequestException e) {
             MyLog.e(TAG, e);
             wasCancelled = true;

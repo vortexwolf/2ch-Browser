@@ -101,7 +101,7 @@ Dark theme
 Photon theme 
 ==================
     -->
-    <style name="Theme_Photon_Base" parent="@style/Theme_Light_Base">
+    <style name="Theme_Photon_Base" parent="@style/Theme_Photon_Switch">
         <item name="activityRootBackground">@color/photon_background</item>
         <item name="threadTitleForeground">@color/photon_thread_title</item>
         <item name="itemInfoForeground">@color/photon_item_info</item>

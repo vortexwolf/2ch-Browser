@@ -14,10 +14,12 @@ import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
@@ -41,9 +43,11 @@ public class BrowserActivity extends Activity {
     private final CacheDirectoryManager mCacheDirectoryManager = Factory.resolve(CacheDirectoryManager.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
 
+    private View mContainerView;
     private View mMainView = null;
     private View mLoadingView = null;
     private View mErrorView = null;
+    private ProgressBar mProgressBar;
 
     private Uri mUri = null;
     private String mTitle = null;
@@ -62,19 +66,23 @@ public class BrowserActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
 
         this.setTheme(mSettings.getTheme());
+        this.setContentView(R.layout.browser);
 
         if (this.mSettings.isLegacyImageViewer() || this.mSettings.isExternalVideoPlayer()) {
-            this.setContentView(R.layout.browser);
-            this.mMainView = this.findViewById(R.id.webview);
+            this.mContainerView = this.findViewById(R.id.webview_container);
+            this.mMainView = this.mContainerView.findViewById(R.id.webview);
             int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
             AppearanceUtils.prepareWebView((WebView)this.mMainView, background);
         } else {
-            this.setContentView(R.layout.image_gallery_item);
-            this.mMainView = this.findViewById(R.id.image_layout);
+            this.mContainerView = this.findViewById(R.id.image_gallery_item_container);
+            this.mContainerView.setVisibility(View.VISIBLE);
+            this.findViewById(R.id.webview_container).setVisibility(View.GONE);
+            this.mMainView = this.mContainerView.findViewById(R.id.image_layout);
         }
 
-        this.mLoadingView = this.findViewById(R.id.loading);
-        this.mErrorView = this.findViewById(R.id.error);
+        this.mProgressBar = (ProgressBar) this.findViewById(R.id.page_progress_bar);
+        this.mLoadingView = this.mContainerView.findViewById(R.id.loading);
+        this.mErrorView = this.mContainerView.findViewById(R.id.error);
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();
@@ -266,6 +274,21 @@ public class BrowserActivity extends Activity {
         }
     }
 
+    private void setProgressComp(int progress) {
+        if (Constants.SDK_VERSION < 21) {
+            this.setProgress(progress);
+        } else if (progress == Window.PROGRESS_INDETERMINATE_ON) {
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mProgressBar.setIndeterminate(true);
+        } else if (progress > 0 && progress < Window.PROGRESS_END) {
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mProgressBar.setIndeterminate(false);
+            this.mProgressBar.setProgress(progress / 100);
+        } else {
+            this.mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
     private class BrowserDownloadFileView implements IDownloadFileView {
 
         private double mMaxValue = -1;
@@ -274,9 +297,9 @@ public class BrowserActivity extends Activity {
         public void setCurrentProgress(int value) {
             if (this.mMaxValue > 0) {
                 double percent = value / this.mMaxValue;
-                BrowserActivity.this.setProgress((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
+                BrowserActivity.this.setProgressComp((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
             } else {
-                BrowserActivity.this.setProgress(Window.PROGRESS_INDETERMINATE_ON);
+                BrowserActivity.this.setProgressComp(Window.PROGRESS_INDETERMINATE_ON);
             }
         }
 
@@ -292,7 +315,7 @@ public class BrowserActivity extends Activity {
 
         @Override
         public void hideLoading() {
-            BrowserActivity.this.setProgress(Window.PROGRESS_END);
+            BrowserActivity.this.setProgressComp(Window.PROGRESS_END);
             BrowserActivity.this.switchToPageView();
         }
 

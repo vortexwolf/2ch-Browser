@@ -23,4 +23,7 @@
         <item name="iconComputer">@drawable/ic_menu_play_clip</item>
     </style>
 
+    <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
+    </style>
+
 </resources>

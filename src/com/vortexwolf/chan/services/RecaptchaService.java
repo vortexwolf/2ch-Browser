@@ -26,7 +26,7 @@ public class RecaptchaService {
     private static final String SEND_POST_KEY = "6LcM2P4SAAAAAD97nF449oigatS5hPCIgt8AQanz";
     private static final String RECAPTCHA_CHALLENGE_URI = "http://www.google.com/recaptcha/api/challenge?k=";
     private static final String FALLBACK_URI = "http://www.google.com/recaptcha/api/fallback?k=";
-    private static final String IMAGE_URI = "http://www.google.com/recaptcha/api2/payload?c=";
+    private static final String IMAGE_URI = "http://www.google.com/recaptcha/api/image?c=";
 
     private static final Pattern jsChallengePattern = Pattern.compile("challenge.?:.?'([\\w-]+)'");
 

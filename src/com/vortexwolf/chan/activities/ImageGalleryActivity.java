@@ -20,6 +20,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
@@ -61,6 +62,7 @@ public class ImageGalleryActivity extends Activity {
 
     private Menu mMenu;
     private TextView mImageText;
+    private ProgressBar mProgressBar;
     private int mBackgroundColor;
 
     @Override
@@ -90,6 +92,7 @@ public class ImageGalleryActivity extends Activity {
         this.setTheme(this.mApplicationSettings.getTheme());
         this.setContentView(R.layout.image_gallery_view);
         this.mImageText = (TextView) this.findViewById(R.id.image_gallery_text);
+        this.mProgressBar = (ProgressBar) this.findViewById(R.id.page_progress_bar);
         this.mBackgroundColor = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
 
         // view pager
@@ -251,7 +254,7 @@ public class ImageGalleryActivity extends Activity {
         File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(uri);
         if (cachedFile.exists()) {
             // show from cache
-            this.setProgress(Window.PROGRESS_END);
+            this.setProgressComp(Window.PROGRESS_END);
             this.setImage(cachedFile, viewBag);
         } else {
             // download image and cache it
@@ -304,7 +307,20 @@ public class ImageGalleryActivity extends Activity {
         this.updateOptionsMenu();
     }
 
-
+    private void setProgressComp(int progress) {
+        if (Constants.SDK_VERSION < 21) {
+            this.setProgress(progress);
+        } else if (progress == Window.PROGRESS_INDETERMINATE_ON) {
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mProgressBar.setIndeterminate(true);
+        } else if (progress > 0 && progress < Window.PROGRESS_END) {
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mProgressBar.setIndeterminate(false);
+            this.mProgressBar.setProgress(progress / 100);
+        } else {
+            this.mProgressBar.setVisibility(View.GONE);
+        }
+    }
 
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
         private final LayoutInflater mInflater;
@@ -355,9 +371,9 @@ public class ImageGalleryActivity extends Activity {
         public void setCurrentProgress(int value) {
             if (this.mMaxValue > 0) {
                 double percent = value / this.mMaxValue;
-                ImageGalleryActivity.this.setProgress((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
+                ImageGalleryActivity.this.setProgressComp((int) (percent * Window.PROGRESS_END)); // from 0 to 10000
             } else {
-                ImageGalleryActivity.this.setProgress(Window.PROGRESS_INDETERMINATE_ON);
+                ImageGalleryActivity.this.setProgressComp(Window.PROGRESS_INDETERMINATE_ON);
             }
         }
 
@@ -375,7 +391,7 @@ public class ImageGalleryActivity extends Activity {
 
         @Override
         public void hideLoading() {
-            ImageGalleryActivity.this.setProgress(Window.PROGRESS_END);
+            ImageGalleryActivity.this.setProgressComp(Window.PROGRESS_END);
             this.mViewBag.layout.setVisibility(View.VISIBLE);
             this.mViewBag.loading.setVisibility(View.GONE);
             this.mViewBag.error.setVisibility(View.GONE);

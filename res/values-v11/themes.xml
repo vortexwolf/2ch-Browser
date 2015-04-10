@@ -25,6 +25,9 @@
         <item name="android:actionBarStyle">@style/HoloDark.ActionBar</item>
     </style>
 
+    <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
+    </style>
+
     <!-- Remove the blue line from the action bar -->
     <style name="HoloLight.ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">@null</item>

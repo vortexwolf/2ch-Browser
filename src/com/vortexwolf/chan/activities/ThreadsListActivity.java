@@ -235,11 +235,6 @@ public class ThreadsListActivity extends BaseListActivity {
 
     private void setAdapterData(ThreadModel[] threads) {
         this.mAdapter.setAdapterData(threads);
-        // Устанавливаем позицию, если открываем как уже открытую вкладку
-        AppearanceUtils.ListViewPosition savedPosition = this.mTabModel.getPosition();
-        if (savedPosition != null) {
-            this.getListView().setSelectionFromTop(savedPosition.position, savedPosition.top);
-        }
     }
 
     @Override
@@ -485,6 +480,11 @@ public class ThreadsListActivity extends BaseListActivity {
                 ThreadsListActivity.this.refreshThreads(false);
             } else {
                 ThreadsListActivity.this.setAdapterData(threads);
+                // Устанавливаем позицию, если открываем как уже открытую вкладку
+                if (mTabModel.getPosition() != null) {
+                    AppearanceUtils.ListViewPosition p = mTabModel.getPosition();
+                    ThreadsListActivity.this.getListView().setSelectionFromTop(p.position, p.top);
+                }
             }
         }
     }

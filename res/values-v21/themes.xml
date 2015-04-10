@@ -10,6 +10,8 @@
         <item name="iconForward">@drawable/ic_navigation_next_item</item>
         <item name="iconComputer">@drawable/ic_actionbar_computer</item>
         <item name="iconList">@drawable/ic_actionbar_tabs</item>
+        <item name="android:colorPrimary">@color/white_background</item>
+        <item name="android:actionBarStyle">@style/Material.Light.ActionBar</item>
     </style>
 
     <style name="Theme_Dark_Switch" parent="@android:style/Theme.Material">
@@ -21,6 +23,19 @@
         <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
         <item name="iconComputer">@drawable/ic_actionbar_computer_dark</item>
         <item name="iconList">@drawable/ic_actionbar_tabs_dark</item>
+        <item name="android:colorPrimary">@color/neutron_background</item>
+        <item name="android:actionBarStyle">@style/Material.ActionBar</item>
     </style>
 
+    <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
+        <item name="android:colorPrimary">@color/photon_background</item>
+    </style>
+
+    <style name="Material.Light.ActionBar" parent="@android:style/Widget.Material.Light.ActionBar.Solid">
+        <item name="android:elevation">1dip</item>
+    </style>
+
+    <style name="Material.ActionBar" parent="@android:style/Widget.Material.ActionBar.Solid">
+        <item name="android:elevation">1dip</item>
+    </style>
 </resources>

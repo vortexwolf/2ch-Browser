@@ -207,7 +207,7 @@
     <string name="error_save_file">An error has occurred while saving the file.</string>
     <string name="error_image_cannot_be_attached">The selected image cannot be attached to the post.</string>
     <string name="error_image_search">The TinEye website doesn\'t work.</string>
-    <string name="error_download_no_space_sdcard">Error while downloading, no space left on device.</string>
+    <string name="error_download_sdcard">Can not download the file, SD card is read-only or is not available.</string>
     <string name="error_create_request">Unable to make a request to the page.</string>
     <string name="error_read_response">Unable to read the response from the server.</string>
     <string name="error_not_json">Unable to use JSON API. Open the page in an external browser.</string>
