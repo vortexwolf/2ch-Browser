@@ -7,9 +7,10 @@
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
         <item name="iconEdit">@drawable/ic_menu_add</item>
         <item name="iconList">@drawable/ic_menu_windows</item>
-        <item name="iconBack">@drawable/ic_navigation_previous_item</item>
-        <item name="iconForward">@drawable/ic_navigation_next_item</item>
+        <item name="iconBack">@drawable/ic_action_previous_item</item>
+        <item name="iconForward">@drawable/ic_action_next_item</item>
         <item name="iconComputer">@drawable/ic_menu_play_clip</item>
+        <item name="iconOverflow">@drawable/ic_action_overflow</item>
     </style>
 
     <style name="Theme_Dark_Switch" parent="@android:style/Theme">
@@ -18,9 +19,10 @@
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
         <item name="iconEdit">@drawable/ic_menu_add</item>
         <item name="iconList">@drawable/ic_menu_windows</item>
-        <item name="iconBack">@drawable/ic_navigation_previous_item_dark</item>
-        <item name="iconForward">@drawable/ic_navigation_next_item_dark</item>
+        <item name="iconBack">@drawable/ic_action_previous_item_dark</item>
+        <item name="iconForward">@drawable/ic_action_next_item_dark</item>
         <item name="iconComputer">@drawable/ic_menu_play_clip</item>
+        <item name="iconOverflow">@drawable/ic_action_overflow_dark</item>
     </style>
 
     <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">

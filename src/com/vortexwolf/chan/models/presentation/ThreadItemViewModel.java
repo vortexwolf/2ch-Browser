@@ -46,6 +46,8 @@ public class ThreadItemViewModel {
     private SpannableStringBuilder createSpannedComment() {
         String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
         SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme, this.mUrlBuilder);
+        HtmlUtils.replaceUrls(spanned, null, this.mTheme);
+
         return spanned;
     }
 

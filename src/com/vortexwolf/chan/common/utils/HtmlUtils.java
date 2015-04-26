@@ -45,7 +45,6 @@ public class HtmlUtils {
 
     public static SpannableStringBuilder createSpannedFromHtml(String htmlText, Theme theme, IUrlBuilder urlBuilder) {
         SpannableStringBuilder builder = (SpannableStringBuilder) MyHtml.fromHtml(StringUtils.emptyIfNull(htmlText), getImageGetter(urlBuilder), new UnknownTagsHandler(theme));
-        HtmlUtils.replaceUrls(builder, null, theme);
 
         return builder;
     }

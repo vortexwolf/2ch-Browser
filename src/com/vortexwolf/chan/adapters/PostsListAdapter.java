@@ -24,11 +24,10 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.activities.PostsListActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ClickableURLSpan;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
-import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
+import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.IBusyAdapter;
 import com.vortexwolf.chan.interfaces.IURLSpanClickListener;
@@ -161,7 +160,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
                 this.mPostItemViewBuilder.displayPopupDialog(
                         (PostItemViewModel)this.getItem(position),
                         this.mActivity, this.mTheme,
-                        Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(this.mActivity) ? getSpanCoordinates(v, span) : null);
+                        CompatibilityUtils.isTablet(this.mActivity) ? getSpanCoordinates(v, span) : null);
             } else {
                 this.mListView.setSelection(position);
             }

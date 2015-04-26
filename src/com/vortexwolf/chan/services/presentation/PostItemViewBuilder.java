@@ -3,6 +3,7 @@ package com.vortexwolf.chan.services.presentation;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -11,27 +12,29 @@ import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.activities.PostsListActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
 import com.vortexwolf.chan.common.controls.MyLinkMovementMethod;
 import com.vortexwolf.chan.common.library.MyHtml;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtilsImpl;
-import com.vortexwolf.chan.common.utils.CompatibilityUtilsImplAPI4;
 import com.vortexwolf.chan.common.utils.HtmlUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
@@ -127,7 +130,7 @@ public class PostItemViewBuilder {
         String trip = item.getTrip();
         String subject = item.getSubject();
 
-        if (isTablet == null) isTablet = Constants.SDK_VERSION >= 4 && CompatibilityUtilsImplAPI4.isTablet(mAppContext);
+        if (isTablet == null) isTablet = CompatibilityUtils.isTablet(mAppContext);
         if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
             if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
                 name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
@@ -268,13 +271,20 @@ public class PostItemViewBuilder {
         vb.showFullTextView.setVisibility(View.GONE);
     }
 
-    public void displayPopupDialog(final PostItemViewModel item, final Context activityContext, Theme theme, final Point coordinates) {
-        if (item == null) return;
-        final View view = this.getView(item, null, false);
+    public void displayPopupDialog(final PostItemViewModel model, final Activity activity, Theme theme, final Point coordinates) {
+        if (model == null) return;
+        final View view = this.getView(model, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный
         int backColor = AppearanceUtils.getThemeColor(theme, R.styleable.Theme_activityRootBackground);
         view.setBackgroundColor(backColor);
+
+        // контекстное меню
+        ImageView menuButton = (ImageView) view.findViewById(R.id.post_item_menu);
+        if (Constants.SDK_VERSION >= 11) {
+            menuButton.setVisibility(View.VISIBLE);
+            menuButton.setOnClickListener(CompatibilityUtilsImpl.createClickListenerShowPostMenu(activity, model, view));
+        }
 
         // Перемещаем текст в ScrollView
         ScrollView scrollView = (ScrollView) view.findViewById(R.id.post_item_scroll);
@@ -285,7 +295,7 @@ public class PostItemViewBuilder {
         scrollView.setVisibility(View.VISIBLE);
 
         // Отображаем созданное view в диалоге
-        final Dialog currentDialog = new Dialog(activityContext);
+        final Dialog currentDialog = new Dialog(activity);
         currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         currentDialog.setCanceledOnTouchOutside(true);
         currentDialog.setContentView(view);
@@ -301,17 +311,15 @@ public class PostItemViewBuilder {
                     int gravity = 0;
                     int x = coordinates.x;
                     int y = coordinates.y;
-                    if (activityContext instanceof Activity) {
-                        Rect windowRect = new Rect();
-                        ((Activity)activityContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
-                        if (x + view.getWidth() > windowRect.width() && x >= view.getWidth()) {
-                            gravityLeft = false;
-                            x = windowRect.width() - x;
-                        }
-                        if (y + view.getHeight() > windowRect.height() && y >= view.getHeight()) {
-                            gravityTop = false;
-                            y = windowRect.height() - y;
-                        }
+                    Rect windowRect = new Rect();
+                    activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
+                    if (x + view.getWidth() > windowRect.width() && x >= view.getWidth()) {
+                        gravityLeft = false;
+                        x = windowRect.width() - x;
+                    }
+                    if (y + view.getHeight() > windowRect.height() && y >= view.getHeight()) {
+                        gravityTop = false;
+                        y = windowRect.height() - y;
                     }
                     gravity |= gravityLeft ? Gravity.LEFT : Gravity.RIGHT;
                     gravity |= gravityTop ? Gravity.TOP : Gravity.BOTTOM;
@@ -320,7 +328,7 @@ public class PostItemViewBuilder {
                     ((ViewGroup) view.getParent()).removeView(view);
                     currentDialog.hide();
                     currentDialog.cancel();
-                    Dialog currentDialog = new Dialog(activityContext);
+                    Dialog currentDialog = new Dialog(activity);
                     WindowManager.LayoutParams params = currentDialog.getWindow().getAttributes();
                     params.x = x;
                     params.y = y;

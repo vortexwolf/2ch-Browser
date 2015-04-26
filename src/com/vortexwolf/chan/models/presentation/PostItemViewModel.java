@@ -129,6 +129,18 @@ public class PostItemViewModel implements IPostListEntity {
         return this.mPosition;
     }
 
+    public IWebsite getWebsite() {
+        return this.mWebsite;
+    }
+
+    public String getBoardName() {
+        return this.mBoardName;
+    }
+
+    public String getThreadNumber() {
+        return this.mThreadNumber;
+    }
+
     public String getNumber() {
         return this.mModel.getNumber();
     }

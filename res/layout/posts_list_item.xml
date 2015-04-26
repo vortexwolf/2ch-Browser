@@ -29,6 +29,26 @@
             android:textColor="?postIndexForeground"
             android:textStyle="bold" />
 
+        <ImageView
+            android:id="@+id/post_item_menu"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:src="?iconOverflow"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/post_item_date_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/post_index"
+            android:layout_toLeftOf="@id/post_item_menu"
+            android:layout_alignWithParentIfMissing="true"
+            android:singleLine="true"
+            android:text="25.05.2012 23:59:59"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
         <TextView
             android:id="@+id/post_id"
             android:layout_width="wrap_content"
@@ -78,16 +98,6 @@
             android:textColor="?postTripForeground" />
 
         <TextView
-            android:id="@+id/post_item_date_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/post_index"
-            android:layout_alignParentRight="true"
-            android:singleLine="true"
-            android:text="25.05.2012 23:59:59"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
             android:id="@+id/post_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,37 +109,36 @@
             android:singleLine="true"
             android:text="anon anonanonanonanon"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-    </RelativeLayout>
 
-    
-    <LinearLayout 
+        <LinearLayout
             android:id="@+id/badge_view"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/post_index"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="visible">
 
-        <com.vortexwolf.chan.common.controls.DynamicWidthImageView
-            android:id="@+id/badge_image"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/badge_size"
-            android:layout_gravity="center_vertical"
-            android:minWidth="@dimen/badge_size"
-            android:adjustViewBounds="false"
-            android:scaleType="fitStart" />
-        <TextView
-            android:id="@+id/badge_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:singleLine="true"
-            android:layout_marginLeft="4dip"
-            android:text="ru"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </LinearLayout>
+            <com.vortexwolf.chan.common.controls.DynamicWidthImageView
+                android:id="@+id/badge_image"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/badge_size"
+                android:layout_gravity="center_vertical"
+                android:minWidth="@dimen/badge_size"
+                android:adjustViewBounds="false"
+                android:scaleType="fitStart" />
+            <TextView
+                android:id="@+id/badge_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true"
+                android:layout_marginLeft="4dip"
+                android:text="ru"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <!-- Content -->
-
     <ScrollView
         android:id="@+id/post_item_scroll"
         android:layout_width="fill_parent"

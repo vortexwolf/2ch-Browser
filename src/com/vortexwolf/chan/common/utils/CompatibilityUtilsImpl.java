@@ -2,23 +2,31 @@ package com.vortexwolf.chan.common.utils;
 
 import java.util.concurrent.Executor;
 
+import com.vortexwolf.chan.activities.PostsListActivity;
+import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 /**
@@ -39,11 +47,7 @@ public class CompatibilityUtilsImpl {
     public static boolean isDocumentUri(Context context, Uri uri) {
         return DocumentsContract.isDocumentUri(context, uri);
     }
-    
-    public static void displayGetSize(Display display, Point point) {
-        display.getSize(point);
-    }
-    
+
     public static void setScrollbarFadingEnabled(WebView webView, boolean fadeScrollbars) {
         webView.setScrollbarFadingEnabled(fadeScrollbars);
     }
@@ -115,5 +119,29 @@ public class CompatibilityUtilsImpl {
         } catch (Exception e) {
             MyLog.e("setDefaultExecutor", e);
         }        
+    }
+
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    public static View.OnClickListener createClickListenerShowPostMenu(final Activity activity, final PostItemViewModel model, final View view) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                PopupMenu popupMenu = new PopupMenu(activity, v);
+                Menu menu = popupMenu.getMenu();
+                PostsListActivity.populateContextMenu(menu, model, Factory.resolve(Resources.class));
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        PostsListActivity.handleContextMenuItemClick(menuItem, model, activity, view);
+                        return true;
+                    }
+                });
+                popupMenu.show();
+            }
+        };
     }
 }

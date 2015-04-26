@@ -27,6 +27,7 @@
         <attr name="iconForward" format="integer|reference" />
         <attr name="iconList" format="integer|reference" />
         <attr name="iconComputer" format="integer|reference" />
+        <attr name="iconOverflow" format="integer|reference" />
         <attr name="iconMarkupBold" format="integer|reference" />
         <attr name="iconMarkupItalic" format="integer|reference" />
         <attr name="iconMarkupUnderline" format="integer|reference" />

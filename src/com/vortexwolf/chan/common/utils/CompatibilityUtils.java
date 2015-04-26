@@ -5,11 +5,11 @@ import android.content.Context;
 import android.os.Build;
 import android.widget.TextView;
 
-public class CompatibilityUtils {
-    public static final Integer sCurrentVersion = Integer.valueOf(Build.VERSION.SDK);
+import com.vortexwolf.chan.common.Constants;
 
+public class CompatibilityUtils {
     public static void setDisplayHomeAsUpEnabled(Activity activity) {
-        if (sCurrentVersion < 11) {
+        if (Constants.SDK_VERSION < 11) {
             return;
         }
 
@@ -17,15 +17,15 @@ public class CompatibilityUtils {
     }
 
     public static boolean hasHardwareMenu(Context context) {
-        if (sCurrentVersion < 11) {
+        if (Constants.SDK_VERSION < 11) {
             return true;
         }
 
-        return CompatibilityUtilsImpl.hasHardwareMenu(context, sCurrentVersion);
+        return CompatibilityUtilsImpl.hasHardwareMenu(context, Constants.SDK_VERSION);
     }
 
     public static boolean isTextSelectable(TextView textView) {
-        if (sCurrentVersion < 11) {
+        if (Constants.SDK_VERSION < 11) {
             return false;
         }
 
@@ -33,6 +33,14 @@ public class CompatibilityUtils {
     }
 
     public static void copyText(Activity activity, String label, String text) {
-        CompatibilityUtilsImpl.copyText(activity, label, text, sCurrentVersion);
+        CompatibilityUtilsImpl.copyText(activity, label, text, Constants.SDK_VERSION);
+    }
+
+    public static boolean isTablet(Context context) {
+        if (Constants.SDK_VERSION < 4) {
+            return false;
+        }
+
+        return CompatibilityUtilsImpl.isTablet(context);
     }
 }

@@ -3,6 +3,7 @@ package com.vortexwolf.chan.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.IPostListEntity;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
+import com.vortexwolf.chan.models.presentation.PostsViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
@@ -268,7 +270,7 @@ public class PostsListActivity extends BaseListActivity {
                 this.startActivity(preferencesIntent);
                 break;
             case R.id.add_menu_id:
-                this.navigateToAddPostView(null, null);
+                this.navigateToAddNewPost();
                 break;
             case R.id.share_menu_id:
                 String shareUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
@@ -308,18 +310,24 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         PostItemViewModel model = (PostItemViewModel)item;
-        menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST, 0, this.getString(R.string.cmenu_reply_post));
+        populateContextMenu(menu, model, this.getResources());
+    }
+
+    public static void populateContextMenu(Menu menu, PostItemViewModel model, Resources res) {
+        menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST, 0, res.getString(R.string.cmenu_reply_post));
         if (!StringUtils.isEmpty(model.getSpannedComment().toString())) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST_QUOTE, 1, this.getString(R.string.cmenu_reply_post_quote));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_REPLY_POST_QUOTE, 1, res.getString(R.string.cmenu_reply_post_quote));
         }
         if (!StringUtils.isEmpty(model.getSpannedComment())) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, this.getString(R.string.cmenu_copy_post));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_TEXT, 2, res.getString(R.string.cmenu_copy_post));
         }
         if (model.hasAttachment() && model.getAttachment(0).isFile()) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, this.getString(model.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file : R.string.cmenu_download_files));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_DOWNLOAD_FILE, 3, res.getString(
+                    model.getAttachmentsNumber() == 1 ? R.string.cmenu_download_file
+                            : R.string.cmenu_download_files));
         }
         if (!StringUtils.isEmpty(model.getSpannedComment())) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 4, this.getString(R.string.cmenu_share));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_SHARE, 4, res.getString(R.string.cmenu_share));
         }
     }
 
@@ -332,39 +340,43 @@ public class PostsListActivity extends BaseListActivity {
         }
 
         PostItemViewModel model = (PostItemViewModel) adapterItem;
+        View view = AppearanceUtils.getListItemAtPosition(this.getListView(), menuInfo.position);
 
+        return handleContextMenuItemClick(item, model, this, view);
+    }
+
+    public static boolean handleContextMenuItemClick(MenuItem item, PostItemViewModel model, Activity activity, View view) {
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_REPLY_POST:
-                this.navigateToAddPostView(model.getNumber(), null);
+                navigateToAddReply(activity, model, null);
                 break;
             case Constants.CONTEXT_MENU_REPLY_POST_QUOTE:
-                this.navigateToAddPostView(model.getNumber(), model.getSpannedComment().toString());
+                navigateToAddReply(activity, model, model.getSpannedComment().toString());
                 break;
             case Constants.CONTEXT_MENU_COPY_TEXT:
-                View view = AppearanceUtils.getListItemAtPosition(this.getListView(), menuInfo.position);
                 PostItemViewBuilder.ViewBag vb = (PostItemViewBuilder.ViewBag) view.getTag();
 
                 if (CompatibilityUtils.isTextSelectable(vb.commentView)) {
                     vb.commentView.startSelection();
                 } else {
-                    CompatibilityUtils.copyText(this, "#" + model.getNumber(), model.getSpannedComment().toString());
+                    CompatibilityUtils.copyText(activity, "#" + model.getNumber(), model.getSpannedComment().toString());
 
-                    AppearanceUtils.showToastMessage(this, this.getString(R.string.notification_post_copied));
+                    AppearanceUtils.showToastMessage(activity, activity.getString(R.string.notification_post_copied));
                 }
                 break;
             case Constants.CONTEXT_MENU_DOWNLOAD_FILE:
                 for (int i = 0; i < model.getAttachmentsNumber(); ++i) {
                     AttachmentInfo attachment = model.getAttachment(i);
                     Uri fileUri = Uri.parse(attachment.getSourceUrl());
-                    new DownloadFileTask(this, fileUri).execute();
+                    new DownloadFileTask(activity, fileUri).execute();
                 }
                 break;
             case Constants.CONTEXT_MENU_SHARE:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
                 shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, this.mBoardName + ", post #" + model.getNumber());
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, model.getBoardName() + ", post #" + model.getNumber());
                 shareLinkIntent.putExtra(Intent.EXTRA_TEXT, model.getSpannedComment().toString());
-                this.startActivity(Intent.createChooser(shareLinkIntent, this.getString(R.string.share_via)));
+                activity.startActivity(Intent.createChooser(shareLinkIntent, activity.getString(R.string.share_via)));
                 break;
         }
 
@@ -391,20 +403,26 @@ public class PostsListActivity extends BaseListActivity {
         }
     }
 
-    private void navigateToAddPostView(String postNumber, String postComment) {
+    private void navigateToAddNewPost() {
         Intent addPostIntent = new Intent(this.getApplicationContext(), AddPostActivity.class);
         addPostIntent.putExtra(Constants.EXTRA_WEBSITE, this.mWebsite.name());
         addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, this.mBoardName);
         addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, this.mThreadNumber);
 
-        if (postNumber != null) {
-            addPostIntent.putExtra(Constants.EXTRA_POST_NUMBER, postNumber);
-        }
+        this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+    }
+
+    private static void navigateToAddReply(Activity activity, PostItemViewModel model, String postComment) {
+        Intent addPostIntent = new Intent(activity.getApplicationContext(), AddPostActivity.class);
+        addPostIntent.putExtra(Constants.EXTRA_WEBSITE, model.getWebsite().name());
+        addPostIntent.putExtra(Constants.EXTRA_BOARD_NAME, model.getBoardName());
+        addPostIntent.putExtra(Constants.EXTRA_THREAD_NUMBER, model.getThreadNumber());
+        addPostIntent.putExtra(Constants.EXTRA_POST_NUMBER, model.getNumber());
         if (postComment != null) {
             addPostIntent.putExtra(Constants.EXTRA_POST_COMMENT, postComment);
         }
 
-        this.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
+        activity.startActivityForResult(addPostIntent, Constants.REQUEST_CODE_ADD_POST_ACTIVITY);
     }
 
     private void navigateToThreads() {
