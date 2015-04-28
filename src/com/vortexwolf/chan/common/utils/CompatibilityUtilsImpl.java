@@ -121,9 +121,11 @@ public class CompatibilityUtilsImpl {
         }        
     }
 
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    public static class API4 {
+        public static boolean isTablet(Context context) {
+            return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+                    >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+        }
     }
 
     public static View.OnClickListener createClickListenerShowPostMenu(final Activity activity, final PostItemViewModel model, final View view) {

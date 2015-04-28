@@ -41,6 +41,6 @@ public class CompatibilityUtils {
             return false;
         }
 
-        return CompatibilityUtilsImpl.isTablet(context);
+        return CompatibilityUtilsImpl.API4.isTablet(context);
     }
 }
