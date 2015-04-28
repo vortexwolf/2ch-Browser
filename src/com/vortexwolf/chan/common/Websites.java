@@ -22,9 +22,9 @@ public class Websites {
     // Handles external URLs which are declared in AndroidManifest
     public static IWebsite fromUri(Uri uri) {
         String host = uri.getHost();
-        if (MakabaWebsite.URI_PATTERN.matcher(host).matches()) {
+        if (MakabaWebsite.URI_PATTERN.matcher(host).find()) {
             return Factory.resolve(MakabaWebsite.class);
-        } else if (FourchanWebsite.URI_PATTERN.matcher(host).matches()) {
+        } else if (FourchanWebsite.URI_PATTERN.matcher(host).find()) {
             return Factory.resolve(FourchanWebsite.class);
         }
 
