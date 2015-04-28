@@ -1,5 +1,5 @@
 /*
-Copyright 2014 David Morrissey
+Copyright 2013-2015 David Morrissey
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,40 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/*
- * Modified by miku-nyan:
- * - removed xml attributes;
- * - added annotation TargetApi;
- * - changed zoom values (default, min, max, double-tap behavior);
- * - added callback and fail listener;
- */
-
 package com.davemorrissey.labs.subscaleview;
 
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.TypedArray;
 import android.graphics.*;
-import android.graphics.Bitmap.Config;
 import android.graphics.Paint.Style;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build.VERSION;
 import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.FloatMath;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
+import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
+import com.davemorrissey.labs.subscaleview.decoder.SkiaImageDecoder;
+import com.davemorrissey.labs.subscaleview.decoder.SkiaImageRegionDecoder;
 
-//import com.davemorrissey.labs.subscaleview.R.styleable;
 import java.lang.ref.WeakReference;
 import java.util.*;
+
+/*
+ * Changed by vortexwolf:
+ * - removed xml attributes;
+ * - modified error callbacks to be called for null bitmaps or OutOfMemory errors
+ */
 
 /**
  * Displays an image subsampled as necessary to avoid loading too much image data into memory. After a pinch to zoom in,
@@ -107,18 +109,34 @@ public class FixedSubsamplingScaleImageView extends View {
     public static final int SCALE_TYPE_CENTER_INSIDE = 1;
     /** Scale the image uniformly so that both dimensions of the image will be equal to or larger than the corresponding dimension of the view. The image is then centered in the view. */
     public static final int SCALE_TYPE_CENTER_CROP = 2;
+    /** Scale the image so that both dimensions of the image will be equal to or less than the maxScale and equal to or larger than minScale. The image is then centered in the view. */
+    public static final int SCALE_TYPE_CUSTOM = 3;
 
-    private static final List<Integer> VALID_SCALE_TYPES = Arrays.asList(SCALE_TYPE_CENTER_CROP, SCALE_TYPE_CENTER_INSIDE);
+    private static final List<Integer> VALID_SCALE_TYPES = Arrays.asList(SCALE_TYPE_CENTER_CROP, SCALE_TYPE_CENTER_INSIDE, SCALE_TYPE_CUSTOM);
+
+    // Bitmap (preview or full image)
+    private Bitmap bitmap;
+
+    // Whether the bitmap is a preview image
+    private boolean preview;
+
+    // Sample size used to display the whole image when fully zoomed out
+    private int fullImageSampleSize;
+
+    // Map of zoom level to tile grid
+    private Map<Integer, List<Tile>> tileMap;
 
     // Overlay tile boundaries and other info
-    private boolean debug = false;
+    private boolean debug;
 
     // Image orientation setting
     private int orientation = ORIENTATION_0;
 
     // Max scale allowed (prevent infinite zoom)
-    //private float maxScale = 2F;
-    private float maxScale = 3F;
+    private float maxScale = 2F;
+
+    // Min scale allowed (prevent infinite zoom)
+    private float minScale = minScale();
 
     // Density to reach before loading higher resolution tiles
     private int minimumTileDpi = -1;
@@ -132,6 +150,7 @@ public class FixedSubsamplingScaleImageView extends View {
     // Gesture detection settings
     private boolean panEnabled = true;
     private boolean zoomEnabled = true;
+    private boolean quickScaleEnabled = true;
 
     // Double tap zoom behaviour
     private float doubleTapZoomScale = 1F;
@@ -140,8 +159,6 @@ public class FixedSubsamplingScaleImageView extends View {
     // Current scale and scale at start of zoom
     private float scale;
     private float scaleStart;
-    
-    private float defaultScale = 1F;
 
     // Screen coordinate of top-left corner of source image
     private PointF vTranslate;
@@ -156,36 +173,48 @@ public class FixedSubsamplingScaleImageView extends View {
     private int sWidth;
     private int sHeight;
     private int sOrientation;
+    private Rect sRegion;
+    private Rect pRegion;
 
     // Is two-finger zooming in progress
     private boolean isZooming;
     // Is one-finger panning in progress
     private boolean isPanning;
+    // Is quick-scale gesture in progress
+    private boolean isQuickScaling;
     // Max touches used in current gesture
     private int maxTouchCount;
 
     // Fling detector
     private GestureDetector detector;
 
-    // Tile decoder
-    private BitmapRegionDecoder decoder;
+    // Tile and image decoding
+    private ImageRegionDecoder decoder;
     private final Object decoderLock = new Object();
-
-    // Sample size used to display the whole image when fully zoomed out
-    private int fullImageSampleSize;
-
-    // Map of zoom level to tile grid
-    private Map<Integer, List<Tile>> tileMap;
+    private Class<? extends ImageRegionDecoder> regionDecoderClass = SkiaImageRegionDecoder.class;
+    private Class<? extends ImageDecoder> bitmapDecoderClass = SkiaImageDecoder.class;
 
     // Debug values
     private PointF vCenterStart;
     private float vDistStart;
 
+    // Current quickscale state
+    private final float quickScaleThreshold;
+    private PointF quickScaleCenter;
+    private float quickScaleLastDistance;
+    private PointF quickScaleLastPoint;
+    private boolean quickScaleMoved;
+
     // Scale and center animation tracking
     private Anim anim;
 
     // Whether a ready notification has been sent to subclasses
-    private boolean readySent = false;
+    private boolean readySent;
+    // Whether a base layer loaded notification has been sent to subclasses
+    private boolean imageLoadedSent;
+
+    // Event listener
+    private OnImageEventListener onImageEventListener;
 
     // Long click listener
     private OnLongClickListener onLongClickListener;
@@ -197,11 +226,19 @@ public class FixedSubsamplingScaleImageView extends View {
     // Paint objects created once and reused for efficiency
     private Paint bitmapPaint;
     private Paint debugPaint;
+    private Paint tileBgPaint;
+
+    // Volatile fields used to reduce object creation
+    private ScaleAndTranslate satTemp;
+    private Matrix matrix;
+    private RectF sRect;
+    private float[] srcArray = new float[8];
+    private float[] dstArray = new float[8];
 
     public FixedSubsamplingScaleImageView(Context context, AttributeSet attr) {
         super(context, attr);
-        //setMinimumDpi(160);
-        //setDoubleTapZoomDpi(160);
+        setMinimumDpi(160);
+        setDoubleTapZoomDpi(160);
         setGestureDetector(context);
         this.handler = new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
@@ -214,13 +251,19 @@ public class FixedSubsamplingScaleImageView extends View {
                 return true;
             }
         });
-        // Handle XML attributes
-        /*if (attr != null) {
+        /*// Handle XML attributes
+        if (attr != null) {
             TypedArray typedAttr = getContext().obtainStyledAttributes(attr, styleable.SubsamplingScaleImageView);
             if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_assetName)) {
                 String assetName = typedAttr.getString(styleable.SubsamplingScaleImageView_assetName);
                 if (assetName != null && assetName.length() > 0) {
-                    setImageAsset(assetName);
+                    setImage(ImageSource.asset(assetName).tilingEnabled());
+                }
+            }
+            if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_src)) {
+                int resId = typedAttr.getResourceId(styleable.SubsamplingScaleImageView_src, 0);
+                if (resId > 0) {
+                    setImage(ImageSource.resource(resId).tilingEnabled());
                 }
             }
             if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_panEnabled)) {
@@ -229,7 +272,16 @@ public class FixedSubsamplingScaleImageView extends View {
             if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_zoomEnabled)) {
                 setZoomEnabled(typedAttr.getBoolean(styleable.SubsamplingScaleImageView_zoomEnabled, true));
             }
+            if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_quickScaleEnabled)) {
+                setQuickScaleEnabled(typedAttr.getBoolean(styleable.SubsamplingScaleImageView_quickScaleEnabled, true));
+            }
+            if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_tileBackgroundColor)) {
+                setTileBackgroundColor(typedAttr.getColor(styleable.SubsamplingScaleImageView_tileBackgroundColor, Color.argb(0, 0, 0, 0)));
+            }
+            typedAttr.recycle();
         }*/
+
+        quickScaleThreshold = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, context.getResources().getDisplayMetrics());
     }
 
     public FixedSubsamplingScaleImageView(Context context) {
@@ -251,57 +303,101 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
-     * Display an image from a file in internal or external storage.
-     * @param extFile URI of the file to display.
+     * Set the image source from a bitmap, resource, asset, file or other URI.
+     * @param imageSource Image source.
      */
-    public final void setImageFile(String extFile) {
-        reset(true);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false, this.failListener);
-        task.execute();
-        invalidate();
-    }
-    
-    public final void setImageFile(String extFile, FailedCallback failListener) {
-        this.failListener = failListener;
-        setImageFile(extFile);
+    public final void setImage(ImageSource imageSource) {
+        setImage(imageSource, null, null);
     }
 
     /**
-     * Display an image from a file in internal or external storage, starting with a given orientation setting, scale
-     * and center. This is the best method to use when you want scale and center to be restored after screen orientation
-     * change; it avoids any redundant loading of tiles in the wrong orientation.
-     * @param extFile URI of the file to display.
+     * Set the image source from a bitmap, resource, asset, file or other URI, starting with a given orientation
+     * setting, scale and center. This is the best method to use when you want scale and center to be restored
+     * after screen orientation change; it avoids any redundant loading of tiles in the wrong orientation.
+     * @param imageSource Image source.
      * @param state State to be restored. Nullable.
      */
-    public final void setImageFile(String extFile, ImageViewState state) {
-        reset(true);
-        restoreState(state);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), extFile, false, this.failListener);
-        task.execute();
-        invalidate();
+    public final void setImage(ImageSource imageSource, ImageViewState state) {
+        setImage(imageSource, null, state);
     }
 
     /**
-     * Display an image from a file in assets.
-     * @param assetName asset name.
+     * Set the image source from a bitmap, resource, asset, file or other URI, providing a preview image to be
+     * displayed until the full size image is loaded.
+     *
+     * You must declare the dimensions of the full size image by calling {@link ImageSource#dimensions(int, int)}
+     * on the imageSource object. The preview source will be ignored if you don't provide dimensions,
+     * and if you provide a bitmap for the full size image.
+     * @param imageSource Image source. Dimensions must be declared.
+     * @param previewSource Optional source for a preview image to be displayed and allow interaction while the full size image loads.
      */
-    public final void setImageAsset(String assetName) {
-        setImageAsset(assetName, null);
+    public final void setImage(ImageSource imageSource, ImageSource previewSource) {
+        setImage(imageSource, previewSource, null);
     }
 
     /**
-     * Display an image from a file in assets, starting with a given orientation setting, scale and center. This is the
-     * best method to use when you want scale and center to be restored after screen orientation change; it avoids any
-     * redundant loading of tiles in the wrong orientation.
-     * @param assetName asset name.
+     * Set the image source from a bitmap, resource, asset, file or other URI, providing a preview image to be
+     * displayed until the full size image is loaded, starting with a given orientation setting, scale and center.
+     * This is the best method to use when you want scale and center to be restored after screen orientation change;
+     * it avoids any redundant loading of tiles in the wrong orientation.
+     *
+     * You must declare the dimensions of the full size image by calling {@link ImageSource#dimensions(int, int)}
+     * on the imageSource object. The preview source will be ignored if you don't provide dimensions,
+     * and if you provide a bitmap for the full size image.
+     * @param imageSource Image source. Dimensions must be declared.
+     * @param previewSource Optional source for a preview image to be displayed and allow interaction while the full size image loads.
      * @param state State to be restored. Nullable.
      */
-    public final void setImageAsset(String assetName, ImageViewState state) {
+    public final void setImage(ImageSource imageSource, ImageSource previewSource, ImageViewState state) {
+        if (imageSource == null) {
+            throw new NullPointerException("imageSource must not be null");
+        }
+
         reset(true);
-        restoreState(state);
-        BitmapInitTask task = new BitmapInitTask(this, getContext(), assetName, true, this.failListener);
-        task.execute();
-        invalidate();
+        if (state != null) { restoreState(state); }
+
+        if (previewSource != null) {
+            if (imageSource.getBitmap() != null) {
+                throw new IllegalArgumentException("Preview image cannot be used when a bitmap is provided for the main image");
+            }
+            if (imageSource.getSWidth() <= 0 || imageSource.getSHeight() <= 0) {
+                throw new IllegalArgumentException("Preview image cannot be used unless dimensions are provided for the main image");
+            }
+            this.sWidth = imageSource.getSWidth();
+            this.sHeight = imageSource.getSHeight();
+            this.pRegion = previewSource.getSRegion();
+            if (previewSource.getBitmap() != null) {
+                onPreviewLoaded(previewSource.getBitmap());
+            } else {
+                Uri uri = previewSource.getUri();
+                if (uri == null && previewSource.getResource() != null) {
+                    uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + previewSource.getResource());
+                }
+                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderClass, uri, true);
+                task.execute();
+            }
+        }
+
+        if (imageSource.getBitmap() != null && imageSource.getSRegion() != null) {
+            onImageLoaded(Bitmap.createBitmap(imageSource.getBitmap(), imageSource.getSRegion().left, imageSource.getSRegion().top, imageSource.getSRegion().width(), imageSource.getSRegion().height()), ORIENTATION_0);
+        } else if (imageSource.getBitmap() != null) {
+            onImageLoaded(imageSource.getBitmap(), ORIENTATION_0);
+        } else {
+            this.sRegion = imageSource.getSRegion();
+            Uri uri = imageSource.getUri();
+            if (uri == null && imageSource.getResource() != null) {
+                uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + imageSource.getResource());
+            }
+            if (imageSource.getTile() || this.sRegion != null) {
+                // Load the bitmap using tile decoding.
+                TilesInitTask task = new TilesInitTask(this, getContext(), regionDecoderClass, uri);
+                task.execute();
+            } else {
+                // Load the bitmap as a single image.
+                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderClass, uri, false);
+                task.execute();
+            }
+        }
     }
 
     /**
@@ -317,11 +413,19 @@ public class FixedSubsamplingScaleImageView extends View {
         sRequestedCenter = null;
         isZooming = false;
         isPanning = false;
+        isQuickScaling = false;
         maxTouchCount = 0;
         fullImageSampleSize = 0;
         vCenterStart = null;
         vDistStart = 0;
+        quickScaleCenter = null;
+        quickScaleLastDistance = 0f;
+        quickScaleLastPoint = null;
+        quickScaleMoved = false;
         anim = null;
+        satTemp = null;
+        matrix = null;
+        sRect = null;
         if (newImage) {
             if (decoder != null) {
                 synchronized (decoderLock) {
@@ -329,10 +433,18 @@ public class FixedSubsamplingScaleImageView extends View {
                     decoder = null;
                 }
             }
+            if (bitmap != null) {
+                bitmap.recycle();
+            }
             sWidth = 0;
             sHeight = 0;
             sOrientation = 0;
+            sRegion = null;
+            pRegion = null;
             readySent = false;
+            imageLoadedSent = false;
+            bitmap = null;
+            preview = false;
         }
         if (tileMap != null) {
             for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
@@ -346,10 +458,12 @@ public class FixedSubsamplingScaleImageView extends View {
             }
             tileMap = null;
         }
+        setGestureDetector(getContext());
     }
 
     private void setGestureDetector(final Context context) {
         this.detector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if (panEnabled && readySent && vTranslate != null && e1 != null && e2 != null && (Math.abs(e1.getX() - e2.getX()) > 50 || Math.abs(e1.getY() - e2.getY()) > 50) && (Math.abs(velocityX) > 500 || Math.abs(velocityY) > 500) && !isZooming) {
@@ -371,30 +485,28 @@ public class FixedSubsamplingScaleImageView extends View {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
                 if (zoomEnabled && readySent && vTranslate != null) {
-                    float doubleTapZoomScale = Math.min(maxScale, FixedSubsamplingScaleImageView.this.doubleTapZoomScale);
-                    
-                    float targetScale;
-                    if (scale > doubleTapZoomScale * 0.9 && scale * 0.9 < doubleTapZoomScale) targetScale = maxScale;
-                    else if (scale > maxScale * 0.99) targetScale = defaultScale;
-                    else targetScale = doubleTapZoomScale;
-                    
-                    boolean zoomIn = scale <= targetScale;
-                    
-                    PointF targetSCenter = viewToSourceCoord(new PointF(e.getX(), e.getY()));
-                    if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER_IMMEDIATE) {
-                        setScaleAndCenter(targetScale, targetSCenter);
-                    } else if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER || !zoomIn) {
-                        new AnimationBuilder(targetScale, targetSCenter).withInterruptible(false).start();
-                    } else if (doubleTapZoomStyle == ZOOM_FOCUS_FIXED) {
-                        new AnimationBuilder(targetScale, targetSCenter, new PointF(e.getX(), e.getY())).withInterruptible(false).start();
-                    }
-
-                    // Hacky solution for #15 - after a double tap the GestureDetector gets in a state where the next
-                    // fling is ignored, so here we replace it with a new one.
+                    // Hacky solution for #15 - after a double tap the GestureDetector gets in a state
+                    // where the next fling is ignored, so here we replace it with a new one.
                     setGestureDetector(context);
-
-                    invalidate();
-                    return true;
+                    if (quickScaleEnabled) {
+                        // Store quick scale params. This will become either a double tap zoom or a
+                        // quick scale depending on whether the user swipes.
+                        vCenterStart = new PointF(e.getX(), e.getY());
+                        vTranslateStart = new PointF(vTranslate.x, vTranslate.y);
+                        scaleStart = scale;
+                        isQuickScaling = true;
+                        isZooming = true;
+                        quickScaleCenter = viewToSourceCoord(vCenterStart);
+                        quickScaleLastDistance = -1F;
+                        quickScaleLastPoint = new PointF(quickScaleCenter.x, quickScaleCenter.y);
+                        quickScaleMoved = false;
+                        // We need to get events in onTouchEvent after this.
+                        return false;
+                    } else {
+                        // Start double tap zoom animation.
+                        doubleTapZoom(viewToSourceCoord(new PointF(e.getX(), e.getY())), new PointF(e.getX(), e.getY()));
+                        return true;
+                    }
                 }
                 return super.onDoubleTapEvent(e);
             }
@@ -406,8 +518,11 @@ public class FixedSubsamplingScaleImageView extends View {
      */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if (readySent) {
-            setScaleAndCenter(getScale(), getCenter());
+        PointF sCenter = getCenter();
+        if (readySent && sCenter != null) {
+            this.anim = null;
+            this.pendingScale = scale;
+            this.sPendingCenter = sCenter;
         }
     }
 
@@ -443,10 +558,8 @@ public class FixedSubsamplingScaleImageView extends View {
     /**
      * Handle touch events. One finger pans, and two finger pinch and zoom plus panning.
      */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        PointF vCenterEnd;
-        float vDistEnd;
+    @Override @SuppressWarnings("deprecation")
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
         // During non-interruptible anims, ignore all touch events
         if (anim != null && !anim.interruptible) {
             getParent().requestDisallowInterceptTouchEvent(true);
@@ -460,9 +573,15 @@ public class FixedSubsamplingScaleImageView extends View {
             return true;
         }
         // Detect flings, taps and double taps
-        if (detector == null || detector.onTouchEvent(event)) {
+        if (!isQuickScaling && (detector == null || detector.onTouchEvent(event))) {
+            isZooming = false;
+            isPanning = false;
+            maxTouchCount = 0;
             return true;
         }
+
+        if (vTranslateStart == null) { vTranslateStart = new PointF(0, 0); }
+        if (vCenterStart == null) { vCenterStart = new PointF(0, 0); }
 
         int touchCount = event.getPointerCount();
         switch (event.getAction()) {
@@ -478,18 +597,18 @@ public class FixedSubsamplingScaleImageView extends View {
                         float distance = distance(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
                         scaleStart = scale;
                         vDistStart = distance;
-                        vTranslateStart = new PointF(vTranslate.x, vTranslate.y);
-                        vCenterStart = new PointF((event.getX(0) + event.getX(1))/2, (event.getY(0) + event.getY(1))/2);
+                        vTranslateStart.set(vTranslate.x, vTranslate.y);
+                        vCenterStart.set((event.getX(0) + event.getX(1))/2, (event.getY(0) + event.getY(1))/2);
                     } else {
                         // Abort all gestures on second touch
                         maxTouchCount = 0;
                     }
                     // Cancel long click timer
                     handler.removeMessages(MESSAGE_LONG_CLICK);
-                } else {
+                } else if (!isQuickScaling) {
                     // Start one-finger pan
-                    vTranslateStart = new PointF(vTranslate.x, vTranslate.y);
-                    vCenterStart = new PointF(event.getX(), event.getY());
+                    vTranslateStart.set(vTranslate.x, vTranslate.y);
+                    vCenterStart.set(event.getX(), event.getY());
 
                     // Start long click timer
                     handler.sendEmptyMessageDelayed(MESSAGE_LONG_CLICK, 600);
@@ -500,10 +619,11 @@ public class FixedSubsamplingScaleImageView extends View {
                 if (maxTouchCount > 0) {
                     if (touchCount >= 2) {
                         // Calculate new distance between touch points, to scale and pan relative to start values.
-                        vDistEnd = distance(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
-                        vCenterEnd = new PointF((event.getX(0) + event.getX(1))/2, (event.getY(0) + event.getY(1))/2);
+                        float vDistEnd = distance(event.getX(0), event.getX(1), event.getY(0), event.getY(1));
+                        float vCenterEndX = (event.getX(0) + event.getX(1))/2;
+                        float vCenterEndY = (event.getY(0) + event.getY(1))/2;
 
-                        if (zoomEnabled && (distance(vCenterStart.x, vCenterEnd.x, vCenterStart.y, vCenterEnd.y) > 5 || Math.abs(vDistEnd - vDistStart) > 5 || isPanning)) {
+                        if (zoomEnabled && (distance(vCenterStart.x, vCenterEndX, vCenterStart.y, vCenterEndY) > 5 || Math.abs(vDistEnd - vDistStart) > 5 || isPanning)) {
                             isZooming = true;
                             isPanning = true;
                             consumed = true;
@@ -514,8 +634,8 @@ public class FixedSubsamplingScaleImageView extends View {
                                 // Minimum scale reached so don't pan. Adjust start settings so any expand will zoom in.
                                 vDistStart = vDistEnd;
                                 scaleStart = minScale();
-                                vCenterStart = vCenterEnd;
-                                vTranslateStart = vTranslate;
+                                vCenterStart.set(vCenterEndX, vCenterEndY);
+                                vTranslateStart.set(vTranslate);
                             } else if (panEnabled) {
                                 // Translate to place the source image coordinate that was at the center of the pinch at the start
                                 // at the center of the pinch now, to give simultaneous pan + zoom.
@@ -523,8 +643,8 @@ public class FixedSubsamplingScaleImageView extends View {
                                 float vTopStart = vCenterStart.y - vTranslateStart.y;
                                 float vLeftNow = vLeftStart * (scale/scaleStart);
                                 float vTopNow = vTopStart * (scale/scaleStart);
-                                vTranslate.x = vCenterEnd.x - vLeftNow;
-                                vTranslate.y = vCenterEnd.y - vTopNow;
+                                vTranslate.x = vCenterEndX - vLeftNow;
+                                vTranslate.y = vCenterEndY - vTopNow;
                             } else if (sRequestedCenter != null) {
                                 // With a center specified from code, zoom around that point.
                                 vTranslate.x = (getWidth()/2) - (scale * sRequestedCenter.x);
@@ -538,6 +658,51 @@ public class FixedSubsamplingScaleImageView extends View {
                             fitToBounds(true);
                             refreshRequiredTiles(false);
                         }
+                    } else if (isQuickScaling) {
+                        // One finger zoom
+                        // Stole Google's Magical Formula™ to make sure it feels the exact same
+                        float dist = Math.abs(vCenterStart.y - event.getY()) * 2 + quickScaleThreshold;
+
+                        if (quickScaleLastDistance == -1F) quickScaleLastDistance = dist;
+                        boolean isUpwards = event.getY() > quickScaleLastPoint.y;
+                        quickScaleLastPoint.set(0, event.getY());
+
+                        float spanDiff = (Math.abs(1 - (dist / quickScaleLastDistance)) * 0.5F);
+
+                        if (spanDiff > 0.03f || quickScaleMoved) {
+                            quickScaleMoved = true;
+
+                            float multiplier = 1;
+                            if (quickScaleLastDistance > 0) {
+                                multiplier = isUpwards ? (1 + spanDiff) : (1 - spanDiff);
+                            }
+
+                            scale = Math.max(minScale(), Math.min(maxScale, scale * multiplier));
+
+                            if (panEnabled) {
+                                float vLeftStart = vCenterStart.x - vTranslateStart.x;
+                                float vTopStart = vCenterStart.y - vTranslateStart.y;
+                                float vLeftNow = vLeftStart * (scale/scaleStart);
+                                float vTopNow = vTopStart * (scale/scaleStart);
+                                vTranslate.x = vCenterStart.x - vLeftNow;
+                                vTranslate.y = vCenterStart.y - vTopNow;
+                            } else if (sRequestedCenter != null) {
+                                // With a center specified from code, zoom around that point.
+                                vTranslate.x = (getWidth()/2) - (scale * sRequestedCenter.x);
+                                vTranslate.y = (getHeight()/2) - (scale * sRequestedCenter.y);
+                            } else {
+                                // With no requested center, scale around the image center.
+                                vTranslate.x = (getWidth()/2) - (scale * (sWidth()/2));
+                                vTranslate.y = (getHeight()/2) - (scale * (sHeight()/2));
+                            }
+                        }
+
+                        quickScaleLastDistance = dist;
+
+                        fitToBounds(true);
+                        refreshRequiredTiles(false);
+
+                        consumed = true;
                     } else if (!isZooming) {
                         // One finger pan - translate the image. We do this calculation even with pan disabled so click
                         // and long click behaviour is preserved.
@@ -551,7 +716,10 @@ public class FixedSubsamplingScaleImageView extends View {
                             float lastX = vTranslate.x;
                             float lastY = vTranslate.y;
                             fitToBounds(true);
-                            if (lastX == vTranslate.x || (lastY == vTranslate.y && dy > 10) || isPanning) {
+                            boolean atXEdge = lastX != vTranslate.x;
+                            boolean edgeXSwipe = atXEdge && dx > dy && !isPanning;
+                            boolean yPan = lastY == vTranslate.y && dy > 15;
+                            if (!edgeXSwipe && (!atXEdge || yPan || isPanning)) {
                                 isPanning = true;
                             } else if (dx > 5) {
                                 // Haven't panned the image, and we're at the left or right edge. Switch to page swipe.
@@ -580,15 +748,21 @@ public class FixedSubsamplingScaleImageView extends View {
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_POINTER_2_UP:
                 handler.removeMessages(MESSAGE_LONG_CLICK);
+                if (isQuickScaling) {
+                    isQuickScaling = false;
+                    if (!quickScaleMoved) {
+                        doubleTapZoom(quickScaleCenter, vCenterStart);
+                    }
+                }
                 if (maxTouchCount > 0 && (isZooming || isPanning)) {
                     if (isZooming && touchCount == 2) {
                         // Convert from zoom to pan with remaining touch
                         isPanning = true;
-                        vTranslateStart = new PointF(vTranslate.x, vTranslate.y);
+                        vTranslateStart.set(vTranslate.x, vTranslate.y);
                         if (event.getActionIndex() == 1) {
-                            vCenterStart = new PointF(event.getX(0), event.getY(0));
+                            vCenterStart.set(event.getX(0), event.getY(0));
                         } else {
-                            vCenterStart = new PointF(event.getX(1), event.getY(1));
+                            vCenterStart.set(event.getX(1), event.getY(1));
                         }
                     }
                     if (touchCount < 3) {
@@ -614,9 +788,33 @@ public class FixedSubsamplingScaleImageView extends View {
         return super.onTouchEvent(event);
     }
 
-    @Override
-    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
-        this.onLongClickListener = onLongClickListener;
+    /**
+     * Double tap zoom handler triggered from gesture detector or on touch, depending on whether
+     * quick scale is enabled.
+     */
+    private void doubleTapZoom(PointF sCenter, PointF vFocus) {
+        if (!panEnabled) {
+            if (sRequestedCenter != null) {
+                // With a center specified from code, zoom around that point.
+                sCenter.x = sRequestedCenter.x;
+                sCenter.y = sRequestedCenter.y;
+            } else {
+                // With no requested center, scale around the image center.
+                sCenter.x = sWidth()/2;
+                sCenter.y = sHeight()/2;
+            }
+        }
+        float doubleTapZoomScale = Math.min(maxScale, FixedSubsamplingScaleImageView.this.doubleTapZoomScale);
+        boolean zoomIn = scale <= doubleTapZoomScale * 0.9;
+        float targetScale = zoomIn ? doubleTapZoomScale : minScale();
+        if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER_IMMEDIATE) {
+            setScaleAndCenter(targetScale, sCenter);
+        } else if (doubleTapZoomStyle == ZOOM_FOCUS_CENTER || !zoomIn || !panEnabled) {
+            new AnimationBuilder(targetScale, sCenter).withInterruptible(false).start();
+        } else if (doubleTapZoomStyle == ZOOM_FOCUS_FIXED) {
+            new AnimationBuilder(targetScale, sCenter, vFocus).withInterruptible(false).start();
+        }
+        invalidate();
     }
 
     /**
@@ -629,39 +827,24 @@ public class FixedSubsamplingScaleImageView extends View {
         createPaints();
 
         // If image or view dimensions are not known yet, abort.
-        if (sWidth == 0 || sHeight == 0 || decoder == null || getWidth() == 0 || getHeight() == 0) {
+        if (sWidth == 0 || sHeight == 0 || getWidth() == 0 || getHeight() == 0) {
             return;
         }
 
-        // On first render with no tile map ready, initialise it and kick off async base image loading.
-        if (tileMap == null) {
+        // When using tiles, on first render with no tile map ready, initialise it and kick off async base image loading.
+        if (tileMap == null && decoder != null) {
             initialiseBaseLayer(getMaxBitmapDimensions(canvas));
+        }
+
+        // If image has been loaded or supplied as a bitmap, onDraw may be the first time the view has
+        // dimensions and therefore the first opportunity to set scale and translate. If this call returns
+        // false there is nothing to be drawn so return immediately.
+        if (!checkReady()) {
             return;
         }
 
-        // If waiting to translate to new center position, set translate now
-        if (sPendingCenter != null && pendingScale != null) {
-            scale = pendingScale;
-            vTranslate.x = (getWidth()/2) - (scale * sPendingCenter.x);
-            vTranslate.y = (getHeight()/2) - (scale * sPendingCenter.y);
-            sPendingCenter = null;
-            pendingScale = null;
-            fitToBounds(true);
-            refreshRequiredTiles(true);
-        }
-
-        // On first display of base image set up position, and in other cases make sure scale is correct.
-        fitToBounds(false);
-
-        // Everything is set up and coordinates are valid. Inform subclasses.
-        if (!readySent) {
-            readySent = true;
-            new Thread(new Runnable() {
-                public void run() {
-                    onImageReady();
-                }
-            }).start();
-        }
+        // Set scale and translate before draw.
+        preDraw();
 
         // If animating scale, calculate current scale and center with easing equations
         if (anim != null) {
@@ -674,9 +857,8 @@ public class FixedSubsamplingScaleImageView extends View {
             float vFocusNowX = ease(anim.easing, scaleElapsed, anim.vFocusStart.x, anim.vFocusEnd.x - anim.vFocusStart.x, anim.duration);
             float vFocusNowY = ease(anim.easing, scaleElapsed, anim.vFocusStart.y, anim.vFocusEnd.y - anim.vFocusStart.y, anim.duration);
             // Find out where the focal point is at this scale and adjust its position to follow the animation path
-            PointF vFocus = sourceToViewCoord(anim.sCenterEnd);
-            vTranslate.x -= vFocus.x - vFocusNowX;
-            vTranslate.y -= vFocus.y - vFocusNowY;
+            vTranslate.x -= sourceToViewX(anim.sCenterEnd.x) - vFocusNowX;
+            vTranslate.y -= sourceToViewY(anim.sCenterEnd.y) - vFocusNowY;
 
             // For translate anims, showing the image non-centered is never allowed, for scaling anims it is during the animation.
             fitToBounds(finished || (anim.scaleStart == anim.scaleEnd));
@@ -687,57 +869,178 @@ public class FixedSubsamplingScaleImageView extends View {
             invalidate();
         }
 
-        // Optimum sample size for current scale
-        int sampleSize = Math.min(fullImageSampleSize, calculateInSampleSize());
+        if (tileMap != null && isBaseLayerReady()) {
 
-        // First check for missing tiles - if there are any we need the base layer underneath to avoid gaps
-        boolean hasMissingTiles = false;
-        for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
-            if (tileMapEntry.getKey() == sampleSize) {
-                for (Tile tile : tileMapEntry.getValue()) {
-                    if (tile.visible && (tile.loading || tile.bitmap == null)) {
-                        hasMissingTiles = true;
-                    }
-                }
-            }
-        }
+            // Optimum sample size for current scale
+            int sampleSize = Math.min(fullImageSampleSize, calculateInSampleSize());
 
-        // Render all loaded tiles. LinkedHashMap used for bottom up rendering - lower res tiles underneath.
-        for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
-            if (tileMapEntry.getKey() == sampleSize || hasMissingTiles) {
-                for (Tile tile : tileMapEntry.getValue()) {
-                    Rect vRect = convertRect(sourceToViewRect(tile.sRect));
-                    if (!tile.loading && tile.bitmap != null) {
-                        canvas.drawBitmap(tile.bitmap, null, vRect, bitmapPaint);
-                        if (debug) {
-                            canvas.drawRect(vRect, debugPaint);
+            // First check for missing tiles - if there are any we need the base layer underneath to avoid gaps
+            boolean hasMissingTiles = false;
+            for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
+                if (tileMapEntry.getKey() == sampleSize) {
+                    for (Tile tile : tileMapEntry.getValue()) {
+                        if (tile.visible && (tile.loading || tile.bitmap == null)) {
+                            hasMissingTiles = true;
                         }
-                    } else if (tile.loading && debug) {
-                        canvas.drawText("LOADING", vRect.left + 5, vRect.top + 35, debugPaint);
-                    }
-                    if (tile.visible && debug) {
-                        canvas.drawText("ISS " + tile.sampleSize + " RECT " + tile.sRect.top + "," + tile.sRect.left + "," + tile.sRect.bottom + "," + tile.sRect.right, vRect.left + 5, vRect.top + 15, debugPaint);
                     }
                 }
             }
+
+            // Render all loaded tiles. LinkedHashMap used for bottom up rendering - lower res tiles underneath.
+            for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
+                if (tileMapEntry.getKey() == sampleSize || hasMissingTiles) {
+                    for (Tile tile : tileMapEntry.getValue()) {
+                        sourceToViewRect(tile.sRect, tile.vRect);
+                        if (!tile.loading && tile.bitmap != null) {
+                            if (tileBgPaint != null) {
+                                canvas.drawRect(tile.vRect, tileBgPaint);
+                            }
+                            if (matrix == null) { matrix = new Matrix(); }
+                            matrix.reset();
+                            setMatrixArray(srcArray, 0, 0, tile.bitmap.getWidth(), 0, tile.bitmap.getWidth(), tile.bitmap.getHeight(), 0, tile.bitmap.getHeight());
+                            if (getRequiredRotation() == ORIENTATION_0) {
+                                setMatrixArray(dstArray, tile.vRect.left, tile.vRect.top, tile.vRect.right, tile.vRect.top, tile.vRect.right, tile.vRect.bottom, tile.vRect.left, tile.vRect.bottom);
+                            } else if (getRequiredRotation() == ORIENTATION_90) {
+                                setMatrixArray(dstArray, tile.vRect.right, tile.vRect.top, tile.vRect.right, tile.vRect.bottom, tile.vRect.left, tile.vRect.bottom, tile.vRect.left, tile.vRect.top);
+                            } else if (getRequiredRotation() == ORIENTATION_180) {
+                                setMatrixArray(dstArray, tile.vRect.right, tile.vRect.bottom, tile.vRect.left, tile.vRect.bottom, tile.vRect.left, tile.vRect.top, tile.vRect.right, tile.vRect.top);
+                            } else if (getRequiredRotation() == ORIENTATION_270) {
+                                setMatrixArray(dstArray, tile.vRect.left, tile.vRect.bottom, tile.vRect.left, tile.vRect.top, tile.vRect.right, tile.vRect.top, tile.vRect.right, tile.vRect.bottom);
+                            }
+                            matrix.setPolyToPoly(srcArray, 0, dstArray, 0, 4);
+                            canvas.drawBitmap(tile.bitmap, matrix, bitmapPaint);
+                            if (debug) {
+                                canvas.drawRect(tile.vRect, debugPaint);
+                            }
+                        } else if (tile.loading && debug) {
+                            canvas.drawText("LOADING", tile.vRect.left + 5, tile.vRect.top + 35, debugPaint);
+                        }
+                        if (tile.visible && debug) {
+                            canvas.drawText("ISS " + tile.sampleSize + " RECT " + tile.sRect.top + "," + tile.sRect.left + "," + tile.sRect.bottom + "," + tile.sRect.right, tile.vRect.left + 5, tile.vRect.top + 15, debugPaint);
+                        }
+                    }
+                }
+            }
+
+            if (debug) {
+                canvas.drawText("Scale: " + String.format("%.2f", scale), 5, 15, debugPaint);
+                canvas.drawText("Translate: " + String.format("%.2f", vTranslate.x) + ":" + String.format("%.2f", vTranslate.y), 5, 35, debugPaint);
+                PointF center = getCenter();
+                canvas.drawText("Source center: " + String.format("%.2f", center.x) + ":" + String.format("%.2f", center.y), 5, 55, debugPaint);
+
+                if (anim != null) {
+                    PointF vCenterStart = sourceToViewCoord(anim.sCenterStart);
+                    PointF vCenterEndRequested = sourceToViewCoord(anim.sCenterEndRequested);
+                    PointF vCenterEnd = sourceToViewCoord(anim.sCenterEnd);
+                    canvas.drawCircle(vCenterStart.x, vCenterStart.y, 10, debugPaint);
+                    canvas.drawCircle(vCenterEndRequested.x, vCenterEndRequested.y, 20, debugPaint);
+                    canvas.drawCircle(vCenterEnd.x, vCenterEnd.y, 25, debugPaint);
+                    canvas.drawCircle(getWidth() / 2, getHeight() / 2, 30, debugPaint);
+                }
+            }
+
+        } else if (bitmap != null) {
+
+            float xScale = scale, yScale = scale;
+            if (preview) {
+                xScale = scale * ((float)sWidth/bitmap.getWidth());
+                yScale = scale * ((float)sHeight/bitmap.getHeight());
+            }
+
+            if (matrix == null) { matrix = new Matrix(); }
+            matrix.reset();
+            matrix.postScale(xScale, yScale);
+            matrix.postRotate(getOrientation());
+            matrix.postTranslate(vTranslate.x, vTranslate.y);
+
+            if (getOrientation() == ORIENTATION_180) {
+                matrix.postTranslate(scale * sWidth, scale * sHeight);
+            } else if (getOrientation() == ORIENTATION_90) {
+                matrix.postTranslate(scale * sHeight, 0);
+            } else if (getOrientation() == ORIENTATION_270) {
+                matrix.postTranslate(0, scale * sWidth);
+            }
+
+            if (tileBgPaint != null) {
+                if (sRect == null) { sRect = new RectF(); }
+                sRect.set(0f, 0f, sWidth, sHeight);
+                matrix.mapRect(sRect);
+                canvas.drawRect(sRect, tileBgPaint);
+            }
+            canvas.drawBitmap(bitmap, matrix, bitmapPaint);
+
         }
+    }
 
-        if (debug) {
-            canvas.drawText("Scale: " + String.format("%.2f", scale), 5, 15, debugPaint);
-            canvas.drawText("Translate: " + String.format("%.2f", vTranslate.x) + ":" + String.format("%.2f", vTranslate.y), 5, 35, debugPaint);
-            PointF center = getCenter();
-            canvas.drawText("Source center: " + String.format("%.2f", center.x) + ":" + String.format("%.2f", center.y), 5, 55, debugPaint);
+    /**
+     * Helper method for setting the values of a tile matrix array.
+     */
+    private void setMatrixArray(float[] array, float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7) {
+        array[0] = f0;
+        array[1] = f1;
+        array[2] = f2;
+        array[3] = f3;
+        array[4] = f4;
+        array[5] = f5;
+        array[6] = f6;
+        array[7] = f7;
+    }
 
-            if (anim != null) {
-                PointF vCenterStart = sourceToViewCoord(anim.sCenterStart);
-                PointF vCenterEndRequested = sourceToViewCoord(anim.sCenterEndRequested);
-                PointF vCenterEnd = sourceToViewCoord(anim.sCenterEnd);
-                canvas.drawCircle(vCenterStart.x, vCenterStart.y, 10, debugPaint);
-                canvas.drawCircle(vCenterEndRequested.x, vCenterEndRequested.y, 20, debugPaint);
-                canvas.drawCircle(vCenterEnd.x, vCenterEnd.y, 25, debugPaint);
-                canvas.drawCircle(getWidth()/2, getHeight()/2, 30, debugPaint);
+    /**
+     * Checks whether the base layer of tiles or full size bitmap is ready.
+     */
+    private boolean isBaseLayerReady() {
+        if (bitmap != null && !preview) {
+            return true;
+        } else if (tileMap != null) {
+            boolean baseLayerReady = true;
+            for (Map.Entry<Integer, List<Tile>> tileMapEntry : tileMap.entrySet()) {
+                if (tileMapEntry.getKey() == fullImageSampleSize) {
+                    for (Tile tile : tileMapEntry.getValue()) {
+                        if (tile.loading || tile.bitmap == null) {
+                            baseLayerReady = false;
+                        }
+                    }
+                }
+            }
+            return baseLayerReady;
+        }
+        return false;
+    }
+
+    /**
+     * Check whether view and image dimensions are known and either a preview, full size image or
+     * base layer tiles are loaded. First time, send ready event to listener. The next draw will
+     * display an image.
+     */
+    private boolean checkReady() {
+        boolean ready = getWidth() > 0 && getHeight() > 0 && sWidth > 0 && sHeight > 0 && (bitmap != null || isBaseLayerReady());
+        if (!readySent && ready) {
+            preDraw();
+            readySent = true;
+            onReady();
+            if (onImageEventListener != null) {
+                onImageEventListener.onReady();
             }
         }
+        return ready;
+    }
+
+    /**
+     * Check whether either the full size bitmap or base layer tiles are loaded. First time, send image
+     * loaded event to listener.
+     */
+    private boolean checkImageLoaded() {
+        boolean imageLoaded = isBaseLayerReady();
+        if (!imageLoadedSent && imageLoaded) {
+            preDraw();
+            imageLoadedSent = true;
+            onImageLoaded();
+            if (onImageEventListener != null) {
+                onImageEventListener.onImageLoaded();
+            }
+        }
+        return imageLoaded;
     }
 
     /**
@@ -763,9 +1066,6 @@ public class FixedSubsamplingScaleImageView extends View {
      * the base layer image - the whole source subsampled as necessary.
      */
     private synchronized void initialiseBaseLayer(Point maxTileDimensions) {
-        //Default zoom >= 2
-        scale = Math.min(2F, Math.min(getWidth() / (float) sWidth(), getHeight() / (float) sHeight()));
-        defaultScale = scale;
 
         fitToBounds(true);
 
@@ -780,7 +1080,7 @@ public class FixedSubsamplingScaleImageView extends View {
 
         List<Tile> baseGrid = tileMap.get(fullImageSampleSize);
         for (Tile baseTile : baseGrid) {
-            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, baseTile, this.failListener);
+            TileLoadTask task = new TileLoadTask(this, decoder, baseTile);
             task.execute();
         }
 
@@ -792,9 +1092,9 @@ public class FixedSubsamplingScaleImageView extends View {
      * @param load Whether to load the new tiles needed. Use false while scrolling/panning for performance.
      */
     private void refreshRequiredTiles(boolean load) {
+        if (decoder == null || tileMap == null) { return; }
+
         int sampleSize = Math.min(fullImageSampleSize, calculateInSampleSize());
-        RectF vVisRect = new RectF(0, 0, getWidth(), getHeight());
-        RectF sVisRect = viewToSourceRect(vVisRect);
 
         // Load tiles of the correct sample size that are on screen. Discard tiles off screen, and those that are higher
         // resolution than required, or lower res than required but not the base layer, so the base layer is always present.
@@ -808,10 +1108,10 @@ public class FixedSubsamplingScaleImageView extends View {
                     }
                 }
                 if (tile.sampleSize == sampleSize) {
-                    if (RectF.intersects(sVisRect, convertRect(tile.sRect))) {
+                    if (tileVisible(tile)) {
                         tile.visible = true;
                         if (!tile.loading && tile.bitmap == null && load) {
-                            BitmapTileTask task = new BitmapTileTask(this, decoder, decoderLock, tile, this.failListener);
+                            TileLoadTask task = new TileLoadTask(this, decoder, tile);
                             task.execute();
                         }
                     } else if (tile.sampleSize != fullImageSampleSize) {
@@ -827,6 +1127,40 @@ public class FixedSubsamplingScaleImageView extends View {
             }
         }
 
+    }
+
+    /**
+     * Determine whether tile is visible.
+     */
+    private boolean tileVisible(Tile tile) {
+        float sVisLeft = viewToSourceX(0),
+                sVisRight = viewToSourceX(getWidth()),
+                sVisTop = viewToSourceY(0),
+                sVisBottom = viewToSourceY(getHeight());
+        return !(sVisLeft > tile.sRect.right || tile.sRect.left > sVisRight || sVisTop > tile.sRect.bottom || tile.sRect.top > sVisBottom);
+    }
+
+    /**
+     * Sets scale and translate ready for the next draw.
+     */
+    private void preDraw() {
+        if (getWidth() == 0 || getHeight() == 0 || sWidth <= 0 || sHeight <= 0) {
+            return;
+        }
+
+        // If waiting to translate to new center position, set translate now
+        if (sPendingCenter != null && pendingScale != null) {
+            scale = pendingScale;
+            vTranslate.x = (getWidth()/2) - (scale * sPendingCenter.x);
+            vTranslate.y = (getHeight()/2) - (scale * sPendingCenter.y);
+            sPendingCenter = null;
+            pendingScale = null;
+            fitToBounds(true);
+            refreshRequiredTiles(true);
+        }
+
+        // On first display of base image set up position, and in other cases make sure scale is correct.
+        fitToBounds(false);
     }
 
     /**
@@ -875,19 +1209,19 @@ public class FixedSubsamplingScaleImageView extends View {
      * is set so one dimension fills the view and the image is centered on the other dimension. Used to calculate what the target of an
      * animation should be.
      * @param center Whether the image should be centered in the dimension it's too small to fill. While animating this can be false to avoid changes in direction as bounds are reached.
-     * @param scaleAndTranslate The scale we want and the translation we're aiming for. The values are adjusted to be valid.
+     * @param sat The scale we want and the translation we're aiming for. The values are adjusted to be valid.
      */
-    private void fitToBounds(boolean center, ScaleAndTranslate scaleAndTranslate) {
-        if (panLimit == PAN_LIMIT_OUTSIDE && isImageReady()) {
+    private void fitToBounds(boolean center, ScaleAndTranslate sat) {
+        if (panLimit == PAN_LIMIT_OUTSIDE && isReady()) {
             center = false;
         }
 
-        PointF vTranslate = scaleAndTranslate.translate;
-        float scale = limitedScale(scaleAndTranslate.scale);
+        PointF vTranslate = sat.vTranslate;
+        float scale = limitedScale(sat.scale);
         float scaleWidth = scale * sWidth();
         float scaleHeight = scale * sHeight();
 
-        if (panLimit == PAN_LIMIT_CENTER && isImageReady()) {
+        if (panLimit == PAN_LIMIT_CENTER && isReady()) {
             vTranslate.x = Math.max(vTranslate.x, getWidth()/2 - scaleWidth);
             vTranslate.y = Math.max(vTranslate.y, getHeight()/2 - scaleHeight);
         } else if (center) {
@@ -898,14 +1232,18 @@ public class FixedSubsamplingScaleImageView extends View {
             vTranslate.y = Math.max(vTranslate.y, -scaleHeight);
         }
 
+        // Asymmetric padding adjustments
+        float xPaddingRatio = getPaddingLeft() > 0 || getPaddingRight() > 0 ? getPaddingLeft()/(float)(getPaddingLeft() + getPaddingRight()) : 0.5f;
+        float yPaddingRatio = getPaddingTop() > 0 || getPaddingBottom() > 0 ? getPaddingTop()/(float)(getPaddingTop() + getPaddingBottom()) : 0.5f;
+
         float maxTx;
         float maxTy;
-        if (panLimit == PAN_LIMIT_CENTER && isImageReady()) {
+        if (panLimit == PAN_LIMIT_CENTER && isReady()) {
             maxTx = Math.max(0, getWidth()/2);
             maxTy = Math.max(0, getHeight()/2);
         } else if (center) {
-            maxTx = Math.max(0, (getWidth() - scaleWidth) / 2);
-            maxTy = Math.max(0, (getHeight() - scaleHeight) / 2);
+            maxTx = Math.max(0, (getWidth() - scaleWidth) * xPaddingRatio);
+            maxTy = Math.max(0, (getHeight() - scaleHeight) * yPaddingRatio);
         } else {
             maxTx = Math.max(0, getWidth());
             maxTy = Math.max(0, getHeight());
@@ -914,7 +1252,7 @@ public class FixedSubsamplingScaleImageView extends View {
         vTranslate.x = Math.min(vTranslate.x, maxTx);
         vTranslate.y = Math.min(vTranslate.y, maxTy);
 
-        scaleAndTranslate.scale = scale;
+        sat.scale = scale;
     }
 
     /**
@@ -928,11 +1266,16 @@ public class FixedSubsamplingScaleImageView extends View {
             init = true;
             vTranslate = new PointF(0, 0);
         }
-        ScaleAndTranslate input = new ScaleAndTranslate(scale, vTranslate);
-        fitToBounds(center, input);
-        scale = input.scale;
+        if (satTemp == null) {
+            satTemp = new ScaleAndTranslate(0, new PointF(0, 0));
+        }
+        satTemp.scale = scale;
+        satTemp.vTranslate.set(vTranslate);
+        fitToBounds(center, satTemp);
+        scale = satTemp.scale;
+        vTranslate.set(satTemp.vTranslate);
         if (init) {
-            vTranslate = vTranslateForSCenter(new PointF(sWidth()/2, sHeight()/2), scale);
+            vTranslate.set(vTranslateForSCenter(sWidth()/2, sHeight()/2, scale));
         }
     }
 
@@ -949,12 +1292,12 @@ public class FixedSubsamplingScaleImageView extends View {
             int sTileHeight = sHeight()/yTiles;
             int subTileWidth = sTileWidth/sampleSize;
             int subTileHeight = sTileHeight/sampleSize;
-            while (subTileWidth > maxTileDimensions.x || (subTileWidth > getWidth() * 1.25 && sampleSize < fullImageSampleSize)) {
+            while (subTileWidth + xTiles + 1 > maxTileDimensions.x || (subTileWidth > getWidth() * 1.25 && sampleSize < fullImageSampleSize)) {
                 xTiles += 1;
                 sTileWidth = sWidth()/xTiles;
                 subTileWidth = sTileWidth/sampleSize;
             }
-            while (subTileHeight > maxTileDimensions.y || (subTileHeight > getHeight() * 1.25 && sampleSize < fullImageSampleSize)) {
+            while (subTileHeight + yTiles + 1 > maxTileDimensions.y || (subTileHeight > getHeight() * 1.25 && sampleSize < fullImageSampleSize)) {
                 yTiles += 1;
                 sTileHeight = sHeight()/yTiles;
                 subTileHeight = sTileHeight/sampleSize;
@@ -968,9 +1311,11 @@ public class FixedSubsamplingScaleImageView extends View {
                     tile.sRect = new Rect(
                             x * sTileWidth,
                             y * sTileHeight,
-                            (x + 1) * sTileWidth,
-                            (y + 1) * sTileHeight
+                            x == xTiles - 1 ? sWidth() : (x + 1) * sTileWidth,
+                            y == yTiles - 1 ? sHeight() : (y + 1) * sTileHeight
                     );
+                    tile.vRect = new Rect(0, 0, 0, 0);
+                    tile.fileSRect = new Rect(tile.sRect);
                     tileGrid.add(tile);
                 }
             }
@@ -984,113 +1329,97 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
-     * Called by worker task when decoder is ready and image size and EXIF orientation is known.
-     */
-    private void onImageInited(BitmapRegionDecoder decoder, int sWidth, int sHeight, int sOrientation) {
-        this.decoder = decoder;
-        this.sWidth = sWidth;
-        this.sHeight = sHeight;
-        this.sOrientation = sOrientation;
-        requestLayout();
-        invalidate();
-    }
-
-    /**
-     * Called by worker task when a tile has loaded. Redraws the view.
-     */
-    private void onTileLoaded() {
-        invalidate();
-    }
-
-    /**
      * Async task used to get image details without blocking the UI thread.
      */
-    private static class BitmapInitTask extends AsyncTask<Void, Void, int[]> {
+    private static class TilesInitTask extends AsyncTask<Void, Void, int[]> {
         private final WeakReference<FixedSubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
-        private final String source;
-        private final boolean sourceIsAsset;
-        private BitmapRegionDecoder decoder;
-        private final FailedCallback listener;
+        private final WeakReference<Class<? extends ImageRegionDecoder>> decoderClassRef;
+        private final Uri source;
+        private ImageRegionDecoder decoder;
+        private Exception exception;
 
-        public BitmapInitTask(FixedSubsamplingScaleImageView view, Context context, String source, boolean sourceIsAsset, FailedCallback listener) {
+        public TilesInitTask(FixedSubsamplingScaleImageView view, Context context, Class<? extends ImageRegionDecoder> decoderClass, Uri source) {
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
             this.contextRef = new WeakReference<Context>(context);
+            this.decoderClassRef = new WeakReference<Class<? extends ImageRegionDecoder>>(decoderClass);
             this.source = source;
-            this.sourceIsAsset = sourceIsAsset;
-            this.listener = listener;
         }
 
         @Override
         protected int[] doInBackground(Void... params) {
             try {
-                if (viewRef != null && contextRef != null) {
-                    Context context = contextRef.get();
-                    if (context != null) {
-                        int exifOrientation = ORIENTATION_0;
-                        if (sourceIsAsset) {
-                            decoder = BitmapRegionDecoder.newInstance(context.getAssets().open(source, AssetManager.ACCESS_RANDOM), true);
-                        } else {
-                            decoder = BitmapRegionDecoder.newInstance(source, true);
-                            try {
-                                ExifInterface exifInterface = new ExifInterface(source);
-                                int orientationAttr = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                                if (orientationAttr == ExifInterface.ORIENTATION_NORMAL || orientationAttr == ExifInterface.ORIENTATION_UNDEFINED) {
-                                    exifOrientation = ORIENTATION_0;
-                                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_90) {
-                                    exifOrientation = ORIENTATION_90;
-                                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_180) {
-                                    exifOrientation = ORIENTATION_180;
-                                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_270) {
-                                    exifOrientation = ORIENTATION_270;
-                                } else {
-                                    Log.w(TAG, "Unsupported EXIF orientation: " + orientationAttr);
-                                }
-                            } catch (Exception e) {
-                                Log.w(TAG, "Could not get EXIF orientation of image");
-                            }
-
-                        }
-                        return new int[] { decoder.getWidth(), decoder.getHeight(), exifOrientation };
+                String sourceUri = source.toString();
+                Context context = contextRef.get();
+                Class<? extends ImageRegionDecoder> decoderClass = decoderClassRef.get();
+                FixedSubsamplingScaleImageView view = viewRef.get();
+                if (context != null && decoderClass != null && view != null) {
+                    decoder = decoderClass.newInstance();
+                    Point dimensions = decoder.init(context, source);
+                    int sWidth = dimensions.x;
+                    int sHeight = dimensions.y;
+                    int exifOrientation = view.getExifOrientation(sourceUri);
+                    if (view.sRegion != null) {
+                        sWidth = view.sRegion.width();
+                        sHeight = view.sRegion.height();
                     }
+                    return new int[] { sWidth, sHeight, exifOrientation };
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to initialise bitmap decoder", e);
-            } catch (OutOfMemoryError e) {
-                Log.e(TAG, "OutOfMemory in initialise bitmap decoder", e);
-                System.gc();
+                this.exception = e;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(int[] xyo) {
-            if (xyo == null && listener != null) listener.onFail();
-            if (viewRef != null && decoder != null) {
-                final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
-                if (subsamplingScaleImageView != null && decoder != null && xyo != null && xyo.length == 3) {
-                    subsamplingScaleImageView.onImageInited(decoder, xyo[0], xyo[1], xyo[2]);
+            final FixedSubsamplingScaleImageView view = viewRef.get();
+            if (view != null) {
+                if (decoder != null && xyo != null && xyo.length == 3) {
+                    view.onTilesInited(decoder, xyo[0], xyo[1], xyo[2]);
+                } else if (exception != null && view.onImageEventListener != null) {
+                    view.onImageEventListener.onImageLoadError(exception);
                 }
             }
         }
     }
 
     /**
+     * Called by worker task when decoder is ready and image size and EXIF orientation is known.
+     */
+    private synchronized void onTilesInited(ImageRegionDecoder decoder, int sWidth, int sHeight, int sOrientation) {
+        // If actual dimensions don't match the declared size, reset everything.
+        if (this.sWidth > 0 && this.sHeight > 0 && (this.sWidth != sWidth || this.sHeight != sHeight)) {
+            reset(false);
+            if (bitmap != null) {
+                bitmap.recycle();
+                bitmap = null;
+                preview = false;
+            }
+        }
+        this.decoder = decoder;
+        this.sWidth = sWidth;
+        this.sHeight = sHeight;
+        this.sOrientation = sOrientation;
+        checkReady();
+        checkImageLoaded();
+        invalidate();
+        requestLayout();
+    }
+
+    /**
      * Async task used to load images without blocking the UI thread.
      */
-    private static class BitmapTileTask extends AsyncTask<Void, Void, Bitmap> {
+    private static class TileLoadTask extends AsyncTask<Void, Void, Bitmap> {
         private final WeakReference<FixedSubsamplingScaleImageView> viewRef;
-        private final WeakReference<BitmapRegionDecoder> decoderRef;
-        private final WeakReference<Object> decoderLockRef;
+        private final WeakReference<ImageRegionDecoder> decoderRef;
         private final WeakReference<Tile> tileRef;
-        private final FailedCallback listener;
-        private boolean isFail = false;
+        private Throwable exception;
 
-        public BitmapTileTask(FixedSubsamplingScaleImageView view, BitmapRegionDecoder decoder, Object decoderLock, Tile tile, FailedCallback listener) {
-            this.listener = listener;
+        public TileLoadTask(FixedSubsamplingScaleImageView view, ImageRegionDecoder decoder, Tile tile) {
             this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
-            this.decoderRef = new WeakReference<BitmapRegionDecoder>(decoder);
-            this.decoderLockRef = new WeakReference<Object>(decoderLock);
+            this.decoderRef = new WeakReference<ImageRegionDecoder>(decoder);
             this.tileRef = new WeakReference<Tile>(tile);
             tile.loading = true;
         }
@@ -1098,53 +1427,185 @@ public class FixedSubsamplingScaleImageView extends View {
         @Override
         protected Bitmap doInBackground(Void... params) {
             try {
-                if (decoderRef != null && tileRef != null && viewRef != null) {
-                    final BitmapRegionDecoder decoder = decoderRef.get();
-                    final Object decoderLock = decoderLockRef.get();
-                    final Tile tile = tileRef.get();
-                    final FixedSubsamplingScaleImageView view = viewRef.get();
-                    if (decoder != null && decoderLock != null && tile != null && view != null && !decoder.isRecycled()) {
-                        synchronized (decoderLock) {
-                            BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.inSampleSize = tile.sampleSize;
-                            options.inPreferredConfig = Config.RGB_565;
-                            options.inDither = true;
-                            Bitmap bitmap = decoder.decodeRegion(view.fileSRect(tile.sRect), options);
-                            int rotation = view.getRequiredRotation();
-                            if (rotation != 0) {
-                                Matrix matrix = new Matrix();
-                                matrix.postRotate(rotation);
-                                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                            }
-                            return bitmap;
+                FixedSubsamplingScaleImageView view = viewRef.get();
+                ImageRegionDecoder decoder = decoderRef.get();
+                Tile tile = tileRef.get();
+                if (decoder != null && tile != null && view != null && decoder.isReady()) {
+                    synchronized (view.decoderLock) {
+                        // Update tile's file sRect according to rotation
+                        view.fileSRect(tile.sRect, tile.fileSRect);
+                        if (view.sRegion != null) {
+                            tile.fileSRect.offset(view.sRegion.left, view.sRegion.top);
                         }
-                    } else if (tile != null) {
-                        tile.loading = false;
+                        return decoder.decodeRegion(tile.fileSRect, tile.sampleSize);
                     }
+                } else if (tile != null) {
+                    tile.loading = false;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 Log.e(TAG, "Failed to decode tile", e);
-            } catch (OutOfMemoryError e) {
-                Log.e(TAG, "OutOfMemory in decode tile", e);
-                System.gc();
-                this.isFail = true;
+                this.exception = e;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            if (this.isFail && listener != null) listener.onFail();
-            if (viewRef != null && tileRef != null && bitmap != null) {
-                final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
-                final Tile tile = tileRef.get();
-                if (subsamplingScaleImageView != null && tile != null) {
+            final FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
+            final Tile tile = tileRef.get();
+            if (subsamplingScaleImageView != null && tile != null) {
+                if (bitmap != null) {
                     tile.bitmap = bitmap;
                     tile.loading = false;
                     subsamplingScaleImageView.onTileLoaded();
+                } else if (subsamplingScaleImageView.onImageEventListener != null) {
+                    subsamplingScaleImageView.onImageEventListener.onTileLoadError(exception);
                 }
             }
         }
+    }
+
+    /**
+     * Called by worker task when a tile has loaded. Redraws the view.
+     */
+    private synchronized void onTileLoaded() {
+        checkReady();
+        checkImageLoaded();
+        if (isBaseLayerReady() && bitmap != null) {
+            bitmap.recycle();
+            bitmap = null;
+            preview = false;
+        }
+        invalidate();
+    }
+
+    /**
+     * Async task used to load bitmap without blocking the UI thread.
+     */
+    private static class BitmapLoadTask extends AsyncTask<Void, Void, Integer> {
+        private final WeakReference<FixedSubsamplingScaleImageView> viewRef;
+        private final WeakReference<Context> contextRef;
+        private final WeakReference<Class<? extends ImageDecoder>> decoderClassRef;
+        private final Uri source;
+        private final boolean preview;
+        private Bitmap bitmap;
+        private Throwable exception;
+
+        public BitmapLoadTask(FixedSubsamplingScaleImageView view, Context context, Class<? extends ImageDecoder> decoderClass, Uri source, boolean preview) {
+            this.viewRef = new WeakReference<FixedSubsamplingScaleImageView>(view);
+            this.contextRef = new WeakReference<Context>(context);
+            this.decoderClassRef = new WeakReference<Class<? extends ImageDecoder>>(decoderClass);
+            this.source = source;
+            this.preview = preview;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            try {
+                String sourceUri = source.toString();
+                Context context = contextRef.get();
+                Class<? extends ImageDecoder> decoderClass = decoderClassRef.get();
+                FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
+                if (context != null && decoderClass != null && subsamplingScaleImageView != null) {
+                    bitmap = decoderClass.newInstance().decode(context, source);
+                    return subsamplingScaleImageView.getExifOrientation(sourceUri);
+                }
+            } catch (Throwable e) {
+                Log.e(TAG, "Failed to load bitmap", e);
+                this.exception = e;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer orientation) {
+            FixedSubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
+            if (subsamplingScaleImageView != null) {
+                if (bitmap != null && orientation != null) {
+                    if (preview) {
+                        subsamplingScaleImageView.onPreviewLoaded(bitmap);
+                    } else {
+                        subsamplingScaleImageView.onImageLoaded(bitmap, orientation);
+                    }
+                } else if (subsamplingScaleImageView.onImageEventListener != null) {
+                    if (preview) {
+                        subsamplingScaleImageView.onImageEventListener.onPreviewLoadError(exception);
+                    } else {
+                        subsamplingScaleImageView.onImageEventListener.onImageLoadError(exception);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Called by worker task when preview image is loaded.
+     */
+    private synchronized void onPreviewLoaded(Bitmap previewBitmap) {
+        if (bitmap != null || imageLoadedSent) {
+            previewBitmap.recycle();
+            return;
+        }
+        if (pRegion != null) {
+            bitmap = Bitmap.createBitmap(previewBitmap, pRegion.left, pRegion.top, pRegion.width(), pRegion.height());
+        } else {
+            bitmap = previewBitmap;
+        }
+        preview = true;
+        if (checkReady()) {
+            invalidate();
+            requestLayout();
+        }
+    }
+
+    /**
+     * Called by worker task when full size image bitmap is ready (tiling is disabled).
+     */
+    private synchronized void onImageLoaded(Bitmap bitmap, int sOrientation) {
+        // If actual dimensions don't match the declared size, reset everything.
+        if (this.sWidth > 0 && this.sHeight > 0 && (this.sWidth != bitmap.getWidth() || this.sHeight != bitmap.getHeight())) {
+            reset(false);
+        }
+        if (this.bitmap != null) {
+            this.bitmap.recycle();
+        }
+        this.preview = false;
+        this.bitmap = bitmap;
+        this.sWidth = bitmap.getWidth();
+        this.sHeight = bitmap.getHeight();
+        this.sOrientation = sOrientation;
+        if (checkReady() || checkImageLoaded()) {
+            invalidate();
+            requestLayout();
+        }
+    }
+
+    /**
+     * Helper method for load tasks. Examines the EXIF info on the image file to determine the orientation.
+     * This will only work for external files, not assets, resources or other URIs.
+     */
+    private int getExifOrientation(String sourceUri) {
+        int exifOrientation = ORIENTATION_0;
+        if (sourceUri.startsWith(ImageSource.FILE_SCHEME) && !sourceUri.startsWith(ImageSource.ASSET_SCHEME)) {
+            try {
+                ExifInterface exifInterface = new ExifInterface(sourceUri.substring(ImageSource.FILE_SCHEME.length() - 1));
+                int orientationAttr = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                if (orientationAttr == ExifInterface.ORIENTATION_NORMAL || orientationAttr == ExifInterface.ORIENTATION_UNDEFINED) {
+                    exifOrientation = ORIENTATION_0;
+                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_90) {
+                    exifOrientation = ORIENTATION_90;
+                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_180) {
+                    exifOrientation = ORIENTATION_180;
+                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_270) {
+                    exifOrientation = ORIENTATION_270;
+                } else {
+                    Log.w(TAG, "Unsupported EXIF orientation: " + orientationAttr);
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Could not get EXIF orientation of image");
+            }
+        }
+        return exifOrientation;
     }
 
     private static class Tile {
@@ -1154,6 +1615,10 @@ public class FixedSubsamplingScaleImageView extends View {
         private Bitmap bitmap;
         private boolean loading;
         private boolean visible;
+
+        // Volatile fields instantiated once then updated before use to reduce GC.
+        private Rect vRect;
+        private Rect fileSRect;
 
     }
 
@@ -1174,12 +1639,12 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     private static class ScaleAndTranslate {
-        private ScaleAndTranslate(float scale, PointF translate) {
+        private ScaleAndTranslate(float scale, PointF vTranslate) {
             this.scale = scale;
-            this.translate = translate;
+            this.vTranslate = vTranslate;
         }
         private float scale;
-        private PointF translate;
+        private PointF vTranslate;
     }
 
     /**
@@ -1213,6 +1678,7 @@ public class FixedSubsamplingScaleImageView extends View {
     /**
      * Get source width taking rotation into account.
      */
+    @SuppressWarnings("SuspiciousNameCombination")
     private int sWidth() {
         int rotation = getRequiredRotation();
         if (rotation == 90 || rotation == 270) {
@@ -1225,6 +1691,7 @@ public class FixedSubsamplingScaleImageView extends View {
     /**
      * Get source height taking rotation into account.
      */
+    @SuppressWarnings("SuspiciousNameCombination")
     private int sHeight() {
         int rotation = getRequiredRotation();
         if (rotation == 90 || rotation == 270) {
@@ -1238,15 +1705,16 @@ public class FixedSubsamplingScaleImageView extends View {
      * Converts source rectangle from tile, which treats the image file as if it were in the correct orientation already,
      * to the rectangle of the image that needs to be loaded.
      */
-    private Rect fileSRect(Rect sRect) {
+    @SuppressWarnings("SuspiciousNameCombination")
+    private void fileSRect(Rect sRect, Rect target) {
         if (getRequiredRotation() == 0) {
-            return sRect;
+            target.set(sRect);
         } else if (getRequiredRotation() == 90) {
-            return new Rect(sRect.top, sHeight - sRect.right, sRect.bottom, sHeight - sRect.left);
+            target.set(sRect.top, sHeight - sRect.right, sRect.bottom, sHeight - sRect.left);
         } else if (getRequiredRotation() == 180) {
-            return new Rect(sWidth - sRect.right, sHeight - sRect.bottom, sWidth - sRect.left, sHeight - sRect.top);
+            target.set(sWidth - sRect.right, sHeight - sRect.bottom, sWidth - sRect.left, sHeight - sRect.top);
         } else {
-            return new Rect(sWidth - sRect.bottom, sRect.left, sWidth - sRect.top, sRect.right);
+            target.set(sWidth - sRect.bottom, sRect.left, sWidth - sRect.top, sRect.right);
         }
     }
 
@@ -1271,116 +1739,169 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
+     * Releases all resources the view is using and resets the state, nulling any fields that use significant memory.
+     * After you have called this method, the view can be re-used by setting a new image. Settings are remembered
+     * but state (scale and center) is forgotten. You can restore these yourself if required.
+     */
+    public void recycle() {
+        reset(true);
+        bitmapPaint = null;
+        debugPaint = null;
+        tileBgPaint = null;
+    }
+
+    /**
+     * Convert screen to source x coordinate.
+     */
+    private float viewToSourceX(float vx) {
+        if (vTranslate == null) { return Float.NaN; }
+        return (vx - vTranslate.x)/scale;
+    }
+
+    /**
+     * Convert screen to source y coordinate.
+     */
+    private float viewToSourceY(float vy) {
+        if (vTranslate == null) { return Float.NaN; }
+        return (vy - vTranslate.y)/scale;
+    }
+
+    /**
      * Convert screen coordinate to source coordinate.
      */
     public final PointF viewToSourceCoord(PointF vxy) {
-        return viewToSourceCoord(vxy.x, vxy.y);
+        return viewToSourceCoord(vxy.x, vxy.y, new PointF());
     }
 
     /**
      * Convert screen coordinate to source coordinate.
      */
     public final PointF viewToSourceCoord(float vx, float vy) {
+        return viewToSourceCoord(vx, vy, new PointF());
+    }
+
+    /**
+     * Convert screen coordinate to source coordinate.
+     */
+    public final PointF viewToSourceCoord(PointF vxy, PointF sTarget) {
+        return viewToSourceCoord(vxy.x, vxy.y, sTarget);
+    }
+
+    /**
+     * Convert screen coordinate to source coordinate.
+     */
+    public final PointF viewToSourceCoord(float vx, float vy, PointF sTarget) {
         if (vTranslate == null) {
             return null;
         }
-        float sx = (vx - vTranslate.x)/scale;
-        float sy = (vy - vTranslate.y)/scale;
-        return new PointF(sx, sy);
+        sTarget.set(viewToSourceX(vx), viewToSourceY(vy));
+        return sTarget;
+    }
+
+    /**
+     * Convert source to screen x coordinate.
+     */
+    private float sourceToViewX(float sx) {
+        if (vTranslate == null) { return Float.NaN; }
+        return (sx * scale) + vTranslate.x;
+    }
+
+    /**
+     * Convert source to screen y coordinate.
+     */
+    private float sourceToViewY(float sy) {
+        if (vTranslate == null) { return Float.NaN; }
+        return (sy * scale) + vTranslate.y;
     }
 
     /**
      * Convert source coordinate to screen coordinate.
      */
     public final PointF sourceToViewCoord(PointF sxy) {
-        return sourceToViewCoord(sxy.x, sxy.y);
+        return sourceToViewCoord(sxy.x, sxy.y, new PointF());
     }
 
     /**
      * Convert source coordinate to screen coordinate.
      */
     public final PointF sourceToViewCoord(float sx, float sy) {
+        return sourceToViewCoord(sx, sy, new PointF());
+    }
+
+    /**
+     * Convert source coordinate to screen coordinate.
+     */
+    public final PointF sourceToViewCoord(PointF sxy, PointF vTarget) {
+        return sourceToViewCoord(sxy.x, sxy.y, vTarget);
+    }
+
+    /**
+     * Convert source coordinate to screen coordinate.
+     */
+    public final PointF sourceToViewCoord(float sx, float sy, PointF vTarget) {
         if (vTranslate == null) {
             return null;
         }
-        float vx = (sx * scale) + vTranslate.x;
-        float vy = (sy * scale) + vTranslate.y;
-        return new PointF(vx, vy);
+        vTarget.set(sourceToViewX(sx), sourceToViewY(sy));
+        return vTarget;
     }
 
     /**
-     * Convert source rect to screen rect.
+     * Convert source rect to screen rect, integer values.
      */
-    private RectF sourceToViewRect(Rect sRect) {
-        return sourceToViewRect(convertRect(sRect));
+    private Rect sourceToViewRect(Rect sRect, Rect vTarget) {
+        vTarget.set(
+                (int)sourceToViewX(sRect.left),
+                (int)sourceToViewY(sRect.top),
+                (int)sourceToViewX(sRect.right),
+                (int)sourceToViewY(sRect.bottom)
+        );
+        return vTarget;
     }
 
     /**
-     * Convert source rect to screen rect.
+     * Get the translation required to place a given source coordinate at the center of the screen, with the center
+     * adjusted for asymmetric padding. Accepts the desired scale as an argument, so this is independent of current
+     * translate and scale. The result is fitted to bounds, putting the image point as near to the screen center as permitted.
      */
-    private RectF sourceToViewRect(RectF sRect) {
-        PointF vLT = sourceToViewCoord(new PointF(sRect.left, sRect.top));
-        PointF vRB = sourceToViewCoord(new PointF(sRect.right, sRect.bottom));
-        return new RectF(vLT.x, vLT.y, vRB.x, vRB.y);
-    }
-
-    /**
-     * Convert screen rect to source rect.
-     */
-    private RectF viewToSourceRect(RectF vRect) {
-        PointF sLT = viewToSourceCoord(new PointF(vRect.left, vRect.top));
-        PointF sRB = viewToSourceCoord(new PointF(vRect.right, vRect.bottom));
-        return new RectF(sLT.x, sLT.y, sRB.x, sRB.y);
-    }
-
-    /**
-     * Int to float rect conversion.
-     */
-    private RectF convertRect(Rect rect) {
-        return new RectF(rect.left, rect.top, rect.right, rect.bottom);
-    }
-
-    /**
-     * Float to int rect conversion.
-     */
-    private Rect convertRect(RectF rect) {
-        return new Rect((int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom);
-    }
-
-    /**
-     * Get the translation required to place a given source coordinate at the center of the screen. Accepts the desired
-     * scale as an argument, so this is independent of current translate and scale. The result is fitted to bounds, putting
-     * the image point as near to the screen center as permitted.
-     */
-    private PointF vTranslateForSCenter(PointF sCenter, float scale) {
-        PointF vTranslate = new PointF((getWidth()/2) - (sCenter.x * scale), (getHeight()/2) - (sCenter.y * scale));
-        ScaleAndTranslate sat = new ScaleAndTranslate(scale, vTranslate);
-        fitToBounds(true, sat);
-        return vTranslate;
+    private PointF vTranslateForSCenter(float sCenterX, float sCenterY, float scale) {
+        int vxCenter = getPaddingLeft() + (getWidth() - getPaddingRight() - getPaddingLeft())/2;
+        int vyCenter = getPaddingTop() + (getHeight() - getPaddingBottom() - getPaddingTop())/2;
+        if (satTemp == null) {
+            satTemp = new ScaleAndTranslate(0, new PointF(0, 0));
+        }
+        satTemp.scale = scale;
+        satTemp.vTranslate.set(vxCenter - (sCenterX * scale), vyCenter - (sCenterY * scale));
+        fitToBounds(true, satTemp);
+        return satTemp.vTranslate;
     }
 
     /**
      * Given a requested source center and scale, calculate what the actual center will have to be to keep the image in
      * pan limits, keeping the requested center as near to the middle of the screen as allowed.
      */
-    private PointF limitedSCenter(PointF sCenter, float scale) {
-        PointF vTranslate = vTranslateForSCenter(sCenter, scale);
-        int mY = getHeight()/2;
-        float sx = ((getWidth()/2) - vTranslate.x)/scale;
-        float sy = ((getHeight()/2) - vTranslate.y)/scale;
-        return new PointF(sx, sy);
+    private PointF limitedSCenter(float sCenterX, float sCenterY, float scale, PointF sTarget) {
+        PointF vTranslate = vTranslateForSCenter(sCenterX, sCenterY, scale);
+        int vxCenter = getPaddingLeft() + (getWidth() - getPaddingRight() - getPaddingLeft())/2;
+        int vyCenter = getPaddingTop() + (getHeight() - getPaddingBottom() - getPaddingTop())/2;
+        float sx = (vxCenter - vTranslate.x)/scale;
+        float sy = (vyCenter - vTranslate.y)/scale;
+        sTarget.set(sx, sy);
+        return sTarget;
     }
 
     /**
      * Returns the minimum allowed scale.
      */
     private float minScale() {
-        if (minimumScaleType == SCALE_TYPE_CENTER_INSIDE) {
-            //return Math.min(getWidth() / (float) sWidth(), getHeight() / (float) sHeight());
-            //make possible zoom out to real size
-            return Math.min(1F, Math.min(getWidth() / (float) sWidth(), getHeight() / (float) sHeight()));
+        int vPadding = getPaddingBottom() + getPaddingTop();
+        int hPadding = getPaddingLeft() + getPaddingRight();
+        if (minimumScaleType == SCALE_TYPE_CENTER_CROP) {
+            return Math.max((getWidth() - hPadding) / (float) sWidth(), (getHeight() - vPadding) / (float) sHeight());
+        } else if (minimumScaleType == SCALE_TYPE_CUSTOM && minScale > 0) {
+            return minScale;
         } else {
-            return Math.max(getWidth() / (float) sWidth(), getHeight() / (float) sHeight());
+            return Math.min((getWidth() - hPadding) / (float) sWidth(), (getHeight() - vPadding) / (float) sHeight());
         }
     }
 
@@ -1445,6 +1966,32 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
+     * Swap the default region decoder implementation for one of your own. You must do this before setting the image file or
+     * asset, and you cannot use a custom decoder when using layout XML to set an asset name. Your class must have a
+     * public default constructor.
+     * @param regionDecoderClass The {@link ImageRegionDecoder} implementation to use.
+     */
+    public final void setRegionDecoderClass(Class<? extends ImageRegionDecoder> regionDecoderClass) {
+        if (regionDecoderClass == null) {
+            throw new IllegalArgumentException("Decoder class cannot be set to null");
+        }
+        this.regionDecoderClass = regionDecoderClass;
+    }
+
+    /**
+     * Swap the default bitmap decoder implementation for one of your own. You must do this before setting the image file or
+     * asset, and you cannot use a custom decoder when using layout XML to set an asset name. Your class must have a
+     * public default constructor.
+     * @param bitmapDecoderClass The {@link ImageDecoder} implementation to use.
+     */
+    public final void setBitmapDecoderClass(Class<? extends ImageDecoder> bitmapDecoderClass) {
+        if (bitmapDecoderClass == null) {
+            throw new IllegalArgumentException("Decoder class cannot be set to null");
+        }
+        this.bitmapDecoderClass = bitmapDecoderClass;
+    }
+
+    /**
      * Set the pan limiting style. See static fields. Normally {@link #PAN_LIMIT_INSIDE} is best, for image galleries.
      */
     public final void setPanLimit(int panLimit) {
@@ -1452,7 +1999,7 @@ public class FixedSubsamplingScaleImageView extends View {
             throw new IllegalArgumentException("Invalid pan limit: " + panLimit);
         }
         this.panLimit = panLimit;
-        if (isImageReady()) {
+        if (isReady()) {
             fitToBounds(true);
             invalidate();
         }
@@ -1466,7 +2013,7 @@ public class FixedSubsamplingScaleImageView extends View {
             throw new IllegalArgumentException("Invalid scale type: " + scaleType);
         }
         this.minimumScaleType = scaleType;
-        if (isImageReady()) {
+        if (isReady()) {
             fitToBounds(true);
             invalidate();
         }
@@ -1482,10 +2029,11 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
-     * Returns the maximum allowed scale.
+     * Set the minimum scale allowed. A value of 1 means 1:1 pixels at minimum scale. You may wish to set this according
+     * to screen density. Consider using {@link #setMaximumDpi(int)}, which is density aware.
      */
-    public float getMaxScale() {
-        return maxScale;
+    public final void setMinScale(float minScale) {
+        this.minScale = minScale;
     }
 
     /**
@@ -1501,6 +2049,24 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
+     * This is a screen density aware alternative to {@link #setMinScale(float)}; it allows you to express the minimum
+     * allowed scale in terms of the maximum pixel density.
+     * @param dpi Source image pixel density at minimum zoom.
+     */
+    public final void setMaximumDpi(int dpi) {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        float averageDpi = (metrics.xdpi + metrics.ydpi)/2;
+        setMinScale(averageDpi/dpi);
+    }
+
+    /**
+     * Returns the maximum allowed scale.
+     */
+    public float getMaxScale() {
+        return maxScale;
+    }
+
+    /**
      * Returns the minimum allowed scale.
      */
     public final float getMinScale() {
@@ -1511,14 +2077,15 @@ public class FixedSubsamplingScaleImageView extends View {
      * By default, image tiles are at least as high resolution as the screen. For a retina screen this may not be
      * necessary, and may increase the likelihood of an OutOfMemoryError. This method sets a DPI at which higher
      * resolution tiles should be loaded. Using a lower number will on average use less memory but result in a lower
-     * quality image. 160-240dpi will usually be enough.
+     * quality image. 160-240dpi will usually be enough. This should be called before setting the image source,
+     * because it affects which tiles get loaded. When using an untiled source image this method has no effect.
      * @param minimumTileDpi Tile loading threshold.
      */
     public void setMinimumTileDpi(int minimumTileDpi) {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         float averageDpi = (metrics.xdpi + metrics.ydpi)/2;
         this.minimumTileDpi = (int)Math.min(averageDpi, minimumTileDpi);
-        if (isImageReady()) {
+        if (isReady()) {
             reset(false);
             invalidate();
         }
@@ -1561,7 +2128,7 @@ public class FixedSubsamplingScaleImageView extends View {
     public final void resetScaleAndCenter() {
         this.anim = null;
         this.pendingScale = limitedScale(0);
-        if (isImageReady()) {
+        if (isReady()) {
             this.sPendingCenter = new PointF(sWidth()/2, sHeight()/2);
         } else {
             this.sPendingCenter = new PointF(0, 0);
@@ -1570,18 +2137,37 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
-     * Subclasses can override this method to be informed when the view is set up and ready for rendering, so they can
-     * skip their own rendering until the base layer (and its scale and translate) are known.
+     * Call to find whether the view is initialised, has dimensions, and will display an image on
+     * the next draw. If a preview has been provided, it may be the preview that will be displayed
+     * and the full size image may still be loading. If no preview was provided, this is called once
+     * the base layer tiles of the full size image are loaded.
      */
-    protected void onImageReady() {
-        if (initCallback != null) initCallback.onInit();
+    public final boolean isReady() {
+        return readySent;
     }
 
     /**
-     * Call to find whether the view is initialised and ready for rendering tiles.
+     * Called once when the view is initialised, has dimensions, and will display an image on the
+     * next draw. This is triggered at the same time as {@link OnImageEventListener#onReady()} but
+     * allows a subclass to receive this event without using a listener.
      */
-    public final boolean isImageReady() {
-        return readySent && vTranslate != null && tileMap != null && sWidth > 0 && sHeight > 0;
+    protected void onReady() {
+
+    }
+
+    /**
+     * Call to find whether the main image (base layer tiles where relevant) have been loaded. Before
+     * this event the view is blank unless a preview was provided.
+     */
+    public final boolean isImageLoaded() {
+        return imageLoadedSent;
+    }
+
+    /**
+     * Called once when the full size image or its base layer tiles have been loaded.
+     */
+    protected void onImageLoaded() {
+
     }
 
     /**
@@ -1642,6 +2228,20 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
+     * Returns true if double tap & swipe to zoom is enabled.
+     */
+    public final boolean isQuickScaleEnabled() {
+        return quickScaleEnabled;
+    }
+
+    /**
+     * Enable or disable double tap & swipe to zoom.
+     */
+    public final void setQuickScaleEnabled(boolean quickScaleEnabled) {
+        this.quickScaleEnabled = quickScaleEnabled;
+    }
+
+    /**
      * Returns true if pan gesture detection is enabled.
      */
     public final boolean isPanEnabled() {
@@ -1656,11 +2256,26 @@ public class FixedSubsamplingScaleImageView extends View {
         if (!panEnabled && vTranslate != null) {
             vTranslate.x = (getWidth()/2) - (scale * (sWidth()/2));
             vTranslate.y = (getHeight()/2) - (scale * (sHeight()/2));
-            if (isImageReady()) {
+            if (isReady()) {
                 refreshRequiredTiles(true);
                 invalidate();
             }
         }
+    }
+
+    /**
+     * Set a solid color to render behind tiles, useful for displaying transparent PNGs.
+     * @param tileBgColor Background color for tiles.
+     */
+    public final void setTileBackgroundColor(int tileBgColor) {
+        if (Color.alpha(tileBgColor) == 0) {
+            tileBgPaint = null;
+        } else {
+            tileBgPaint = new Paint();
+            tileBgPaint.setStyle(Style.FILL);
+            tileBgPaint.setColor(tileBgColor);
+        }
+        invalidate();
     }
 
     /**
@@ -1704,15 +2319,30 @@ public class FixedSubsamplingScaleImageView extends View {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
+    }
+
+    /**
+     * Add a listener allowing notification of load and error events.
+     */
+    public void setOnImageEventListener(OnImageEventListener onImageEventListener) {
+        this.onImageEventListener = onImageEventListener;
+    }
+
+    /**
      * Creates a panning animation builder, that when started will animate the image to place the given coordinates of
      * the image in the center of the screen. If doing this would move the image beyond the edges of the screen, the
      * image is instead animated to move the center point as near to the center of the screen as is allowed - it's
      * guaranteed to be on screen.
      * @param sCenter Target center point
-     * @return {@link AnimationBuilder} instance. Call {@link com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
+     * @return {@link AnimationBuilder} instance. Call {@link FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
      */
     public AnimationBuilder animateCenter(PointF sCenter) {
-        if (!isImageReady()) {
+        if (!isReady()) {
             return null;
         }
         return new AnimationBuilder(sCenter);
@@ -1722,10 +2352,10 @@ public class FixedSubsamplingScaleImageView extends View {
      * Creates a scale animation builder, that when started will animate a zoom in or out. If this would move the image
      * beyond the panning limits, the image is automatically panned during the animation.
      * @param scale Target scale.
-     * @return {@link AnimationBuilder} instance. Call {@link com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
+     * @return {@link AnimationBuilder} instance. Call {@link FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
      */
     public AnimationBuilder animateScale(float scale) {
-        if (!isImageReady()) {
+        if (!isReady()) {
             return null;
         }
         return new AnimationBuilder(scale);
@@ -1735,10 +2365,10 @@ public class FixedSubsamplingScaleImageView extends View {
      * Creates a scale animation builder, that when started will animate a zoom in or out. If this would move the image
      * beyond the panning limits, the image is automatically panned during the animation.
      * @param scale Target scale.
-     * @return {@link AnimationBuilder} instance. Call {@link com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
+     * @return {@link AnimationBuilder} instance. Call {@link FixedSubsamplingScaleImageView.AnimationBuilder#start()} to start the anim.
      */
     public AnimationBuilder animateScaleAndCenter(float scale, PointF sCenter) {
-        if (!isImageReady()) {
+        if (!isReady()) {
             return null;
         }
         return new AnimationBuilder(scale, sCenter);
@@ -1748,8 +2378,6 @@ public class FixedSubsamplingScaleImageView extends View {
      * Builder class used to set additional options for a scale animation. Create an instance using {@link #animateScale(float)},
      * then set your options and call {@link #start()}.
      */
-    
-    
     public final class AnimationBuilder {
 
         private final float targetScale;
@@ -1832,8 +2460,10 @@ public class FixedSubsamplingScaleImageView extends View {
          * Starts the animation.
          */
         public void start() {
+            int vxCenter = getPaddingLeft() + (getWidth() - getPaddingRight() - getPaddingLeft())/2;
+            int vyCenter = getPaddingTop() + (getHeight() - getPaddingBottom() - getPaddingTop())/2;
             float targetScale = limitedScale(this.targetScale);
-            PointF targetSCenter = panLimited ? limitedSCenter(this.targetSCenter, targetScale) : this.targetSCenter;
+            PointF targetSCenter = panLimited ? limitedSCenter(this.targetSCenter.x, this.targetSCenter.y, targetScale, new PointF()) : this.targetSCenter;
             anim = new Anim();
             anim.scaleStart = scale;
             anim.scaleEnd = targetScale;
@@ -1843,8 +2473,8 @@ public class FixedSubsamplingScaleImageView extends View {
             anim.sCenterEnd = targetSCenter;
             anim.vFocusStart = sourceToViewCoord(targetSCenter);
             anim.vFocusEnd = new PointF(
-                getWidth()/2,
-                getHeight()/2
+                    vxCenter,
+                    vyCenter
             );
             anim.duration = duration;
             anim.interruptible = interruptible;
@@ -1860,8 +2490,8 @@ public class FixedSubsamplingScaleImageView extends View {
                 fitToBounds(true, satEnd);
                 // Adjust the position of the focus point at end so image will be in bounds
                 anim.vFocusEnd = new PointF(
-                        vFocus.x + (satEnd.translate.x - vTranslateXEnd),
-                        vFocus.y + (satEnd.translate.y - vTranslateYEnd)
+                        vFocus.x + (satEnd.vTranslate.x - vTranslateXEnd),
+                        vFocus.y + (satEnd.vTranslate.y - vTranslateYEnd)
                 );
             }
 
@@ -1869,21 +2499,68 @@ public class FixedSubsamplingScaleImageView extends View {
         }
 
     }
-    
-    
-    private InitedCallback initCallback;
-    private FailedCallback failListener;
-    
-    public void setInitCallback(InitedCallback initCallback) {
-        this.initCallback = initCallback;
+
+    /**
+     * An event listener, allowing subclasses and activities to be notified of significant events.
+     */
+    public static interface OnImageEventListener {
+
+        /**
+         * Called when the dimensions of the image and view are known, and either a preview image,
+         * the full size image, or base layer tiles are loaded. This indicates the scale and translate
+         * are known and the next draw will display an image. This event can be used to hide a loading
+         * graphic, or inform a subclass that it is safe to draw overlays.
+         */
+        void onReady();
+
+        /**
+         * Called when the full size image is ready. When using tiling, this means the lowest resolution
+         * base layer of tiles are loaded, and when tiling is disabled, the image bitmap is loaded.
+         * This event could be used as a trigger to enable gestures if you wanted interaction disabled
+         * while only a preview is displayed, otherwise for most cases {@link #onReady()} is the best
+         * event to listen to.
+         */
+        void onImageLoaded();
+
+        /**
+         * Called when a preview image could not be loaded. This method cannot be relied upon; certain
+         * encoding types of supported image formats can result in corrupt or blank images being loaded
+         * and displayed with no detectable error. The view will continue to load the full size image.
+         * @param e The exception thrown. This error is logged by the view.
+         */
+        void onPreviewLoadError(Throwable e);
+
+        /**
+         * Indicates an error initiliasing the decoder when using a tiling, or when loading the full
+         * size bitmap when tiling is disabled. This method cannot be relied upon; certain encoding
+         * types of supported image formats can result in corrupt or blank images being loaded and
+         * displayed with no detectable error.
+         * @param e The exception thrown. This error is also logged by the view.
+         */
+        void onImageLoadError(Throwable e);
+
+        /**
+         * Called when an image tile could not be loaded. This method cannot be relied upon; certain
+         * encoding types of supported image formats can result in corrupt or blank images being loaded
+         * and displayed with no detectable error. Most cases where an unsupported file is used will
+         * result in an error caught by {@link #onImageLoadError(Throwable)}.
+         * @param e The exception thrown. This error is logged by the view.
+         */
+        void onTileLoadError(Throwable e);
+
     }
-    
-    public interface InitedCallback {
-        public void onInit();
+
+    /**
+     * Default implementation of {@link OnImageEventListener} for extension. This does nothing in any method.
+     */
+    public static class DefaultOnImageEventListener implements OnImageEventListener {
+
+        @Override public void onReady() { }
+        @Override public void onImageLoaded() { }
+        @Override public void onPreviewLoadError(Throwable e) { }
+        @Override public void onImageLoadError(Throwable e) { }
+        @Override public void onTileLoadError(Throwable e) { }
+
     }
-    
-    public interface FailedCallback {
-        public void onFail();
-    }
-    
+
 }

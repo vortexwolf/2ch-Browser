@@ -61,6 +61,10 @@ public class PostsViewModel {
         return result;
     }
 
+    public List<PostItemViewModel> getAllModels() {
+        return new ArrayList<PostItemViewModel>(this.mViewModels.values());
+    }
+
     /**
      * Возвращает номер последнего сообщения в треде
      */

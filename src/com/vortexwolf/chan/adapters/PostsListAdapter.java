@@ -362,6 +362,18 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
         return this.mOriginalPosts.toArray(new PostModel[this.mOriginalPosts.size()]);
     }
 
+    public List<String> getAllPostFiles() {
+        ArrayList<String> filePaths = new ArrayList<String>();
+        for (PostItemViewModel model : this.mPostsViewModel.getAllModels()) {
+            for (int i = 0; i < model.getAttachmentsNumber(); i++) {
+                AttachmentInfo attachment = model.getAttachment(i);
+                filePaths.add(attachment.getSourceUrl());
+            }
+        }
+
+        return filePaths;
+    }
+
     private class LoadImagesTimerTask extends TimerTask {
         @Override
         public void run() {

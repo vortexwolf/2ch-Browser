@@ -107,7 +107,8 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
         if (success) {
             if (this.mUpdateGallery) {
-                new SingleMediaScanner(this.mContext, this.mSaveTo);
+                SingleMediaScanner scanner = new SingleMediaScanner(this.mContext, this.mSaveTo);
+                scanner.scan();
             }
             this.mProgressView.hideLoading();
             this.mProgressView.showSuccess(this.mSaveTo);

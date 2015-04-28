@@ -91,9 +91,9 @@
         <item>mov; фильмы; 1</item>
         <item>mu; музыка; 1</item>
         <item>ne; животные и природа; 1</item>
+        <item>out; активный отдых; 0</item>
         <item>pvc; фигурки; 0</item>
         <item>ph; философия; 0</item>
-        <item>po; политика и новости; 0</item>
         <item>psy; психология; 1</item>
         <item>re; религия; 0</item>
         <item>sf; научная фантастика; 1</item>
@@ -116,10 +116,8 @@
         <item>izd; издательство; 0</item>
         <item>mus; музыканты; 1</item>
         <item>o; мазня; 1</item>
-        <item>out; активный отдых; 0</item>
         <item>pa; живопись; 1</item>
         <item>p; фото; 0</item>
-        <item>td; трёхмерная графика; 0</item>
         <item>wp; обои и высокое разрешение; 0</item>
         <item>wrk; работа и карьера; 0</item>
         <item>td; трёхмерная графика; 0</item>
@@ -146,11 +144,19 @@
         <item>wr; текстовые ролевые игры; 0</item>
     </string-array>
     <string-array name="pickboard_boards_hidden">
+        <item>Политика</item>
+        <item>by; Беларусь</item>
+        <item>nvr; ДНР и ЛНР</item>
+        <item>po; Политика и новости</item>
+        <item>ussr; советский союз</item>
+        <item>ukr; Украина</item>
+        <item>zog; теории заговора</item>
         <item>Японская культура</item>
         <item>a; аниме</item>
         <item>aa; аниме арт</item>
         <item>fd; фэндом</item>
         <item>ja; японская культура</item>
+        <item>jsf; Japanese Street Fashion</item>
         <item>ma; манга</item>
         <item>rm; rozen maiden</item>
         <item>to; touhou</item>

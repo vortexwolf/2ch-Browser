@@ -46,6 +46,14 @@
         <item quantity="one">%d new post</item>
         <item quantity="other">%d new posts</item>
     </plurals>
+    <plurals name="data_downloaded_files_quantity">
+        <item quantity="one">%d file downloaded</item>
+        <item quantity="other">%d files downloaded</item>
+    </plurals>
+    <plurals name="data_files_download_start_quantity">
+        <item quantity="one">%1$d file will be downloaded to %2$s</item>
+        <item quantity="other">%1$d files will be downloaded to %2$s</item>
+    </plurals>
 
     <string name="data_posts_files">%1$s and %2$s</string>
     <string name="data_file_size_measure">KB</string>
@@ -83,6 +91,7 @@
     <string name="menu_search_image_google">Search in Google</string>
     <string name="menu_image_operations">Image operations</string>
     <string name="menu_play_video_external">Open external player</string>
+    <string name="menu_download_all_files">Download all images</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>

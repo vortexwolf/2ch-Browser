@@ -7,22 +7,27 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 
 public class SingleMediaScanner implements MediaScannerConnection.MediaScannerConnectionClient {
-    private MediaScannerConnection mMs;
-    private File mFile;
+    private final Context mContext;
+    private final File mFile;
+    private MediaScannerConnection mConnection;
 
     public SingleMediaScanner(Context context, File f) {
+        this.mContext = context;
         this.mFile = f;
-        this.mMs = new MediaScannerConnection(context, this);
-        this.mMs.connect();
+    }
+
+    public void scan() {
+        this.mConnection = new MediaScannerConnection(this.mContext, this);
+        this.mConnection.connect();
     }
 
     @Override
     public void onMediaScannerConnected() {
-        this.mMs.scanFile(this.mFile.getAbsolutePath(), null);
+        this.mConnection.scanFile(this.mFile.getAbsolutePath(), null);
     }
 
     @Override
     public void onScanCompleted(String path, Uri uri) {
-        this.mMs.disconnect();
+        this.mConnection.disconnect();
     }
 }

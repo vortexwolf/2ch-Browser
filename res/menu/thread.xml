@@ -28,6 +28,9 @@
         android:id="@+id/add_remove_favorites_menu_id"
         android:title="@string/menu_add_favorites"/>
     <item
+        android:id="@+id/download_all_files_menu_id"
+        android:title="@string/menu_download_all_files" />
+    <item
         android:id="@+id/share_menu_id"
         android:icon="@drawable/ic_menu_share"
         android:title="@string/menu_share"/>

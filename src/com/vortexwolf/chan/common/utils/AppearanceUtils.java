@@ -27,6 +27,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.davemorrissey.labs.subscaleview.FixedSubsamplingScaleImageView;
+import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
@@ -230,12 +231,19 @@ public class AppearanceUtils {
                     && Constants.SDK_VERSION >= 10
                     && !IoUtils.isNonStandardGrayscaleImage(file)) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
-                imageView.setImageFile(file.getAbsolutePath(), new FixedSubsamplingScaleImageView.FailedCallback() {
+
+                imageView.setImage(ImageSource.uri(Uri.fromFile(file)));
+                imageView.setOnImageEventListener(new FixedSubsamplingScaleImageView.DefaultOnImageEventListener() {
                     @Override
-                    public void onFail() {
+                    public void onTileLoadError(Throwable e) {
+                        AppearanceUtils.setImage(file, context, layout, background, true);
+                    }
+                    @Override
+                    public void onImageLoadError(Throwable e) {
                         AppearanceUtils.setImage(file, context, layout, background, true);
                     }
                 });
+
                 imageView.setLayoutParams(MATCH_PARAMS);
                 imageView.setBackgroundColor(background);
                 layout.addView(imageView);

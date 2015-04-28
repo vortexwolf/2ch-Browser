@@ -39,19 +39,26 @@
         <item quantity="one">%d сообщение</item>
         <item quantity="few">%d сообщения</item>
         <item quantity="many">%d сообщений</item>
-        <item quantity="other">%d сообщений</item>
     </plurals>
     <plurals name="data_files_quantity">
         <item quantity="one">%d файл</item>
         <item quantity="few">%d файла</item>
         <item quantity="many">%d файлов</item>
-        <item quantity="other">%d файлов</item>
     </plurals>
     <plurals name="data_new_posts_quantity">
         <item quantity="one">%d новое сообщение</item>
         <item quantity="few">%d новых сообщения</item>
         <item quantity="many">%d новых сообщений</item>
-        <item quantity="other">%d новых сообщений</item>
+    </plurals>
+    <plurals name="data_downloaded_files_quantity">
+        <item quantity="one">Загружен %d файл</item>
+        <item quantity="few">Загружено %d файла</item>
+        <item quantity="many">Загружено %d файлов</item>
+    </plurals>
+    <plurals name="data_files_download_start_quantity">
+        <item quantity="one">%1$d файл будет сохранен в %2$s</item>
+        <item quantity="few">%1$d файла будут сохранены в %2$s</item>
+        <item quantity="many">%1$d файлов будут сохранены в %2$s</item>
     </plurals>
 
     <string name="data_posts_files">%1$s и %2$s</string>
@@ -91,7 +98,8 @@
     <string name="menu_search_image_google">Поиск в Google</string>
     <string name="menu_image_operations">Действия c изображением</string>
     <string name="menu_play_video_external">Открыть во внешнем плеере</string>
-    
+    <string name="menu_download_all_files">Сохранить все изображения</string>
+
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Ответить не читая</string>
     <string name="cmenu_open_attachment">Открыть файл</string>

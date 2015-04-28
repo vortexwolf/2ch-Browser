@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.PostsListAdapter;
+import com.vortexwolf.chan.asynctasks.DownloadFileListTask;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.asynctasks.DownloadPostsTask;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
@@ -42,6 +43,8 @@ import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.PostsViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
+import com.vortexwolf.chan.models.presentation.ThreadImageModel;
+import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
@@ -54,6 +57,9 @@ import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.vortexwolf.chan.settings.SettingsEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
@@ -271,6 +277,13 @@ public class PostsListActivity extends BaseListActivity {
                 break;
             case R.id.add_menu_id:
                 this.navigateToAddNewPost();
+                break;
+            case R.id.download_all_files_menu_id:
+                List<String> filePaths = this.mAdapter.getAllPostFiles();
+                if (filePaths.size() > 0) {
+                    DownloadFileListTask downloadAllTask = new DownloadFileListTask(this, filePaths);
+                    downloadAllTask.execute();
+                }
                 break;
             case R.id.share_menu_id:
                 String shareUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
