@@ -2,7 +2,6 @@ package com.vortexwolf.chan.common.utils;
 
 import android.net.Uri;
 
-import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 
 public class UriUtils {
@@ -31,7 +30,8 @@ public class UriUtils {
             return false;
         }
 
-        return RegexUtils.getFileExtension(uri.toString()).equalsIgnoreCase("webm");
+        String extension = RegexUtils.getFileExtension(uri.toString());
+        return extension != null && extension.equalsIgnoreCase("webm");
     }
 
     public static boolean isYoutubeUri(Uri uri) {

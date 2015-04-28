@@ -1,7 +1,6 @@
 package com.vortexwolf.chan.asynctasks;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.vortexwolf.chan.common.Factory;
@@ -79,6 +78,10 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
                 this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
             } else {
                 this.mCaptcha = RecaptchaService.loadPostingRecaptcha();
+            }
+
+            if (this.mCaptcha == null) {
+                return false;
             }
         }
 
