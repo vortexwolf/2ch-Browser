@@ -44,21 +44,25 @@
         <item quantity="one">%d файл</item>
         <item quantity="few">%d файла</item>
         <item quantity="many">%d файлов</item>
+        <item quantity="other">%d файлов</item>
     </plurals>
     <plurals name="data_new_posts_quantity">
         <item quantity="one">%d новое сообщение</item>
         <item quantity="few">%d новых сообщения</item>
         <item quantity="many">%d новых сообщений</item>
+        <item quantity="other">%d новых сообщений</item>
     </plurals>
     <plurals name="data_downloaded_files_quantity">
         <item quantity="one">Загружен %d файл</item>
         <item quantity="few">Загружено %d файла</item>
         <item quantity="many">Загружено %d файлов</item>
+        <item quantity="other">Загружено %d файлов</item>
     </plurals>
     <plurals name="data_files_download_start_quantity">
         <item quantity="one">%1$d файл будет сохранен в %2$s</item>
         <item quantity="few">%1$d файла будут сохранены в %2$s</item>
         <item quantity="many">%1$d файлов будут сохранены в %2$s</item>
+        <item quantity="other">%1$d файлов будут сохранены в %2$s</item>
     </plurals>
 
     <string name="data_posts_files">%1$s и %2$s</string>

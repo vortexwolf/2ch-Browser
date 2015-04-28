@@ -246,6 +246,7 @@ public class AppearanceUtils {
 
                 imageView.setLayoutParams(MATCH_PARAMS);
                 imageView.setBackgroundColor(background);
+                imageView.setMaxScale(4F);
                 layout.addView(imageView);
                 isDone = true;
             }

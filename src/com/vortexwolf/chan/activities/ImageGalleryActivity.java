@@ -128,6 +128,15 @@ public class ImageGalleryActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        if (this.mCurrentTask != null) {
+            this.mCurrentTask.cancel(true);
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = this.getMenuInflater();
         inflater.inflate(R.menu.browser, menu);
@@ -230,6 +239,17 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void loadImage(ThreadImageModel model, GalleryItemViewBag viewBag) {
+        this.mImageLoaded = false;
+        this.mImageLoadedFile = null;
+        this.mCurrentImageModel = model;
+        this.mCurrentImageViewBag = viewBag;
+        this.updateOptionsMenu();
+
+        if (this.mCurrentTask != null) {
+            // only 1 image per time
+            this.mCurrentTask.cancel(true);
+        }
+
         if (UriUtils.isWebmUri(Uri.parse(model.url)) && this.mApplicationSettings.isExternalVideoPlayer()) {
             if (model.attachment != null) {
                 this.setThumbnail(model.attachment, viewBag);
@@ -238,16 +258,6 @@ public class ImageGalleryActivity extends Activity {
             }
             return;
         }
-        if (this.mCurrentTask != null) {
-            // only 1 image per time
-            this.mCurrentTask.cancel(true);
-        }
-
-        this.mImageLoaded = false;
-        this.mImageLoadedFile = null;
-        this.mCurrentImageModel = model;
-        this.mCurrentImageViewBag = viewBag;
-        this.updateOptionsMenu();
 
         Uri uri = Uri.parse(model.url);
 
