@@ -3,6 +3,7 @@ package com.vortexwolf.chan.services.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,9 +116,8 @@ public class JsonHttpReader {
                 }
             }
 
-            InputStream memoryStream = this.createStreamForParsing(bytes, listener, task);
-
-            JsonNode result = this.mObjectMapper.readValue(memoryStream, JsonNode.class);
+            InputStreamReader streamReader = this.createStreamReaderForParsing(bytes, listener, task);
+            JsonNode result = this.mObjectMapper.readValue(streamReader, JsonNode.class);
             return result;
         } finally {
             if (streamModel != null) {
@@ -141,13 +141,16 @@ public class JsonHttpReader {
         return bytes;
     }
 
-    private InputStream createStreamForParsing(byte[] bytes, IJsonProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
+    private InputStreamReader createStreamReaderForParsing(byte[] bytes, IJsonProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
         InputStream memoryStream = IoUtils.modifyInputStream(new ByteArrayInputStream(bytes), listener.getContentLength(), listener, task);
-        Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
-        replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x6E});
-        memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
+        // Maybe I don't need these replacements anymore because if InputStreamReader. I need to check.
+        //Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
+        //replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x6E});
+        //memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
 
-        return memoryStream;
+        InputStreamReader streamReader = new InputStreamReader(memoryStream, Constants.UTF8_CHARSET.name());
+
+        return streamReader;
     }
 
     private static class CancelTaskException extends Exception {
