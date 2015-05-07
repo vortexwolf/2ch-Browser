@@ -281,7 +281,7 @@ public class PostsListActivity extends BaseListActivity {
             case R.id.download_all_files_menu_id:
                 List<String> filePaths = this.mAdapter.getAllPostFiles();
                 if (filePaths.size() > 0) {
-                    DownloadFileListTask downloadAllTask = new DownloadFileListTask(this, filePaths);
+                    DownloadFileListTask downloadAllTask = new DownloadFileListTask(this, this.mThreadNumber, filePaths);
                     downloadAllTask.execute();
                 }
                 break;

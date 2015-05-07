@@ -55,6 +55,7 @@ public class Constants {
     public static final int REQUEST_CODE_ADD_POST_ACTIVITY = 2;
     public static final int REQUEST_CODE_GALLERY = 3;
     public static final int REQUEST_CODE_RECAPTCHA = 4;
+    public static final int REQUEST_CODE_VIDEO_FILE = 5;
 
     // Extra-параметры для передачи в объект Intent
     public static final String EXTRA_BOARD_NAME = "ExtraBoardName";

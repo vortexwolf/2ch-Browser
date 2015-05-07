@@ -56,6 +56,7 @@ import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.presentation.AddAttachmentViewBag;
 import com.vortexwolf.chan.models.presentation.CaptchaViewType;
 import com.vortexwolf.chan.models.presentation.DraftPostModel;
+import com.vortexwolf.chan.models.presentation.FileModel;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
@@ -73,7 +74,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private IUrlParser mUrlParser;
     private IUrlBuilder mUrlBuilder;
 
-    private ImageFileModel[] mAttachedFiles = new ImageFileModel[4];
+    private FileModel[] mAttachedFiles = new FileModel[4];
     private CaptchaEntity mCaptcha;
     private IWebsite mWebsite;
     private String mBoardName;
@@ -133,7 +134,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 commentBuilder.append(draft.getComment() + "\n");
             }
 
-            for (ImageFileModel file : draft.getAttachedFiles()) {
+            for (FileModel file : draft.getAttachedFiles()) {
                 this.setAttachment(file);
             }
 
@@ -561,6 +562,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 i.setType("image/*");
                 this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
+            case R.id.menu_attach_video_id:
+                if (this.getAttachments().size() >= ThreadPostUtils.getMaximumAttachments(this.mBoardName)) {
+                    AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
+                    break;
+                }
+
+                Intent videoIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                videoIntent.setType("video/*");
+                this.startActivityForResult(videoIntent, Constants.REQUEST_CODE_VIDEO_FILE);
+                break;
         }
 
         return true;
@@ -596,9 +607,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 case Constants.REQUEST_CODE_GALLERY:
                     Uri imageUri = data.getData();
                     File imageFile = IoUtils.getFile(this, imageUri);
-
-                    // Почему-то было 2 error reports с NullReferenceException
-                    // из-за метода File.fixSlashes, добавлю проверку
                     if (imageFile != null) {
                         ImageFileModel image = new ImageFileModel(imageFile);
                         this.setAttachment(image);
@@ -607,17 +615,31 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     }
 
                     break;
+                case Constants.REQUEST_CODE_VIDEO_FILE:
+                    Uri videoUri = data.getData();
+                    File videoFile = IoUtils.getFile(this, videoUri);
+                    if (videoFile != null) {
+                        FileModel attachmentModel = new FileModel(videoFile);
+                        this.setAttachment(attachmentModel);
+                    } else {
+                        AppearanceUtils.showToastMessage(this, this.getString(R.string.error_image_cannot_be_attached));
+                    }
             }
         }
     }
 
-    private void setAttachment(ImageFileModel fileModel) {
-        int index = 0;
+    private void setAttachment(FileModel fileModel) {
+        int index = -1;
         for (int i = 0; i < this.mAttachedFiles.length; i++) {
             if (this.mAttachedFiles[i] == null) {
                 index = i;
                 break;
             }
+        }
+
+        if (index == -1) {
+            AppearanceUtils.showToastMessage(this, this.getString(R.string.error_image_cannot_be_attached));
+            return;
         }
 
         this.mAttachedFiles[index] = fileModel;
@@ -633,9 +655,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         return this.getAttachments().size() > 0;
     }
 
-    private List<ImageFileModel> getAttachments() {
-        ArrayList<ImageFileModel> attachments = new ArrayList<ImageFileModel>(4);
-        for (ImageFileModel file : this.mAttachedFiles) {
+    private List<FileModel> getAttachments() {
+        ArrayList<FileModel> attachments = new ArrayList<FileModel>(4);
+        for (FileModel file : this.mAttachedFiles) {
             if (file != null) {
                 attachments.add(file);
             }
@@ -646,7 +668,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     private List<File> getAttachedFiles() {
         ArrayList<File> files = new ArrayList<File>(4);
-        for (ImageFileModel file : this.getAttachments()) {
+        for (FileModel file : this.getAttachments()) {
             files.add(file.file);
         }
 

@@ -37,35 +37,40 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final CacheDirectoryManager mCacheDirectoryManager = Factory.resolve(CacheDirectoryManager.class);
     private final Context mContext;
+    private final String mThreadNumber;
     private final List<String> mFromList;
 
     private String mUserError = null;
-    private ArrayList<String> mDownloadedFilePaths = new ArrayList<String>();
+    private ArrayList<File> mDownloadedFiles = new ArrayList<File>();
 
-    public DownloadFileListTask(Context context, List<String> fromList) {
+    public DownloadFileListTask(Context context, String threadNumber, List<String> fromList) {
         this.mContext = context;
+        this.mThreadNumber = threadNumber;
         this.mFromList = fromList;
     }
 
     @Override
     protected Integer doInBackground(Void... arg0) {
+        File saveFolder = new File(this.mSettings.getDownloadDirectory(), this.mThreadNumber);
+        saveFolder.mkdirs();
+
         for (String from : this.mFromList) {
             Uri saveFrom = this.getUriOrCachedFile(Uri.parse(from));
-            File saveTo = IoUtils.getSaveFilePath(saveFrom, this.mSettings);
+            File saveTo = new File(saveFolder, saveFrom.getLastPathSegment());
             if (saveTo.exists()) {
                 continue;
             }
 
             try {
                 this.mDownloadFileService.downloadFile(saveFrom, saveTo, null, this);
-                this.mDownloadedFilePaths.add(saveTo.getAbsolutePath());
+                this.mDownloadedFiles.add(saveTo);
             } catch (DownloadFileException e) {
                 this.mUserError = e.getMessage();
                 continue;
             }
         }
 
-        return this.mDownloadedFilePaths.size();
+        return this.mDownloadedFiles.size();
     }
 
     @Override
@@ -79,9 +84,10 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
     public void onPostExecute(Integer downloadedCount) {
         if (downloadedCount > 0) {
             ArrayList<String> downloadedImagePaths = new ArrayList<String>();
-            for (String path : this.mDownloadedFilePaths) {
-                if (RegexUtils.isImagePathString(path)) {
-                    downloadedImagePaths.add(path);
+            for (File file : this.mDownloadedFiles) {
+                Uri uri = Uri.fromFile(file);
+                if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {
+                    downloadedImagePaths.add(file.getAbsolutePath());
                 }
             }
 

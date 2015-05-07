@@ -6,10 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class SerializableFileModel extends ImageFileModel implements Parcelable {
-    public SerializableFileModel() {
-
-    }
-
     public SerializableFileModel(ImageFileModel copy) {
         this.file = copy.file;
         this.imageHeight = copy.imageHeight;
@@ -17,7 +13,9 @@ public class SerializableFileModel extends ImageFileModel implements Parcelable 
     }
 
     public SerializableFileModel(Parcel in) {
-        this.readFromParcel(in);
+        this.file = new File(in.readString());
+        this.imageHeight = in.readInt();
+        this.imageWidth = in.readInt();
     }
 
     @Override
@@ -33,14 +31,6 @@ public class SerializableFileModel extends ImageFileModel implements Parcelable 
 
         dest.writeInt(this.imageHeight);
         dest.writeInt(this.imageWidth);
-    }
-
-    private void readFromParcel(Parcel in) {
-        this.file = new File(in.readString());
-        // bitmap = in.readParcelable(Bitmap.class.getClassLoader());
-
-        this.imageHeight = in.readInt();
-        this.imageWidth = in.readInt();
     }
 
     public static final Parcelable.Creator<SerializableFileModel> CREATOR = new Parcelable.Creator<SerializableFileModel>() {

@@ -92,6 +92,7 @@
     <string name="menu_image_operations">Image operations</string>
     <string name="menu_play_video_external">Open external player</string>
     <string name="menu_download_all_files">Download all images</string>
+    <string name="menu_attach_video">Attach video file</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>

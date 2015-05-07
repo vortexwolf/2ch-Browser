@@ -11,4 +11,9 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_gallery"/>
 
+    <item
+        android:id="@+id/menu_attach_video_id"
+        android:icon="@drawable/ic_menu_attachment"
+        android:title="@string/menu_attach_video"/>
+
 </menu>

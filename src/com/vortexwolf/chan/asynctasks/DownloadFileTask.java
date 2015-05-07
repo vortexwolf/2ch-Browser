@@ -13,6 +13,7 @@ import com.vortexwolf.chan.common.library.BackgroundDownloadFileView;
 import com.vortexwolf.chan.common.library.DialogDownloadFileView;
 import com.vortexwolf.chan.common.library.SingleMediaScanner;
 import com.vortexwolf.chan.common.utils.IoUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.DownloadFileException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
@@ -106,7 +107,8 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     public void onPostExecute(Boolean success) {
 
         if (success) {
-            if (this.mUpdateGallery) {
+            Uri uri = Uri.fromFile(this.mSaveTo);
+            if (this.mUpdateGallery && (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri))) {
                 SingleMediaScanner scanner = new SingleMediaScanner(this.mContext, this.mSaveTo);
                 scanner.scan();
             }

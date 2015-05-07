@@ -8,6 +8,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+
 public class AddAttachmentViewBag {
     public View container;
     public ImageView thumbnailView;
@@ -31,13 +33,19 @@ public class AddAttachmentViewBag {
         this.thumbnailView.setImageResource(android.R.color.transparent);
     }
     
-    public void show(ImageFileModel model, Resources resources) {
+    public void show(FileModel model, Resources resources) {
         this.container.setVisibility(View.VISIBLE);
-        this.thumbnailView.setImageBitmap(model.getBitmap(100)); // max 100x100
-        
         this.fileName.setText(model.file.getName());
-        
-        String info = String.format(resources.getString(R.string.data_add_post_attachment_info), model.getFileSize(), model.imageWidth, model.imageHeight);
-        this.fileSize.setText(info);
+
+        if (model instanceof ImageFileModel) {
+            ImageFileModel imageModel = (ImageFileModel)model;
+            this.thumbnailView.setImageBitmap(imageModel.getBitmap(100)); // max 100x100
+
+            String info = String.format(resources.getString(R.string.data_add_post_attachment_info), model.getFileSize(), imageModel.imageWidth, imageModel.imageHeight);
+            this.fileSize.setText(info);
+        } else {
+            this.thumbnailView.setImageResource(R.drawable.ic_email_attachment);
+            this.fileSize.setText(model.getFileSize() + resources.getString(R.string.data_file_size_measure));
+        }
     }
 }

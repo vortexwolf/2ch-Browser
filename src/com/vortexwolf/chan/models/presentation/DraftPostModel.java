@@ -8,7 +8,7 @@ import com.vortexwolf.chan.models.domain.CaptchaEntity;
 
 public class DraftPostModel {
     private String mComment;
-    private List<ImageFileModel> mAttachedFiles;
+    private List<FileModel> mAttachedFiles;
     private boolean mIsSage;
     private CaptchaViewType mCaptchaType;
     private CaptchaEntity mCaptcha;
@@ -16,7 +16,7 @@ public class DraftPostModel {
     private boolean mCaptchaPasscodeSuccess;
     private boolean mCaptchaPasscodeFail;
 
-    public DraftPostModel(String comment, List<ImageFileModel> attachedFiles, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, boolean isCaptchaPasscodeSuccess, boolean isCaptchaPasscodeFail) {
+    public DraftPostModel(String comment, List<FileModel> attachedFiles, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, boolean isCaptchaPasscodeSuccess, boolean isCaptchaPasscodeFail) {
         this.mComment = comment;
         this.mAttachedFiles = attachedFiles;
         this.mIsSage = isSage;
@@ -31,7 +31,7 @@ public class DraftPostModel {
         return this.mComment;
     }
 
-    public List<ImageFileModel> getAttachedFiles() {
+    public List<FileModel> getAttachedFiles() {
         return this.mAttachedFiles;
     }
 
