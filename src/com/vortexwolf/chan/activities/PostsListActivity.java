@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.activities;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -41,10 +43,7 @@ import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.IPostListEntity;
 import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
-import com.vortexwolf.chan.models.presentation.PostsViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
-import com.vortexwolf.chan.models.presentation.ThreadImageModel;
-import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
@@ -57,9 +56,6 @@ import com.vortexwolf.chan.services.presentation.PostItemViewBuilder;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.vortexwolf.chan.settings.SettingsEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
@@ -281,7 +277,7 @@ public class PostsListActivity extends BaseListActivity {
             case R.id.download_all_files_menu_id:
                 List<String> filePaths = this.mAdapter.getAllPostFiles();
                 if (filePaths.size() > 0) {
-                    DownloadFileListTask downloadAllTask = new DownloadFileListTask(this, this.mThreadNumber, filePaths);
+                    DownloadFileListTask downloadAllTask = new DownloadFileListTask(this, this.mWebsite, this.mThreadNumber, filePaths);
                     downloadAllTask.execute();
                 }
                 break;
