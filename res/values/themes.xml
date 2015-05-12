@@ -25,6 +25,9 @@
         <item name="iconOverflow">@drawable/ic_action_overflow_dark</item>
     </style>
 
+    <style name="Theme_Black_Switch" parent="@style/Theme_Dark_Switch">
+    </style>
+
     <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
     </style>
 

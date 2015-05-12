@@ -42,7 +42,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/darkBlueText" />
+            android:textColor="#456793" />
 
         <TextView
             android:id="@+id/filelist_status"
@@ -51,7 +51,7 @@
             android:layout_weight="0.0"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/darkGrayText" />
+            android:textColor="#808080" />
     </LinearLayout>
 
 </LinearLayout>

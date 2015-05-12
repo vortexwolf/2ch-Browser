@@ -3,6 +3,7 @@ package com.vortexwolf.chan.common.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.text.Spannable;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.common.Constants;
@@ -42,5 +43,13 @@ public class CompatibilityUtils {
         }
 
         return CompatibilityUtilsImpl.API4.isTablet(context);
+    }
+
+    public static void resetMyLeadingMarginSpanState(Spannable ss) {
+        if (Constants.SDK_VERSION < 8) {
+            return;
+        }
+
+        CompatibilityUtilsImpl.resetMyLeadingMarginSpanState(ss);
     }
 }

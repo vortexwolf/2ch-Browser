@@ -32,7 +32,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // set theme before creating
         this.mSettings = Factory.resolve(ApplicationSettings.class);
-        this.setTheme(Constants.SDK_VERSION > 13 || Constants.SDK_VERSION < 6 ? this.mSettings.getTheme() : R.style.Theme_Dark_Medium);
+        this.setTheme(this.mSettings.getTheme());
         
         // create
         super.onCreate(savedInstanceState);
@@ -49,9 +49,6 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();
-        /*if (Constants.SDK_VERSION < 19) {
-            this.disablePreference(R.string.pref_kitkat_fix_key);
-        }*/
         if (Constants.SDK_VERSION < 11) {
             this.disablePreference(R.string.pref_disable_zoom_controls_key);
         }

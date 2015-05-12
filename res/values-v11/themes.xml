@@ -27,6 +27,9 @@
         <item name="android:actionBarStyle">@style/HoloDark.ActionBar</item>
     </style>
 
+    <style name="Theme_Black_Switch" parent="@style/Theme_Dark_Switch">
+    </style>
+
     <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
     </style>
 

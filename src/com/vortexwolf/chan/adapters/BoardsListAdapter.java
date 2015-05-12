@@ -52,7 +52,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         if (convertView == null) {
             convertView = this.mInflater.inflate(item.isSection()
                     ? com.vortexwolf.chan.R.layout.pick_board_section
-                    : android.R.layout.simple_list_item_1, null);
+                    : com.vortexwolf.chan.R.layout.simple_list_item, null);
         }
 
         if (item.isSection()) {
@@ -62,7 +62,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
             sectionView.setText(si.getTitle());
         } else {
             BoardEntity bi = (BoardEntity) item;
-            final TextView text = (TextView) convertView.findViewById(android.R.id.text1);
+            final TextView text = (TextView) convertView;
 
             String description = !StringUtils.isEmpty(bi.getTitle())
                     ? bi.getCode() + " - " + bi.getTitle()

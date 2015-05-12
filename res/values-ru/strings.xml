@@ -125,10 +125,17 @@
     <string name="cmenu_open_thread">Открыть тред</string>
 
     <!-- Preferences -->
-    <string name="pref_category_appearance">Интерфейс</string>
+    <string name="pref_screen_dvach">2ch</string>
+    <string name="pref_screen_dvach_summary">Настройки имиджборды 2ch.hk</string>
+    <string name="pref_screen_style">Стиль</string>
+    <string name="pref_screen_style_summary">Темы, размеры шрифтов, интерфейс</string>
+    <string name="pref_screen_images">Изображения</string>
+    <string name="pref_screen_images_summary">Просмотр и загрузка изображений</string>
+    <string name="pref_screen_other">Другие настройки</string>
+    <string name="pref_screen_other_summary">Все остальное</string>
+    <string name="pref_category_image_viewer">Просмотрщик изображений</string>
     <string name="pref_category_autorefresh">Автообновление</string>
     <string name="pref_category_cache">Кэширование</string>
-    <string name="pref_category_images">Изображения</string>
     <string name="pref_category_datetime">Дата и время</string>
     <string name="pref_homepage">Стартовая страница</string>
     <string name="pref_homepage_summary">Изменить стартовую страницу</string>
@@ -168,10 +175,7 @@
     <string name="pref_use_https_summary">Включить защищенное соединение через https:// вместо http://</string>
     <string name="pref_unsafe_ssl">Игнорировать ошибки SSL</string>
     <string name="pref_unsafe_ssl_summary">Отключить проверку сертификата</string>
-    
-    <string name="pref_extended_preferences">Настройки галереи</string>
-    <string name="pref_extended_preferences_summary">Страница с дополнительными настройками галереи</string>
-    
+
     <string name="pref_disable_zoom_controls">Отключить кнопки масштаба</string>
 	<string name="pref_disable_zoom_controls_summary">Отключить встроенные кнопки масштаба при просмотре изображений через WebView (только для Android 3 и выше)</string>
     
@@ -188,16 +192,19 @@
     </string-array>
     
     <string-array name="pref_text_size_choices">
-        <item>Средний</item>
-        <item>Большой</item>
-        <item>Больше</item>
-        <item>Самый большой</item>
+        <item>Обычный (13sp)</item>
+        <item>Обычный (14sp)</item>
+        <item>Средний (15sp)</item>
+        <item>Средний (16sp)</item>
+        <item>Большой (20sp)</item>
+        <item>Большой (24sp)</item>
     </string-array>
 
     <string name="pref_theme">Тема</string>
 
     <string-array name="pref_theme_choices">
-        <item>Light</item>
+        <item>Белая</item>
+        <item>Черная</item>
         <item>Neutron</item>
         <item>Photon</item>
     </string-array>

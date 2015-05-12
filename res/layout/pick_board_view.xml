@@ -24,7 +24,8 @@
             android:layout_toLeftOf="@id/pick_board_button"
             android:hint="@string/pick_board_input_hint"
             android:inputType="text|textEmailAddress"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textAppearance="?android:textAppearanceMedium" />
     </RelativeLayout>
 
     <ListView

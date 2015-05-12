@@ -4,9 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -58,6 +60,17 @@ public class ClickableLinksTextView extends TextView {
         }
 
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        // Reset the MyLeadingMarginSpan2 state
+        CharSequence text = this.getText();
+        if (text != null && text instanceof Spannable) {
+            CompatibilityUtils.resetMyLeadingMarginSpanState((Spannable) text);
+        }
+
+        super.onDraw(canvas);
     }
 
     public void startSelection() {

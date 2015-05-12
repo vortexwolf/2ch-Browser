@@ -222,51 +222,71 @@ public class ApplicationSettings {
     }
 
     public int getTheme() {
-        final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_default_value);
-        final String defaultThemeValue = this.mResources.getString(R.string.pref_theme_default_value);
+        final String defaultTextSizeValue = this.mResources.getString(R.string.pref_text_size_13_value);
+        final String defaultThemeValue = this.mResources.getString(R.string.pref_theme_white_value);
 
         String theme = this.mSettings.getString(this.mResources.getString(R.string.pref_theme_key), defaultThemeValue);
         String textSize = this.mSettings.getString(this.mResources.getString(R.string.pref_text_size_key), defaultTextSizeValue);
 
-        if (theme.equals(defaultThemeValue)) {
-            if (textSize.equals(defaultTextSizeValue)) {
-                return R.style.Theme_Light_Medium;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_large_value))) {
-                return R.style.Theme_Light_Large;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_larger_value))) {
-                return R.style.Theme_Light_Larger;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_huge_value))) {
-                return R.style.Theme_Light_Huge;
+        if (theme.equals(this.mResources.getString(R.string.pref_theme_white_value))) {
+            if (textSize.equals(this.mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Light_13;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Light_14;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Light_15;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Light_16;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Light_20;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Light_24;
             }
-
-            return R.style.Theme_Light_Medium;
-        } else if (theme.equals(this.mResources.getString(R.string.pref_theme_dark_value))) {
-            if (textSize.equals(defaultTextSizeValue)) {
-                return R.style.Theme_Dark_Medium;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_large_value))) {
-                return R.style.Theme_Dark_Large;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_larger_value))) {
-                return R.style.Theme_Dark_Larger;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_huge_value))) {
-                return R.style.Theme_Dark_Huge;
+        } else if (theme.equals(this.mResources.getString(R.string.pref_theme_black_value))) {
+            if (textSize.equals(this.mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Black_13;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Black_14;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Black_15;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Black_16;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Black_20;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Black_24;
             }
-
-            return R.style.Theme_Dark_Medium;
+        } else if (theme.equals(this.mResources.getString(R.string.pref_theme_neutron_value))) {
+            if (textSize.equals(this.mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Neutron_13;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Neutron_14;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Neutron_15;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Neutron_16;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Neutron_20;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Neutron_24;
+            }
         } else if (theme.equals(this.mResources.getString(R.string.pref_theme_photon_value))) {
-            if (textSize.equals(defaultTextSizeValue)) {
-                return R.style.Theme_Photon_Medium;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_large_value))) {
-                return R.style.Theme_Photon_Large;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_larger_value))) {
-                return R.style.Theme_Photon_Larger;
-            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_huge_value))) {
-                return R.style.Theme_Photon_Huge;
+            if (textSize.equals(this.mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Photon_13;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Photon_14;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Photon_15;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Photon_16;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Photon_20;
+            } else if (textSize.equals(this.mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Photon_24;
             }
-
-            return R.style.Theme_Photon_Medium;
         }
 
-        return R.style.Theme_Light_Medium;
+        return R.style.Theme_Light_13;
     }
 
     public SettingsEntity getCurrentSettings() {

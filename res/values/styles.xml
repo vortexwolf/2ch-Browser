@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <style name="WidgetTextViewListSeparator">
-        <item name="android:textSize">14.0sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?android:textColorSecondary</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:background">?listSectionBackground</item>
-        <item name="android:paddingLeft">5.0sp</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">25.0dip</item>
-    </style>
-
     <style name="TextFormatButton">
         <item name="android:background">@null</item>
         <item name="android:padding">5dip</item>
@@ -39,7 +27,6 @@ Light theme
         <item name="postItemBackground">@drawable/border_light</item>
         <item name="urlLinkForeground">@color/white_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
-        <item name="postDivider">@color/white_post_divider</item>
         <item name="postSageForeground">@color/white_sage_text</item>
         <item name="postTripForeground">@color/white_trip_text</item>
         <item name="postOpForeground">@color/white_op_text</item>
@@ -59,10 +46,47 @@ Light theme
         <item name="android:windowBackground">@color/white_background</item>
         <item name="android:colorBackground">@color/white_background</item>
         <item name="android:textColorPrimary">@color/white_primary_text</item>
+        <item name="android:textColorSecondary">@color/white_secondary_text</item>
     </style>
     <!--
 ==================
-Dark theme 
+Black theme
+==================
+    -->
+    <style name="Theme_Black_Base" parent="@style/Theme_Black_Switch">
+        <item name="activityRootBackground">@color/black_background</item>
+        <item name="threadTitleForeground">@color/black_thread_title</item>
+        <item name="itemInfoForeground">@color/black_item_info</item>
+        <item name="postBackground">@color/black_post_background</item>
+        <item name="postNumberForeground">@color/black_post_number</item>
+        <item name="listSectionBackground">@color/black_list_section</item>
+        <item name="postItemBackground">@drawable/border_dark</item>
+        <item name="urlLinkForeground">@color/black_url_link</item>
+        <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
+        <item name="postSageForeground">@color/black_sage_text</item>
+        <item name="postTripForeground">@color/black_trip_text</item>
+        <item name="postOpForeground">@color/black_op_text</item>
+        <item name="postIndexForeground">@color/black_post_index_text</item>
+        <!-- Comment colors -->
+        <item name="postQuoteForeground">@color/black_post_quote</item>
+        <item name="spoilerForeground">@color/black_spoiler_text</item>
+        <item name="spoilerBackground">@color/black_spoiler</item>
+        <!-- Markup icons -->
+        <item name="iconMarkupBold">@drawable/markup_bold_blue</item>
+        <item name="iconMarkupItalic">@drawable/markup_italic_blue</item>
+        <item name="iconMarkupUnderline">@drawable/markup_underline_blue</item>
+        <item name="iconMarkupStrike">@drawable/markup_strike_blue</item>
+        <item name="iconMarkupSpoiler">@drawable/markup_spoiler_blue</item>
+        <item name="iconMarkupQuote">@drawable/markup_quote_blue</item>
+        <!-- Android built-in styles -->
+        <item name="android:windowBackground">@color/black_background</item>
+        <item name="android:colorBackground">@color/black_background</item>
+        <item name="android:textColorPrimary">@color/black_primary_text</item>
+        <item name="android:textColorSecondary">@color/black_secondary_text</item>
+    </style>
+    <!--
+==================
+Neutron theme
 ==================
     -->
     <style name="Theme_Neutron_Base" parent="@style/Theme_Dark_Switch">
@@ -75,7 +99,6 @@ Dark theme
         <item name="postItemBackground">@drawable/border_dark</item>
         <item name="urlLinkForeground">@color/neutron_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
-        <item name="postDivider">@color/neutron_post_divider</item>
         <item name="postSageForeground">@color/neutron_sage_text</item>
         <item name="postTripForeground">@color/neutron_trip_text</item>
         <item name="postOpForeground">@color/neutron_op_text</item>
@@ -95,6 +118,7 @@ Dark theme
         <item name="android:windowBackground">@color/neutron_background</item>
         <item name="android:colorBackground">@color/neutron_background</item>
         <item name="android:textColorPrimary">@color/neutron_primary_text</item>
+        <item name="android:textColorSecondary">@color/neutron_secondary_text</item>
     </style>
     <!--
 ==================
@@ -111,7 +135,6 @@ Photon theme
         <item name="postItemBackground">@drawable/border_photon</item>
         <item name="urlLinkForeground">@color/photon_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
-        <item name="postDivider">@color/photon_post_divider</item>
         <item name="postSageForeground">@color/photon_sage_text</item>
         <item name="postTripForeground">@color/photon_trip_text</item>
         <item name="postOpForeground">@color/photon_op_text</item>
@@ -131,127 +154,191 @@ Photon theme
         <item name="android:windowBackground">@color/photon_background</item>
         <item name="android:colorBackground">@color/photon_background</item>
         <item name="android:textColorPrimary">@color/photon_primary_text</item>
+        <item name="android:textColorSecondary">@color/photon_secondary_text</item>
     </style>
 
     <!-- TextAppearance for different font size settings -->
-    <style name="TextAppearance_Medium.Small" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance_13.Small" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">11sp</item>
     </style>
-
-    <style name="TextAppearance_Medium.Medium" parent="@android:style/TextAppearance.Medium">
+    <style name="TextAppearance_13.Medium" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">13sp</item>
     </style>
-
-    <style name="TextAppearance_Medium.Large" parent="@android:style/TextAppearance.Large">
+    <style name="TextAppearance_13.Large" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="TextAppearance_Large.Small" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance_14.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="TextAppearance_14.Medium" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance_14.Large" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance_15.Small" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">13sp</item>
     </style>
-
-    <style name="TextAppearance_Large.Medium" parent="@android:style/TextAppearance.Medium">
+    <style name="TextAppearance_15.Medium" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">15sp</item>
     </style>
-
-    <style name="TextAppearance_Large.Large" parent="@android:style/TextAppearance.Large">
+    <style name="TextAppearance_15.Large" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="TextAppearance_Larger.Small" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">15sp</item>
+    <style name="TextAppearance_16.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">14sp</item>
     </style>
-
-    <style name="TextAppearance_Larger.Medium" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">17sp</item>
+    <style name="TextAppearance_16.Medium" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">16sp</item>
     </style>
-
-    <style name="TextAppearance_Larger.Large" parent="@android:style/TextAppearance.Large">
-        <item name="android:textSize">19sp</item>
-    </style>
-
-    <style name="TextAppearance_Huge.Small" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance_16.Large" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextAppearance_Huge.Medium" parent="@android:style/TextAppearance.Medium">
+    <style name="TextAppearance_20.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextAppearance_20.Medium" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">20sp</item>
     </style>
-
-    <style name="TextAppearance_Huge.Large" parent="@android:style/TextAppearance.Large">
+    <style name="TextAppearance_20.Large" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">22sp</item>
     </style>
 
-    <style name="Theme_Light_Medium" parent="@style/Theme_Light_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    <style name="TextAppearance_24.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="TextAppearance_24.Medium" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="TextAppearance_24.Large" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">26sp</item>
     </style>
 
-    <style name="Theme_Light_Large" parent="@style/Theme_Light_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    <style name="Theme_Light_13" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_13.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_13.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_13.Large</item>
+    </style>
+    <style name="Theme_Light_14" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_14.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_14.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_14.Large</item>
+    </style>
+    <style name="Theme_Light_15" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_15.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_15.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_15.Large</item>
+    </style>
+    <style name="Theme_Light_16" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
+    </style>
+    <style name="Theme_Light_20" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_20.Large</item>
+    </style>
+    <style name="Theme_Light_24" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_24.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_24.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_24.Large</item>
     </style>
 
-    <style name="Theme_Light_Larger" parent="@style/Theme_Light_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Larger.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Larger.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Larger.Large</item>
+    <style name="Theme_Black_13" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_13.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_13.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_13.Large</item>
+    </style>
+    <style name="Theme_Black_14" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_14.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_14.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_14.Large</item>
+    </style>
+    <style name="Theme_Black_15" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_15.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_15.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_15.Large</item>
+    </style>
+    <style name="Theme_Black_16" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
+    </style>
+    <style name="Theme_Black_20" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_20.Large</item>
+    </style>
+    <style name="Theme_Black_24" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_24.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_24.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_24.Large</item>
     </style>
 
-    <style name="Theme_Light_Huge" parent="@style/Theme_Light_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    <style name="Theme_Neutron_13" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_13.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_13.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_13.Large</item>
+    </style>
+    <style name="Theme_Neutron_14" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_14.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_14.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_14.Large</item>
+    </style>
+    <style name="Theme_Neutron_15" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_15.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_15.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_15.Large</item>
+    </style>
+    <style name="Theme_Neutron_16" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
+    </style>
+    <style name="Theme_Neutron_20" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_20.Large</item>
+    </style>
+    <style name="Theme_Neutron_24" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_24.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_24.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_24.Large</item>
     </style>
 
-    <style name="Theme_Dark_Medium" parent="@style/Theme_Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    <style name="Theme_Photon_13" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_13.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_13.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_13.Large</item>
     </style>
-
-    <style name="Theme_Dark_Large" parent="@style/Theme_Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    <style name="Theme_Photon_14" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_14.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_14.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_14.Large</item>
     </style>
-
-    <style name="Theme_Dark_Larger" parent="@style/Theme_Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Larger.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Larger.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Larger.Large</item>
+    <style name="Theme_Photon_15" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_15.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_15.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_15.Large</item>
     </style>
-
-    <style name="Theme_Dark_Huge" parent="@style/Theme_Neutron_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
+    <style name="Theme_Photon_16" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
     </style>
-
-    <style name="Theme_Photon_Medium" parent="@style/Theme_Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Medium.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Medium.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Medium.Large</item>
+    <style name="Theme_Photon_20" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_20.Large</item>
     </style>
-
-    <style name="Theme_Photon_Large" parent="@style/Theme_Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Large.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Large.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Large.Large</item>
+    <style name="Theme_Photon_24" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_24.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_24.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_24.Large</item>
     </style>
-
-    <style name="Theme_Photon_Larger" parent="@style/Theme_Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Larger.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Larger.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Larger.Large</item>
-    </style>
-
-    <style name="Theme_Photon_Huge" parent="@style/Theme_Photon_Base">
-        <item name="android:textAppearanceSmall">@style/TextAppearance_Huge.Small</item>
-        <item name="android:textAppearanceMedium">@style/TextAppearance_Huge.Medium</item>
-        <item name="android:textAppearanceLarge">@style/TextAppearance_Huge.Large</item>
-    </style>
-
 </resources>

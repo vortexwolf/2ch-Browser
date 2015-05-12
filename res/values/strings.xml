@@ -113,10 +113,17 @@
     <string name="cmenu_open_thread">Open thread</string>
 
     <!-- Preferences -->
-    <string name="pref_category_appearance">Appearance</string>
+    <string name="pref_screen_dvach">2ch</string>
+    <string name="pref_screen_dvach_summary">2ch.hk specific options</string>
+    <string name="pref_screen_style">Style</string>
+    <string name="pref_screen_style_summary">Set themes, font sizes, UI</string>
+    <string name="pref_screen_images">Images</string>
+    <string name="pref_screen_images_summary">Images specific options</string>
+    <string name="pref_screen_other">Other</string>
+    <string name="pref_screen_other_summary">Everything else</string>
+    <string name="pref_category_image_viewer">Image viewer</string>
     <string name="pref_category_autorefresh">AutoRefresh</string>
     <string name="pref_category_cache">Cache</string>
-    <string name="pref_category_images">Images</string>
     <string name="pref_category_datetime">Date &amp; Time</string>
     <string name="pref_homepage">Default start page</string>
     <string name="pref_homepage_summary">Change the start page</string>
@@ -159,9 +166,6 @@
     <string name="pref_unsafe_ssl">Ignore SSL Certificate Errors</string>
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
     
-    <string name="pref_extended_preferences">Image Gallery Preferences</string>
-    <string name="pref_extended_preferences_summary">Image and video viewer preferences</string>
-    
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
     
@@ -178,16 +182,19 @@
     </string-array>
     
     <string-array name="pref_text_size_choices">
-        <item>Medium</item>
-        <item>Large</item>
-        <item>Larger</item>
-        <item>Huge</item>
+        <item>Normal (13sp)</item>
+        <item>Normal (14sp)</item>
+        <item>Medium (15sp)</item>
+        <item>Medium (16sp)</item>
+        <item>Large (20sp)</item>
+        <item>Large (24sp)</item>
     </string-array>
 
     <string name="pref_theme">Theme</string>
 
     <string-array name="pref_theme_choices">
-        <item>Light</item>
+        <item>White</item>
+        <item>Black</item>
         <item>Neutron</item>
         <item>Photon</item>
     </string-array>

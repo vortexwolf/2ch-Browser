@@ -4,6 +4,7 @@ import java.util.concurrent.Executor;
 
 import com.vortexwolf.chan.activities.PostsListActivity;
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.controls.MyLeadingMarginSpan2;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 
@@ -17,6 +18,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.DocumentsContract;
+import android.text.Spannable;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -145,5 +147,12 @@ public class CompatibilityUtilsImpl {
                 popupMenu.show();
             }
         };
+    }
+
+    public static void resetMyLeadingMarginSpanState(Spannable ss) {
+        MyLeadingMarginSpan2[] spans = ss.getSpans(0, ss.length(), MyLeadingMarginSpan2.class);
+        for (MyLeadingMarginSpan2 span : spans) {
+            span.resetDrawState();
+        }
     }
 }

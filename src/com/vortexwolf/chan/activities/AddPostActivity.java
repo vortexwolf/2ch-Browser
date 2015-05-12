@@ -184,6 +184,15 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     @Override
+    protected void onDestroy() {
+        if (this.mProgressDialog != null) {
+            this.mProgressDialog.dismiss();
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
         MyLog.v(TAG, "save state");
         if (!this.mFinishedSuccessfully) {
