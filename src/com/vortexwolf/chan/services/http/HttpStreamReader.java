@@ -100,6 +100,7 @@ public class HttpStreamReader {
             } catch (SSLException e) {
                 throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
             } catch (Exception e) {
+                MyLog.e(TAG, e.getMessage());
                 throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
             }
 
@@ -237,6 +238,7 @@ public class HttpStreamReader {
         } catch (SSLException e) {
             throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
         } catch (Exception e) {
+            MyLog.e(TAG, e.getMessage());
             throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
         }
 

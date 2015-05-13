@@ -50,7 +50,7 @@ public class OpenTabsManager {
 
     public void navigate(OpenTabModel tab, Activity activity) {
         if (StringUtils.isEmpty(tab.getThread())) {
-            this.mNavigationService.navigateBoardPage(activity, null, tab.getWebsite().name(), tab.getBoard(), 0, true);
+            this.mNavigationService.navigateBoardPage(activity, null, tab.getWebsite().name(), tab.getBoard(), tab.getPage(), true);
         } else {
             this.mNavigationService.navigateThread(activity, null, tab.getWebsite().name(), tab.getBoard(), tab.getThread(), tab.getTitle(), null, true);
         }

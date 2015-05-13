@@ -41,7 +41,7 @@ public class Constants {
     public static final String MULTIPART_BOUNDARY = "----WebKitFormBoundaryyD8qfvcSfpRMHx9M";
 
     public static final String CF_CLEARANCE_COOKIE = "cf_clearance";
-    public static final String USERCODE_COOKIE = "usercode";
+    public static final String USERCODE_NOCAPTCHA_COOKIE = "usercode_nocaptcha";
 
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;

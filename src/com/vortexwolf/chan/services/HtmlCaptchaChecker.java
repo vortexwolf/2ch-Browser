@@ -26,7 +26,7 @@ public class HtmlCaptchaChecker {
         String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(this.mApplicationSettings.getPasscodeCookieValue());
 
         // Add referer, because it always returns the incorrect value CHECK if not to set it
-        String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, board, thread);
+        String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, board, 0, thread);
         Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
 
         CaptchaResult result;

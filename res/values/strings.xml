@@ -92,7 +92,7 @@
     <string name="menu_image_operations">Image operations</string>
     <string name="menu_play_video_external">Open external player</string>
     <string name="menu_download_all_files">Download all images</string>
-    <string name="menu_attach_video">Attach video file</string>
+    <string name="menu_attach_video">Attach video</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>
@@ -186,6 +186,7 @@
         <item>Normal (14sp)</item>
         <item>Medium (15sp)</item>
         <item>Medium (16sp)</item>
+        <item>Medium (18sp)</item>
         <item>Large (20sp)</item>
         <item>Large (24sp)</item>
     </string-array>

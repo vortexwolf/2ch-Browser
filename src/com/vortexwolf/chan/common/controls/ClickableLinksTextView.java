@@ -104,30 +104,11 @@ public class ClickableLinksTextView extends TextView {
             return superResult;
         }
 
-        final boolean touchIsFinished = (action == MotionEvent.ACTION_UP) && !this.getIgnoreActionUpEvent() && this.isFocused();
-
-        // Copied from the LinkMovementMethod class
-        if (touchIsFinished) {
-            Spannable spannable = (Spannable) this.getText();
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-
-            x -= this.getTotalPaddingLeft();
-            y -= this.getTotalPaddingTop();
-
-            x += this.getScrollX();
-            y += this.getScrollY();
-
-            Layout layout = this.getLayout();
-            int line = layout.getLineForVertical(y);
-            int off = layout.getOffsetForHorizontal(line, x);
-
-            ClickableSpan[] link = spannable.getSpans(off, off, ClickableSpan.class);
-
-            if (link.length != 0) {
-                link[0].onClick(this);
-                return true;
-            }
+        boolean isLinkClick = MyLinkMovementMethod.getInstance().isLinkClickEvent(this, (Spannable) this.getText(), event);
+        boolean isTouchStarted = action == MotionEvent.ACTION_DOWN;
+        boolean isTouchFinished = (action == MotionEvent.ACTION_UP) && !this.getIgnoreActionUpEvent();
+        if (isLinkClick && (isTouchStarted || isTouchFinished) && this.isFocused()) {
+            return true;
         }
 
         return superResult;

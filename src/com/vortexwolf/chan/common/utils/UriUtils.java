@@ -66,9 +66,9 @@ public class UriUtils {
         return cookieDomain.equalsIgnoreCase(siteDomain);
     }
 
-    public static String getBoardOrThreadUrl(IUrlBuilder builder, String boardName, String threadNumber) {
+    public static String getBoardOrThreadUrl(IUrlBuilder builder, String boardName, int page, String threadNumber) {
         if(StringUtils.isEmpty(threadNumber)) {
-            return builder.getPageUrlHtml(boardName, 0);
+            return builder.getPageUrlHtml(boardName, page);
         }
 
         return builder.getThreadUrlHtml(boardName, threadNumber);

@@ -24,7 +24,6 @@ Light theme
         <item name="postBackground">@color/white_post_background</item>
         <item name="postNumberForeground">@color/white_post_number</item>
         <item name="listSectionBackground">@color/white_list_section</item>
-        <item name="postItemBackground">@drawable/border_light</item>
         <item name="urlLinkForeground">@color/white_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_light</item>
         <item name="postSageForeground">@color/white_sage_text</item>
@@ -60,7 +59,6 @@ Black theme
         <item name="postBackground">@color/black_post_background</item>
         <item name="postNumberForeground">@color/black_post_number</item>
         <item name="listSectionBackground">@color/black_list_section</item>
-        <item name="postItemBackground">@drawable/border_dark</item>
         <item name="urlLinkForeground">@color/black_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
         <item name="postSageForeground">@color/black_sage_text</item>
@@ -96,7 +94,6 @@ Neutron theme
         <item name="postBackground">@color/neutron_post_background</item>
         <item name="postNumberForeground">@color/neutron_post_number</item>
         <item name="listSectionBackground">@color/neutron_list_section</item>
-        <item name="postItemBackground">@drawable/border_dark</item>
         <item name="urlLinkForeground">@color/neutron_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_dark</item>
         <item name="postSageForeground">@color/neutron_sage_text</item>
@@ -132,7 +129,6 @@ Photon theme
         <item name="postBackground">@color/photon_post_background</item>
         <item name="postNumberForeground">@color/photon_post_number</item>
         <item name="listSectionBackground">@color/photon_list_section</item>
-        <item name="postItemBackground">@drawable/border_photon</item>
         <item name="urlLinkForeground">@color/photon_url_link</item>
         <item name="tabCloseButtonBackground">@drawable/tab_close_photon</item>
         <item name="postSageForeground">@color/photon_sage_text</item>
@@ -198,6 +194,16 @@ Photon theme
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="TextAppearance_18.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance_18.Medium" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextAppearance_18.Large" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="TextAppearance_20.Small" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">18sp</item>
     </style>
@@ -238,6 +244,11 @@ Photon theme
         <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
     </style>
+    <style name="Theme_Light_18" parent="@style/Theme_Light_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_18.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_18.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_18.Large</item>
+    </style>
     <style name="Theme_Light_20" parent="@style/Theme_Light_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
@@ -268,6 +279,11 @@ Photon theme
         <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
+    </style>
+    <style name="Theme_Black_18" parent="@style/Theme_Black_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_18.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_18.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_18.Large</item>
     </style>
     <style name="Theme_Black_20" parent="@style/Theme_Black_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
@@ -300,6 +316,11 @@ Photon theme
         <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
     </style>
+    <style name="Theme_Neutron_18" parent="@style/Theme_Neutron_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_18.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_18.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_18.Large</item>
+    </style>
     <style name="Theme_Neutron_20" parent="@style/Theme_Neutron_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_20.Medium</item>
@@ -330,6 +351,11 @@ Photon theme
         <item name="android:textAppearanceSmall">@style/TextAppearance_16.Small</item>
         <item name="android:textAppearanceMedium">@style/TextAppearance_16.Medium</item>
         <item name="android:textAppearanceLarge">@style/TextAppearance_16.Large</item>
+    </style>
+    <style name="Theme_Photon_18" parent="@style/Theme_Photon_Base">
+        <item name="android:textAppearanceSmall">@style/TextAppearance_18.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance_18.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance_18.Large</item>
     </style>
     <style name="Theme_Photon_20" parent="@style/Theme_Photon_Base">
         <item name="android:textAppearanceSmall">@style/TextAppearance_20.Small</item>

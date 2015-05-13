@@ -2,12 +2,12 @@
 <resources>
     <color name="blue">#0000FF</color>
 
-    <color name="white_background">#f3f3f3</color>
+    <color name="white_background">#f4f4f4</color>
     <color name="black_background">@android:color/black</color>
     <color name="neutron_background">#212121</color>
     <color name="photon_background">#EEEEEE</color>
-    <color name="white_post_background">@color/white_background</color>
-    <color name="black_post_background">@color/black_background</color>
+    <color name="white_post_background">#f1f1f1</color>
+    <color name="black_post_background">#030303</color>
     <color name="neutron_post_background">#2C2C2C</color>
     <color name="photon_post_background">#DDDDDD</color>
     <color name="white_primary_text">@android:color/black</color>
@@ -16,8 +16,8 @@
     <color name="photon_primary_text">#333333</color>
     <color name="white_secondary_text">#323232</color>
     <color name="black_secondary_text">#bebebe</color>
-    <color name="neutron_secondary_text">@color/neutron_primary_text</color>
-    <color name="photon_secondary_text">@color/photon_primary_text</color>
+    <color name="neutron_secondary_text">@color/black_secondary_text</color>
+    <color name="photon_secondary_text">@color/white_secondary_text</color>
     <color name="white_thread_title">@color/blue</color>
     <color name="black_thread_title">@android:color/white</color>
     <color name="neutron_thread_title">#3941AC</color>

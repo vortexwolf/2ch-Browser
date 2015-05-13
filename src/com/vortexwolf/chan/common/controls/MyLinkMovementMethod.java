@@ -5,6 +5,7 @@ import android.text.NoCopySpan;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
@@ -174,10 +175,24 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
     public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
         int action = event.getAction();
 
-        if (this.mSkipNextClick && (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN)) {
-            this.mSkipNextClick = false;
-        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+            if (this.mSkipNextClick) {
+                this.mSkipNextClick = false;
+            } else {
+                if (isLinkClickEvent(widget, buffer, event)) {
+                    return true;
+                } else {
+                    this.removeSelection(buffer);
+                }
+            }
+        }
 
+        return super.onTouchEvent(widget, buffer, event);
+    }
+
+    public boolean isLinkClickEvent(TextView widget, Spannable buffer, MotionEvent event) {
+        int action = event.getAction();
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
             int x = (int) event.getX();
             int y = (int) event.getY();
 
@@ -201,12 +216,10 @@ public class MyLinkMovementMethod extends ScrollingMovementMethod {
                 }
 
                 return true;
-            } else {
-                this.removeSelection(buffer);
             }
         }
 
-        return super.onTouchEvent(widget, buffer, event);
+        return false;
     }
 
     @Override

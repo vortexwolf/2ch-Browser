@@ -54,7 +54,7 @@ public class UrlTitleEntity {
 
     public String buildUrl() {
         IUrlBuilder builder = Websites.fromName(this.website).getUrlBuilder();
-        return UriUtils.getBoardOrThreadUrl(builder, this.board, this.thread);
+        return UriUtils.getBoardOrThreadUrl(builder, this.board, 0, this.thread);
     }
 
     public String getTitleOrDefault() {

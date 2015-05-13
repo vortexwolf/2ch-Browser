@@ -25,7 +25,8 @@
             android:inputType="textShortMessage|textCapSentences"
             android:maxLength="255"
             android:singleLine="true"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Spinner
             android:id="@+id/addpost_politics"
@@ -105,7 +106,8 @@
             android:hint="@string/addpost_message_hint"
             android:inputType="textLongMessage|textMultiLine|textCapSentences"
             android:maxLength="15000"
-            android:minLines="3" />
+            android:minLines="3"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <include
             android:layout_width="fill_parent"

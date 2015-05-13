@@ -58,7 +58,7 @@ public class OpenTabModel {
 
     public String buildUrl() {
         IUrlBuilder builder = this.mWebsite.getUrlBuilder();
-        return UriUtils.getBoardOrThreadUrl(builder, this.mBoard, this.mThread);
+        return UriUtils.getBoardOrThreadUrl(builder, this.mBoard, this.mPage, this.mThread);
     }
 
     public String getTitleOrDefault() {

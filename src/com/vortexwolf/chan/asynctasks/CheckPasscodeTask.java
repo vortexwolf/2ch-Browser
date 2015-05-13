@@ -24,6 +24,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
@@ -31,17 +32,19 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final String mPasscode;
     private final DefaultHttpClient mHttpClient = Factory.resolve(DefaultHttpClient.class);
     private final ApplicationSettings mApplicationSettings = Factory.resolve(ApplicationSettings.class);
-    private IUrlBuilder mUrlBuilder;
+    private final IWebsite mWebsite;
 
     private Cookie mUserCodeCookie = null;
     private String mErrorMessage = null;
 
-    public CheckPasscodeTask(ICheckPasscodeView view) {
+    public CheckPasscodeTask(IWebsite website, ICheckPasscodeView view) {
+        this.mWebsite = website;
         this.mCheckPasscodeView = view;
         this.mPasscode = this.mApplicationSettings.getPasscodeRaw();
     }
 
-    public CheckPasscodeTask(ICheckPasscodeView view, String passcode) {
+    public CheckPasscodeTask(IWebsite website, ICheckPasscodeView view, String passcode) {
+        this.mWebsite = website;
         this.mCheckPasscodeView = view;
         this.mPasscode = passcode;
     }
@@ -51,7 +54,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
         HttpPost post = null;
         HttpResponse response = null;
         try {
-            String url = this.mUrlBuilder.getPasscodeCheckUrl();
+            String url = this.mWebsite.getUrlBuilder().getPasscodeCheckUrl();
             post = new HttpPost(url);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -64,7 +67,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             response = this.mHttpClient.execute(post);
             StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() != 302) {
+            if (status.getStatusCode() != 302 && status.getStatusCode() != 301) {
                 this.mErrorMessage = status.getStatusCode() + " - " + status.getReasonPhrase();
                 return null;
             }
@@ -73,7 +76,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
             for (Cookie c : cookies) {
-                if (c.getName().equals(Constants.USERCODE_COOKIE) &&
+                if (c.getName().equals(Constants.USERCODE_NOCAPTCHA_COOKIE) &&
                     UriUtils.areCookieDomainsEqual(c.getDomain(), Uri.parse(url).getHost())) {
                     this.mUserCodeCookie = c;
                     break;

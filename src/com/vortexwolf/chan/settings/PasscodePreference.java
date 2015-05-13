@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
+import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
@@ -28,7 +29,7 @@ public class PasscodePreference extends EditTextPreference {
     }
 
     public void sendPasscodeToServer(String passcode) {
-        CheckPasscodeTask task = new CheckPasscodeTask(new CheckPasscodeView(), passcode);
+        CheckPasscodeTask task = new CheckPasscodeTask(Websites.getDefault(), new CheckPasscodeView(), passcode);
         task.execute();
     }
 

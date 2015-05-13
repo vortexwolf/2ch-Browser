@@ -12,7 +12,8 @@
     <string name="pref_text_size_14_value">TEXT_SIZE_14</string>
     <string name="pref_text_size_15_value">TEXT_SIZE_LARGE</string>
     <string name="pref_text_size_16_value">TEXT_SIZE_16</string>
-    <string name="pref_text_size_20_value">TEXT_SIZE_LARGER</string>
+    <string name="pref_text_size_18_value">TEXT_SIZE_LARGER</string>
+    <string name="pref_text_size_20_value">TEXT_SIZE_20</string>
     <string name="pref_text_size_24_value">TEXT_SIZE_HUGE</string>
     <string name="pref_theme_key">pref_theme_key</string>
     <string name="pref_theme_white_value">THEME_WHITE</string>
@@ -62,6 +63,7 @@
         <item>@string/pref_text_size_14_value</item>
         <item>@string/pref_text_size_15_value</item>
         <item>@string/pref_text_size_16_value</item>
+        <item>@string/pref_text_size_18_value</item>
         <item>@string/pref_text_size_20_value</item>
         <item>@string/pref_text_size_24_value</item>
     </string-array>

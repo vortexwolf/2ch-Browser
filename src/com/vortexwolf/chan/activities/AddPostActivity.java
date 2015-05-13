@@ -697,7 +697,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mCurrentCheckPasscodeTask.cancel(true);
         }
 
-        this.mCurrentCheckPasscodeTask = new CheckPasscodeTask(new CheckPasscodeView());
+        this.mCurrentCheckPasscodeTask = new CheckPasscodeTask(this.mWebsite, new CheckPasscodeView());
         this.mCurrentCheckPasscodeTask.execute();
     }
 
