@@ -73,6 +73,19 @@ public class ClickableLinksTextView extends TextView {
         super.onDraw(canvas);
     }
 
+    @Override
+    public int getOffsetForPosition(float x, float y) {
+        // Set the current line for MyLeadingMarginSpan2
+        CharSequence text = this.getText();
+        if (text != null && text instanceof Spannable) {
+            int line = this.getLineAtCoordinate(y);
+
+            CompatibilityUtils.setMyLeadingMarginSpanCurrentLine((Spannable) text, line);
+        }
+
+        return super.getOffsetForPosition(x, y);
+    }
+
     public void startSelection() {
         if (StringUtils.isEmpty(this.getText())) {
             return;
@@ -88,6 +101,15 @@ public class ClickableLinksTextView extends TextView {
         } catch (Exception e) {
             MyLog.e(TAG, e);
         }
+    }
+
+    private int getLineAtCoordinate(float y) {
+        y -= getTotalPaddingTop();
+        // Clamp the position to inside of the view.
+        y = Math.max(0.0f, y);
+        y = Math.min(getHeight() - getTotalPaddingBottom() - 1, y);
+        y += getScrollY();
+        return getLayout().getLineForVertical((int) y);
     }
 
     private boolean checkLinksOnTouch(MotionEvent event) {

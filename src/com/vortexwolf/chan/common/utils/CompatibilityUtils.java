@@ -52,4 +52,12 @@ public class CompatibilityUtils {
 
         CompatibilityUtilsImpl.resetMyLeadingMarginSpanState(ss);
     }
+
+    public static void setMyLeadingMarginSpanCurrentLine(Spannable ss, int line) {
+        if (Constants.SDK_VERSION < 8) {
+            return;
+        }
+
+        CompatibilityUtilsImpl.setMyLeadingMarginSpanCurrentLine(ss, line);
+    }
 }

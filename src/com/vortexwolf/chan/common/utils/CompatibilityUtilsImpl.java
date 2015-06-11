@@ -155,4 +155,11 @@ public class CompatibilityUtilsImpl {
             span.resetDrawState();
         }
     }
+
+    public static void setMyLeadingMarginSpanCurrentLine(Spannable ss, int line) {
+        MyLeadingMarginSpan2[] spans = ss.getSpans(0, ss.length(), MyLeadingMarginSpan2.class);
+        for (MyLeadingMarginSpan2 span : spans) {
+            span.setMyLeadingMarginSpanCurrentLine(line);
+        }
+    }
 }
