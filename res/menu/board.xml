@@ -13,7 +13,7 @@
         android:id="@+id/refresh_menu_id"
         android:alphabeticShortcut="r"
         android:icon="?iconRefresh"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/menu_refresh"/>
     <item
         android:id="@+id/pick_board_menu_id"
@@ -25,7 +25,7 @@
         android:title="@string/menu_open_browser"/>
     <item
         android:id="@+id/menu_search_id"
-        android:icon="@drawable/ic_menu_search"
+        android:icon="?iconSearch"
         android:title="@string/menu_search"/>
     <item
         android:id="@+id/menu_catalog_id"

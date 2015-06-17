@@ -11,6 +11,7 @@
         <item name="iconForward">@drawable/ic_action_next_item</item>
         <item name="iconComputer">@drawable/ic_menu_play_clip</item>
         <item name="iconOverflow">@drawable/ic_action_overflow</item>
+        <item name="iconSearch">@drawable/ic_menu_search</item>
     </style>
 
     <style name="Theme_Dark_Switch" parent="@android:style/Theme">
@@ -23,6 +24,7 @@
         <item name="iconForward">@drawable/ic_action_next_item_dark</item>
         <item name="iconComputer">@drawable/ic_menu_play_clip</item>
         <item name="iconOverflow">@drawable/ic_action_overflow_dark</item>
+        <item name="iconSearch">@drawable/ic_menu_search</item>
     </style>
 
     <style name="Theme_Black_Switch" parent="@style/Theme_Dark_Switch">

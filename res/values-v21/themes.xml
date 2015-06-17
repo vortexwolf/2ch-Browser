@@ -11,6 +11,7 @@
         <item name="iconComputer">@drawable/ic_actionbar_computer</item>
         <item name="iconList">@drawable/ic_actionbar_tabs</item>
         <item name="iconOverflow">@drawable/ic_action_overflow</item>
+        <item name="iconSearch">@drawable/ic_actionbar_search</item>
         <item name="android:colorPrimary">@color/white_background</item>
         <item name="android:actionBarStyle">@style/Material.Light.ActionBar</item>
     </style>
@@ -25,6 +26,7 @@
         <item name="iconComputer">@drawable/ic_actionbar_computer_dark</item>
         <item name="iconList">@drawable/ic_actionbar_tabs_dark</item>
         <item name="iconOverflow">@drawable/ic_action_overflow_dark</item>
+        <item name="iconSearch">@drawable/ic_actionbar_search_dark</item>
         <item name="android:colorPrimary">@color/neutron_background</item>
         <item name="android:actionBarStyle">@style/Material.ActionBar</item>
     </style>

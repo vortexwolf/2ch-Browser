@@ -32,6 +32,7 @@
     <string name="show_full_comment"><a href=''>Show the full text</a></string>
     <string name="tap_to_refresh">Tap to refresh</string>
     <string name="send_post_again">Send your post again</string>
+    <string name="search_history_hint">Text or board code</string>
     
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -93,6 +94,7 @@
     <string name="menu_play_video_external">Open external player</string>
     <string name="menu_download_all_files">Download all images</string>
     <string name="menu_attach_video">Attach video</string>
+    <string name="menu_search_history">Search history</string>
 
     <!-- Context menus -->
     <string name="cmenu_answer_without_reading">Reply without reading</string>

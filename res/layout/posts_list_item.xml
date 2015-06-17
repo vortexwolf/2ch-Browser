@@ -144,6 +144,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="1.0"
+        android:minHeight="50dip"
         android:fillViewport="true"
         android:visibility="gone" />
 

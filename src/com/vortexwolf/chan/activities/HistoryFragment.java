@@ -2,18 +2,26 @@ package com.vortexwolf.chan.activities;
 
 import java.util.List;
 
+import android.content.Context;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.HistoryAdapter;
@@ -31,6 +39,9 @@ public class HistoryFragment extends BaseListFragment {
     private HistoryDataSource mDatasource;
     private FavoritesDataSource mFavoritesDatasource;
     private NavigationService mNavigationService;
+
+    private View mSearchContainer;
+    private EditText mSearchInput;
 
     private HistoryAdapter mAdapter;
 
@@ -60,6 +71,33 @@ public class HistoryFragment extends BaseListFragment {
         this.registerForContextMenu(this.getListView());
 
         new OpenDataSourceTask().execute();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        this.mSearchContainer = view.findViewById(R.id.history_search_container);
+        this.mSearchInput = (EditText) view.findViewById(R.id.history_search_input);
+
+        this.mSearchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    searchHistory();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        ImageButton searchButton = (ImageButton) view.findViewById(R.id.history_search_button);
+        searchButton.setOnClickListener(new ImageButton.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchHistory();
+            }
+        });
     }
 
     @Override
@@ -95,6 +133,14 @@ public class HistoryFragment extends BaseListFragment {
                 this.mDatasource.deleteAllHistory();
                 this.mAdapter.clear();
                 break;
+            case R.id.menu_search_history_id:
+                if (this.mSearchContainer.getVisibility() == View.VISIBLE) {
+                    this.searchHistory();
+                } else {
+                    this.mSearchContainer.setVisibility(View.VISIBLE);
+                    this.mSearchInput.setText("");
+                }
+                break;
         }
 
         return true;
@@ -129,27 +175,30 @@ public class HistoryFragment extends BaseListFragment {
         return false;
     }
 
-    private class OpenDataSourceTask extends AsyncTask<Void, Void, List<HistoryEntity>> {
+    private void searchHistory() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(this.mSearchInput.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
+        String query = this.mSearchInput.getText().toString();
+        mAdapter.searchItems(query);
+    }
+
+    private class OpenDataSourceTask extends AsyncTask<Void, Void, List<HistoryEntity>> {
         @Override
         protected List<HistoryEntity> doInBackground(Void... arg0) {
-            List<HistoryEntity> historyItems = HistoryFragment.this.mDatasource.getAllHistory();
+            List<HistoryEntity> historyItems = mDatasource.getAllHistory();
             return historyItems;
         }
 
         @Override
         protected void onPostExecute(List<HistoryEntity> result) {
-            HistoryFragment.this.mAdapter.clear();
-            for (HistoryEntity item : result) {
-                HistoryFragment.this.mAdapter.add(item);
-            }
-
-            HistoryFragment.this.switchToListView();
+            mAdapter.setItems(result);
+            switchToListView();
         }
 
         @Override
         protected void onPreExecute() {
-            HistoryFragment.this.switchToLoadingView();
+            switchToLoadingView();
         }
     }
 }

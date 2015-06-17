@@ -11,13 +11,19 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryEntity;
+
+import java.util.List;
 
 public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 
     private final LayoutInflater mInflater;
     private final FavoritesDataSource mFavoritesDataSource;
+
+    private List<HistoryEntity> mOriginalItems;
+    private String mSearchQuery;
 
     public HistoryAdapter(Context context, FavoritesDataSource favoritesDataSource) {
         super(context, -1);
@@ -60,6 +66,33 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
         });
 
         return view;
+    }
+
+    public void setItems(List<HistoryEntity> items) {
+        this.mOriginalItems = items;
+        this.refreshVisibleItems();
+    }
+
+    public void searchItems(String query) {
+        query = !StringUtils.isEmptyOrWhiteSpace(query) ? query : null;
+        if (StringUtils.areEqual(this.mSearchQuery, query)) {
+            return;
+        }
+
+        this.mSearchQuery = query;
+        this.refreshVisibleItems();
+    }
+
+    private void refreshVisibleItems() {
+        this.clear();
+        for (HistoryEntity item : this.mOriginalItems) {
+            if (this.mSearchQuery == null
+                || item.getTitleOrDefault().contains(this.mSearchQuery)
+                || item.getBoard().contains(this.mSearchQuery)
+                || this.mSearchQuery.contains("/") && item.buildUrl().contains(this.mSearchQuery)) {
+                this.add(item);
+            }
+        }
     }
 
     static class ViewBag {
