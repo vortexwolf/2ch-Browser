@@ -74,7 +74,7 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
     }
 
     public void searchItems(String query) {
-        query = !StringUtils.isEmptyOrWhiteSpace(query) ? query : null;
+        query = !StringUtils.isEmptyOrWhiteSpace(query) ? query.toLowerCase() : null;
         if (StringUtils.areEqual(this.mSearchQuery, query)) {
             return;
         }
@@ -87,7 +87,7 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
         this.clear();
         for (HistoryEntity item : this.mOriginalItems) {
             if (this.mSearchQuery == null
-                || item.getTitleOrDefault().contains(this.mSearchQuery)
+                || item.getTitleOrDefault().toLowerCase().contains(this.mSearchQuery)
                 || item.getBoard().contains(this.mSearchQuery)
                 || this.mSearchQuery.contains("/") && item.buildUrl().contains(this.mSearchQuery)) {
                 this.add(item);

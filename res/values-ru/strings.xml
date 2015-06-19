@@ -19,7 +19,6 @@
     <string name="pick_board_title">Форумы</string>
     <string name="postitem_replies">Ответы:</string>
     <string name="fileslist_nofiles">Нет файлов.</string>
-    <string name="postitem_sameperson_generic_name">Аноним</string>
     <string name="tabs_opentabs">Вкладки</string>
     <string name="tabs_bookmarks">Закладки</string>
     <string name="tabs_history">История</string>
@@ -33,7 +32,7 @@
     <string name="show_full_comment"><a href=''>Показать весь текст</a></string>
     <string name="tap_to_refresh">Нажмите, чтобы обновить</string>
     <string name="send_post_again">Отправьте сообщение еще раз</string>
-    <string name="search_history_hint">Текст или код форума</string>
+    <string name="search_history_hint">Искать текст или /код_форума/</string>
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -86,7 +85,6 @@
     <string name="menu_preferences">Настройки</string>
     <string name="menu_add_post">Ответ</string>
     <string name="menu_add_thread">Новый тред</string>
-    <string name="menu_send_post">Отправить</string>
     <string name="menu_attach_file">Прикрепить файл</string>
     <string name="menu_save">Сохранить</string>
     <string name="menu_gallery">Галерея</string>
@@ -278,9 +276,7 @@
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>
-		<item>Сортировка по Последнему ответу</item>
 		<item>Сортировка по Времени создания</item>
-		<item>Сортировка по Размеру изображения</item>
 	</string-array>
     
     

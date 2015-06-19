@@ -345,11 +345,12 @@ public class PostItemViewBuilder {
     }
 
     public void displayThumbnail(final View v, final PostItemViewModel item) {
-        ViewBag vb = (ViewBag) v.getTag();
-        if (item == null || vb == null) {
+        Object tag = v.getTag();
+        if (item == null || tag == null || !(tag instanceof ViewBag)) {
             return;
         }
 
+        ViewBag vb = (ViewBag) tag;
         if (item.getAttachmentsNumber() == 1) {
             ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
         } else if (item.getAttachmentsNumber() > 1) {

@@ -132,15 +132,20 @@ public class ThreadPostUtils {
         Uri uri = Uri.parse(url);
         ThreadImagesService imagesService = Factory.resolve(ThreadImagesService.class);
         ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
-        if (Constants.SDK_VERSION >= 4 && !settings.isLegacyImageViewer() && imagesService.hasImage(attachment.getThreadUrl(), url)) {
+
+        if (attachment.isVideo() && settings.isExternalVideoPlayer()) {
+            BrowserLauncher.launchExternalBrowser(context, url);
+        } else if (Constants.SDK_VERSION < 4
+            || settings.isLegacyImageViewer()
+            || !imagesService.hasImage(attachment.getThreadUrl(), url)) {
+            BrowserLauncher.launchInternalBrowser(context, url);
+        } else {
             // open a gallery activity
             Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
             imageGallery.setData(uri);
             imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
             context.startActivity(imageGallery);
-        } else {
-            BrowserLauncher.launchInternalBrowser(context, url);
         }
     }
 

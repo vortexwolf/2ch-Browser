@@ -57,7 +57,6 @@
         android:hint="@string/addpost_captcha_hint"
         android:imeOptions="flagNoExtractUi|flagNoFullscreen|actionSend"
         android:inputType="number"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:singleLine="true" />
 
 </LinearLayout>

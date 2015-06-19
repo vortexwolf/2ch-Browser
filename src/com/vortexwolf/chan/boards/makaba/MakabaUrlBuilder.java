@@ -7,7 +7,7 @@ import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class MakabaUrlBuilder implements IUrlBuilder {
-    private static final String[] CATALOG_FILTERS = { "standart", "last_reply", "num", "image_size" };
+    private static final String[] CATALOG_FILTERS = { "catalog", "catalog_num" };
     private final ApplicationSettings mSettings;
 
     public MakabaUrlBuilder(ApplicationSettings settings) {
@@ -44,13 +44,11 @@ public class MakabaUrlBuilder implements IUrlBuilder {
     }
 
     public String getCatalogUrlApi(String board, int filter) {
-        String path = String.format("makaba/makaba.fcgi?task=catalog&board=%s&filter=%s&json=1", board, CATALOG_FILTERS[filter]);
-        return this.createRootUri(path).toString();
+        return this.createBoardUri(board, CATALOG_FILTERS[filter] + ".json").toString();
     }
 
     public String getCatalogUrlHtml(String board, int filter) {
-        String path = String.format("makaba/makaba.fcgi?task=catalog&board=%s&filter=%s", board, CATALOG_FILTERS[filter]);
-        return this.createRootUri(path).toString();
+        return this.createBoardUri(board, CATALOG_FILTERS[filter] + ".html").toString();
     }
 
     public String getSearchUrlApi() {

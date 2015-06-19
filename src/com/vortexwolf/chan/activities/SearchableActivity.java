@@ -195,6 +195,9 @@ public class SearchableActivity extends BaseListActivity {
             this.mSearchQuery = intent.getStringExtra(SearchManager.QUERY);
             Bundle b = intent.getBundleExtra(SearchManager.APP_DATA);
             this.mWebsite = Websites.fromName(b.getString(Constants.EXTRA_WEBSITE));
+            if (this.mWebsite == null) {
+                this.mWebsite = Websites.getDefault();
+            }
             this.mBoardName = b.getString(Constants.EXTRA_BOARD_NAME);
 
             this.setAdapter(this.mBoardName);

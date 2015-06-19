@@ -10,8 +10,13 @@
         android:id="@+id/history_search_container"
         android:layout_width="fill_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/history_search_button"
+            android:layout_width="?android:attr/listPreferredItemHeight"
+            android:layout_height="fill_parent"
+            android:background="@null"
+            android:src="?iconSearch" />
 
         <EditText
             android:id="@+id/history_search_input"
@@ -22,14 +27,6 @@
             android:hint="@string/search_history_hint"
             android:inputType="text|textUri"
             android:singleLine="true" />
-
-        <ImageButton
-            android:id="@+id/history_search_button"
-            android:layout_width="?android:attr/listPreferredItemHeight"
-            android:layout_height="?android:attr/listPreferredItemHeight"
-            android:background="@null"
-            android:src="?iconSearch" />
-
     </LinearLayout>
 
     <FrameLayout

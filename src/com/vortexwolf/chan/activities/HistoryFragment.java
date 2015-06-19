@@ -133,14 +133,6 @@ public class HistoryFragment extends BaseListFragment {
                 this.mDatasource.deleteAllHistory();
                 this.mAdapter.clear();
                 break;
-            case R.id.menu_search_history_id:
-                if (this.mSearchContainer.getVisibility() == View.VISIBLE) {
-                    this.searchHistory();
-                } else {
-                    this.mSearchContainer.setVisibility(View.VISIBLE);
-                    this.mSearchInput.setText("");
-                }
-                break;
         }
 
         return true;
