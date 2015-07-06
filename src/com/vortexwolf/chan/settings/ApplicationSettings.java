@@ -193,14 +193,10 @@ public class ApplicationSettings {
         return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), false);
     }
 
-    public boolean isExternalVideoPlayer() {
-        return Constants.SDK_VERSION < 10 || this.mSettings.getBoolean(this.mResources.getString(R.string.pref_external_video_key), false);
-    }
-
     public int getImageView() {
         final String subScaleViewValue = this.mResources.getString(R.string.pref_image_preview_subscaleview_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_image_preview_key), subScaleViewValue);
-        if (method.equals(subScaleViewValue)) {
+        if (method.equals(subScaleViewValue) && Constants.SDK_VERSION >= 10) {
             return Constants.IMAGE_VIEW_SUBSCALEVIEW;
         }
 
@@ -215,6 +211,35 @@ public class ApplicationSettings {
         }
 
         return Constants.GIF_WEB_VIEW;
+    }
+
+    public int getVideoPlayer() {
+        final String autoValue = this.mResources.getString(R.string.pref_video_player_auto_value);
+        String value = this.mSettings.getString(this.mResources.getString(R.string.pref_video_player_key), autoValue);
+
+        int webViewWorkingVersion = 21;
+        int videoViewWorkingVersion = 10;
+
+        if (value.equals(this.mResources.getString(R.string.pref_video_player_external_1click_value))) {
+            return Constants.VIDEO_PLAYER_EXTERNAL_1CLICK;
+        } else if (value.equals(this.mResources.getString(R.string.pref_video_player_external_2click_value))) {
+            return Constants.VIDEO_PLAYER_EXTERNAL_2CLICK;
+        } else if (Constants.SDK_VERSION >= webViewWorkingVersion
+            && value.equals(this.mResources.getString(R.string.pref_video_player_webview_value))) {
+            return Constants.VIDEO_PLAYER_WEBVIEW;
+        } else if (Constants.SDK_VERSION >= videoViewWorkingVersion
+            && value.equals(this.mResources.getString(R.string.pref_video_player_videoview_value))) {
+            return Constants.VIDEO_PLAYER_VIDEOVIEW;
+        }
+
+        if (this.mSettings.getBoolean(this.mResources.getString(R.string.pref_external_video_key), false)) {
+            // Check legacy setting 'External video player'. It can be removed in the future.
+            return Constants.VIDEO_PLAYER_EXTERNAL_1CLICK;
+        } else if (Constants.SDK_VERSION >= videoViewWorkingVersion) {
+            return Constants.VIDEO_PLAYER_VIDEOVIEW;
+        }
+
+        return Constants.VIDEO_PLAYER_EXTERNAL_1CLICK;
     }
 
     public boolean isMobileApi() {

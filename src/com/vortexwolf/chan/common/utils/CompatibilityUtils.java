@@ -60,4 +60,12 @@ public class CompatibilityUtils {
 
         CompatibilityUtilsImpl.setMyLeadingMarginSpanCurrentLine(ss, line);
     }
+
+    public static void callMyLeadingMarginSpanMeasure(Spannable ss) {
+        if (Constants.SDK_VERSION < 8) {
+            return;
+        }
+
+        CompatibilityUtilsImpl.callMyLeadingMarginSpanMeasure(ss);
+    }
 }

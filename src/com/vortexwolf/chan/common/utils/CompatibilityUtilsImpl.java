@@ -162,4 +162,11 @@ public class CompatibilityUtilsImpl {
             span.setMyLeadingMarginSpanCurrentLine(line);
         }
     }
+
+    public static void callMyLeadingMarginSpanMeasure(Spannable ss) {
+        MyLeadingMarginSpan2[] spans = ss.getSpans(0, ss.length(), MyLeadingMarginSpan2.class);
+        for (MyLeadingMarginSpan2 span : spans) {
+            span.onMeasure();
+        }
+    }
 }

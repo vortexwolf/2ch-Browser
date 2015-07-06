@@ -94,4 +94,9 @@ public class Constants {
 
     public static final int GIF_WEB_VIEW = 0;
     public static final int GIF_NATIVE_LIB = 1;
+
+    public static final int VIDEO_PLAYER_WEBVIEW = 0;
+    public static final int VIDEO_PLAYER_VIDEOVIEW = 1;
+    public static final int VIDEO_PLAYER_EXTERNAL_1CLICK = 2;
+    public static final int VIDEO_PLAYER_EXTERNAL_2CLICK = 3;
 }

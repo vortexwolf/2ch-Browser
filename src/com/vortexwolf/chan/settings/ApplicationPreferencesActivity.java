@@ -46,6 +46,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.updateListSummary(R.string.pref_text_size_key);
         this.updateListSummary(R.string.pref_image_preview_key);
         this.updateListSummary(R.string.pref_gif_preview_key);
+        this.updateListSummary(R.string.pref_video_player_key);
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();

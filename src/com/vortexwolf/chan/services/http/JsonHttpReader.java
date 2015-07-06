@@ -116,6 +116,12 @@ public class JsonHttpReader {
                 }
             }
 
+            // Quick fix: replaced multiple ",,,," by single ",".
+            // Should be fixed on the server side.
+            String jsonStr = new String(bytes, 0, bytes.length, Constants.UTF8_CHARSET.name());
+            jsonStr = jsonStr.replaceAll(",{2,}", ",");
+            bytes = jsonStr.getBytes();
+
             InputStreamReader streamReader = this.createStreamReaderForParsing(bytes, listener, task);
             JsonNode result = this.mObjectMapper.readValue(streamReader, JsonNode.class);
             return result;
@@ -145,7 +151,7 @@ public class JsonHttpReader {
         InputStream memoryStream = IoUtils.modifyInputStream(new ByteArrayInputStream(bytes), listener.getContentLength(), listener, task);
         // Maybe I don't need these replacements anymore because if InputStreamReader. I need to check.
         //Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
-        //replacements.put(new byte[] {0x5C, 0x76}, new byte[] {0x5C, 0x6E});
+        //replacements.put(new byte[] {(byte)'\\', (byte)'v'}, new byte[] {(byte)'\\', (byte)'n'});
         //memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
 
         InputStreamReader streamReader = new InputStreamReader(memoryStream, Constants.UTF8_CHARSET.name());

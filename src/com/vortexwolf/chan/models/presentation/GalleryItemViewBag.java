@@ -5,6 +5,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.services.TimerService;
 
 public class GalleryItemViewBag {
@@ -23,6 +24,11 @@ public class GalleryItemViewBag {
     }
 
     public void clear() {
+        if (layout.getChildAt(0) instanceof WebViewFixed) {
+            WebViewFixed webView = (WebViewFixed)layout.getChildAt(0);
+            webView.loadUrl("about:blank");
+        }
+
         layout.removeAllViews();
 
         if (timer != null) {

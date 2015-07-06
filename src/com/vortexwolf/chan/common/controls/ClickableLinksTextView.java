@@ -74,6 +74,16 @@ public class ClickableLinksTextView extends TextView {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        CharSequence text = this.getText();
+        if (text != null && text instanceof Spannable) {
+            CompatibilityUtils.callMyLeadingMarginSpanMeasure((Spannable) text);
+        }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
     public int getOffsetForPosition(float x, float y) {
         // Set the current line for MyLeadingMarginSpan2
         CharSequence text = this.getText();

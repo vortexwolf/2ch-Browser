@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,6 +21,7 @@ import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
+import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
@@ -43,14 +43,14 @@ public class BrowserActivity extends Activity {
     private final CacheDirectoryManager mCacheDirectoryManager = Factory.resolve(CacheDirectoryManager.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
 
-    private View mContainerView;
-    private View mMainView = null;
+    private FrameLayout mContentView = null;
     private View mLoadingView = null;
     private View mErrorView = null;
     private ProgressBar mProgressBar;
 
     private Uri mUri = null;
     private String mTitle = null;
+    private int mBackground;
 
     private Menu mMenu;
     private boolean mImageLoaded = false;
@@ -68,21 +68,14 @@ public class BrowserActivity extends Activity {
         this.setTheme(mSettings.getTheme());
         this.setContentView(R.layout.browser);
 
-        if (this.mSettings.isLegacyImageViewer() || this.mSettings.isExternalVideoPlayer()) {
-            this.mContainerView = this.findViewById(R.id.webview_container);
-            this.mMainView = this.mContainerView.findViewById(R.id.webview);
-            int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-            AppearanceUtils.prepareWebView((WebView)this.mMainView, background);
-        } else {
-            this.mContainerView = this.findViewById(R.id.image_gallery_item_container);
-            this.mContainerView.setVisibility(View.VISIBLE);
-            this.findViewById(R.id.webview_container).setVisibility(View.GONE);
-            this.mMainView = this.mContainerView.findViewById(R.id.image_layout);
-        }
 
+        this.mBackground = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
+
+        View containerView = this.findViewById(R.id.image_gallery_item_container);
+        this.mContentView = (FrameLayout) containerView.findViewById(R.id.image_layout);
+        this.mLoadingView = containerView.findViewById(R.id.loading);
+        this.mErrorView = containerView.findViewById(R.id.error);
         this.mProgressBar = (ProgressBar) this.findViewById(R.id.page_progress_bar);
-        this.mLoadingView = this.mContainerView.findViewById(R.id.loading);
-        this.mErrorView = this.mContainerView.findViewById(R.id.error);
 
         this.mUri = this.getIntent().getData();
         this.mTitle = this.mUri.toString();
@@ -105,6 +98,11 @@ public class BrowserActivity extends Activity {
         if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
+        if (this.mContentView.getChildAt(0) instanceof WebViewFixed) {
+            WebViewFixed webView = (WebViewFixed)this.mContentView.getChildAt(0);
+            webView.loadUrl("about:blank");
+        }
+        this.mContentView.removeAllViews();
     }
 
     @Override
@@ -176,6 +174,11 @@ public class BrowserActivity extends Activity {
             this.mCurrentTask.cancel(true);
         }
 
+        if (UriUtils.isWebmUri(this.mUri) && this.mSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
+            this.switchToErrorView(this.getString(R.string.error_video_playing));
+            return;
+        }
+
         File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
         if (cachedFile.exists()) {
             // show from cache
@@ -191,20 +194,17 @@ public class BrowserActivity extends Activity {
     private void setImage(File file) {
         this.mLoadedFile = file;
 
-        if (this.mSettings.isLegacyImageViewer() || this.mSettings.isExternalVideoPlayer()) {
-            AppearanceUtils.setScaleWebView((WebView)this.mMainView, (View)this.mMainView.getParent(), file, this);
-            ((WebView)this.mMainView).loadUrl(Uri.fromFile(file).toString());
-        }
-        else if (UriUtils.isWebmUri(this.mUri)) {
+        if (UriUtils.isWebmUri(this.mUri)) {
             GalleryItemViewBag vb = new GalleryItemViewBag();
-            vb.layout = (FrameLayout)this.mMainView;
+            vb.layout = this.mContentView;
             vb.loading = this.mLoadingView;
             vb.error = this.mErrorView;
 
-            AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb);
+            AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb, this.mBackground);
+        } else if (UriUtils.isImageUri(this.mUri)) {
+            AppearanceUtils.setImage(file, this, this.mContentView, this.mBackground);
         } else {
-            int background = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
-            AppearanceUtils.setImage(file, this, (FrameLayout)mMainView, background);
+            AppearanceUtils.setWebViewFile(file, this, this.mContentView, this.mBackground, false);
         }
 
         this.mImageLoaded = true;
@@ -257,17 +257,17 @@ public class BrowserActivity extends Activity {
 
         switch (vt) {
             case PAGE:
-                this.mMainView.setVisibility(View.VISIBLE);
+                this.mContentView.setVisibility(View.VISIBLE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case LOADING:
-                this.mMainView.setVisibility(View.GONE);
+                this.mContentView.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.VISIBLE);
                 this.mErrorView.setVisibility(View.GONE);
                 break;
             case ERROR:
-                this.mMainView.setVisibility(View.GONE);
+                this.mContentView.setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.VISIBLE);
                 break;

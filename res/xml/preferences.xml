@@ -131,7 +131,6 @@
             	android:summary="@string/pref_legacy_image_viewer_summary"
             	android:title="@string/pref_legacy_image_viewer" />
         	<ListPreference
-        	    android:dependency="@string/pref_legacy_image_viewer_key"
             	android:entries="@array/pref_image_preview_choices" 
             	android:entryValues="@array/pref_image_preview_values" 
             	android:dialogTitle="@string/pref_image_preview" 
@@ -139,23 +138,24 @@
             	android:title="@string/pref_image_preview" 
             	android:defaultValue="@string/pref_image_preview_subscaleview_value"/>
         	<ListPreference
-        	    android:dependency="@string/pref_legacy_image_viewer_key"
             	android:entries="@array/pref_gif_preview_choices" 
             	android:entryValues="@array/pref_gif_preview_values" 
             	android:dialogTitle="@string/pref_gif_preview" 
             	android:key="@string/pref_gif_preview_key" 
             	android:title="@string/pref_gif_preview" 
             	android:defaultValue="@string/pref_gif_preview_native_lib_value"/>
+            <ListPreference
+                android:entries="@array/pref_video_player_choices"
+                android:entryValues="@array/pref_video_player_values"
+                android:dialogTitle="@string/pref_video_player"
+                android:key="@string/pref_video_player_key"
+                android:title="@string/pref_video_player"
+                android:defaultValue="@string/pref_video_player_auto_value"/>
         	<CheckBoxPreference
 				android:summary="@string/pref_disable_zoom_controls_summary"
 				android:key="@string/pref_disable_zoom_controls_key"
 				android:title="@string/pref_disable_zoom_controls"
 				android:defaultValue="false"/>
-        	<CheckBoxPreference
-	            android:defaultValue="false"
-            	android:key="@string/pref_external_video_key"
-            	android:summary="@string/pref_external_video_summary"
-            	android:title="@string/pref_external_video" />
         </PreferenceCategory>
     </PreferenceScreen>
 

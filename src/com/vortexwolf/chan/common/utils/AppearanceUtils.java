@@ -209,7 +209,6 @@ public class AppearanceUtils {
         boolean isDone = false;
 
         layout.removeAllViews();
-        System.gc();
 
         try {
             if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
@@ -228,7 +227,6 @@ public class AppearanceUtils {
                     isDone = true;
                 }
             } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW
-                    && Constants.SDK_VERSION >= 10
                     && !IoUtils.isNonStandardGrayscaleImage(file)) {
                 final FixedSubsamplingScaleImageView imageView = new FixedSubsamplingScaleImageView(context);
 
@@ -256,18 +254,21 @@ public class AppearanceUtils {
             MyLog.e(TAG, e);
             System.gc();
         }
+
         if (!isDone) {
-            WebViewFixed wV = new WebViewFixed(context);
-            wV.setLayoutParams(MATCH_PARAMS);
-            layout.addView(wV);
-            AppearanceUtils.prepareWebView(wV, background);
-            AppearanceUtils.setScaleWebView(wV, layout, file, context);
-            wV.loadUrl(Uri.fromFile(file).toString());
+            setWebViewFile(file, context, layout, background, true);
         }
     }
 
-    public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag) {
+    public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag, final int background) {
+        ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
         viewBag.layout.removeAllViews();
+
+        if (settings.getVideoPlayer() == Constants.VIDEO_PLAYER_WEBVIEW) {
+            setWebViewFile(file, context, viewBag.layout, background, false);
+            return;
+        }
+
         View container = LayoutInflater.from(context).inflate(R.layout.video_view, viewBag.layout);
 
         final VideoView videoView = (VideoView)container.findViewById(R.id.video_view);
@@ -306,6 +307,17 @@ public class AppearanceUtils {
         });
 
         videoView.setVideoPath(file.getAbsolutePath());
+    }
+
+    public static void setWebViewFile(File file, Activity context, FrameLayout layout, int background, boolean isImage) {
+        WebViewFixed wV = new WebViewFixed(context);
+        wV.setLayoutParams(MATCH_PARAMS);
+        layout.addView(wV);
+        AppearanceUtils.prepareWebView(wV, background);
+        if (isImage) {
+            AppearanceUtils.setScaleWebView(wV, layout, file, context);
+        }
+        wV.loadUrl(Uri.fromFile(file).toString());
     }
 
     private static String formatVideoTime(int milliseconds) {

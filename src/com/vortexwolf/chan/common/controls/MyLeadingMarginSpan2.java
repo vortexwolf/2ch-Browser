@@ -28,6 +28,10 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
         this.drawnLines = 0;
     }
 
+    public void onMeasure() {
+        this.isDrawnAtLeastOnce = false;
+    }
+
     public void setMyLeadingMarginSpanCurrentLine(int line) {
         this.clickedLine = line;
     }

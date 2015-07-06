@@ -182,6 +182,15 @@
         <item>WebView</item>
         <item>subsampling-scale-image-view (requires Android 2.3.3 and newer)</item>
     </string-array>
+
+    <string name="pref_video_player">Webm Player</string>
+    <string-array name="pref_video_player_choices">
+        <item>Auto</item>
+        <item>WebView (Android 5 and newer)</item>
+        <item>VideoView (Android 2.3.3 and newer)</item>
+        <item>External player, 1 click</item>
+        <item>External player, 2 clicks through gallery</item>
+    </string-array>
     
     <string-array name="pref_text_size_choices">
         <item>Normal (13sp)</item>

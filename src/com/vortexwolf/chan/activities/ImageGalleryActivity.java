@@ -132,6 +132,9 @@ public class ImageGalleryActivity extends Activity {
         if (this.mCurrentTask != null) {
             this.mCurrentTask.cancel(true);
         }
+        if (this.mCurrentImageViewBag != null) {
+            this.mCurrentImageViewBag.clear();
+        }
 
         super.onDestroy();
     }
@@ -250,7 +253,7 @@ public class ImageGalleryActivity extends Activity {
             this.mCurrentTask.cancel(true);
         }
 
-        if (UriUtils.isWebmUri(Uri.parse(model.url)) && this.mApplicationSettings.isExternalVideoPlayer()) {
+        if (UriUtils.isWebmUri(Uri.parse(model.url)) && this.mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
             if (model.attachment != null) {
                 this.setThumbnail(model.attachment, viewBag);
             } else {
@@ -307,9 +310,9 @@ public class ImageGalleryActivity extends Activity {
 
     private void setImage(File file, GalleryItemViewBag viewBag) {
         if (UriUtils.isImageUri(Uri.fromFile(file))) {
-            AppearanceUtils.setImage(file, this, viewBag.layout, ImageGalleryActivity.this.mBackgroundColor);
+            AppearanceUtils.setImage(file, this, viewBag.layout, this.mBackgroundColor);
         } else if (UriUtils.isWebmUri(Uri.fromFile(file))) {
-            AppearanceUtils.setVideoFile(file, this, viewBag);
+            AppearanceUtils.setVideoFile(file, this, viewBag, this.mBackgroundColor);
         }
 
         this.mImageLoaded = true;

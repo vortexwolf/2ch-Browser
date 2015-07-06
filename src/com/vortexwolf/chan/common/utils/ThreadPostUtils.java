@@ -133,7 +133,7 @@ public class ThreadPostUtils {
         ThreadImagesService imagesService = Factory.resolve(ThreadImagesService.class);
         ApplicationSettings settings = Factory.resolve(ApplicationSettings.class);
 
-        if (attachment.isVideo() && settings.isExternalVideoPlayer()) {
+        if (attachment.isVideo() && settings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_1CLICK) {
             BrowserLauncher.launchExternalBrowser(context, url);
         } else if (Constants.SDK_VERSION < 4
             || settings.isLegacyImageViewer()
