@@ -8,13 +8,15 @@ import android.text.Layout;
 import android.text.style.LeadingMarginSpan.LeadingMarginSpan2;
 
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
 
 @TargetApi(Build.VERSION_CODES.FROYO)
 public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     private int margin;
     private int firstMarginLines;
-    private boolean isDrawnAtLeastOnce = false;
-    private boolean isDrawCall = false;
+    // some code can be called between TextView.onDraw and this.drawLeadingMargin
+    private boolean isWaitingForDraw = false;
     private int drawnLines = 0;
     private int clickedLine = -1;
 
@@ -24,12 +26,12 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
     }
 
     public void resetDrawState() {
-        this.isDrawCall = false;
         this.drawnLines = 0;
+        this.isWaitingForDraw = true;
     }
 
     public void onMeasure() {
-        this.isDrawnAtLeastOnce = false;
+        this.drawnLines = 0;
     }
 
     public void setMyLeadingMarginSpanCurrentLine(int line) {
@@ -41,11 +43,16 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
         boolean isFirstMargin = first;
 
         if (Constants.SDK_VERSION >= 21) {
-            if (this.isDrawCall) {
+            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+            String method3 = stackTraceElements[3].getMethodName();
+
+            if (StringUtils.areEqual(method3, "generate")) {
+                // use the default value
+            } else if (StringUtils.areEqual(method3, "drawText")) {
                 // margin for visible text after it was drawn
-                this.isDrawCall = false;
                 isFirstMargin = this.drawnLines <= this.firstMarginLines - 1;
-            } else if (!this.isDrawCall && this.isDrawnAtLeastOnce) {
+            } else if (StringUtils.areEqual(method3, "getParagraphLeadingMargin")
+                    && (this.drawnLines > 0 || this.isWaitingForDraw)) {
                 // margin for invisible selectable text
                 // if you click somewhere - you can select and copy a word from invisible text
                 isFirstMargin = this.clickedLine <= this.firstMarginLines - 2;
@@ -57,8 +64,7 @@ public class MyLeadingMarginSpan2 implements LeadingMarginSpan2 {
 
     @Override
     public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top, int baseline, int bottom, CharSequence text, int start, int end, boolean first, Layout layout) {
-        this.isDrawnAtLeastOnce = true;
-        this.isDrawCall = true;
+        this.isWaitingForDraw = false;
         this.drawnLines++;
     }
 

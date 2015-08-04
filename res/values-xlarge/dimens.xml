@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <dimen name="navigation_button_size">72dp</dimen>
     <dimen name="thumbnail_size">146dp</dimen>
-    <dimen name="filelist_frame_size">130dp</dimen>
-    <dimen name="filelist_thumbnail_size">122dp</dimen>
-    <dimen name="badge_size">30dp</dimen>
 </resources>

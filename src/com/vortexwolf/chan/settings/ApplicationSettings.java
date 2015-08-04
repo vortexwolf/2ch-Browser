@@ -193,6 +193,10 @@ public class ApplicationSettings {
         return !this.mSettings.getBoolean(this.mResources.getString(R.string.pref_disable_zoom_controls_key), false);
     }
 
+    public boolean isVideoMute() {
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_video_mute_key), false);
+    }
+
     public int getImageView() {
         final String subScaleViewValue = this.mResources.getString(R.string.pref_image_preview_subscaleview_value);
         String method = this.mSettings.getString(this.mResources.getString(R.string.pref_image_preview_key), subScaleViewValue);

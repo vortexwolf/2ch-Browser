@@ -151,6 +151,11 @@
                 android:key="@string/pref_video_player_key"
                 android:title="@string/pref_video_player"
                 android:defaultValue="@string/pref_video_player_auto_value"/>
+            <CheckBoxPreference
+                android:summary="@string/pref_video_mute_summary"
+                android:key="@string/pref_video_mute_key"
+                android:title="@string/pref_video_mute"
+                android:defaultValue="false"/>
         	<CheckBoxPreference
 				android:summary="@string/pref_disable_zoom_controls_summary"
 				android:key="@string/pref_disable_zoom_controls_key"

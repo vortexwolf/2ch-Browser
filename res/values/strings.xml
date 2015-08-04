@@ -225,6 +225,8 @@
     <string name="pref_legacy_image_viewer_summary">Do not use the gallery, open single images instead</string>
     <string name="pref_external_video">External video player</string>
     <string name="pref_external_video_summary">Use external video player for webm files</string>
+    <string name="pref_video_mute">Mute video</string>
+    <string name="pref_video_mute_summary">Set sound to 0 when video starts</string>
 
     <!-- Errors -->
     <string name="error_send_post">An error has occurred while sending the post.</string>

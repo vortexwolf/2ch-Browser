@@ -312,7 +312,7 @@ public class ImageGalleryActivity extends Activity {
         if (UriUtils.isImageUri(Uri.fromFile(file))) {
             AppearanceUtils.setImage(file, this, viewBag.layout, this.mBackgroundColor);
         } else if (UriUtils.isWebmUri(Uri.fromFile(file))) {
-            AppearanceUtils.setVideoFile(file, this, viewBag, this.mBackgroundColor);
+            AppearanceUtils.setVideoFile(file, this, viewBag, this.mBackgroundColor, this.getTheme());
         }
 
         this.mImageLoaded = true;

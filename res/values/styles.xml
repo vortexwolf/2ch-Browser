@@ -11,7 +11,6 @@
     <style name="TextFormatButtonLong" parent="@style/TextFormatButton">
         <item name="android:layout_width">62dip</item>
     </style>
-
     <!--
 ==================
 Light theme 
@@ -30,6 +29,8 @@ Light theme
         <item name="postTripForeground">@color/white_trip_text</item>
         <item name="postOpForeground">@color/white_op_text</item>
         <item name="postIndexForeground">@color/white_post_index_text</item>
+        <item name="iconSoundMute">@drawable/ic_sound_mute</item>
+        <item name="iconSoundSpeaker">@drawable/ic_sound_speaker</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/white_post_quote</item>
         <item name="spoilerForeground">@color/white_spoiler_text</item>
@@ -65,6 +66,8 @@ Black theme
         <item name="postTripForeground">@color/black_trip_text</item>
         <item name="postOpForeground">@color/black_op_text</item>
         <item name="postIndexForeground">@color/black_post_index_text</item>
+        <item name="iconSoundMute">@drawable/ic_sound_mute_dark</item>
+        <item name="iconSoundSpeaker">@drawable/ic_sound_speaker_dark</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/black_post_quote</item>
         <item name="spoilerForeground">@color/black_spoiler_text</item>
@@ -100,6 +103,8 @@ Neutron theme
         <item name="postTripForeground">@color/neutron_trip_text</item>
         <item name="postOpForeground">@color/neutron_op_text</item>
         <item name="postIndexForeground">@color/neutron_post_index_text</item>
+        <item name="iconSoundMute">@drawable/ic_sound_mute_dark</item>
+        <item name="iconSoundSpeaker">@drawable/ic_sound_speaker_dark</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/neutron_post_quote</item>
         <item name="spoilerForeground">@color/neutron_spoiler_text</item>
@@ -135,6 +140,8 @@ Photon theme
         <item name="postTripForeground">@color/photon_trip_text</item>
         <item name="postOpForeground">@color/photon_op_text</item>
         <item name="postIndexForeground">@color/photon_post_index_text</item>
+        <item name="iconSoundMute">@drawable/ic_sound_mute</item>
+        <item name="iconSoundSpeaker">@drawable/ic_sound_speaker</item>
         <!-- Comment colors -->
         <item name="postQuoteForeground">@color/photon_post_quote</item>
         <item name="spoilerForeground">@color/photon_spoiler_text</item>

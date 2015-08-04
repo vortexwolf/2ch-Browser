@@ -11,15 +11,20 @@ import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -197,6 +202,14 @@ public class AppearanceUtils {
         return color;
     }
 
+    public static Drawable getThemeDrawable(Theme theme, int styleableId) {
+        TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
+        Drawable drawable = a.getDrawable(styleableId);
+        a.recycle();
+
+        return drawable;
+    }
+
     public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background) {
         setImage(file, context, layout, background, false);
     }
@@ -256,37 +269,38 @@ public class AppearanceUtils {
         }
 
         if (!isDone) {
-            setWebViewFile(file, context, layout, background, true);
+            setWebViewFile(file, context, layout, background);
         }
     }
 
-    public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag, final int background) {
-        ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
+    public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag, final int background, final Theme theme) {
+        final ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
         viewBag.layout.removeAllViews();
 
         if (settings.getVideoPlayer() == Constants.VIDEO_PLAYER_WEBVIEW) {
-            setWebViewFile(file, context, viewBag.layout, background, false);
+            setWebViewFile(file, context, viewBag.layout, background);
             return;
         }
 
         View container = LayoutInflater.from(context).inflate(R.layout.video_view, viewBag.layout);
 
-        final VideoView videoView = (VideoView)container.findViewById(R.id.video_view);
-        final TextView durationView = (TextView)container.findViewById(R.id.video_duration);
+        final VideoViewViewBag videoViewViewBag = VideoViewViewBag.fromContainer(container);
+        videoViewViewBag.speakerDrawable = getThemeDrawable(theme, R.styleable.Theme_iconSoundSpeaker);
+        videoViewViewBag.muteDrawable = getThemeDrawable(theme, R.styleable.Theme_iconSoundMute);
 
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        videoViewViewBag.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(final MediaPlayer mp) {
                 mp.setLooping(true);
 
-                durationView.setText("00:00 / " + formatVideoTime(mp.getDuration()));
+                videoViewViewBag.durationView.setText("00:00 / " + formatVideoTime(mp.getDuration()));
 
                 viewBag.timer = new TimerService(1, context);
                 viewBag.timer.runTask(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            durationView.setText(formatVideoTime(mp.getCurrentPosition()) +
+                            videoViewViewBag.durationView.setText(formatVideoTime(mp.getCurrentPosition()) +
                                 " / " + formatVideoTime(mp.getDuration()));
                         } catch (Exception e) {
                             viewBag.timer.stop();
@@ -294,10 +308,30 @@ public class AppearanceUtils {
                     }
                 });
 
+                if (settings.isVideoMute()) {
+                    mp.setVolume(0, 0);
+                    videoViewViewBag.setVolume(0);
+                } else {
+                    mp.setVolume(1, 1);
+                    videoViewViewBag.setVolume(1);
+                }
+                videoViewViewBag.muteButton.setOnClickListener(new ImageButton.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (videoViewViewBag.volume > 0) {
+                            mp.setVolume(0, 0);
+                            videoViewViewBag.setVolume(0);
+                        } else {
+                            mp.setVolume(1, 1);
+                            videoViewViewBag.setVolume(1);
+                        }
+                    }
+                });
+
                 mp.start();
             }
         });
-        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        videoViewViewBag.videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 MyLog.e(TAG, "Error code: " + what);
@@ -306,18 +340,44 @@ public class AppearanceUtils {
             }
         });
 
-        videoView.setVideoPath(file.getAbsolutePath());
+        videoViewViewBag.videoView.setVideoPath(file.getAbsolutePath());
     }
 
-    public static void setWebViewFile(File file, Activity context, FrameLayout layout, int background, boolean isImage) {
+    public static void setWebViewFile(File file, Activity context, FrameLayout layout, int background) {
         WebViewFixed wV = new WebViewFixed(context);
         wV.setLayoutParams(MATCH_PARAMS);
         layout.addView(wV);
-        AppearanceUtils.prepareWebView(wV, background);
-        if (isImage) {
+
+        Uri uri = Uri.fromFile(file);
+
+        if (UriUtils.isImageUri(uri)) {
+            AppearanceUtils.prepareWebView(wV, background);
             AppearanceUtils.setScaleWebView(wV, layout, file, context);
+            wV.loadUrl(Uri.fromFile(file).toString());
+        } else if (UriUtils.isWebmUri(uri)) {
+            ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
+
+            String mutedAttr = settings.isVideoMute() ? "muted" : "";
+            String attributes = String.format("src='%1$s' controls autoplay %2$s", uri, mutedAttr);
+
+            wV.setBackgroundColor(background);
+            wV.loadDataWithBaseURL(null, createHtmlForElement("video", attributes, "HTML5 video is not supported.", true),
+                "text/html; charset=UTF-8", null, null);
+        } else {
+            wV.loadUrl(uri.toString());
         }
-        wV.loadUrl(Uri.fromFile(file).toString());
+    }
+
+    private static String createHtmlForElement(String elementName, String attributes, String content, boolean isContentElement) {
+        StringBuffer elementHtml = new StringBuffer("<" + elementName +
+            " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes);
+        if (isContentElement) {
+            elementHtml.append(">" + content + "</" + elementName + ">");
+        } else {
+            elementHtml.append("/>");
+        }
+
+        return "<body style='margin:0;'>" + elementHtml.toString() + "</body>";
     }
 
     private static String formatVideoTime(int milliseconds) {
@@ -350,5 +410,34 @@ public class AppearanceUtils {
 
         public int position;
         public int top;
+    }
+
+    private static class VideoViewViewBag {
+        public View container;
+        public VideoView videoView;
+        public TextView durationView;
+        public ImageButton muteButton;
+        public Drawable speakerDrawable;
+        public Drawable muteDrawable;
+        public float volume;
+
+        public static VideoViewViewBag fromContainer(View container) {
+            VideoViewViewBag vb = new VideoViewViewBag();
+            vb.container = container;
+            vb.videoView = (VideoView)container.findViewById(R.id.video_view);
+            vb.durationView = (TextView)container.findViewById(R.id.video_duration);
+            vb.muteButton = (ImageButton)container.findViewById(R.id.mute_speaker_image);
+
+            return vb;
+        }
+
+        public void setVolume(float volume) {
+            this.volume = volume;
+            if (this.volume > 0) {
+                this.muteButton.setImageDrawable(this.speakerDrawable);
+            } else {
+                this.muteButton.setImageDrawable(this.muteDrawable);
+            }
+        }
     }
 }

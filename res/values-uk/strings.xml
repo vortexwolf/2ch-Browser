@@ -235,7 +235,9 @@
     <string name="pref_file_cache_no_limit_summary">Отменить ограничение на размер кэша в 25Мб</string>
     <string name="pref_external_video">Внешний видеоплеер</string>
     <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
-    
+    <string name="pref_video_mute">Видео без звука</string>
+    <string name="pref_video_mute_summary">Уменьшить звук до 0 при открытии видео</string>
+
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>
     <string name="error_download_data">Невозможно открыть страницу.</string>

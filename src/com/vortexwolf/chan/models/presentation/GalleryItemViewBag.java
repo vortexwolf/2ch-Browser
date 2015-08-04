@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.models.presentation;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;

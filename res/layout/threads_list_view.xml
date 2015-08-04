@@ -45,12 +45,13 @@
     <LinearLayout
         android:id="@+id/threads_navigation_bar"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/navigation_button_size">
+        android:layout_height="wrap_content">
 
         <ImageButton
             android:id="@+id/threads_prev_page"
             android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
+            android:padding="@dimen/navigation_button_padding"
             android:background="@null"
             android:src="?iconBack"
             android:scaleType="fitStart"
@@ -67,6 +68,7 @@
             android:id="@+id/threads_next_page"
             android:layout_width="0dip"
             android:layout_height="@dimen/navigation_button_size"
+            android:padding="@dimen/navigation_button_padding"
             android:background="@null"
             android:src="?iconForward"
             android:scaleType="fitEnd"
@@ -75,12 +77,12 @@
     
     <RelativeLayout
         android:id="@+id/threads_catalog_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/navigation_button_size" >
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
         <Spinner
             android:id="@+id/threads_filter_select"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="@dimen/navigation_button_size"
             android:entries="@array/catalog_filters" />
     </RelativeLayout>    
 

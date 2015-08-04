@@ -3,8 +3,10 @@ package com.vortexwolf.chan.activities;
 import java.io.File;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -200,11 +202,11 @@ public class BrowserActivity extends Activity {
             vb.loading = this.mLoadingView;
             vb.error = this.mErrorView;
 
-            AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb, this.mBackground);
+            AppearanceUtils.setVideoFile(this.mLoadedFile, this, vb, this.mBackground, this.getTheme());
         } else if (UriUtils.isImageUri(this.mUri)) {
             AppearanceUtils.setImage(file, this, this.mContentView, this.mBackground);
         } else {
-            AppearanceUtils.setWebViewFile(file, this, this.mContentView, this.mBackground, false);
+            AppearanceUtils.setWebViewFile(file, this, this.mContentView, this.mBackground);
         }
 
         this.mImageLoaded = true;
