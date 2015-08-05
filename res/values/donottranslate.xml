@@ -42,7 +42,7 @@
     <string name="pref_multithumbnails_in_threads_key">pref_multithumbnails_in_threads_key</string>
     <string name="pref_disable_zoom_controls_key">pref_display_zoom_controls_key</string>
     <string name="pref_mobileapi_key">pref_mobileapi_key</string>
-    <string name="pref_use_https_key">pref_use_https_key</string>
+    <string name="pref_use_https_key">pref_use_https_key_1</string>
     <string name="pref_unsafe_ssl_key">pref_unsafe_ssl_key</string>
     <string name="pref_image_preview_key">pref_image_preview_key</string>
     <string name="pref_image_preview_webview_value">IMAGE_PREVIEW_WEBVIEW</string>
