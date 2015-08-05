@@ -84,6 +84,10 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
     }
 
     private void refreshVisibleItems() {
+        if (this.mOriginalItems == null) {
+            return;
+        }
+
         this.clear();
         for (HistoryEntity item : this.mOriginalItems) {
             if (this.mSearchQuery == null

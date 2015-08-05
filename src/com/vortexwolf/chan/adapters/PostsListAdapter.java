@@ -156,9 +156,14 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
                 return;
             }
 
+            IPostListEntity item = this.getItem(position);
+            if (!(item instanceof PostItemViewModel)) {
+                return;
+            }
+
             if (this.mSettings.isLinksInPopup()) {
                 this.mPostItemViewBuilder.displayPopupDialog(
-                        (PostItemViewModel)this.getItem(position),
+                        (PostItemViewModel) item,
                         this.mActivity, this.mTheme,
                         CompatibilityUtils.isTablet(this.mActivity) ? getSpanCoordinates(v, span) : null);
             } else {

@@ -115,75 +115,37 @@ public class AppearanceUtils {
         return resizedBitmap;
     }
 
-    public static void prepareWebView(WebView webView, int backgroundColor) {
+    public static void prepareWebViewForImage(WebView webView, int backgroundColor) {
         webView.setBackgroundColor(backgroundColor);
-        webView.setInitialScale(100);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-        if (Constants.SDK_VERSION >= 5) {
-            CompatibilityUtilsImpl.setScrollbarFadingEnabled(webView, true);
-        }
 
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setSupportZoom(true);
-        settings.setAllowFileAccess(true);
-        if (Constants.SDK_VERSION >= 7) {
-            CompatibilityUtilsImpl.setDefaultZoomFAR(settings);
-            CompatibilityUtilsImpl.setLoadWithOverviewMode(settings, true);
-        }
-        settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setJavaScriptEnabled(true);
 
+        if (Constants.SDK_VERSION >= 5) {
+            CompatibilityUtilsImpl.setScrollbarFadingEnabled(webView, true);
+        }
         if (Constants.SDK_VERSION >= 8) {
             CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
-
         if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
             boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
             CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
         }
     }
 
-    public static void setScaleWebView(final WebView webView, final View layout, final File file, final Activity context) {
-        Runnable callSetScaleWebView = new Runnable() {
-            @Override
-            public void run() {
-                setPrivateScaleWebView(webView, layout, file, context);
-            }
-        };
+    public static void prepareWebViewForVideo(WebView webView, int backgroundColor) {
+        webView.setBackgroundColor(backgroundColor);
 
-        Point resolution = getResolution(layout);
-        if (resolution.equals(0, 0)) {
-            // wait until the view is measured and its size is known
-            callWhenLoaded(layout, callSetScaleWebView);
-        } else {
-            callSetScaleWebView.run();
+        WebSettings settings = webView.getSettings();
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        if (Constants.SDK_VERSION >= 8) {
+            CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
-    }
-
-    private static void setPrivateScaleWebView(WebView webView, View layout, File file, Activity context) {
-        Point imageSize = getImageSize(file);
-        Point resolution = getResolution(layout);
-
-        //MyLog.d(TAG, "Resolution: "+resolution.x+"x"+resolution.y);
-        double scaleX = (double)resolution.x / (double)imageSize.x;
-        double scaleY = (double)resolution.y / (double)imageSize.y;
-        int scale = (int)Math.round(Math.min(scaleX, scaleY) * 100d);
-        scale = Math.max(scale, 1);
-        //MyLog.d(TAG, "Scale: "+(Math.min(scaleX, scaleY) * 100d));
-        if (Constants.SDK_VERSION >= 7) {
-            double picdpi = (context.getResources().getDisplayMetrics().density * 160d) / scaleX;
-            if (picdpi >= 240) {
-                CompatibilityUtilsImpl.setDefaultZoomFAR(webView.getSettings());
-            } else if (picdpi <= 120) {
-                CompatibilityUtilsImpl.setDefaultZoomCLOSE(webView.getSettings());
-            } else {
-                CompatibilityUtilsImpl.setDefaultZoomMEDIUM(webView.getSettings());
-            }
-        }
-
-        webView.setInitialScale(scale);
-        webView.setPadding(0, 0, 0, 0);
     }
 
     private static Point getImageSize(File file) {
@@ -344,40 +306,59 @@ public class AppearanceUtils {
     }
 
     public static void setWebViewFile(File file, Activity context, FrameLayout layout, int background) {
-        WebViewFixed wV = new WebViewFixed(context);
-        wV.setLayoutParams(MATCH_PARAMS);
-        layout.addView(wV);
+        WebViewFixed webView = new WebViewFixed(context);
+        webView.setLayoutParams(MATCH_PARAMS);
+        layout.addView(webView);
 
+        ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
         Uri uri = Uri.fromFile(file);
 
         if (UriUtils.isImageUri(uri)) {
-            AppearanceUtils.prepareWebView(wV, background);
-            AppearanceUtils.setScaleWebView(wV, layout, file, context);
-            wV.loadUrl(Uri.fromFile(file).toString());
+            AppearanceUtils.prepareWebViewForImage(webView, background);
+            webView.loadDataWithBaseURL(null, createHtmlForImage(uri), "text/html; charset=UTF-8", null, null);
         } else if (UriUtils.isWebmUri(uri)) {
-            ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
-
             String mutedAttr = settings.isVideoMute() ? "muted" : "";
             String attributes = String.format("src='%1$s' controls autoplay %2$s", uri, mutedAttr);
 
-            wV.setBackgroundColor(background);
-            wV.loadDataWithBaseURL(null, createHtmlForElement("video", attributes, "HTML5 video is not supported.", true),
-                "text/html; charset=UTF-8", null, null);
+            AppearanceUtils.prepareWebViewForVideo(webView, background);
+            webView.loadDataWithBaseURL(null, createHtmlForVideo(attributes), "text/html; charset=UTF-8", null, null);
         } else {
-            wV.loadUrl(uri.toString());
+            webView.loadUrl(uri.toString());
         }
     }
 
-    private static String createHtmlForElement(String elementName, String attributes, String content, boolean isContentElement) {
-        StringBuffer elementHtml = new StringBuffer("<" + elementName +
-            " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes);
-        if (isContentElement) {
-            elementHtml.append(">" + content + "</" + elementName + ">");
-        } else {
-            elementHtml.append("/>");
-        }
+    private static String createHtmlForVideo(String attributes) {
+        String elementHtml = "<video" +
+            " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes + ">" +
+            "HTML5 video is not supported." +
+            "</video>";
 
-        return "<body style='margin:0;'>" + elementHtml.toString() + "</body>";
+        return "<body style='margin:0;'>" + elementHtml + "</body>";
+    }
+
+    private static String createHtmlForImage(Uri uri) {
+        StringBuffer img = new StringBuffer("<img src='" + uri + "'" +
+                " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:0;height:0;' />");
+
+        img.append("<script type='text/javascript'>");
+        img.append("function updateImageSize() {");
+        img.append("var img = document.getElementsByTagName('img')[0];");
+        img.append("if(!img) return;");
+        img.append("var widthRatio = img.clientWidth / window.innerWidth;");
+        img.append("var heightRatio = img.clientHeight / window.innerHeight;");
+        img.append("var isWide = widthRatio >= heightRatio;");
+        img.append("img.style.height = isWide ? 'auto' : '100%';");
+        img.append("img.style.width = isWide ? '100%' : 'auto';");
+        img.append("}");
+
+        // call when loaded and on each resize
+        img.append("updateImageSize();");
+        img.append("window.onload = updateImageSize;");
+        img.append("window.addEventListener('resize', updateImageSize, false);");
+        img.append("</script>");
+
+        String bodyHtml = "<body style='margin:0;'>" + img + "</body>";
+        return bodyHtml;
     }
 
     private static String formatVideoTime(int milliseconds) {
