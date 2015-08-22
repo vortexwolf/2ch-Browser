@@ -4,9 +4,11 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.res.Resources;
+import android.net.Uri;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.makaba.MakabaSendPostMapper;
@@ -14,12 +16,15 @@ import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.domain.SendPostResult;
 import com.vortexwolf.chan.services.http.HttpStringReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.util.List;
 
 public class PostSender {
     private static final String TAG = "PostSender";
@@ -58,6 +63,15 @@ public class PostSender {
             response = this.executeHttpPost(boardName, httpPost, entity);
             if (response == null) {
                 throw new Exception(this.mResources.getString(R.string.error_send_post));
+            }
+
+            List<Cookie> cookies = this.mHttpClient.getCookieStore().getCookies();
+            for (Cookie c : cookies) {
+                if (c.getName().equals(Constants.ADULT_ACCESS_COOKIE) &&
+                    UriUtils.areCookieDomainsEqual(c.getDomain(), Uri.parse(uri).getHost())) {
+                    this.mApplicationSettings.saveAdultAccessCookie(c);
+                    break;
+                }
             }
 
             int statusCode = response.getStatusLine().getStatusCode();
@@ -113,6 +127,7 @@ public class PostSender {
             for (int i = 0; i < 3; i++) {
                 try {
                     response = this.mHttpClient.execute(httpPost);
+
                     break;
                 } catch (Exception e) {
                     if ("recvfrom failed: ECONNRESET (Connection reset by peer)".equals(e.getMessage())) {

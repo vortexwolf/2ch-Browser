@@ -253,6 +253,10 @@ Possible Solutions:\n
     <string name="error_video_playing">Cannot play the video file.
 \nSelect a menu item to open with an external player.
     </string>
+    <string name="error_cloudflare_recaptcha">You have entered an incorrect Captcha</string>
+    <string name="error_cookie_require_board">To visit this page you should post something on any other page.
+If you want to be in read-only, post to /test/.
+    </string>
 
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code.</string>
@@ -273,7 +277,6 @@ Possible Solutions:\n
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
-    <string name="error_cloudflare_recaptcha">You have entered an incorrect Captcha</string>
     
     <string-array name="catalog_filters">
 		<item>Sort by Bump order</item>

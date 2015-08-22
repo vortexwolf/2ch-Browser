@@ -28,7 +28,7 @@ import com.vortexwolf.chan.services.presentation.FlowTextHelper;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class PostItemViewModel implements IPostListEntity {
-    private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.+?>(?:>>|&gt;&gt;)(\\d+)</a>");
+    private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.*?href=\".+?#(\\d+)\".*?>(?:>>|&gt;&gt;).+?</a>");
 
     private final IWebsite mWebsite;
     private final String mBoardName;

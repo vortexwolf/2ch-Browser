@@ -263,7 +263,11 @@
     <string name="error_video_playing">Не удалось запустить видео.
 \nВыберите опцию в меню для открытия во внешнем плеере.
     </string>
-    
+    <string name="error_cloudflare_recaptcha">Капча введена неверно</string>
+    <string name="error_cookie_require_board">Чтобы зайти на эту страницу, нужно что-нибудь где-нибудь запостить.
+Если вы хотите быть в рид-онли, отправляйте сообщение в /test/.
+    </string>
+
     <!-- Warnings -->
     <string name="warning_enter_captcha">Введите код подтверждения.</string>
     <string name="warning_write_comment">Напишите что-нибудь в сообщении.</string>
@@ -283,7 +287,6 @@
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
     <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
-    <string name="error_cloudflare_recaptcha">Капча введена неверно</string>
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>

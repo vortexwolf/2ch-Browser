@@ -50,6 +50,13 @@ public class ApplicationSettings {
         editor.commit();
     }
 
+    public void saveAdultAccessCookie(Cookie cookie) {
+        SharedPreferences.Editor editor = this.mSettings.edit();
+        editor.putString(this.mResources.getString(R.string.pref_adult_access_cookie_key), cookie.getValue());
+        editor.putString(this.mResources.getString(R.string.pref_adult_access_cookie_domain_key), cookie.getDomain());
+        editor.commit();
+    }
+
     public void saveRecentHistoryTab(int position) {
         SharedPreferences.Editor editor = this.mSettings.edit();
         editor.putInt(this.mResources.getString(R.string.pref_history_tab_position), position);
@@ -85,6 +92,20 @@ public class ApplicationSettings {
         }
 
         BasicClientCookie c = new BasicClientCookie(Constants.CF_CLEARANCE_COOKIE, value);
+        c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
+        c.setPath("/");
+        return c;
+    }
+
+
+    public BasicClientCookie getAdultAccessCookie() {
+        String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_adult_access_cookie_domain_key), null);
+        String value = this.mSettings.getString(this.mResources.getString(R.string.pref_adult_access_cookie_key), null);
+        if (StringUtils.isEmpty(value)) {
+            return null;
+        }
+
+        BasicClientCookie c = new BasicClientCookie(Constants.ADULT_ACCESS_COOKIE, value);
         c.setDomain(!StringUtils.isEmpty(domain) ? domain : "." + Constants.DEFAULT_DOMAIN);
         c.setPath("/");
         return c;

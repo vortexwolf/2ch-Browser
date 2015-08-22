@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.services;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -77,6 +78,11 @@ public class NavigationService {
         extras.putBoolean(Constants.EXTRA_CATALOG, true);
 
         this.navigateActivity(context, ThreadsListActivity.class, null, extras, null);
+    }
+
+    public void restartActivity(Activity activity, Bundle extras) {
+        this.navigateActivity(activity, activity.getClass(), null, extras, null);
+        activity.finish();
     }
 
     private void navigateActivity(Context context, Class<?> activityClass, Uri data, Bundle extras, Integer flags) {

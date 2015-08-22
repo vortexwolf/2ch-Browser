@@ -28,6 +28,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.CompatibilityUtils;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.interfaces.ICloudflareCheckListener;
@@ -95,6 +96,11 @@ public class ThreadsListActivity extends BaseListActivity {
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mPageNumber = extras.getInt(Constants.EXTRA_BOARD_PAGE, 0);
         this.mIsCatalog = extras.getBoolean(Constants.EXTRA_CATALOG);
+
+        if (StringUtils.areEqual(this.mBoardName, "g")) {
+            extras.putString(Constants.EXTRA_BOARD_NAME, "gg");
+            this.mNavigationService.restartActivity(this, extras);
+        }
 
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);

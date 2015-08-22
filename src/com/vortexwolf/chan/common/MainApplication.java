@@ -119,6 +119,7 @@ public class MainApplication extends Application {
 
         httpClient.setCookie(settings.getCloudflareClearanceCookie());
         httpClient.setCookie(settings.getPassCodeCookie());
+        httpClient.setCookie(settings.getAdultAccessCookie());
     }
 
     @Override

@@ -93,7 +93,7 @@ public class CloudflareCheckService {
             CookieSyncManager.createInstance(mActivity);
             CookieManager.getInstance().removeAllCookie();
             mWebView.setWebViewClient(mClient);
-            mWebView.getSettings().setUserAgentString(Constants.USER_AGENT_STRING);
+            mWebView.getSettings().setUserAgentString(Constants.MOZILLA_USER_AGENT_STRING);
             mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.loadUrl(url);
             new CountDownTimer(20000, 1000) {

@@ -23,6 +23,9 @@ public class Constants {
             "jpeg", "png", "gif" }));
     public static final String GIF_IMAGE = "gif";
 
+    public static final ArrayList<String> COOKIE_REQUIRE_BOARDS = new ArrayList<String>(Arrays.asList(new String[] {
+            "h", "ho", "hc", "e", "fet" }));
+
     public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
     public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);
 
@@ -34,14 +37,15 @@ public class Constants {
     public static final String DEFAULT_DOMAIN = "2ch.hk";
 
     // Для http-запросов
-    //public static final String USER_AGENT_STRING = "2ch browser (Android)";
-    public static final String USER_AGENT_STRING = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0";
+    public static final String USER_AGENT_STRING = "2ch browser (Android)";
+    public static final String MOZILLA_USER_AGENT_STRING = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0";
     public static final String SAGE_EMAIL = "sage";
     public static final Charset UTF8_CHARSET = Charset.forName(HTTP.UTF_8);
     public static final String MULTIPART_BOUNDARY = "----WebKitFormBoundaryyD8qfvcSfpRMHx9M";
 
     public static final String CF_CLEARANCE_COOKIE = "cf_clearance";
     public static final String USERCODE_NOCAPTCHA_COOKIE = "usercode_nocaptcha";
+    public static final String ADULT_ACCESS_COOKIE = "usercode_auth";
 
     // После этого числа порядковый номер поста становится красного цвета
     public static final int BUMP_LIMIT = 500;

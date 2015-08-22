@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.Window;
 
+import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.exceptions.HtmlNotJsonException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
@@ -62,6 +65,11 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
             }
         } catch (Exception e) {
             this.mUserError = e.getMessage();
+
+            if (StringUtils.areEqual(this.mUserError, "404 - Not Found") &&
+                Constants.COOKIE_REQUIRE_BOARDS.contains(this.mBoard)) {
+                this.mUserError = this.mActivity.getString(R.string.error_cookie_require_board);
+            }
         }
 
         return false;

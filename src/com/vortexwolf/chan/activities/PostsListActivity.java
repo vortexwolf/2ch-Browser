@@ -98,14 +98,15 @@ public class PostsListActivity extends BaseListActivity {
         this.mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
         this.mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
         this.mPostNumber = extras.getString(Constants.EXTRA_POST_NUMBER);
+        String pageSubject = StringUtils.nullIfEmpty(extras.getString(Constants.EXTRA_THREAD_SUBJECT));
+
+        if (StringUtils.areEqual(this.mBoardName, "g")) {
+            extras.putString(Constants.EXTRA_BOARD_NAME, "gg");
+            this.mNavigationService.restartActivity(this, extras);
+        }
 
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mJsonReader = Factory.resolve(MakabaApiReader.class);
-
-        // Page title and new tab
-        String pageSubject = extras != null
-                ? StringUtils.nullIfEmpty(extras.getString(Constants.EXTRA_THREAD_SUBJECT))
-                : null;
 
         OpenTabModel tabModel = new OpenTabModel(this.mWebsite, this.mBoardName, 0, this.mThreadNumber, pageSubject);
         this.mTabModel = this.mOpenTabsManager.add(tabModel);

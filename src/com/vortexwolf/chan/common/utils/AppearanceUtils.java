@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -43,6 +44,8 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.services.TimerService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import org.apache.http.protocol.HTTP;
 
 public class AppearanceUtils {
 
@@ -315,13 +318,13 @@ public class AppearanceUtils {
 
         if (UriUtils.isImageUri(uri)) {
             AppearanceUtils.prepareWebViewForImage(webView, background);
-            webView.loadDataWithBaseURL(null, createHtmlForImage(uri), "text/html; charset=UTF-8", null, null);
+            webView.loadDataWithBaseURL(null, createHtmlForImage(uri), "text/html", HTTP.UTF_8, null);
         } else if (UriUtils.isWebmUri(uri)) {
             String mutedAttr = settings.isVideoMute() ? "muted" : "";
             String attributes = String.format("src='%1$s' controls autoplay %2$s", uri, mutedAttr);
 
             AppearanceUtils.prepareWebViewForVideo(webView, background);
-            webView.loadDataWithBaseURL(null, createHtmlForVideo(attributes), "text/html; charset=UTF-8", null, null);
+            webView.loadDataWithBaseURL(null, createHtmlForVideo(attributes), "text/html", HTTP.UTF_8, null);
         } else {
             webView.loadUrl(uri.toString());
         }
