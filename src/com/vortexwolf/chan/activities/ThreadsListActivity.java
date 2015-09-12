@@ -545,7 +545,7 @@ public class ThreadsListActivity extends BaseListActivity {
 
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
-            ThreadsListActivity.this.switchToCaptchaView(captcha);
+            ThreadsListActivity.this.switchToCaptchaView(mWebsite, captcha);
         }
 
         @Override

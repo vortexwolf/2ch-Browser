@@ -21,6 +21,7 @@ import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -97,7 +98,7 @@ public abstract class BaseListActivity extends ListActivity {
         errorTextView.setText(message != null ? message : this.getString(R.string.error_unknown));
     }
 
-    protected void switchToCaptchaView(final CaptchaEntity captcha) {
+    protected void switchToCaptchaView(final IWebsite website, final CaptchaEntity captcha) {
         if (this.mCaptchaView == null) {
             this.switchToErrorView("The captcha view is not designed yet.");
             return;
@@ -117,7 +118,7 @@ public abstract class BaseListActivity extends ListActivity {
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(captchaAnswer.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
-                    CheckCloudflareTask task = new CheckCloudflareTask(captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
+                    CheckCloudflareTask task = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
                     task.execute();
                     return true;
                 }
@@ -128,7 +129,7 @@ public abstract class BaseListActivity extends ListActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckCloudflareTask task = new CheckCloudflareTask(captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
+                CheckCloudflareTask task = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
                 task.execute();
             }
         });

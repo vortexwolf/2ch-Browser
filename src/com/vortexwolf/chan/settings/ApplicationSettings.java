@@ -129,7 +129,7 @@ public class ApplicationSettings {
     }
 
     public Uri getDomainUri() {
-        boolean isHttps = this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_https_key), false);
+        boolean isHttps = this.mSettings.getBoolean(this.mResources.getString(R.string.pref_use_https_key), true);
         String domain = this.mSettings.getString(this.mResources.getString(R.string.pref_domain_key), null);
         domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
 

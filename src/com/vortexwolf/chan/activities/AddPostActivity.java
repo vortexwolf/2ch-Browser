@@ -317,7 +317,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             if (this.mCheckCloudflareTask != null) {
                 this.mCheckCloudflareTask.cancel(true);
             }
-            mCheckCloudflareTask = new CheckCloudflareTask(this.mCaptcha, captchaAnswer, new ICheckCaptchaView(){
+            mCheckCloudflareTask = new CheckCloudflareTask(this.mWebsite, this.mCaptcha, captchaAnswer, new ICheckCaptchaView(){
                 @Override
                 public void showSuccess() {
                     AddPostActivity.this.hidePostLoading();

@@ -19,6 +19,7 @@ import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.services.http.HttpStreamReader;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -38,10 +39,11 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
 
     private String mErrorMessage = null;
 
-    public CheckCloudflareTask(CaptchaEntity captcha, String answer, ICheckCaptchaView view) {
+    public CheckCloudflareTask(IWebsite website, CaptchaEntity captcha, String answer, ICheckCaptchaView view) {
         this.mCaptcha = captcha;
         this.mCaptchaAnswer = answer;
         this.mView = view;
+        this.mUrlBuilder = website.getUrlBuilder();
     }
 
     @Override
