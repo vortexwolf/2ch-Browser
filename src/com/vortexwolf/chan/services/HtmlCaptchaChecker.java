@@ -10,6 +10,7 @@ import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class HtmlCaptchaChecker {
@@ -21,16 +22,13 @@ public class HtmlCaptchaChecker {
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(IWebsite website, String board, String thread) {
+    public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String referer) {
         IUrlBuilder urlBuilder = website.getUrlBuilder();
-        String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(this.mApplicationSettings.getPasscodeCookieValue());
-
-        // Add referer, because it always returns the incorrect value CHECK if not to set it
-        String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, board, 0, thread);
-        Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
+        String checkUrl = urlBuilder.getPasscodeCookieCheckUrl("", captchaType);
 
         CaptchaResult result;
         try {
+            Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
             String captchaBlock = this.mHttpStringReader.fromUri(checkUrl, extraHeaders);
             result = this.checkHtmlBlock(captchaBlock);
         } catch (Exception e) {
@@ -46,15 +44,15 @@ public class HtmlCaptchaChecker {
         }
 
         CaptchaResult result = new CaptchaResult();
-        if (captchaBlock.equals("OK")) {
+        if (captchaBlock.startsWith("OK")) {
             result.canSkip = true;
-        } else if (captchaBlock.equals("VIP")) {
+        } else if (captchaBlock.startsWith("VIP") && !captchaBlock.startsWith("VIPFAIL")) {
             result.canSkip = true;
             result.successPassCode = true;
         } else if (captchaBlock.startsWith("CHECK")) {
             result.canSkip = false;
             result.captchaKey = captchaBlock.substring(captchaBlock.indexOf('\n') + 1);
-        } else if (captchaBlock.equals("VIPFAIL")) {
+        } else if (captchaBlock.startsWith("VIPFAIL")) {
             result.canSkip = true;
             result.failPassCode = true;
         }

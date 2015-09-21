@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
@@ -16,6 +17,7 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 
 public class ApplicationSettings {
 
@@ -345,6 +347,25 @@ public class ApplicationSettings {
         }
 
         return R.style.Theme_Light_13;
+    }
+
+    public CaptchaType getCaptchaType() {
+        String defaultCaptchaTypeValue = this.mResources.getString(R.string.pref_captcha_type_mailru_value);
+        String captchaTypeStr = this.mSettings.getString(this.mResources.getString(R.string.pref_captcha_type_key), defaultCaptchaTypeValue);
+
+        if (captchaTypeStr.equals(this.mResources.getString(R.string.pref_captcha_type_mailru_value))) {
+            return CaptchaType.MAILRU;
+        } else if (captchaTypeStr.equals(this.mResources.getString(R.string.pref_captcha_type_recaptcha_v2_value))) {
+            if (Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
+                return CaptchaType.RECAPTCHA_V2;
+            } else {
+                return CaptchaType.RECAPTCHA_V1;
+            }
+        } else if (captchaTypeStr.equals(this.mResources.getString(R.string.pref_captcha_type_recaptcha_v1_value))) {
+            return CaptchaType.RECAPTCHA_V1;
+        }
+
+        return CaptchaType.MAILRU;
     }
 
     public SettingsEntity getCurrentSettings() {

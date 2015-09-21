@@ -13,6 +13,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.services.RecaptchaService;
 
@@ -28,8 +29,6 @@ public class MakabaSendPostMapper {
     private static final String EMAIL = "email";
     private static final String NAME = "name";
     private static final String SUBJECT = "subject";
-    private static final String CAPTCHA_KEY = "captcha";
-    private static final String CAPTCHA_ANSWER = "captcha_value";
     private static final String[] IMAGES = new String[] { "image1", "image2", "image3", "image4" };
 
     public HttpEntity mapModelToHttpEntity(String boardName, String userCode, SendPostModel model) {
@@ -40,10 +39,16 @@ public class MakabaSendPostMapper {
         this.addStringValue(multipartEntity, THREAD, model.getParentThread());
         this.addStringValue(multipartEntity, USERCODE, userCode);
         this.addStringValue(multipartEntity, COMMENT, StringUtils.emptyIfNull(model.getComment()));
-        if (!model.isRecaptcha()) {
-            this.addStringValue(multipartEntity, CAPTCHA_KEY, model.getCaptchaKey());
-            this.addStringValue(multipartEntity, CAPTCHA_ANSWER, model.getCaptchaAnswer());
-        } else {
+
+        if (model.getCaptchaType() == CaptchaType.MAILRU) {
+            this.addStringValue(multipartEntity, "captcha_type", "mailru");
+            this.addStringValue(multipartEntity, "captcha_id", model.getCaptchaKey());
+            this.addStringValue(multipartEntity, "captcha_value", model.getCaptchaAnswer());
+        } else if (model.getCaptchaType() == CaptchaType.RECAPTCHA_V1) {
+            this.addStringValue(multipartEntity, "captcha_type", "recaptchav1");
+            this.addStringValue(multipartEntity, "recaptcha_challenge_field", model.getCaptchaKey());
+            this.addStringValue(multipartEntity, "recaptcha_response_field", model.getCaptchaAnswer());
+        } else if (model.getCaptchaType() == CaptchaType.RECAPTCHA_V2) {
             try {
                 this.addStringValue(multipartEntity, "captcha_type", "recaptcha");
                 if (model.getRecaptchaHash() != null) {

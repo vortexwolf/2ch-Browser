@@ -12,6 +12,7 @@
     <string name="addpost_captcha_can_skip_passcode">У вас введен пасс-код</string>
     <string name="addpost_captcha_fail_passcode">Пасс-код не действителен, перелогиньтесь</string>
     <string name="addpost_captcha_hint">Код подтверждения</string>
+    <string name="addpost_captcha_solve_recaptcha">Вы увидите капчу после отправки</string>
     <string name="addpost_send_button">Отправить</string>
     <string name="addpost_refresh_button">Обновить</string>
     <string name="pick_board_input_hint">Код форума</string>
@@ -237,6 +238,13 @@
     <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
     <string name="pref_video_mute">Видео без звука</string>
     <string name="pref_video_mute_summary">Уменьшить звук до 0 при открытии видео</string>
+
+    <string name="pref_captcha_type">Вид капчи</string>
+    <string-array name="pref_captcha_type_choices">
+        <item>Mail.ru</item>
+        <item>Recaptcha v1</item>
+        <item>Recaptcha v2 (Android 3.0 или выше)</item>
+    </string-array>
 
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>

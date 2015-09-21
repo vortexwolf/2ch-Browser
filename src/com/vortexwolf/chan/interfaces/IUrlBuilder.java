@@ -1,5 +1,7 @@
 package com.vortexwolf.chan.interfaces;
 
+import com.vortexwolf.chan.models.domain.CaptchaType;
+
 public interface IUrlBuilder {
 
     public abstract String getPageUrlApi(String board, int pageNumber);
@@ -32,6 +34,6 @@ public interface IUrlBuilder {
 
     public abstract String getPasscodeCheckUrl();
 
-    public abstract String getPasscodeCookieCheckUrl(String passcodeCookie);
+    public abstract String getPasscodeCookieCheckUrl(String passcodeCookie, CaptchaType captchaType);
 
 }

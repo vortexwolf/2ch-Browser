@@ -13,18 +13,16 @@ public class DraftPostModel {
     private CaptchaViewType mCaptchaType;
     private CaptchaEntity mCaptcha;
     private Bitmap mCaptchaImage;
-    private boolean mCaptchaPasscodeSuccess;
-    private boolean mCaptchaPasscodeFail;
+    private CaptchaInfoType mCaptchaInfoType;
 
-    public DraftPostModel(String comment, List<FileModel> attachedFiles, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, boolean isCaptchaPasscodeSuccess, boolean isCaptchaPasscodeFail) {
+    public DraftPostModel(String comment, List<FileModel> attachedFiles, boolean isSage, CaptchaViewType captchaType, CaptchaEntity captcha, Bitmap captchaImage, CaptchaInfoType captchaInfoType) {
         this.mComment = comment;
         this.mAttachedFiles = attachedFiles;
         this.mIsSage = isSage;
         this.mCaptchaType = captchaType;
         this.mCaptcha = captcha;
         this.mCaptchaImage = captchaImage;
-        this.mCaptchaPasscodeSuccess = isCaptchaPasscodeSuccess;
-        this.mCaptchaPasscodeFail = isCaptchaPasscodeFail;
+        this.mCaptchaInfoType = captchaInfoType;
     }
 
     public String getComment() {
@@ -51,11 +49,7 @@ public class DraftPostModel {
         return this.mCaptchaImage;
     }
 
-    public boolean isCaptchaPasscodeSuccess() {
-        return this.mCaptchaPasscodeSuccess;
-    }
-
-    public boolean isCaptchaPasscodeFail() {
-        return this.mCaptchaPasscodeFail;
+    public CaptchaInfoType getCaptchaInfoType() {
+        return mCaptchaInfoType;
     }
 }

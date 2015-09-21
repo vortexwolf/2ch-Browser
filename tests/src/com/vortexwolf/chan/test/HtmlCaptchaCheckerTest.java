@@ -12,6 +12,7 @@ import com.vortexwolf.chan.boards.makaba.MakabaWebsite;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IWebsite;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
@@ -23,7 +24,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
         String responseText = "OK";
 
         HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), Factory.resolve(ApplicationSettings.class));
-        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, "", "");
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "");
 
         assertTrue(result.canSkip);
     }
@@ -32,7 +33,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
         String responseText = "CHECK\nSomeKey";
 
         HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), Factory.resolve(ApplicationSettings.class));
-        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, "", "");
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "");
 
         assertFalse(result.canSkip);
         assertEquals("SomeKey", result.captchaKey);

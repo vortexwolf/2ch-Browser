@@ -3,6 +3,7 @@ package com.vortexwolf.chan.boards.fourchan;
 import android.net.Uri;
 
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 
 public class FourchanUrlBuilder implements IUrlBuilder {
     public String getPageUrlApi(String board, int pageNumber) {
@@ -72,7 +73,7 @@ public class FourchanUrlBuilder implements IUrlBuilder {
         return null;
     }
 
-    public String getPasscodeCookieCheckUrl(String passcodeCookie) {
+    public String getPasscodeCookieCheckUrl(String passcodeCookie, CaptchaType captchaType) {
         return null;
     }
 }

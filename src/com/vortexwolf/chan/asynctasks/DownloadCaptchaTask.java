@@ -5,14 +5,16 @@ import android.os.AsyncTask;
 
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
+import com.vortexwolf.chan.services.MailruCaptchaService;
 import com.vortexwolf.chan.services.RecaptchaService;
-import com.vortexwolf.chan.services.YandexCaptchaService;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
@@ -24,7 +26,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final String mThreadNumber;
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
-    private final boolean mCfRecaptcha;
+    private final CaptchaType mCaptchaType;
+    private final MailruCaptchaService mMailruCaptchaService;
 
     private boolean mCanSkip = false;
     private boolean mSuccessPasscode = false;
@@ -33,14 +36,15 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private Bitmap mCaptchaImage;
     private String mUserError;
 
-    public DownloadCaptchaTask(ICaptchaView view, IWebsite website, String boardName, String threadNumber, boolean isCfRecaptcha) {
+    public DownloadCaptchaTask(ICaptchaView view, IWebsite website, String boardName, String threadNumber, CaptchaType captchaType) {
         this.mView = view;
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mThreadNumber = threadNumber;
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
-        this.mCfRecaptcha = isCfRecaptcha;
+        this.mMailruCaptchaService = Factory.resolve(MailruCaptchaService.class);
+        this.mCaptchaType = captchaType;
     }
 
     @Override
@@ -61,36 +65,43 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
-        if (this.mCfRecaptcha) {
-            this.mCaptcha = RecaptchaService.loadCloudflareCaptcha();
-        } else {
-            HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mBoardName, this.mThreadNumber);
-            this.mCanSkip = result.canSkip;
-            this.mSuccessPasscode = result.successPassCode;
-            this.mFailPasscode = result.failPassCode;
-            String captchaKey = result.captchaKey;
+        String referer = UriUtils.getBoardOrThreadUrl(this.mWebsite.getUrlBuilder(), this.mBoardName, 0, this.mThreadNumber);
+        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mCaptchaType, referer);
+        this.mCanSkip = result.canSkip;
+        this.mSuccessPasscode = result.successPassCode;
+        this.mFailPasscode = result.failPassCode;
+        String captchaKey = result.captchaKey;
 
-            if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !StringUtils.isEmpty(this.mThreadNumber)) {
-                return true;
-            }
-
-            if (captchaKey != null) {
-                this.mCaptcha = YandexCaptchaService.loadCaptcha(captchaKey);
-            } else {
-                this.mCaptcha = RecaptchaService.loadPostingRecaptcha();
-            }
-
-            if (this.mCaptcha == null) {
-                return false;
-            }
+        if (this.mSuccessPasscode || this.mFailPasscode || this.mCanSkip && !StringUtils.isEmpty(this.mThreadNumber)) {
+            return true;
         }
 
-        if (this.isCancelled()) {
+        if (this.mCaptchaType == CaptchaType.RECAPTCHA_V2) {
+            this.mCaptcha = new CaptchaEntity();
+            this.mCaptcha.setCaptchaType(this.mCaptchaType);
+            // the entity is empty for Recaptcha V2
+        } else if (this.mCaptchaType == CaptchaType.RECAPTCHA_V1) {
+            this.mCaptcha = RecaptchaService.loadPostingRecaptcha(captchaKey, referer);
+        } else if (this.mCaptchaType == CaptchaType.MAILRU) {
+            this.mCaptcha = this.mMailruCaptchaService.loadCaptcha(captchaKey, referer);
+        } else {
+            return false;
+        }
+
+        if (this.isCancelled() || this.mCaptcha == null) {
+            return false;
+        }
+
+        this.mCaptcha.setCaptchaType(this.mCaptchaType);
+        if (this.mCaptcha.isError()) {
+            this.mUserError = this.mCaptcha.getErrorMessage();
             return false;
         }
 
         try {
-            this.mCaptchaImage = this.mHttpBitmapReader.fromUri(this.mCaptcha.getUrl());
+            if (this.mCaptcha.getUrl() != null) {
+                this.mCaptchaImage = this.mHttpBitmapReader.fromUri(this.mCaptcha.getUrl());
+            }
         } catch (HttpRequestException e) {
             this.mUserError = e.getMessage();
             return false;

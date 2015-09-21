@@ -51,9 +51,10 @@ import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IUrlParser;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
-import com.vortexwolf.chan.models.domain.CaptchaEntity.Type;
+import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.models.presentation.AddAttachmentViewBag;
+import com.vortexwolf.chan.models.presentation.CaptchaInfoType;
 import com.vortexwolf.chan.models.presentation.CaptchaViewType;
 import com.vortexwolf.chan.models.presentation.DraftPostModel;
 import com.vortexwolf.chan.models.presentation.FileModel;
@@ -81,14 +82,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private String mThreadNumber;
     private CaptchaViewType mCurrentCaptchaView = null;
     private Bitmap mCaptchaBitmap;
-    private boolean mCaptchaPasscodeSuccess;
-    private boolean mCaptchaPasscodeFail;
 
     private SendPostTask mCurrentPostSendTask = null;
     private DownloadCaptchaTask mCurrentDownloadCaptchaTask = null;
     private CheckPasscodeTask mCurrentCheckPasscodeTask = null;
 
-    private TextView mCaptchaSkipView = null;
+    private TextView mCaptchaInfoView = null;
     private View mCaptchaLoadingView = null;
     private ImageView mCaptchaImageView = null;
     private EditText mCaptchaAnswerView = null;
@@ -107,8 +106,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     // (после успешной отправки)
     private boolean mFinishedSuccessfully = false;
 
-    private boolean mCfRecaptcha = false;
+    private boolean mRunCloudflareCheck = false;
     private CheckCloudflareTask mCheckCloudflareTask;
+    private CaptchaInfoType mCaptchaInfoType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,8 +140,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
             this.mSageCheckBox.setChecked(draft.isSage());
 
-            if (draft.getCaptchaType() == CaptchaViewType.SKIP) {
-                this.skipCaptcha(draft.isCaptchaPasscodeSuccess(), draft.isCaptchaPasscodeFail());
+            if (draft.getCaptchaType() == CaptchaViewType.INFO) {
+                this.showCaptchaInfo(draft.getCaptchaInfoType());
             } else if (draft.getCaptchaType() == CaptchaViewType.IMAGE && draft.getCaptchaImage() != null && draft.getCaptchaImage().isRecycled() == false) {
                 this.showCaptcha(draft.getCaptcha(), draft.getCaptchaImage());
             }
@@ -196,7 +196,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     protected void onPause() {
         MyLog.v(TAG, "save state");
         if (!this.mFinishedSuccessfully) {
-            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.getAttachments(), this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaPasscodeSuccess, this.mCaptchaPasscodeFail);
+            DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.getAttachments(), this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaInfoType);
 
             this.mDraftPostsStorage.saveDraft(this.mBoardName, this.mThreadNumber, draft);
         } else {
@@ -212,7 +212,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaImageView = (ImageView) this.findViewById(R.id.addpost_captcha_image);
         this.mCaptchaLoadingView = this.findViewById(R.id.addpost_captcha_loading);
-        this.mCaptchaSkipView = (TextView) this.findViewById(R.id.addpost_captcha_skip_text);
+        this.mCaptchaInfoView = (TextView) this.findViewById(R.id.addpost_captcha_info_message);
         this.mCaptchaAnswerView = (EditText) this.findViewById(R.id.addpost_captcha_input);
         this.mCommentView = (EditText) this.findViewById(R.id.addpost_comment_input);
         this.mSageCheckBox = (CheckBox) this.findViewById(R.id.addpost_sage_checkbox);
@@ -311,7 +311,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         // Собираем все заполненные поля
         String captchaAnswer = this.mCaptchaAnswerView.getText().toString();
 
-        if (this.mCfRecaptcha) {
+        if (this.mRunCloudflareCheck) {
             // Check the cloudflare captcha and then show a posting captcha
             this.showPostLoading();
             if (this.mCheckCloudflareTask != null) {
@@ -368,8 +368,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void setCfRecaptcha(boolean isCfRecaptcha) {
-        this.mCfRecaptcha = isCfRecaptcha;
-        this.mCaptchaAnswerView.setInputType(isCfRecaptcha ? InputType.TYPE_CLASS_TEXT : InputType.TYPE_CLASS_NUMBER);
+        this.mRunCloudflareCheck = isCfRecaptcha;
     }
 
     private void sendPost(SendPostModel pe) {
@@ -377,7 +376,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.mCurrentPostSendTask.cancel(true);
         }
         if (this.mCaptcha != null
-                && this.mCaptcha.getType() == Type.RECAPTCHA_POST
+                && this.mCaptcha.getCaptchaType() == CaptchaType.RECAPTCHA_V2
                 && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
             Intent reIntent = new Intent(this, NewRecaptchaActivity.class);
             startActivityForResult(reIntent, Constants.REQUEST_CODE_RECAPTCHA);
@@ -462,16 +461,12 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     @Override
     public void skipCaptcha(boolean successPasscode, boolean failPasscode) {
         if (successPasscode) {
-            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip_passcode));
+            this.showCaptchaInfo(CaptchaInfoType.PASSCODE_SUCCESS);
         } else if (failPasscode) {
-            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_fail_passcode));
+            this.showCaptchaInfo(CaptchaInfoType.PASSCODE_FAIL);
         } else {
-            this.mCaptchaSkipView.setText(this.getString(R.string.addpost_captcha_can_skip));
+            this.showCaptchaInfo(CaptchaInfoType.SKIP);
         }
-
-        this.switchToCaptchaView(CaptchaViewType.SKIP);
-        this.mCaptchaPasscodeSuccess = successPasscode;
-        this.mCaptchaPasscodeFail = failPasscode;
     }
 
     @Override
@@ -485,16 +480,32 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaBitmap = captchaImage;
         this.mCaptchaImageView.setImageBitmap(captchaImage);
 
-        if (captcha.getType() == Type.RECAPTCHA_POST && Constants.SDK_VERSION >= Build.VERSION_CODES.HONEYCOMB) {
-            this.switchToCaptchaView(CaptchaViewType.SKIP);
+        if (captcha.getCaptchaType() == CaptchaType.RECAPTCHA_V2) {
+            this.showCaptchaInfo(CaptchaInfoType.RECAPTCHA_V2);
         } else {
             this.switchToCaptchaView(CaptchaViewType.IMAGE);
-            if (captcha.getType() == Type.YANDEX) {
-                this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
-            } else {
-                this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_TEXT);
-            }
         }
+    }
+
+    public void showCaptchaInfo(CaptchaInfoType captchaInfoType) {
+        this.mCaptchaInfoType = captchaInfoType;
+
+        String message = null;
+        if (this.mCaptchaInfoType == CaptchaInfoType.PASSCODE_SUCCESS) {
+            message = this.getString(R.string.addpost_captcha_can_skip_passcode);
+        } else if (this.mCaptchaInfoType == CaptchaInfoType.PASSCODE_FAIL) {
+            message = this.getString(R.string.addpost_captcha_fail_passcode);
+        } else if (this.mCaptchaInfoType == CaptchaInfoType.SKIP) {
+            message = this.getString(R.string.addpost_captcha_can_skip);
+        } else if (this.mCaptchaInfoType == CaptchaInfoType.RECAPTCHA_V2) {
+            message = this.getString(R.string.addpost_captcha_solve_recaptcha);
+        } else {
+            message = this.getString(R.string.error_unknown);
+        }
+
+        this.mCaptchaInfoView.setText(message);
+
+        this.switchToCaptchaView(CaptchaViewType.INFO);
     }
 
     @Override
@@ -518,7 +529,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.mCaptchaImageView.setVisibility(View.GONE);
                 this.mCaptchaImageView.setImageResource(android.R.color.transparent);
                 this.mCaptchaLoadingView.setVisibility(View.VISIBLE);
-                this.mCaptchaSkipView.setVisibility(View.GONE);
+                this.mCaptchaInfoView.setVisibility(View.GONE);
                 break;
             case ERROR:
             case IMAGE:
@@ -526,14 +537,14 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.mCaptchaAnswerView.setVisibility(View.VISIBLE);
                 this.mCaptchaImageView.setVisibility(View.VISIBLE);
                 this.mCaptchaLoadingView.setVisibility(View.GONE);
-                this.mCaptchaSkipView.setVisibility(View.GONE);
+                this.mCaptchaInfoView.setVisibility(View.GONE);
                 break;
-            case SKIP:
+            case INFO:
                 this.mCurrentDownloadCaptchaTask = null;
                 this.mCaptchaAnswerView.setVisibility(View.GONE);
                 this.mCaptchaImageView.setVisibility(View.GONE);
                 this.mCaptchaLoadingView.setVisibility(View.GONE);
-                this.mCaptchaSkipView.setVisibility(View.VISIBLE);
+                this.mCaptchaInfoView.setVisibility(View.VISIBLE);
                 break;
         }
 
@@ -685,7 +696,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptcha() {
-        if (this.mCurrentCaptchaView == CaptchaViewType.SKIP) {
+        if (this.mCurrentCaptchaView == CaptchaViewType.INFO) {
             this.refreshCaptchaSkipView();
         } else {
             this.refreshCaptchaImageView();
@@ -708,7 +719,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         this.mCaptchaAnswerView.setText("");
 
-        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mCfRecaptcha);
+        this.mCurrentDownloadCaptchaTask = new DownloadCaptchaTask(this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mSettings.getCaptchaType());
         this.mCurrentDownloadCaptchaTask.execute();
     }
 

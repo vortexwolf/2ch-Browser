@@ -18,6 +18,13 @@
             android:summary="@string/pref_passcode_summary"
             android:inputType="textVisiblePassword"
             android:singleLine="true" />
+        <ListPreference
+            android:defaultValue="@string/pref_captcha_type_mailru_value"
+            android:dialogTitle="@string/pref_captcha_type"
+            android:entries="@array/pref_captcha_type_choices"
+            android:entryValues="@array/pref_captcha_type_values"
+            android:key="@string/pref_captcha_type_key"
+            android:title="@string/pref_captcha_type" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="@string/pref_mobileapi_key"

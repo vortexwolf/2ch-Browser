@@ -53,6 +53,7 @@ public class PostSender {
         }
 
         IUrlBuilder urlBuilder = website.getUrlBuilder();
+        String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, boardName, 0, entity.getParentThread());
         String uri = urlBuilder.getPostingUrlApi();
         //String uri = "http://posttestserver.com/post.php?dir=vortexwolf";
 
@@ -60,7 +61,7 @@ public class PostSender {
         HttpResponse response = null;
         try {
             httpPost = new HttpPost(uri);
-            response = this.executeHttpPost(boardName, httpPost, entity);
+            response = this.executeHttpPost(boardName, httpPost, entity, referer);
             if (response == null) {
                 throw new Exception(this.mResources.getString(R.string.error_send_post));
             }
@@ -110,13 +111,14 @@ public class PostSender {
         return result;
     }
 
-    private HttpResponse executeHttpPost(String boardName, HttpPost httpPost, SendPostModel postModel) {
+    private HttpResponse executeHttpPost(String boardName, HttpPost httpPost, SendPostModel postModel, String referer) {
         // Редирект-коды я обработаю самостоятельно путем парсинга и возврата
         // заголовка Location
         HttpClientParams.setRedirecting(httpPost.getParams(), false);
         HttpResponse response = null;
         try {
-            httpPost.setHeader("content-type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
+            httpPost.setHeader("Referer", referer);
+            httpPost.setHeader("Content-Type", "multipart/form-data; boundary=" + Constants.MULTIPART_BOUNDARY);
 
             String usercode = this.mApplicationSettings.getPasscodeCookieValue();
 

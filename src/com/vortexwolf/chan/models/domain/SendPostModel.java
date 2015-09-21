@@ -27,11 +27,6 @@ public class SendPostModel {
         this.mName = name;
     }
 
-    public boolean isRecaptcha() {
-        return this.mCaptcha != null
-                && this.mCaptcha.getType() == CaptchaEntity.Type.RECAPTCHA_POST;
-    }
-
     public void setRecaptchaHash(String hash) {
         this.mRecaptchaHash = hash;
     }
@@ -50,6 +45,10 @@ public class SendPostModel {
 
     public String getCaptchaAnswer() {
         return this.mCaptchaAnswer;
+    }
+
+    public CaptchaType getCaptchaType() {
+        return this.mCaptcha != null ? this.mCaptcha.getCaptchaType() : null;
     }
 
     public void setComment(String comment) {

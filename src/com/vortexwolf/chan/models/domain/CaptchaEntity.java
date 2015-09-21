@@ -1,11 +1,12 @@
 package com.vortexwolf.chan.models.domain;
 
 public class CaptchaEntity {
-    public enum Type { YANDEX, RECAPTCHA_CF, RECAPTCHA_POST }
-
     private String url;
     private String key;
-    private Type type;
+    private CaptchaType captchaType;
+    private boolean isVerified;
+    private boolean isError;
+    private String errorMessage;
 
     public String getUrl() {
         return this.url;
@@ -23,11 +24,35 @@ public class CaptchaEntity {
         this.key = key;
     }
 
-    public Type getType() {
-        return type;
+    public CaptchaType getCaptchaType() {
+        return captchaType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setCaptchaType(CaptchaType captchaType) {
+        this.captchaType = captchaType;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean isVerified) {
+        this.isVerified = isVerified;
+    }
+
+    public boolean isError() {
+        return isError;
+    }
+
+    public void setIsError(boolean isError) {
+        this.isError = isError;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
