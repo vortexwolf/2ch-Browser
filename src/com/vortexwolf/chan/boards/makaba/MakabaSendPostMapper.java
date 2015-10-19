@@ -60,7 +60,12 @@ public class MakabaSendPostMapper {
                 MyLog.d(TAG, "can't check get recaptcha hash");
                 MyLog.e(TAG, e);
             }
+        } else if (model.getCaptchaType() == CaptchaType.DVACH) {
+            this.addStringValue(multipartEntity, "captcha_type", "2chaptcha");
+            this.addStringValue(multipartEntity, "2chaptcha_id", model.getCaptchaKey());
+            this.addStringValue(multipartEntity, "2chaptcha_value", model.getCaptchaAnswer());
         }
+
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());
         this.addStringValue(multipartEntity, NAME, model.getName());
         this.addStringValue(multipartEntity, EMAIL, model.isSage() ? Constants.SAGE_EMAIL : null);

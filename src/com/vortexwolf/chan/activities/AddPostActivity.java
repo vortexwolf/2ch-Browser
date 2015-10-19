@@ -790,8 +790,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         public void onPasscodeChecked(boolean isSuccess, String errorMessage) {
             AddPostActivity activity = AddPostActivity.this;
             if (isSuccess) {
+                activity.showCaptchaInfo(CaptchaInfoType.PASSCODE_SUCCESS);
                 AppearanceUtils.showToastMessage(activity, activity.getString(R.string.notification_passcode_correct));
-                AppearanceUtils.showToastMessage(activity, activity.getString(R.string.send_post_again));
             } else {
                 String error = !StringUtils.isEmpty(errorMessage) ? errorMessage : activity.getString(R.string.notification_passcode_incorrect);
                 AppearanceUtils.showToastMessage(activity, error);

@@ -24,6 +24,7 @@ import com.vortexwolf.chan.db.HiddenThreadsDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
+import com.vortexwolf.chan.services.DvachCaptchaService;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MailruCaptchaService;
@@ -110,6 +111,7 @@ public class MainApplication extends Application {
         container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, settings));
         container.register(IconsList.class, new IconsList());
         container.register(MailruCaptchaService.class, new MailruCaptchaService(httpStringReader));
+        container.register(DvachCaptchaService.class, new DvachCaptchaService());
 
         historyDataSource.open();
         favoritesDataSource.open();

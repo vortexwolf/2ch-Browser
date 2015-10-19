@@ -12,6 +12,7 @@ import com.vortexwolf.chan.interfaces.ICaptchaView;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.models.domain.CaptchaType;
+import com.vortexwolf.chan.services.DvachCaptchaService;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.MailruCaptchaService;
 import com.vortexwolf.chan.services.RecaptchaService;
@@ -28,6 +29,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
     private final CaptchaType mCaptchaType;
     private final MailruCaptchaService mMailruCaptchaService;
+    private final DvachCaptchaService mDvachCaptchaService;
 
     private boolean mCanSkip = false;
     private boolean mSuccessPasscode = false;
@@ -44,6 +46,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         this.mHttpBitmapReader = Factory.resolve(HttpBitmapReader.class);
         this.mHtmlCaptchaChecker = Factory.resolve(HtmlCaptchaChecker.class);
         this.mMailruCaptchaService = Factory.resolve(MailruCaptchaService.class);
+        this.mDvachCaptchaService = Factory.resolve(DvachCaptchaService.class);
         this.mCaptchaType = captchaType;
     }
 
@@ -84,6 +87,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             this.mCaptcha = RecaptchaService.loadPostingRecaptcha(captchaKey, referer);
         } else if (this.mCaptchaType == CaptchaType.MAILRU) {
             this.mCaptcha = this.mMailruCaptchaService.loadCaptcha(captchaKey, referer);
+        } else if (this.mCaptchaType == CaptchaType.DVACH) {
+            this.mCaptcha = this.mDvachCaptchaService.loadCaptcha(captchaKey, this.mWebsite);
         } else {
             return false;
         }

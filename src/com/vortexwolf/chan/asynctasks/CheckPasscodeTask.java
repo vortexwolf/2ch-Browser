@@ -58,8 +58,12 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
             post = new HttpPost(url);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("task", "auth"));
-            nameValuePairs.add(new BasicNameValuePair("usercode", this.mPasscode));
+            if (StringUtils.isEmpty(this.mPasscode)) {
+                nameValuePairs.add(new BasicNameValuePair("task", "logout"));
+            } else {
+                nameValuePairs.add(new BasicNameValuePair("task", "auth"));
+                nameValuePairs.add(new BasicNameValuePair("usercode", this.mPasscode));
+            }
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs);
             post.setEntity(entity);
 

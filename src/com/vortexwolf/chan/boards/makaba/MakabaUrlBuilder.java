@@ -92,6 +92,8 @@ public class MakabaUrlBuilder implements IUrlBuilder {
             captchaTypeParam = "recaptcha";
         } else if (captchaType == CaptchaType.MAILRU) {
             captchaTypeParam = "mailru";
+        } else if (captchaType == CaptchaType.DVACH) {
+            captchaTypeParam = "2chaptcha";
         }
 
         Uri uri = this.createRootUri("makaba/captcha.fcgi");

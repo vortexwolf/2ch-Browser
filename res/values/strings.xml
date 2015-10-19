@@ -229,13 +229,6 @@
     <string name="pref_video_mute">Mute video</string>
     <string name="pref_video_mute_summary">Set sound to 0 when video starts</string>
 
-    <string name="pref_captcha_type">Captcha type</string>
-    <string-array name="pref_captcha_type_choices">
-        <item>Mail.ru</item>
-        <item>Recaptcha v1</item>
-        <item>Recaptcha v2 (Android 3.0 and newer)</item>
-    </string-array>
-
     <!-- Errors -->
     <string name="error_send_post">An error has occurred while sending the post.</string>
     <string name="error_download_data">Unable to connect to the page.</string>

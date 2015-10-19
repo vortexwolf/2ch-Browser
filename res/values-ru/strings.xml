@@ -239,13 +239,6 @@
     <string name="pref_video_mute">Видео без звука</string>
     <string name="pref_video_mute_summary">Уменьшить звук до 0 при открытии видео</string>
 
-    <string name="pref_captcha_type">Вид капчи</string>
-    <string-array name="pref_captcha_type_choices">
-        <item>Mail.ru</item>
-        <item>Recaptcha v1</item>
-        <item>Recaptcha v2 (Android 3.0 или выше)</item>
-    </string-array>
-    
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>
     <string name="error_download_data">Невозможно открыть страницу.</string>
