@@ -319,6 +319,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             }
             mCheckCloudflareTask = new CheckCloudflareTask(this.mWebsite, this.mCaptcha, captchaAnswer, new ICheckCaptchaView(){
                 @Override
+                public void beforeCheck() {
+                }
+
+                @Override
                 public void showSuccess() {
                     AddPostActivity.this.hidePostLoading();
                     AddPostActivity.this.setCfRecaptcha(false);
@@ -484,6 +488,10 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             this.showCaptchaInfo(CaptchaInfoType.RECAPTCHA_V2);
         } else {
             this.switchToCaptchaView(CaptchaViewType.IMAGE);
+        }
+
+        if (captcha.getCaptchaType() == CaptchaType.DVACH) {
+            this.mCaptchaAnswerView.setInputType(InputType.TYPE_CLASS_NUMBER);
         }
     }
 

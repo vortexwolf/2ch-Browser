@@ -34,6 +34,8 @@ public abstract class BaseListActivity extends ListActivity {
     private View mErrorView = null;
     private View mCaptchaView = null;
     private ViewType mCurrentView = null;
+    private Button mCaptchaSendButton;
+    private CheckCloudflareTask mCurrentCheckTask = null;
 
     protected boolean mVisible = false;
 
@@ -108,7 +110,7 @@ public abstract class BaseListActivity extends ListActivity {
 
         ImageView captchaImage = (ImageView) this.mCaptchaView.findViewById(R.id.cloudflare_captcha_image);
         final EditText captchaAnswer = (EditText) this.mCaptchaView.findViewById(R.id.cloudflare_captcha_input);
-        final Button sendButton = (Button) this.mCaptchaView.findViewById(R.id.cloudflare_send_button);
+        this.mCaptchaSendButton = (Button) this.mCaptchaView.findViewById(R.id.cloudflare_send_button);
 
         captchaAnswer.setText("");
         captchaAnswer.setOnEditorActionListener(new OnEditorActionListener() {
@@ -118,19 +120,27 @@ public abstract class BaseListActivity extends ListActivity {
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(captchaAnswer.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
-                    CheckCloudflareTask task = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
-                    task.execute();
+                    if (mCurrentCheckTask != null) {
+                        mCurrentCheckTask.cancel(true);
+                    }
+
+                    mCurrentCheckTask = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
+                    mCurrentCheckTask.execute();
                     return true;
                 }
                 return false;
             }
         });
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        this.mCaptchaSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckCloudflareTask task = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
-                task.execute();
+                if (mCurrentCheckTask != null) {
+                    mCurrentCheckTask.cancel(true);
+                }
+
+                mCurrentCheckTask = new CheckCloudflareTask(website, captcha, captchaAnswer.getText().toString(), new CheckCaptchaView());
+                mCurrentCheckTask.execute();
             }
         });
 
@@ -189,7 +199,13 @@ public abstract class BaseListActivity extends ListActivity {
 
     private class CheckCaptchaView implements ICheckCaptchaView {
         @Override
+        public void beforeCheck() {
+            mCaptchaSendButton.setEnabled(false);
+        }
+
+        @Override
         public void showSuccess() {
+            mCaptchaSendButton.setEnabled(true);
             BaseListActivity.this.refresh();
         }
 
@@ -198,6 +214,7 @@ public abstract class BaseListActivity extends ListActivity {
             message = message != null ? message : "Incorrect captcha.";
             AppearanceUtils.showToastMessage(getApplicationContext(), message);
 
+            mCaptchaSendButton.setEnabled(true);
             BaseListActivity.this.refresh();
         }
     }

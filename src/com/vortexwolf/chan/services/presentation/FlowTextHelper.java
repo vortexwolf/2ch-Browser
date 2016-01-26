@@ -34,7 +34,7 @@ public class FlowTextHelper {
         }
 
         // Set the span according to the number of lines and width of the image
-        int lines = (int) FloatMath.ceil(floatModel.getHeight() / floatModel.getTextLineHeight());
+        int lines = (int) Math.ceil(floatModel.getHeight() / floatModel.getTextLineHeight());
         int offset = floatModel.getWidth() + floatModel.getRightMargin();
 
         ss.setSpan(MyLeadingMarginSpan2Factory.create(lines, offset), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

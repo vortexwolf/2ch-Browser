@@ -76,6 +76,11 @@ public class CheckCloudflareTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
+    protected void onPreExecute() {
+        this.mView.beforeCheck();
+    }
+
+    @Override
     protected void onPostExecute(Boolean result) {
         if (result) {
             this.mView.showSuccess();
