@@ -94,11 +94,15 @@ public class PostItemViewBuilder {
             vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
 
             vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
-            vb.thumbnailViews = new ThumbnailViewBag[4];
+            vb.thumbnailViews = new ThumbnailViewBag[Constants.MAX_ATTACHMENTS];
             vb.thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
             vb.thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
             vb.thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
             vb.thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
+            vb.thumbnailViews[4] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_5));
+            vb.thumbnailViews[5] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_6));
+            vb.thumbnailViews[6] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_7));
+            vb.thumbnailViews[7] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_8));
 
             view.setTag(vb);
         }
@@ -182,7 +186,7 @@ public class PostItemViewBuilder {
             vb.multiThumbnailsView.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.hide();
 
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < Constants.MAX_ATTACHMENTS; ++i) {
                 ThreadPostUtils.refreshAttachmentView(isBusy, item.getAttachment(i), vb.thumbnailViews[i]);
             }
         } else {

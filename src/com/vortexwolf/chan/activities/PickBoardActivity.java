@@ -118,7 +118,6 @@ public class PickBoardActivity extends ListActivity {
     private void parseAllBoards() {
         //TODO: загружать /makaba/mobile.fcgi?task=get_boards
         this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards));
-        this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards_hidden));
     }
 
     private void updateVisibleBoards(BoardsListAdapter adapter) {
@@ -168,8 +167,7 @@ public class PickBoardActivity extends ListActivity {
             if (parts.length == 1) {
                 currentGroup = parts[0];
             } else if (parts.length >= 2) {
-                boolean isVisible = parts.length >= 3 && parts[2].equals("1");
-                boards.add(new BoardModel(parts[0], parts[1], isVisible, currentGroup));
+                boards.add(new BoardModel(parts[0], parts[1], true, currentGroup));
             }
         }
 

@@ -12,6 +12,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.library.MyHtml;
@@ -43,7 +44,7 @@ public class PostItemViewModel implements IPostListEntity {
 
     private final SpannableStringBuilder mSpannedComment;
     private SpannableStringBuilder mCachedReferencesString = null;
-    private AttachmentInfo[] mAttachments = new AttachmentInfo[4]; //4 - максимальное число аттачей к посту на макабе
+    private AttachmentInfo[] mAttachments = new AttachmentInfo[Constants.MAX_ATTACHMENTS];
     private String mPostDate = null;
     private final BadgeModel mBadge;
 

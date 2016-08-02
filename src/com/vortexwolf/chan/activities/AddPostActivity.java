@@ -349,7 +349,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         boolean isSage = this.mSageCheckBox.isChecked();
 
-        if (StringUtils.isEmpty(this.mThreadNumber) && !this.hasAttachments()) {
+        if (StringUtils.isEmpty(this.mThreadNumber) && !this.hasAttachments() && this.mBoardName != "d") {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }

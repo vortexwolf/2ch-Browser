@@ -50,6 +50,8 @@ public class Constants {
     public static final int BUMP_LIMIT = 500;
     public static final int BUMP_LIMIT_EXTENDED = 1000;
 
+    public static final int MAX_ATTACHMENTS = 8;
+
     public static final int OP_POST_POSITION = 0;
 
     // Request-коды для запуска метода startActivityForResult
