@@ -1,6 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import com.vortexwolf.chan.common.library.MyLog;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -10,6 +9,8 @@ import android.os.Bundle;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.vortexwolf.chan.common.library.MyLog;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class NewRecaptchaActivity extends Activity {

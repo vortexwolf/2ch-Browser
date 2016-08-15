@@ -17,13 +17,11 @@ public class CacheDirectoryManager {
     private final File mInternalCacheDir;
     private final File mExternalCacheDir;
     private final ApplicationSettings mSettings;
-    private final MyTracker mTracker;
 
-    public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings, MyTracker tracker) {
+    public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings) {
         this.mPackageName = packageName;
         this.mInternalCacheDir = internalCacheDir;
         this.mSettings = settings;
-        this.mTracker = tracker;
         this.mExternalCacheDir = this.getExternalCachePath();
     }
 

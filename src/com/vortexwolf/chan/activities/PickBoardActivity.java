@@ -1,10 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,12 +33,16 @@ import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.presentation.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.vortexwolf.chan.settings.SettingsEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class PickBoardActivity extends ListActivity {
 
@@ -51,7 +50,6 @@ public class PickBoardActivity extends ListActivity {
 
     private static final Pattern boardCodePattern = Pattern.compile("^\\w+$");
 
-    private MyTracker mTracker = Factory.resolve(MyTracker.class);
     private FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
@@ -92,8 +90,6 @@ public class PickBoardActivity extends ListActivity {
         this.setListAdapter(this.mAdapter);
 
         this.setTitle(this.getString(R.string.pick_board_title));
-
-        this.mTracker.trackActivityView(TAG);
     }
 
     @Override

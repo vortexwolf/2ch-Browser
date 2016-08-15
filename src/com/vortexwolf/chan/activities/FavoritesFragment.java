@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.util.List;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -24,6 +22,8 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
 import com.vortexwolf.chan.services.NavigationService;
+
+import java.util.List;
 
 public class FavoritesFragment extends BaseListFragment {
     private FavoritesDataSource mDatasource;

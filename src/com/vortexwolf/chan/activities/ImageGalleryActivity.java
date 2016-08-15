@@ -1,8 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
@@ -27,23 +24,23 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.ExtendedViewPager;
 import com.vortexwolf.chan.common.library.ExtendedPagerAdapter;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
-import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
 import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class ImageGalleryActivity extends Activity {
     public static final String TAG = "ImageGalleryActivity";
@@ -117,14 +114,6 @@ public class ImageGalleryActivity extends Activity {
                 viewPager.moveNext();
             }
         });
-
-        IWebsite website = Websites.fromUri(Uri.parse(imageUrl));
-        if (website != null) {
-            Factory.resolve(MyTracker.class).setBoardVar(website.getUrlParser().getBoardName(Uri.parse(imageUrl)));
-        } else {
-            Factory.resolve(MyTracker.class).setBoardVar("");
-        }
-        Factory.resolve(MyTracker.class).trackActivityView(TAG);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.vortexwolf.chan.activities;
 
-import java.util.List;
-
 import android.content.Context;
-import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -34,6 +31,8 @@ import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.HistoryDataSource;
 import com.vortexwolf.chan.db.HistoryEntity;
 import com.vortexwolf.chan.services.NavigationService;
+
+import java.util.List;
 
 public class HistoryFragment extends BaseListFragment {
     private HistoryDataSource mDatasource;

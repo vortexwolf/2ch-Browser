@@ -1,9 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -16,10 +12,10 @@ import android.preference.PreferenceManager;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.ExtendedHttpClient;
 import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.services.MyTracker;
+
+import org.apache.http.impl.client.DefaultHttpClient;
 
 public class ApplicationPreferencesActivity extends PreferenceActivity {
     private static final String TAG = "ApplicationPreferencesActivity";
@@ -53,8 +49,6 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         if (Constants.SDK_VERSION < 11) {
             this.disablePreference(R.string.pref_disable_zoom_controls_key);
         }
-
-        Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
 
     @Override

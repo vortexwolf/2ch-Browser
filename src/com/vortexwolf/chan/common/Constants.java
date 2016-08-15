@@ -17,8 +17,6 @@ public class Constants {
     // Нужно не забыть отключить логгирование при выпуске приложения
     public static final boolean LOGGING = DEBUG;
 
-    public static final String ANALYTICS_KEY = "UA-28782631-2";
-
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));
     public static final String GIF_IMAGE = "gif";

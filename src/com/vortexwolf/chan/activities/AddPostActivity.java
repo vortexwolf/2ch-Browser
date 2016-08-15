@@ -1,9 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -62,16 +58,18 @@ import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
 import com.vortexwolf.chan.services.IconsList;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.presentation.DraftPostsStorage;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
     public static final String TAG = "AddPostActivity";
 
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final DraftPostsStorage mDraftPostsStorage = Factory.resolve(DraftPostsStorage.class);
-    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private IUrlParser mUrlParser;
     private IUrlBuilder mUrlBuilder;
 
@@ -178,9 +176,6 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         } else {
             this.setTitle(String.format(this.getString(R.string.data_add_post_title), this.mBoardName, this.mThreadNumber));
         }
-
-        this.mTracker.setBoardVar(this.mBoardName);
-        this.mTracker.trackActivityView(TAG);
     }
 
     @Override
@@ -349,7 +344,9 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         boolean isSage = this.mSageCheckBox.isChecked();
 
-        if (StringUtils.isEmpty(this.mThreadNumber) && !this.hasAttachments() && this.mBoardName != "d") {
+        if (StringUtils.isEmpty(this.mThreadNumber)
+            && !this.hasAttachments()
+            && !this.mBoardName.equals("d")) {
             AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_attach_file_new_thread));
             return;
         }

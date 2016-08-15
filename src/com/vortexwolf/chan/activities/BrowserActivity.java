@@ -1,12 +1,8 @@
 package com.vortexwolf.chan.activities;
 
-import java.io.File;
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,17 +18,16 @@ import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.DownloadFileTask;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.controls.WebViewFixed;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.interfaces.IDownloadFileView;
-import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.GalleryItemViewBag;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.io.File;
 
 public class BrowserActivity extends Activity {
     public static final String TAG = "BrowserActivity";
@@ -41,7 +36,6 @@ public class BrowserActivity extends Activity {
         PAGE, LOADING, ERROR
     }
 
-    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final CacheDirectoryManager mCacheDirectoryManager = Factory.resolve(CacheDirectoryManager.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
 
@@ -84,14 +78,6 @@ public class BrowserActivity extends Activity {
         this.setTitle(this.mTitle);
 
         this.loadImage();
-
-        IWebsite website = Websites.fromUri(this.mUri);
-        if (website != null) {
-            this.mTracker.setBoardVar(website.getUrlParser().getBoardName(this.mUri));
-        } else {
-            this.mTracker.setBoardVar("");
-        }
-        this.mTracker.trackActivityView(TAG);
     }
 
     @Override

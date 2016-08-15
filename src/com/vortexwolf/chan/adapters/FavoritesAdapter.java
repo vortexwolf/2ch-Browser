@@ -34,13 +34,7 @@ public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
 
         titleView.setText(item.getTitleOrDefault());
         urlView.setText(item.buildUrl());
-
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FavoritesAdapter.this.removeItem(item);
-            }
-        });
+        deleteButton.setVisibility(View.GONE);
 
         return view;
     }

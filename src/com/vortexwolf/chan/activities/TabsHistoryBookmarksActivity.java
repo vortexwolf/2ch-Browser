@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 public class TabsHistoryBookmarksActivity extends FragmentActivity {
@@ -34,10 +33,7 @@ public class TabsHistoryBookmarksActivity extends FragmentActivity {
         
         if (mApplicationSettings.getRecentHistoryTab() != -1) {
             this.mViewPager.setCurrentItem(mApplicationSettings.getRecentHistoryTab());
-        }        
-
-        MyTracker tracker = Factory.getContainer().resolve(MyTracker.class);
-        tracker.trackActivityView(TAG);
+        }
     }
     
     @Override

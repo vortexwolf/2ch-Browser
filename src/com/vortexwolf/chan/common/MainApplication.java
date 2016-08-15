@@ -1,9 +1,5 @@
 package com.vortexwolf.chan.common;
 
-import java.io.File;
-
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Application;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
@@ -28,7 +24,6 @@ import com.vortexwolf.chan.services.DvachCaptchaService;
 import com.vortexwolf.chan.services.HtmlCaptchaChecker;
 import com.vortexwolf.chan.services.IconsList;
 import com.vortexwolf.chan.services.MailruCaptchaService;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.PostSender;
 import com.vortexwolf.chan.services.SerializationService;
@@ -43,6 +38,10 @@ import com.vortexwolf.chan.services.presentation.DraftPostsStorage;
 import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 import com.vortexwolf.chan.services.presentation.PagesSerializationService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.File;
 
 public class MainApplication extends Application {
 
@@ -60,7 +59,6 @@ public class MainApplication extends Application {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
 
-        MyTracker tracker = new MyTracker(this);
         ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
@@ -72,7 +70,7 @@ public class MainApplication extends Application {
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dbHelper);
-        CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings, tracker);
+        CacheDirectoryManager cacheManager = new CacheDirectoryManager(super.getCacheDir(), this.getPackageName(), settings);
         BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
         HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), this.getResources(), httpBitmapReader);
         NavigationService navigationService = new NavigationService();
@@ -97,7 +95,6 @@ public class MainApplication extends Application {
         container.register(DraftPostsStorage.class, new DraftPostsStorage());
         container.register(NavigationService.class, navigationService);
         container.register(OpenTabsManager.class, new OpenTabsManager(historyDataSource, navigationService));
-        container.register(MyTracker.class, tracker);
         container.register(CacheDirectoryManager.class, cacheManager);
         container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);

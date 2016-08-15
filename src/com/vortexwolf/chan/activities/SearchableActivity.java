@@ -35,7 +35,6 @@ import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.services.CloudflareCheckService;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
 
@@ -64,9 +63,6 @@ public class SearchableActivity extends BaseListActivity {
 
         this.handleIntent(this.getIntent());
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
-
-        Factory.getContainer().resolve(MyTracker.class).setBoardVar(this.mBoardName);
-        Factory.getContainer().resolve(MyTracker.class).trackActivityView(TAG);
     }
 
     @Override

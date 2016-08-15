@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +31,8 @@ import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.OpenTabsManager;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.util.List;
 
 public class TabsHistoryBookmarksCompActivity extends Activity {
     private FrameLayout layout;

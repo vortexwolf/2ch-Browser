@@ -43,7 +43,6 @@ import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.ThreadItemViewModel;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.CloudflareCheckService;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.presentation.ClickListenersFactory;
 import com.vortexwolf.chan.services.presentation.ListViewScrollListener;
@@ -58,7 +57,6 @@ public class ThreadsListActivity extends BaseListActivity {
     private static final String TAG = "ThreadsListActivity";
 
     private IJsonApiReader mJsonReader;
-    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
@@ -123,10 +121,6 @@ public class ThreadsListActivity extends BaseListActivity {
         this.resetUI();
 
         this.setAdapter(savedInstanceState);
-
-        this.mTracker.setBoardVar(this.mBoardName);
-        this.mTracker.setPageNumberVar(this.mPageNumber);
-        this.mTracker.trackActivityView(TAG);
     }
 
     @Override

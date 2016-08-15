@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +43,6 @@ import com.vortexwolf.chan.models.presentation.OpenTabModel;
 import com.vortexwolf.chan.models.presentation.PostItemViewModel;
 import com.vortexwolf.chan.models.presentation.StatusIndicatorEntity;
 import com.vortexwolf.chan.services.BrowserLauncher;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.services.TimerService;
@@ -57,11 +54,12 @@ import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.vortexwolf.chan.settings.SettingsEntity;
 
+import java.util.List;
+
 public class PostsListActivity extends BaseListActivity {
     private static final String TAG = "PostsListActivity";
 
     private IJsonApiReader mJsonReader;
-    private final MyTracker mTracker = Factory.resolve(MyTracker.class);
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
@@ -129,9 +127,6 @@ public class PostsListActivity extends BaseListActivity {
 
         this.mAutoRefreshTimer = new TimerService(this.mSettings.isAutoRefresh(), this.mSettings.getAutoRefreshInterval(), refreshTask, this);
         this.mAutoRefreshTimer.start();
-
-        this.mTracker.setBoardVar(this.mBoardName);
-        this.mTracker.trackActivityView(TAG);
     }
 
     @Override

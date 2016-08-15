@@ -1,12 +1,5 @@
 package com.vortexwolf.chan.activities;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,12 +18,17 @@ import android.widget.TextView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.MainApplication;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.models.presentation.ImageFileModel;
 import com.vortexwolf.chan.models.presentation.SerializableFileModel;
-import com.vortexwolf.chan.services.MyTracker;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class FilesListActivity extends ListActivity {
     public static final String TAG = "FilePickerActivity";
@@ -93,8 +91,6 @@ public class FilesListActivity extends ListActivity {
             ArrayList<String> collection = this.getIntent().getStringArrayListExtra(EXTRA_ACCEPTED_FILE_EXTENSIONS);
             this.acceptedFileExtensions = collection.toArray(new String[collection.size()]);
         }
-        
-        Factory.resolve(MyTracker.class).trackActivityView(TAG);
     }
 
     @Override
