@@ -103,6 +103,12 @@ public class MakabaUrlBuilder implements IUrlBuilder {
         return uri.toString();
     }
 
+    @Override
+    public String getPasscodeCookieCheckUrlNew() {
+        Uri uri = this.createRootUri("/api/captcha/2chaptcha/service_id");
+        return uri.toString();
+    }
+
     public String makeAbsolute(String url) {
         Uri uri = Uri.parse(url);
         uri = uri.isRelative() ? this.createRootUri(url) : uri;
