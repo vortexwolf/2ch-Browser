@@ -36,4 +36,6 @@ public interface IUrlBuilder {
 
     public abstract String getPasscodeCookieCheckUrl(String passcodeCookie, CaptchaType captchaType);
 
+    public abstract String getPasscodeCookieCheckUrlNew();
+
 }

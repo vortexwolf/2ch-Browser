@@ -10,7 +10,7 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
 public class DvachCaptchaService {
-    public static final String IMAGE_URI = "makaba/captcha.fcgi?type=2chaptcha&action=image&id=";
+    public static final String IMAGE_URI = "/api/captcha/2chaptcha/image/";
 
     public CaptchaEntity loadCaptcha(String key, IWebsite website) {
         IUrlBuilder urlBuilder = website.getUrlBuilder();
