@@ -86,10 +86,22 @@ public class HtmlCaptchaChecker {
         CaptchaResult result = new CaptchaResult();
         try {
             CaptchaResultNew fromJson = mapper.readValue(captchaBlock,CaptchaResultNew.class);
-               result.captchaKey = fromJson.getId();
-               result.canSkip = false;
-               result.failPassCode = false;
-               result.successPassCode = false;
+               switch (fromJson.getResult()){
+                  case "3":{
+                      result.canSkip = true;
+                 }
+                   case "2":{
+                       result.canSkip = true;
+                       result.successPassCode = true;
+                   }
+                   case "1":{
+                       result.canSkip = false;
+                       result.captchaKey = fromJson.getId();
+                   }
+
+               }
+
+
         }     catch (Exception e) {
             System.out.println(e.getStackTrace());
             result = this.createEmptyResult();    }
