@@ -73,12 +73,13 @@ public class FourchanUrlBuilder implements IUrlBuilder {
         return null;
     }
 
-    public String getPasscodeCookieCheckUrl(String passcodeCookie, CaptchaType captchaType) {
+    public String getPasscodeCookieCheckUrl() {
         return null;
     }
 
     @Override
-    public String getPasscodeCookieCheckUrlNew() {
+    public String getAppCaptchaCheckUrl(String public_key) {
         return null;
     }
+
 }

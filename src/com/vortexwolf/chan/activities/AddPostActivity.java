@@ -97,6 +97,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private EditText mSubjectView;
     private Spinner mPoliticsView;
     private boolean isPoliticsBoard = false;
+    private boolean isAppCaptchedNewPost = false;
+
 
     private SendPostModel mCachedSendPostModel;
 
@@ -511,6 +513,13 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCaptchaInfoView.setText(message);
 
         this.switchToCaptchaView(CaptchaViewType.INFO);
+    }
+
+    @Override
+    public void appCaptcha(CaptchaEntity captcha) {
+        this.mCaptcha = captcha;
+        this.isAppCaptchedNewPost = true;
+        this.showCaptchaInfo(CaptchaInfoType.PASSCODE_SUCCESS);
     }
 
     @Override

@@ -9,12 +9,14 @@ import android.net.Uri;
 
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.wildflyforcer.utils.CaptchaResultNew;
+import com.wildflyforcer.utils.Constants;
 
 public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;
@@ -27,58 +29,35 @@ public class HtmlCaptchaChecker {
 
     public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String referer) {
         IUrlBuilder urlBuilder = website.getUrlBuilder();
-        String checkUrl = urlBuilder.getPasscodeCookieCheckUrl("", captchaType);
-
-        CaptchaResult result;
+        if (captchaType == CaptchaType.APP) {
+            String appcaptchaUrl = urlBuilder.getAppCaptchaCheckUrl(Constants.PUBLIC_API_KEY);
+            CaptchaResult resultapp;
         try {
-            Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
-            String captchaBlock = this.mHttpStringReader.fromUri(checkUrl, extraHeaders);
-            result = this.checkHtmlBlock(captchaBlock);
-        } catch (Exception e) {
-            result = this.createEmptyResult();
+            String appcaptchaBlock = this.mHttpStringReader.fromUri(appcaptchaUrl);
+            resultapp = this.checkHtmlBlock(appcaptchaBlock);
+            resultapp.appCaptcha = true;
+
+        } catch (HttpRequestException e) {
+            resultapp = this.createEmptyResult();
         }
-
-        return result;
-    }
-    public CaptchaResult canSkipCaptchaNew(IWebsite website, CaptchaType captchaType, String referer) {
-        IUrlBuilder urlBuilder = website.getUrlBuilder();
-
-        String checkUrl = urlBuilder.getPasscodeCookieCheckUrlNew();
+            return resultapp;
+        } else {
+            String checkUrl = urlBuilder.getPasscodeCookieCheckUrl();
 
         CaptchaResult result;
         try {
             Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
             String captchaBlock = this.mHttpStringReader.fromUri(checkUrl);
-            result = this.checkHtmlBlockNew(captchaBlock);
+            result = this.checkHtmlBlock(captchaBlock);
         } catch (Exception e) {
             result = this.createEmptyResult();
         }
 
-        return result;
+            return result;
+        }
     }
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
-        if (captchaBlock == null) {
-            return this.createEmptyResult();
-        }
-
-        CaptchaResult result = new CaptchaResult();
-        if (captchaBlock.startsWith("OK")) {
-            result.canSkip = true;
-        } else if (captchaBlock.startsWith("VIP") && !captchaBlock.startsWith("VIPFAIL")) {
-            result.canSkip = true;
-            result.successPassCode = true;
-        } else if (captchaBlock.startsWith("CHECK")) {
-            result.canSkip = false;
-            result.captchaKey = captchaBlock.substring(captchaBlock.indexOf('\n') + 1);
-        } else if (captchaBlock.startsWith("VIPFAIL")) {
-            result.canSkip = true;
-            result.failPassCode = true;
-        }
-
-        return result;
-    }
-    public CaptchaResult checkHtmlBlockNew(String captchaBlock) {
         if (captchaBlock == null) {
             return this.createEmptyResult();
         }
@@ -97,6 +76,11 @@ public class HtmlCaptchaChecker {
                    case "1":{
                        result.canSkip = false;
                        result.captchaKey = fromJson.getId();
+                       if (fromJson.getType() == "app") {
+                           result.appCaptcha = true;
+                       } else {
+                           result.appCaptcha = false;
+                       }
                    }
 
                }
@@ -120,6 +104,7 @@ public class HtmlCaptchaChecker {
         public boolean successPassCode;
         public boolean failPassCode;
         public String captchaKey;
+        public boolean appCaptcha;
     }
 
 

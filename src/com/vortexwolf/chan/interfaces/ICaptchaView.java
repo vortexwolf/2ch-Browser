@@ -13,4 +13,6 @@ public interface ICaptchaView {
     void showCaptcha(CaptchaEntity captcha, Bitmap captchaImage);
 
     void showCaptchaError(String errorMessage);
+
+    void appCaptcha(CaptchaEntity captcha);
 }

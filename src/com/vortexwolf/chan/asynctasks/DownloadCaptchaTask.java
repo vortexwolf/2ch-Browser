@@ -27,7 +27,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     private final String mThreadNumber;
     private final HttpBitmapReader mHttpBitmapReader;
     private final HtmlCaptchaChecker mHtmlCaptchaChecker;
-    private final CaptchaType mCaptchaType;
+    //private final CaptchaType mCaptchaType;
+    private CaptchaType mCaptchaType;
     private final MailruCaptchaService mMailruCaptchaService;
     private final DvachCaptchaService mDvachCaptchaService;
 
@@ -57,7 +58,9 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     public void onPostExecute(Boolean success) {
-        if (this.mCanSkip) {
+        if (this.mCaptchaType == CaptchaType.APP) {
+            this.mView.appCaptcha(this.mCaptcha);
+        } else if (this.mCanSkip) {
             this.mView.skipCaptcha(this.mSuccessPasscode, this.mFailPasscode);
         } else if (success && this.mCaptcha != null) {
             this.mView.showCaptcha(this.mCaptcha, this.mCaptchaImage);
@@ -69,7 +72,21 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
     @Override
     protected Boolean doInBackground(String... params) {
         String referer = UriUtils.getBoardOrThreadUrl(this.mWebsite.getUrlBuilder(), this.mBoardName, 0, this.mThreadNumber);
-        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptchaNew(this.mWebsite, this.mCaptchaType, referer);
+
+        //если это не новый тред проверим апкаптчу и если она работает вернем качпу с кодом
+        if (this.mThreadNumber != "") {
+            HtmlCaptchaChecker.CaptchaResult acresult = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, CaptchaType.APP, referer);
+            if (!StringUtils.isEmpty(acresult.captchaKey)) {
+                this.mCaptchaType = CaptchaType.APP;
+                this.mCaptcha = new CaptchaEntity();
+                mCaptcha.setKey(acresult.captchaKey);
+                mCaptcha.setCaptchaType(CaptchaType.APP);
+
+                return true;
+            }
+        }
+        //иначе используем обычную капчу
+        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mCaptchaType, referer);
         this.mCanSkip = result.canSkip;
         this.mSuccessPasscode = result.successPassCode;
         this.mFailPasscode = result.failPassCode;

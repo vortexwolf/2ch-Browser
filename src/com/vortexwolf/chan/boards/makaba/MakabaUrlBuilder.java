@@ -84,31 +84,17 @@ public class MakabaUrlBuilder implements IUrlBuilder {
         return this.createRootUri("makaba/makaba.fcgi").toString();
     }
 
-    public String getPasscodeCookieCheckUrl(String passcodeCookie, CaptchaType captchaType) {
-        String captchaTypeParam = null;
-        if (captchaType == CaptchaType.RECAPTCHA_V1) {
-            captchaTypeParam = "recaptchav1";
-        } else if (captchaType == CaptchaType.RECAPTCHA_V2) {
-            captchaTypeParam = "recaptcha";
-        } else if (captchaType == CaptchaType.MAILRU) {
-            captchaTypeParam = "mailru";
-        } else if (captchaType == CaptchaType.DVACH) {
-            captchaTypeParam = "2chaptcha";
-        }
-
-        Uri uri = this.createRootUri("makaba/captcha.fcgi");
-        uri = uri.buildUpon()
-                .appendQueryParameter("type", StringUtils.emptyIfNull(captchaTypeParam))
-                .build();
-        return uri.toString();
-    }
-
     @Override
-    public String getPasscodeCookieCheckUrlNew() {
+    public String getPasscodeCookieCheckUrl() {
         Uri uri = this.createRootUri("/api/captcha/2chaptcha/service_id");
         return uri.toString();
     }
 
+    @Override
+    public String getAppCaptchaCheckUrl(String public_key) {
+        Uri uri = this.createRootUri("/api/captcha/app/id/" + public_key);
+        return uri.toString();
+    }
     public String makeAbsolute(String url) {
         Uri uri = Uri.parse(url);
         uri = uri.isRelative() ? this.createRootUri(url) : uri;

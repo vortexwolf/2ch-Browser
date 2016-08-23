@@ -24,3 +24,4 @@ lint.xml
 .gradle
 *.iml
 *.eml
+/src/com/wildflyforcer/utils/Constants.java

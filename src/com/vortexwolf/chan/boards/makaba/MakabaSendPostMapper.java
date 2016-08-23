@@ -16,6 +16,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.models.domain.SendPostModel;
 import com.vortexwolf.chan.services.RecaptchaService;
+import com.wildflyforcer.utils.Digest;
 
 public class MakabaSendPostMapper {
     private static final String TAG = "MakabaSendPostMapper";
@@ -64,6 +65,10 @@ public class MakabaSendPostMapper {
             this.addStringValue(multipartEntity, "captcha_type", "2chaptcha");
             this.addStringValue(multipartEntity, "2chaptcha_id", model.getCaptchaKey());
             this.addStringValue(multipartEntity, "2chaptcha_value", model.getCaptchaAnswer());
+        } else if (model.getCaptchaType() == CaptchaType.APP) {
+            this.addStringValue(multipartEntity, "captcha_type", "app");
+            this.addStringValue(multipartEntity, "app_response_id", model.getCaptchaKey());
+            this.addStringValue(multipartEntity, "app_response", Digest.sha256(model.getCaptchaKey() + "|" + com.wildflyforcer.utils.Constants.PRIVATE_API_KEY));
         }
 
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());
