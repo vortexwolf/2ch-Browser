@@ -74,7 +74,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         String referer = UriUtils.getBoardOrThreadUrl(this.mWebsite.getUrlBuilder(), this.mBoardName, 0, this.mThreadNumber);
 
         //если это не новый тред проверим апкаптчу и если она работает вернем качпу с кодом
-        if (this.mThreadNumber != "") {
+        if (!"".equals(this.mThreadNumber)) {
             HtmlCaptchaChecker.CaptchaResult acresult = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, CaptchaType.APP, referer);
             if (!StringUtils.isEmpty(acresult.captchaKey)) {
                 this.mCaptchaType = CaptchaType.APP;
