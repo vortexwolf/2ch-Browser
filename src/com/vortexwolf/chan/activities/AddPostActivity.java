@@ -502,7 +502,8 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
             message = this.getString(R.string.addpost_captcha_can_skip_passcode);
         } else if (this.mCaptchaInfoType == CaptchaInfoType.PASSCODE_FAIL) {
             message = this.getString(R.string.addpost_captcha_fail_passcode);
-        } else if (this.mCaptchaInfoType == CaptchaInfoType.SKIP) {
+        } else if (this.mCaptchaInfoType == CaptchaInfoType.SKIP ||
+            this.mCaptchaInfoType == CaptchaInfoType.API) {
             message = this.getString(R.string.addpost_captcha_can_skip);
         } else if (this.mCaptchaInfoType == CaptchaInfoType.RECAPTCHA_V2) {
             message = this.getString(R.string.addpost_captcha_solve_recaptcha);
@@ -519,7 +520,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     public void appCaptcha(CaptchaEntity captcha) {
         this.mCaptcha = captcha;
         this.isAppCaptchedNewPost = true;
-        this.showCaptchaInfo(CaptchaInfoType.PASSCODE_SUCCESS);
+        this.showCaptchaInfo(CaptchaInfoType.API);
     }
 
     @Override

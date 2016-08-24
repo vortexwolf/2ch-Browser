@@ -34,9 +34,9 @@ public interface IUrlBuilder {
 
     public abstract String getPasscodeCheckUrl();
 
-    public abstract String getPasscodeCookieCheckUrl();
+    public abstract String getPasscodeCookieCheckUrl(String boardName, String threadNumber);
 
-    public abstract String getAppCaptchaCheckUrl(String public_key);
+    public abstract String getAppCaptchaCheckUrl(String publicKey);
 
 
 

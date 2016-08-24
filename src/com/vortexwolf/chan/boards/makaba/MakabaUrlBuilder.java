@@ -85,16 +85,18 @@ public class MakabaUrlBuilder implements IUrlBuilder {
     }
 
     @Override
-    public String getPasscodeCookieCheckUrl() {
-        Uri uri = this.createRootUri("/api/captcha/2chaptcha/service_id");
+    public String getPasscodeCookieCheckUrl(String boardName, String threadNumber) {
+        Uri uri = this.createRootUri(
+            "/api/captcha/2chaptcha/id?board=" + boardName + "&thread=" + threadNumber);
         return uri.toString();
     }
 
     @Override
-    public String getAppCaptchaCheckUrl(String public_key) {
-        Uri uri = this.createRootUri("/api/captcha/app/id/" + public_key);
+    public String getAppCaptchaCheckUrl(String publicKey) {
+        Uri uri = this.createRootUri("/api/captcha/app/id/" + publicKey);
         return uri.toString();
     }
+
     public String makeAbsolute(String url) {
         Uri uri = Uri.parse(url);
         uri = uri.isRelative() ? this.createRootUri(url) : uri;

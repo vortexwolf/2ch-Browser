@@ -7,6 +7,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import android.net.Uri;
 
+import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
@@ -16,7 +17,6 @@ import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.wildflyforcer.utils.CaptchaResultNew;
-import com.wildflyforcer.utils.Constants;
 
 public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;
@@ -27,34 +27,27 @@ public class HtmlCaptchaChecker {
         this.mApplicationSettings = settings;
     }
 
-    public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String referer) {
+    public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String boardName, String threadNumber) {
         IUrlBuilder urlBuilder = website.getUrlBuilder();
-        if (captchaType == CaptchaType.APP) {
-            String appcaptchaUrl = urlBuilder.getAppCaptchaCheckUrl(Constants.PUBLIC_API_KEY);
-            CaptchaResult resultapp;
-        try {
-            String appcaptchaBlock = this.mHttpStringReader.fromUri(appcaptchaUrl);
-            resultapp = this.checkHtmlBlock(appcaptchaBlock);
-            resultapp.appCaptcha = true;
+        String checkUrl;
 
-        } catch (HttpRequestException e) {
-            resultapp = this.createEmptyResult();
-        }
-            return resultapp;
+        if (captchaType == CaptchaType.APP) {
+            checkUrl = urlBuilder.getAppCaptchaCheckUrl(BuildConfig.CAPTCHA_API_PUBLIC_KEY);
         } else {
-            String checkUrl = urlBuilder.getPasscodeCookieCheckUrl();
+            checkUrl = urlBuilder.getPasscodeCookieCheckUrl(boardName, threadNumber);
+        }
 
         CaptchaResult result;
         try {
+            String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, boardName, 0, threadNumber);
             Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
-            String captchaBlock = this.mHttpStringReader.fromUri(checkUrl);
+            String captchaBlock = this.mHttpStringReader.fromUri(checkUrl, extraHeaders);
             result = this.checkHtmlBlock(captchaBlock);
         } catch (Exception e) {
             result = this.createEmptyResult();
         }
 
-            return result;
-        }
+        return result;
     }
 
     public CaptchaResult checkHtmlBlock(String captchaBlock) {
@@ -64,49 +57,37 @@ public class HtmlCaptchaChecker {
         ObjectMapper mapper = new ObjectMapper();
         CaptchaResult result = new CaptchaResult();
         try {
-            CaptchaResultNew fromJson = mapper.readValue(captchaBlock,CaptchaResultNew.class);
-               switch (fromJson.getResult()){
-                  case "3":{
-                      result.canSkip = true;
-                 }
-                   case "2":{
-                       result.canSkip = true;
-                       result.successPassCode = true;
-                   }
-                   case "1":{
-                       result.canSkip = false;
-                       result.captchaKey = fromJson.getId();
-                       if (fromJson.getType() == "app") {
-                           result.appCaptcha = true;
-                       } else {
-                           result.appCaptcha = false;
-                       }
-                   }
-
-               }
-
-
-        }     catch (Exception e) {
+            CaptchaResultNew fromJson = mapper.readValue(captchaBlock, CaptchaResultNew.class);
+            result.captchaType = fromJson.getType();
+            switch (fromJson.getResult()) {
+                case "3":
+                    result.canSkip = true;
+                    break;
+                case "2":
+                    result.canSkip = true;
+                    result.successPassCode = true;
+                    break;
+                case "1":
+                    result.canSkip = false;
+                    result.captchaKey = fromJson.getId();
+                    break;
+            }
+        } catch (Exception e) {
             System.out.println(e.getStackTrace());
-            result = this.createEmptyResult();    }
+            result = this.createEmptyResult();
+        }
         return result;
     }
 
-    public String stripJson(String str) {
-        return str.substring(0,str.length()-1);
-    }
     private CaptchaResult createEmptyResult() {
         return new CaptchaResult();
     }
 
-    public class CaptchaResult {
+    public static class CaptchaResult {
         public boolean canSkip;
         public boolean successPassCode;
         public boolean failPassCode;
         public String captchaKey;
-        public boolean appCaptcha;
+        public String captchaType;
     }
-
-
-
 }

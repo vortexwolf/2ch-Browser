@@ -10,6 +10,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 
+import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.StringUtils;
@@ -68,7 +69,8 @@ public class MakabaSendPostMapper {
         } else if (model.getCaptchaType() == CaptchaType.APP) {
             this.addStringValue(multipartEntity, "captcha_type", "app");
             this.addStringValue(multipartEntity, "app_response_id", model.getCaptchaKey());
-            this.addStringValue(multipartEntity, "app_response", Digest.sha256(model.getCaptchaKey() + "|" + com.wildflyforcer.utils.Constants.PRIVATE_API_KEY));
+            this.addStringValue(multipartEntity, "app_response",
+                Digest.sha256(model.getCaptchaKey() + "|" + BuildConfig.CAPTCHA_API_PRIVATE_KEY));
         }
 
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());

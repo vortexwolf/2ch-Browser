@@ -4,5 +4,6 @@ public enum CaptchaInfoType {
     PASSCODE_SUCCESS,
     PASSCODE_FAIL,
     SKIP,
-    RECAPTCHA_V2
+    RECAPTCHA_V2,
+    API
 }

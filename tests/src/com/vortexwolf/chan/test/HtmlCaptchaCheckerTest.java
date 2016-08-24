@@ -24,7 +24,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
         String responseText = "OK";
 
         HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), Factory.resolve(ApplicationSettings.class));
-        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "");
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "", "");
 
         assertTrue(result.canSkip);
     }
@@ -33,7 +33,7 @@ public class HtmlCaptchaCheckerTest extends InstrumentationTestCase {
         String responseText = "CHECK\nSomeKey";
 
         HtmlCaptchaChecker checker = new HtmlCaptchaChecker(new FakeHttpStringReader(responseText), Factory.resolve(ApplicationSettings.class));
-        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "");
+        HtmlCaptchaChecker.CaptchaResult result = checker.canSkipCaptcha(mWebsite, CaptchaType.MAILRU, "", "");
 
         assertFalse(result.canSkip);
         assertEquals("SomeKey", result.captchaKey);

@@ -7,6 +7,10 @@ public class CaptchaResultNew {
     public String id;
     @JsonProperty("result")
     public String result;
+    @JsonProperty("description")
+    public String description;
+    @JsonProperty("error")
+    public String error;
     @JsonProperty("type")
     public String type;
 
@@ -41,5 +45,21 @@ public class CaptchaResultNew {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

@@ -73,7 +73,7 @@ public class FourchanUrlBuilder implements IUrlBuilder {
         return null;
     }
 
-    public String getPasscodeCookieCheckUrl() {
+    public String getPasscodeCookieCheckUrl(String boardName, String threadNumber) {
         return null;
     }
 

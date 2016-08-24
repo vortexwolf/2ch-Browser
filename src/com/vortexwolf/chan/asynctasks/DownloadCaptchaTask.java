@@ -74,8 +74,9 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         String referer = UriUtils.getBoardOrThreadUrl(this.mWebsite.getUrlBuilder(), this.mBoardName, 0, this.mThreadNumber);
 
         //если это не новый тред проверим апкаптчу и если она работает вернем качпу с кодом
-        if (!"".equals(this.mThreadNumber)) {
-            HtmlCaptchaChecker.CaptchaResult acresult = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, CaptchaType.APP, referer);
+        if (!StringUtils.isEmpty(this.mThreadNumber)) {
+            HtmlCaptchaChecker.CaptchaResult acresult =
+                this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, CaptchaType.APP, this.mBoardName, this.mThreadNumber);
             if (!StringUtils.isEmpty(acresult.captchaKey)) {
                 this.mCaptchaType = CaptchaType.APP;
                 this.mCaptcha = new CaptchaEntity();
@@ -86,7 +87,8 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
             }
         }
         //иначе используем обычную капчу
-        HtmlCaptchaChecker.CaptchaResult result = this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mCaptchaType, referer);
+        HtmlCaptchaChecker.CaptchaResult result =
+            this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mCaptchaType, this.mBoardName, this.mThreadNumber);
         this.mCanSkip = result.canSkip;
         this.mSuccessPasscode = result.successPassCode;
         this.mFailPasscode = result.failPassCode;
