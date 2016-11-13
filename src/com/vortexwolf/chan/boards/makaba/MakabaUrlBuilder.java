@@ -61,11 +61,11 @@ public class MakabaUrlBuilder implements IUrlBuilder {
     }
 
     public String getThumbnailUrl(String board, String path) {
-        return this.createBoardUri(board, path).toString();
+        return this.createRootUri(path).toString();
     }
 
     public String getImageUrl(String board, String path) {
-        return this.createBoardUri(board, path).toString();
+        return this.createRootUri(path).toString();
     }
 
     public String getPostingUrlApi() {
