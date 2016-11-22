@@ -585,6 +585,7 @@ public class PostsListActivity extends BaseListActivity {
 
             PostsListActivity.this.mAdapter.setUpdating(false);
             PostsListActivity.this.mCurrentDownloadTask = null;
+            PostsListActivity.this.hideRefreshView();
         }
     }
 }

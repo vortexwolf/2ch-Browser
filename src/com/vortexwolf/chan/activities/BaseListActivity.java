@@ -3,6 +3,7 @@ package com.vortexwolf.chan.activities;
 import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -25,7 +26,8 @@ import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
-public abstract class BaseListActivity extends ListActivity {
+public abstract class BaseListActivity extends ListActivity implements SwipeRefreshLayout.OnRefreshListener {
+
     private enum ViewType {
         LIST, LOADING, ERROR, CAPTCHA
     };
@@ -33,11 +35,21 @@ public abstract class BaseListActivity extends ListActivity {
     private View mLoadingView = null;
     private View mErrorView = null;
     private View mCaptchaView = null;
+    private SwipeRefreshLayout mRefreshView = null;
     private ViewType mCurrentView = null;
     private Button mCaptchaSendButton;
     private CheckCloudflareTask mCurrentCheckTask = null;
 
     protected boolean mVisible = false;
+
+    @Override
+    public void onRefresh() {
+        BaseListActivity.this.refresh();
+    }
+
+    protected void hideRefreshView() {
+        mRefreshView.setRefreshing(false);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +85,8 @@ public abstract class BaseListActivity extends ListActivity {
         this.mLoadingView = this.findViewById(R.id.loadingView);
         this.mErrorView = this.findViewById(R.id.error);
         this.mCaptchaView = this.findViewById(R.id.captchaView);
+        this.mRefreshView = (SwipeRefreshLayout) this.findViewById(R.id.refreshView);
+        this.mRefreshView.setOnRefreshListener(this);
 
         this.switchToView(this.mCurrentView);
     }
@@ -169,24 +183,28 @@ public abstract class BaseListActivity extends ListActivity {
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.GONE);
                 this.setCaptchaViewVisibility(View.GONE);
+                this.mRefreshView.setRefreshing(false);
                 break;
             case LOADING:
                 this.getListView().setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.VISIBLE);
                 this.mErrorView.setVisibility(View.GONE);
                 this.setCaptchaViewVisibility(View.GONE);
+                this.mRefreshView.setRefreshing(false);
                 break;
             case ERROR:
                 this.getListView().setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.VISIBLE);
                 this.setCaptchaViewVisibility(View.GONE);
+                this.mRefreshView.setRefreshing(false);
                 break;
             case CAPTCHA:
                 this.getListView().setVisibility(View.GONE);
                 this.mLoadingView.setVisibility(View.GONE);
                 this.mErrorView.setVisibility(View.GONE);
                 this.setCaptchaViewVisibility(View.VISIBLE);
+                this.mRefreshView.setRefreshing(false);
                 break;
         }
     }

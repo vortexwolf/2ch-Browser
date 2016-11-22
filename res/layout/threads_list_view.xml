@@ -10,13 +10,20 @@
         android:layout_height="0dip"
         android:layout_weight="1" >
 
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:fastScrollEnabled="true"
-            android:dividerHeight="0.5dip"
-            android:scrollingCache="false" />
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/refreshView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@android:id/list"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fastScrollEnabled="true"
+                android:dividerHeight="0.5dip"
+                android:scrollingCache="false" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <include
             android:id="@+id/loadingView"
