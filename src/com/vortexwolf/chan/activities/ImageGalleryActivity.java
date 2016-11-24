@@ -100,7 +100,7 @@ public class ImageGalleryActivity extends Activity {
         viewPager.setCurrentItem(imagePosition);
 
         ImageButton prevImageButton = (ImageButton) this.findViewById(R.id.image_gallery_prev);
-        prevImageButton.setOnClickListener(new View.OnClickListener() {
+        prevImageButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 viewPager.movePrevious();
@@ -108,7 +108,7 @@ public class ImageGalleryActivity extends Activity {
         });
 
         ImageButton nextImageButton = (ImageButton) this.findViewById(R.id.image_gallery_next);
-        nextImageButton.setOnClickListener(new View.OnClickListener() {
+        nextImageButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 viewPager.moveNext();
@@ -269,7 +269,8 @@ public class ImageGalleryActivity extends Activity {
     }
 
     private void setThumbnail(final AttachmentInfo attachment, GalleryItemViewBag viewBag) {
-        int thumbnailSize = (int) getResources().getDimension(R.dimen.thumbnail_size);
+        //Set thumbnailSize to stretch across the screen.
+        int thumbnailSize = FrameLayout.LayoutParams.MATCH_PARENT;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(thumbnailSize, thumbnailSize, Gravity.CENTER);
 
         ImageView thumbnailView = new ImageView(this);
@@ -296,7 +297,7 @@ public class ImageGalleryActivity extends Activity {
             }
         }
 
-        AppearanceUtils.showToastMessage(this, getResources().getString(R.string.notification_video_thumbnail));
+        AppearanceUtils.showToastMessage(this, getResources().getString(R.string.notification_video));
     }
 
     private void setImage(File file, GalleryItemViewBag viewBag) {

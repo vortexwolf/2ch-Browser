@@ -287,6 +287,7 @@
     <string name="notification_cloudflare_check_started">Выполняется проверка Cloudflare, подождите…</string>
     <string name="notification_cloudflare_check_finished">Проверка Cloudflare завершена, попробуйте еще раз</string>
     <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
+    <string name="notification_video">Нажмите на превью, чтобы открыть</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
 
     <string-array name="catalog_filters">
