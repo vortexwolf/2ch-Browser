@@ -277,6 +277,7 @@ If you want to be in read-only, post to /test/.
     <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
+    <string name="notification_video">Tap Video Preview to Play</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
     
     <string-array name="catalog_filters">
