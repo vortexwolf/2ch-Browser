@@ -51,10 +51,15 @@ public class AppearanceUtils {
 
     private static final String TAG = "AppearanceUtils";
 
+    private static Toast toast;
+
     public final static ViewGroup.LayoutParams MATCH_PARAMS = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
     public static void showToastMessage(Context context, String msg) {
-        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
+        if(toast != null){
+            toast.cancel();
+        }
+        toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
         toast.show();
     }
 
