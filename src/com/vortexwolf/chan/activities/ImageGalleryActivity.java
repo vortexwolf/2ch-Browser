@@ -158,7 +158,8 @@ public class ImageGalleryActivity extends Activity {
         if (this.mCurrentImageModel != null) {
             boolean isImageUrl = UriUtils.isImageUri(Uri.parse(this.mCurrentImageModel.url));
             boolean isVideoUrl = UriUtils.isWebmUri(Uri.parse(this.mCurrentImageModel.url));
-            playVideoMenuItem.setVisible(this.mImageLoaded && isVideoUrl);
+            playVideoMenuItem.setVisible(this.mImageLoaded && isVideoUrl &&
+                    !(this.mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK));
             searchTineyeMenuItem.setVisible(isImageUrl);
             searchGoogleMenuItem.setVisible(isImageUrl);
             imageOpsMenuItem.setVisible(isImageUrl);
@@ -235,7 +236,6 @@ public class ImageGalleryActivity extends Activity {
         this.mImageLoadedFile = null;
         this.mCurrentImageModel = model;
         this.mCurrentImageViewBag = viewBag;
-        this.updateOptionsMenu();
 
         if (this.mCurrentTask != null) {
             // only 1 image per time
@@ -245,6 +245,7 @@ public class ImageGalleryActivity extends Activity {
         if (UriUtils.isWebmUri(Uri.parse(model.url)) && this.mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
             if (model.attachment != null) {
                 this.setThumbnail(model.attachment, viewBag);
+                this.mImageLoaded = true;
             } else {
                 viewBag.switchToErrorView(this.getString(R.string.error_video_playing));
             }
@@ -264,6 +265,7 @@ public class ImageGalleryActivity extends Activity {
             this.mCurrentTask = new DownloadFileTask(this, uri, writeCachedFile, new ImageDownloadView(viewBag), false);
             this.mCurrentTask.execute();
         }
+        this.updateOptionsMenu();
     }
 
     private void setThumbnail(final AttachmentInfo attachment, GalleryItemViewBag viewBag) {
