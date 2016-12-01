@@ -8,10 +8,16 @@ buildscript {
     }
 }
 
+repositories {
+    jcenter()
+}
+
 apply plugin: 'android'
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+
 }
 
 android {
