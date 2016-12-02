@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.activities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -7,8 +8,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
@@ -62,7 +68,10 @@ import com.vortexwolf.chan.services.presentation.DraftPostsStorage;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
@@ -80,6 +89,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private String mThreadNumber;
     private CaptchaViewType mCurrentCaptchaView = null;
     private Bitmap mCaptchaBitmap;
+    private File instantPhotoTempFile;
 
     private SendPostTask mCurrentPostSendTask = null;
     private DownloadCaptchaTask mCurrentDownloadCaptchaTask = null;
@@ -597,6 +607,32 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 i.setType("image/*");
                 this.startActivityForResult(i, Constants.REQUEST_CODE_GALLERY);
                 break;
+            case R.id.menu_attach_instant_photo:
+                if (this.getAttachments().size() >= ThreadPostUtils.getMaximumAttachments(this.mBoardName)) {
+                    AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
+                    break;
+                }
+
+                Intent instantPhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (instantPhoto.resolveActivity(getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        instantPhotoTempFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                        Log.i(TAG, "IOException");
+                    }
+                    // Continue only if the File was successfully created
+                    if (instantPhotoTempFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(this,
+                                "com.example.android.fileprovider",
+                                instantPhotoTempFile);
+                        instantPhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        this.startActivityForResult(instantPhoto, Constants.REQUEST_CODE_INSTANT_PHOTO);
+                    }
+                }
+                break;
             case R.id.menu_attach_video_id:
                 if (this.getAttachments().size() >= ThreadPostUtils.getMaximumAttachments(this.mBoardName)) {
                     AppearanceUtils.showToastMessage(this, this.getString(R.string.warning_maximum_attachments));
@@ -650,6 +686,16 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     }
 
                     break;
+                case Constants.REQUEST_CODE_INSTANT_PHOTO:
+                    if (instantPhotoTempFile != null) {
+                        //TODO Remove exif from image file.
+                        ImageFileModel image = new ImageFileModel(instantPhotoTempFile);
+                        this.setAttachment(image);
+                    } else {
+                        AppearanceUtils.showToastMessage(this, this.getString(R.string.error_image_cannot_be_attached));
+                    }
+
+                    break;
                 case Constants.REQUEST_CODE_VIDEO_FILE:
                     Uri videoUri = data.getData();
                     File videoFile = IoUtils.getFile(this, videoUri);
@@ -661,6 +707,22 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     }
             }
         }
+    }
+    @TargetApi(8)
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+
+
+        File storageDir = getApplication().getApplicationContext().getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES);
+        instantPhotoTempFile = File.createTempFile(
+                imageFileName,  // prefix
+                ".jpg",         // suffix
+                storageDir      // directory
+        );
+        return instantPhotoTempFile;
     }
 
     private void setAttachment(FileModel fileModel) {

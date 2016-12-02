@@ -105,6 +105,7 @@
     <string name="menu_play_video_external">Открыть во внешнем плеере</string>
     <string name="menu_download_all_files">Сохранить все изображения</string>
     <string name="menu_attach_video">Прикрепить видео</string>
+    <string name="menu_instant_photo">Сделать фотографию</string>
     <string name="menu_search_history">Поиск в истории</string>
 
     <!-- Context menus -->

@@ -13,7 +13,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
     <application android:name="com.vortexwolf.chan.common.MainApplication" android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name="com.vortexwolf.chan.activities.PickBoardActivity" android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
@@ -49,6 +51,18 @@
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:noHistory="true"></activity>
         <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksCompActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:noHistory="true"></activity>
         <activity android:name="com.vortexwolf.chan.activities.NewRecaptchaActivity"></activity>
-        <activity android:name="com.vortexwolf.chan.settings.ApplicationPreferencesActivity"></activity>		
+        <activity android:name="com.vortexwolf.chan.settings.ApplicationPreferencesActivity"></activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
+
+
     </application>
 </manifest>
