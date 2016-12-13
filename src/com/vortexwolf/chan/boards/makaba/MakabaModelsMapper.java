@@ -2,6 +2,7 @@ package com.vortexwolf.chan.boards.makaba;
 
 import java.util.regex.Pattern;
 
+import com.vortexwolf.chan.boards.makaba.models.MakabaBoardInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFileInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
@@ -14,6 +15,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.ThreadPostUtils;
 import com.vortexwolf.chan.models.domain.AttachmentModel;
 import com.vortexwolf.chan.models.domain.BadgeModel;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
@@ -88,6 +90,33 @@ public class MakabaModelsMapper {
         model.setParentThread(source.parent);
 
         return model;
+    }
+
+    public static BoardModel mapBoardModel(MakabaBoardInfo source){
+        BoardModel model = new BoardModel();
+
+        model.setBump_limit(source.bump_limit);
+        model.setCategory(source.category);
+        model.setDefault_name(source.default_name);
+        model.setEnable_likes(source.enable_likes);
+        model.setEnable_posting(source.enable_posting);
+        model.setEnable_thread_tags(source.enable_thread_tags);
+        model.setId(source.id);
+        model.setName(source.name);
+        model.setPages(source.pages);
+        model.setSage(source.sage);
+        model.setTripcodes(source.tripcodes);
+        model.setIcons(source.icons);
+
+        return model;
+    }
+
+    public static BoardModel[] mapBoardModels(MakabaBoardInfo[] source){
+        BoardModel[] result = new BoardModel[source.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = mapBoardModel(source[i]);
+        }
+        return result;
     }
 
     public AttachmentModel mapAttachmentModel(MakabaFileInfo file) {

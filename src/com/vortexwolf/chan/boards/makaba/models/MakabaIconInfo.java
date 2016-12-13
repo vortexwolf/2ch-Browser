@@ -8,4 +8,7 @@ public class MakabaIconInfo {
     
     @JsonProperty("num")
     public int num;
+
+    @JsonProperty("url")
+    public String url;
 }

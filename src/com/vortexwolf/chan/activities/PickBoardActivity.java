@@ -20,6 +20,8 @@ import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.BoardsListAdapter;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
+import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
@@ -28,12 +30,14 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
+import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
-import com.vortexwolf.chan.models.presentation.BoardModel;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
 import com.vortexwolf.chan.services.NavigationService;
+import com.vortexwolf.chan.services.http.VolleyJsonReader;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -46,7 +50,7 @@ import java.util.regex.Pattern;
 
 public class PickBoardActivity extends ListActivity {
 
-    public static final String TAG = "PickBoardActivity";
+    public static final String TAG = PickBoardActivity.class.getSimpleName();
 
     private static final Pattern boardCodePattern = Pattern.compile("^\\w+$");
 
@@ -58,8 +62,9 @@ public class PickBoardActivity extends ListActivity {
     private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
+    private IJsonApiReader mJsonReader;
+    private List<BoardModel> mBoards = new ArrayList<>();
 
-    private final ArrayList<BoardModel> mBoards = new ArrayList<BoardModel>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +77,7 @@ public class PickBoardActivity extends ListActivity {
 
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
+        this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // TODO: add Default Website to the settings and navigate to it
         if (this.mSettings.getStartPage() != null && Intent.ACTION_MAIN.equals(this.getIntent().getAction())) {
@@ -83,7 +89,7 @@ public class PickBoardActivity extends ListActivity {
 
         this.resetUI();
 
-        this.parseAllBoards();
+        this.getBoards();
 
         this.mAdapter = new BoardsListAdapter(this);
         this.updateVisibleBoards(this.mAdapter);
@@ -111,28 +117,29 @@ public class PickBoardActivity extends ListActivity {
         }
     }
 
-    private void parseAllBoards() {
-        //TODO: загружать /makaba/mobile.fcgi?task=get_boards
-        this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards));
+    private void getBoards() {
+        MakabaUrlBuilder mub = new MakabaUrlBuilder(this.mSettings);
+        VolleyJsonReader vjr = VolleyJsonReader.getInstance(getResources(), this.getApplicationContext());
+        vjr.readBoards(mub.getBoardsUrl(), this.mAdapter);
     }
 
     private void updateVisibleBoards(BoardsListAdapter adapter) {
         adapter.clear();
 
-        String currentGroup = null;
+        String currentCategory = null;
         for (BoardModel board : this.mBoards) {
-            if (!board.isVisible && !this.mSettings.isDisplayAllBoards()) {
+            if (!board.isVisible() && !this.mSettings.isDisplayAllBoards()) {
                 continue; // ignore hidden boards
             }
 
             // add group header if necessary
-            if (board.group != null && !board.group.equals(currentGroup)) {
-                currentGroup = board.group;
-                adapter.add(new SectionEntity(currentGroup));
+            if (board.getCategory() != null && !board.getCategory().equals(currentCategory)) {
+                currentCategory = board.getCategory();
+                adapter.add(new SectionEntity(currentCategory));
             }
 
             // add item
-            adapter.add(new BoardEntity(board.code, board.title));
+            adapter.add(new BoardEntity(board.getId(), board.getName()));
         }
 
         // add favorite boards
@@ -143,9 +150,9 @@ public class PickBoardActivity extends ListActivity {
         }
     }
 
-    private BoardModel findBoardByCode(String code) {
+    private BoardModel findBoardByCode(String id) {
         for (BoardModel board : this.mBoards) {
-            if (board.code.equals(code)) {
+            if (board.getId().equals(id)) {
                 return board;
             }
         }
@@ -153,22 +160,23 @@ public class PickBoardActivity extends ListActivity {
         return null;
     }
 
-    private ArrayList<BoardModel> parseBoardsList(int arrayId) {
-        ArrayList<BoardModel> boards = new ArrayList<BoardModel>();
 
-        String[] entities = this.getResources().getStringArray(arrayId);
-        String currentGroup = null;
-        for (String entity : entities) {
-            String[] parts = entity.split(";\\s?");
-            if (parts.length == 1) {
-                currentGroup = parts[0];
-            } else if (parts.length >= 2) {
-                boards.add(new BoardModel(parts[0], parts[1], true, currentGroup));
-            }
-        }
-
-        return boards;
-    }
+//    private ArrayList<BoardModel> parseBoardsList(int arrayId) {
+//        ArrayList<BoardModel> boards = new ArrayList<BoardModel>();
+//
+//        String[] entities = this.getResources().getStringArray(arrayId);
+//        String currentGroup = null;
+//        for (String entity : entities) {
+//            String[] parts = entity.split(";\\s?");
+//            if (parts.length == 1) {
+//                currentGroup = parts[0];
+//            } else if (parts.length >= 2) {
+//                boards.add(new BoardModel(parts[0], parts[1], true, currentGroup));
+//            }
+//        }
+//
+//        return boards;
+//    }
 
     private void resetUI() {
         this.setTheme(this.mSettings.getTheme());

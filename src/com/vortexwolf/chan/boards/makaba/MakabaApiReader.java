@@ -10,6 +10,7 @@ import org.codehaus.jackson.JsonNode;
 import android.content.res.Resources;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.boards.makaba.models.MakabaBoardInfo;
 import com.vortexwolf.chan.boards.makaba.models.MakabaError;
 import com.vortexwolf.chan.boards.makaba.models.MakabaFoundPostsList;
 import com.vortexwolf.chan.boards.makaba.models.MakabaPostInfo;
@@ -23,6 +24,7 @@ import com.vortexwolf.chan.exceptions.JsonApiReaderException;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IJsonProgressChangeListener;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.domain.PostModel;
 import com.vortexwolf.chan.models.domain.SearchPostListModel;
 import com.vortexwolf.chan.models.domain.ThreadModel;
@@ -111,6 +113,15 @@ public class MakabaApiReader implements IJsonApiReader {
         PostModel[] models = this.mMakabaModelsMapper.mapPostModels(data);
         return models;
     }
+
+//    @Override
+//    public BoardModel[] readBoardsList() throws JsonApiReaderException, HtmlNotJsonException {
+//        String uri = this.mMakabaUriBuilder.getBoardsUrl();
+//        JsonNode json = this.mJsonReader.readData(uri, false, listener, task);
+//        MakabaBoardInfo[] data = this.parseDataOrThrowError(json, MakabaBoardInfo[].class);
+//        BoardModel[] models = this.mMakabaModelsMapper.mapBoardModels(data);
+//        return models;
+//    }
 
     @Override
     public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {

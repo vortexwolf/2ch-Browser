@@ -10,9 +10,11 @@ import android.widget.TextView;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
-import com.vortexwolf.chan.models.presentation.BoardModel;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.presentation.IBoardListEntity;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
+
+import java.util.List;
 
 public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
     private static final int ITEM_VIEW_TYPE_BOARD = 0;
@@ -79,6 +81,9 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
         this.mFavoritesCount = 0;
     }
+    public void setData(List<BoardModel> boards){
+
+    }
 
     public void addItemToFavoritesSection(String boardName, BoardModel boardModel) {
         if (this.mFavoritesCount == 0) {
@@ -86,7 +91,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         }
 
         this.mFavoritesCount++;
-        BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.title : null);
+        BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.getName() : null);
         this.insert(newItem, this.mFavoritesCount);
     }
 

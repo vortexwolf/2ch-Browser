@@ -6,7 +6,7 @@
     android:versionName="1.5.28"
       android:installLocation="auto"
       >
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="21"
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="24"
         tools:overrideLibrary="pl.droidsonroids.gif"/>
 
     <uses-permission android:name="android.permission.INTERNET" />

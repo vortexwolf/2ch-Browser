@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
     }
 }
 
@@ -17,7 +17,7 @@ apply plugin: 'com.android.application'
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
-
+    compile 'com.android.volley:volley:1.0.0'
 }
 
 android {

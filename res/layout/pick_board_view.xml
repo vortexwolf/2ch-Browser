@@ -7,6 +7,7 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
+        android:id="@+id/pick_board"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:orientation="horizontal" >
 
