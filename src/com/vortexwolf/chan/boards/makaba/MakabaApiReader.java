@@ -114,14 +114,6 @@ public class MakabaApiReader implements IJsonApiReader {
         return models;
     }
 
-//    @Override
-//    public BoardModel[] readBoardsList() throws JsonApiReaderException, HtmlNotJsonException {
-//        String uri = this.mMakabaUriBuilder.getBoardsUrl();
-//        JsonNode json = this.mJsonReader.readData(uri, false, listener, task);
-//        MakabaBoardInfo[] data = this.parseDataOrThrowError(json, MakabaBoardInfo[].class);
-//        BoardModel[] models = this.mMakabaModelsMapper.mapBoardModels(data);
-//        return models;
-//    }
 
     @Override
     public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {

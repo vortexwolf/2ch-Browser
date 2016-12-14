@@ -1,6 +1,8 @@
 package com.vortexwolf.chan.settings;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -15,8 +17,10 @@ import android.preference.PreferenceManager;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.ObjectSerializer;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.domain.CaptchaType;
 
 public class ApplicationSettings {
@@ -25,6 +29,7 @@ public class ApplicationSettings {
 
     private final SharedPreferences mSettings;
     private final Resources mResources;
+    private ArrayList<BoardModel> boards = null;
 
     public ApplicationSettings(Context context, Resources resources) {
         this.mSettings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -354,6 +359,31 @@ public class ApplicationSettings {
         return CaptchaType.DVACH;
     }
 
+    public ArrayList<BoardModel> getBoards(){
+        try {
+            //it might be already deserialized
+            if(boards != null){
+                return boards;
+            }
+            boards = (ArrayList<BoardModel>) ObjectSerializer.deserialize(mSettings.getString("boards", null));
+            if(boards != null) return boards;
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return new ArrayList<BoardModel>();
+    }
+
+    public boolean setBoards(ArrayList<BoardModel> boards){
+        SharedPreferences.Editor editor = mSettings.edit();
+        try {
+            editor.putString("boards", ObjectSerializer.serialize(boards));
+            return editor.commit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public SettingsEntity getCurrentSettings() {
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();
@@ -361,6 +391,7 @@ public class ApplicationSettings {
         result.isLocalDate = this.isLocalDateTime();
         result.isLoadThumbnails = this.isLoadThumbnails();
         result.isDisplayAllBoards = this.isDisplayAllBoards();
+        result.mBoards = this.getBoards();
 
         return result;
     }

@@ -58,17 +58,29 @@ public class PickBoardActivity extends ListActivity {
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private IUrlBuilder mUrlBuilder;
+    private VolleyJsonReader vjr;
 
     private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
-    private IJsonApiReader mJsonReader;
     private List<BoardModel> mBoards = new ArrayList<>();
 
+    public List<BoardModel> getmBoards() {
+        return mBoards;
+    }
+
+    public BoardsListAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public ApplicationSettings getmSettings() {
+        return mSettings;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         this.mWebsite = Websites.fromName(this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE));
         if (this.mWebsite == null) {
@@ -77,7 +89,6 @@ public class PickBoardActivity extends ListActivity {
 
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mCurrentSettings = this.mSettings.getCurrentSettings();
-        this.mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         // TODO: add Default Website to the settings and navigate to it
         if (this.mSettings.getStartPage() != null && Intent.ACTION_MAIN.equals(this.getIntent().getAction())) {
@@ -88,10 +99,9 @@ public class PickBoardActivity extends ListActivity {
         }
 
         this.resetUI();
-
-        this.getBoards();
-
         this.mAdapter = new BoardsListAdapter(this);
+        this.vjr = VolleyJsonReader.getInstance(this.getApplicationContext());
+        this.getBoards();
         this.updateVisibleBoards(this.mAdapter);
         this.setListAdapter(this.mAdapter);
 
@@ -117,18 +127,23 @@ public class PickBoardActivity extends ListActivity {
         }
     }
 
-    private void getBoards() {
-        MakabaUrlBuilder mub = new MakabaUrlBuilder(this.mSettings);
-        VolleyJsonReader vjr = VolleyJsonReader.getInstance(getResources(), this.getApplicationContext());
-        vjr.readBoards(mub.getBoardsUrl(), this.mAdapter);
+    protected void getBoards() {
+        this.vjr.readBoards(new MakabaUrlBuilder(this.mSettings).getBoardsUrl(), PickBoardActivity.this);
     }
 
-    private void updateVisibleBoards(BoardsListAdapter adapter) {
+    public void updateVisibleBoards(BoardsListAdapter adapter) {
         adapter.clear();
-
         String currentCategory = null;
+
+        if(this.mBoards.size() == 0 && mCurrentSettings.mBoards != null){
+            this.mBoards.clear();
+            for (BoardModel boardModel: mCurrentSettings.mBoards) {
+                this.mBoards.add(boardModel);
+            }
+        }
+
         for (BoardModel board : this.mBoards) {
-            if (!board.isVisible() && !this.mSettings.isDisplayAllBoards()) {
+            if (!board.getCategory().equals("Творчество") && !this.mSettings.isDisplayAllBoards()) {
                 continue; // ignore hidden boards
             }
 
@@ -161,22 +176,6 @@ public class PickBoardActivity extends ListActivity {
     }
 
 
-//    private ArrayList<BoardModel> parseBoardsList(int arrayId) {
-//        ArrayList<BoardModel> boards = new ArrayList<BoardModel>();
-//
-//        String[] entities = this.getResources().getStringArray(arrayId);
-//        String currentGroup = null;
-//        for (String entity : entities) {
-//            String[] parts = entity.split(";\\s?");
-//            if (parts.length == 1) {
-//                currentGroup = parts[0];
-//            } else if (parts.length >= 2) {
-//                boards.add(new BoardModel(parts[0], parts[1], true, currentGroup));
-//            }
-//        }
-//
-//        return boards;
-//    }
 
     private void resetUI() {
         this.setTheme(this.mSettings.getTheme());

@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.domain.BoardModel;
@@ -24,10 +25,13 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
     private final LayoutInflater mInflater;
 
+    private Context mContext;
+
     private int mFavoritesCount = 0;
 
     public BoardsListAdapter(Context context) {
         super(context, -1);
+        this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
     }
 

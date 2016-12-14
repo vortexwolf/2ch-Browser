@@ -3,7 +3,9 @@ package com.vortexwolf.chan.models.domain;
 
 import com.vortexwolf.chan.boards.makaba.models.MakabaIconInfo;
 
-public class BoardModel {
+import java.io.Serializable;
+
+public class BoardModel implements Serializable{
     private String bump_limit;
     private String category;
     private String default_name;

@@ -1,9 +1,14 @@
 package com.vortexwolf.chan.settings;
 
+import com.vortexwolf.chan.models.domain.BoardModel;
+
+import java.util.ArrayList;
+
 public class SettingsEntity {
     public int theme;
     public boolean isDisplayDate;
     public boolean isLocalDate;
     public boolean isLoadThumbnails;
     public boolean isDisplayAllBoards;
+    public ArrayList<BoardModel> mBoards;
 }
