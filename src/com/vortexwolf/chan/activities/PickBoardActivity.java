@@ -65,22 +65,11 @@ public class PickBoardActivity extends ListActivity {
     private SettingsEntity mCurrentSettings = null;
     private List<BoardModel> mBoards = new ArrayList<>();
 
-    public List<BoardModel> getmBoards() {
-        return mBoards;
-    }
-
-    public BoardsListAdapter getmAdapter() {
-        return mAdapter;
-    }
-
-    public ApplicationSettings getmSettings() {
-        return mSettings;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.vjr = VolleyJsonReader.getInstance(this.getApplicationContext());
 
         this.mWebsite = Websites.fromName(this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE));
         if (this.mWebsite == null) {
@@ -100,7 +89,6 @@ public class PickBoardActivity extends ListActivity {
 
         this.resetUI();
         this.mAdapter = new BoardsListAdapter(this);
-        this.vjr = VolleyJsonReader.getInstance(this.getApplicationContext());
         this.getBoards();
         this.updateVisibleBoards(this.mAdapter);
         this.setListAdapter(this.mAdapter);
@@ -154,7 +142,7 @@ public class PickBoardActivity extends ListActivity {
             }
 
             // add item
-            adapter.add(new BoardEntity(board.getId(), board.getName()));
+            adapter.add(new BoardEntity(board.getId(), board.getName(), board.getBump_limit()));
         }
 
         // add favorite boards
@@ -348,4 +336,15 @@ public class PickBoardActivity extends ListActivity {
         return result;
     }
 
+    public List<BoardModel> getmBoards() {
+        return mBoards;
+    }
+
+    public BoardsListAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public ApplicationSettings getmSettings() {
+        return mSettings;
+    }
 }

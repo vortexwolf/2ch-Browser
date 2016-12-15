@@ -21,29 +21,38 @@ dependencies {
 }
 
 android {
+    signingConfigs {
+        release {
+            keyAlias '2ch-browser'
+            keyPassword '2ch-browser'
+            storeFile file('C:/Users/Arcturus/Documents/nexus_5x_dev/New folder/2ch-browser')
+            storePassword '2ch-browser'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion '25.0.1'
-
     defaultConfig {
         // You need to create a new gradle.properties file in the root of the project and add
         // CAPTCHA_API_PUBLIC_KEY="your api key goes here"
         buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", CAPTCHA_API_PUBLIC_KEY)
         buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", CAPTCHA_API_PRIVATE_KEY)
+        signingConfig signingConfigs.release
+        targetSdkVersion 25
     }
-
     useLibrary 'org.apache.http.legacy'
     packagingOptions {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/ASL2.0'
     }
-
     buildTypes {
         debug {
             minifyEnabled false
+            signingConfig signingConfigs.release
         }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
         }
     }
     sourceSets {
@@ -74,5 +83,7 @@ android {
     }
     lintOptions {
         disable 'ResAuto'
+    }
+    productFlavors {
     }
 }

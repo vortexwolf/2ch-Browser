@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.domain.BoardModel;
@@ -58,7 +57,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         if (convertView == null) {
             convertView = this.mInflater.inflate(item.isSection()
                     ? com.vortexwolf.chan.R.layout.pick_board_section
-                    : com.vortexwolf.chan.R.layout.simple_list_item, null);
+                    : R.layout.pick_board_board, null);
         }
 
         if (item.isSection()) {
@@ -68,12 +67,18 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
             sectionView.setText(si.getTitle());
         } else {
             BoardEntity bi = (BoardEntity) item;
-            final TextView text = (TextView) convertView;
+            final TextView boardName = (TextView) convertView.findViewById(R.id.pick_board_name);
+            final TextView boardBumpLimit = (TextView) convertView.findViewById(R.id.pick_board_bump_limit);
 
             String description = !StringUtils.isEmpty(bi.getTitle())
                     ? bi.getCode() + " - " + bi.getTitle()
                     : bi.getCode();
-            text.setText(description);
+            String bumpLimit = !StringUtils.isEmpty(bi.getBumpLimit())
+                    ? bi.getBumpLimit()
+                    : "?";
+
+            boardName.setText(description);
+            boardBumpLimit.setText(bumpLimit);
         }
 
         return convertView;
@@ -95,7 +100,8 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         }
 
         this.mFavoritesCount++;
-        BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.getName() : null);
+        BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.getName() : null,
+                boardModel.getBump_limit() != null ? boardModel.getBump_limit() : "?");
         this.insert(newItem, this.mFavoritesCount);
     }
 
