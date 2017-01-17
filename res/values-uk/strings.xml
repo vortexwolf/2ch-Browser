@@ -239,6 +239,8 @@
     <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
     <string name="pref_video_mute">Видео без звука</string>
     <string name="pref_video_mute_summary">Уменьшить звук до 0 при открытии видео</string>
+    <string name="pref_swipe_to_refresh_summary">Обновление тредов и постов свайпом.</string>
+    <string name="pref_swipe_to_refresh_title">Использовать свайп</string>
 
     <!-- Errors -->
     <string name="error_send_post">При отправке сообщения произошла ошибка.</string>
