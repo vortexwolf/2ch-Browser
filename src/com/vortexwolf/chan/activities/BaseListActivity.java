@@ -25,6 +25,7 @@ import com.vortexwolf.chan.interfaces.ICheckCaptchaView;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaEntity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+import com.vortexwolf.chan.settings.SettingsEntity;
 
 public abstract class BaseListActivity extends ListActivity implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -39,6 +40,8 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
     private ViewType mCurrentView = null;
     private Button mCaptchaSendButton;
     private CheckCloudflareTask mCurrentCheckTask = null;
+    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+    SettingsEntity settingsEntity = mSettings.getCurrentSettings();
 
     protected boolean mVisible = false;
 
@@ -60,12 +63,21 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
 
     @Override
     protected void onPause() {
+
         super.onPause();
         this.mVisible = false;
     }
 
     @Override
     protected void onResume() {
+        SettingsEntity newSettings = mSettings.getCurrentSettings();
+
+        if(!newSettings.equals(settingsEntity)){
+            //settings has been changed
+            settingsEntity = newSettings;
+            resetUI();
+
+        }
         super.onResume();
         this.mVisible = true;
     }
@@ -78,15 +90,17 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
     /** Reloads UI on the page */
     protected void resetUI() {
         // setting of the theme goes first
-        this.setTheme(Factory.resolve(ApplicationSettings.class).getTheme());
+        this.setTheme(mSettings.getTheme());
 
         // completely reload the root view, get loading and error views
         this.setContentView(this.getLayoutId());
         this.mLoadingView = this.findViewById(R.id.loadingView);
         this.mErrorView = this.findViewById(R.id.error);
         this.mCaptchaView = this.findViewById(R.id.captchaView);
+
         this.mRefreshView = (SwipeRefreshLayout) this.findViewById(R.id.refreshView);
         this.mRefreshView.setOnRefreshListener(this);
+        this.mRefreshView.setEnabled(mSettings.isSwipeToRefresh());
 
         this.switchToView(this.mCurrentView);
     }

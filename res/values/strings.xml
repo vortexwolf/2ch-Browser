@@ -229,6 +229,8 @@
     <string name="pref_external_video_summary">Use external video player for webm files</string>
     <string name="pref_video_mute">Mute video</string>
     <string name="pref_video_mute_summary">Set sound to 0 when video starts</string>
+    <string name="pref_swipe_to_refresh_summary">Refresh posts and threads with swipe</string>
+    <string name="pref_swipe_to_refresh_title">Use swipe-to-refresh</string>
 
     <!-- Errors -->
     <string name="error_send_post">An error has occurred while sending the post.</string>

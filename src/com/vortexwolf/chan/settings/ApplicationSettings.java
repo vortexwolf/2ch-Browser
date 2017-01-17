@@ -354,6 +354,10 @@ public class ApplicationSettings {
         return CaptchaType.DVACH;
     }
 
+    public boolean isSwipeToRefresh(){
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_swipe_to_refresh_key), true);
+    }
+
     public SettingsEntity getCurrentSettings() {
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();
@@ -361,6 +365,7 @@ public class ApplicationSettings {
         result.isLocalDate = this.isLocalDateTime();
         result.isLoadThumbnails = this.isLoadThumbnails();
         result.isDisplayAllBoards = this.isDisplayAllBoards();
+        result.isSwipeToRefresh = this.isSwipeToRefresh();
 
         return result;
     }
