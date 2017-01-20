@@ -1,4 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+def keystorePropertiesFile = rootProject.file("keystore.secrets");
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+
 buildscript {
     repositories {
         jcenter()
@@ -22,22 +27,20 @@ dependencies {
 
 android {
     signingConfigs {
-        release {
-            keyAlias '2ch-browser'
-            keyPassword '2ch-browser'
-            storeFile file('C:/Users/Arcturus/Documents/nexus_5x_dev/New folder/2ch-browser')
-            storePassword '2ch-browser'
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
     compileSdkVersion 25
-    buildToolsVersion '25.0.1'
+    buildToolsVersion "25.0.1"
     defaultConfig {
         // You need to create a new gradle.properties file in the root of the project and add
         // CAPTCHA_API_PUBLIC_KEY="your api key goes here"
         buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", CAPTCHA_API_PUBLIC_KEY)
         buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", CAPTCHA_API_PRIVATE_KEY)
-        signingConfig signingConfigs.release
-        targetSdkVersion 25
     }
     useLibrary 'org.apache.http.legacy'
     packagingOptions {
@@ -45,14 +48,15 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/ASL2.0'
     }
+
     buildTypes {
         debug {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.config
         }
         release {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.config
         }
     }
     sourceSets {
@@ -83,7 +87,5 @@ android {
     }
     lintOptions {
         disable 'ResAuto'
-    }
-    productFlavors {
     }
 }

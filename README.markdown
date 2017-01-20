@@ -20,7 +20,7 @@ Direct link:
 https://dl.dropbox.com/u/8047386/2ch-browser.apk
 
 Latest dev build:
-https://dl.dropboxusercontent.com/u/75518900/2ch-Browser-release-unsigned.apk
+https://dl.dropboxusercontent.com/u/75518900/2ch-Browser-release.apk
 
 ## Building Source Code
 

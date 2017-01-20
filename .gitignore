@@ -25,3 +25,4 @@ lint.xml
 *.iml
 *.eml
 /gradle.properties
+*.secrets

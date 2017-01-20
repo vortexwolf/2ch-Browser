@@ -373,7 +373,7 @@ public class ApplicationSettings {
         return new ArrayList<BoardModel>();
     }
 
-    public boolean setBoards(ArrayList<BoardModel> boards){
+    public boolean setBoards(ArrayList<BoardModel> boards) {
         SharedPreferences.Editor editor = mSettings.edit();
         try {
             editor.putString("boards", ObjectSerializer.serialize(boards));
@@ -384,6 +384,10 @@ public class ApplicationSettings {
         return false;
     }
 
+    public boolean isSwipeToRefresh(){
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_swipe_to_refresh_key), true);
+    }
+
     public SettingsEntity getCurrentSettings() {
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();
@@ -392,6 +396,7 @@ public class ApplicationSettings {
         result.isLoadThumbnails = this.isLoadThumbnails();
         result.isDisplayAllBoards = this.isDisplayAllBoards();
         result.mBoards = this.getBoards();
+        result.isSwipeToRefresh = this.isSwipeToRefresh();
 
         return result;
     }
