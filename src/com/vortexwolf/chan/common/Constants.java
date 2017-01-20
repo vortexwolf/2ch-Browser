@@ -8,14 +8,12 @@ import org.apache.http.protocol.HTTP;
 
 import android.os.Build;
 
+import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.common.utils.IoUtils;
 
 public class Constants {
 
-    public static final boolean DEBUG = false;
-
-    // Нужно не забыть отключить логгирование при выпуске приложения
-    public static final boolean LOGGING = DEBUG;
+    public static final boolean LOGGING = BuildConfig.DEBUG;
 
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));

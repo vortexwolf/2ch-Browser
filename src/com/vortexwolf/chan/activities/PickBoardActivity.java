@@ -30,6 +30,7 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
+import com.vortexwolf.chan.interfaces.IBoardsListCallback;
 import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
@@ -48,7 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class PickBoardActivity extends ListActivity {
+public class PickBoardActivity extends ListActivity implements IBoardsListCallback {
 
     public static final String TAG = PickBoardActivity.class.getSimpleName();
 
@@ -58,18 +59,21 @@ public class PickBoardActivity extends ListActivity {
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private IUrlBuilder mUrlBuilder;
-    private VolleyJsonReader vjr;
 
     private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
     private List<BoardModel> mBoards = new ArrayList<>();
 
+    @Override
+    public void listUpdated(List<BoardModel> newBoards) {
+        this.mBoards = newBoards;
+        updateVisibleBoards(this.mAdapter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.vjr = VolleyJsonReader.getInstance(this.getApplicationContext());
 
         this.mWebsite = Websites.fromName(this.getIntent().getStringExtra(Constants.EXTRA_WEBSITE));
         if (this.mWebsite == null) {
@@ -115,18 +119,31 @@ public class PickBoardActivity extends ListActivity {
         }
     }
 
-    protected void getBoards() {
-        this.vjr.readBoards(new MakabaUrlBuilder(this.mSettings).getBoardsUrl(), PickBoardActivity.this);
+    private void getBoards() {
+        VolleyJsonReader volleyJsonReader = VolleyJsonReader.getInstance(this.getApplicationContext());;
+        String boardsUrl = new MakabaUrlBuilder(this.mSettings).getBoardsUrl();
+
+        volleyJsonReader.readBoards(boardsUrl, this);
     }
 
     public void updateVisibleBoards(BoardsListAdapter adapter) {
         adapter.clear();
-        String currentCategory = null;
 
-        if(this.mBoards.size() == 0 && mCurrentSettings.mBoards != null){
-            this.mBoards.clear();
-            for (BoardModel boardModel: mCurrentSettings.mBoards) {
-                this.mBoards.add(boardModel);
+        String currentCategory = null;
+        ArrayList<BoardModel> mSettingsBoards = mSettings.getBoards();
+
+        if(this.mBoards.isEmpty()){
+            //Okay, there are no boards in the list, app first launch.
+
+            if(!mSettingsBoards.isEmpty()){
+                //but there are boards in settings, we good.
+                for (BoardModel boardModel: mSettingsBoards) {
+                    this.mBoards.add(boardModel);
+                }
+            }else {
+                //Well, no boards loaded yet and no previous settings stored.
+                //Adapter will remain empty.
+                return;
             }
         }
 

@@ -90,9 +90,6 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
         this.mFavoritesCount = 0;
     }
-    public void setData(List<BoardModel> boards){
-
-    }
 
     public void addItemToFavoritesSection(String boardName, BoardModel boardModel) {
         if (this.mFavoritesCount == 0) {

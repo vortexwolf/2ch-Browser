@@ -10,7 +10,6 @@ public class SettingsEntity {
     public boolean isLocalDate;
     public boolean isLoadThumbnails;
     public boolean isDisplayAllBoards;
-    public ArrayList<BoardModel> mBoards;
     public boolean isSwipeToRefresh;
 
     @Override
@@ -21,7 +20,6 @@ public class SettingsEntity {
         }
         else{
             SettingsEntity se = (SettingsEntity)obj;
-            //ArrayList of boards is not compared
             result = (this.theme == se.theme) &&
                     (this.isDisplayDate == se.isDisplayDate) &&
                     (this.isLocalDate == se.isLocalDate) &&

@@ -395,7 +395,6 @@ public class ApplicationSettings {
         result.isLocalDate = this.isLocalDateTime();
         result.isLoadThumbnails = this.isLoadThumbnails();
         result.isDisplayAllBoards = this.isDisplayAllBoards();
-        result.mBoards = this.getBoards();
         result.isSwipeToRefresh = this.isSwipeToRefresh();
 
         return result;

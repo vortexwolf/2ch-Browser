@@ -11,8 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.activities.PickBoardActivity;
-import com.vortexwolf.chan.asynctasks.ProcessReadBoardsRespond;
-import com.vortexwolf.chan.asynctasks.helpers.ProcessReadBoardsRespondParams;
+import com.vortexwolf.chan.asynctasks.ParseBoardsTask;
 
 import org.json.JSONObject;
 
@@ -62,10 +61,7 @@ public class VolleyJsonReader {
                     public void onResponse(JSONObject response) {
                         //onResponse method is invoked in main thread but boards object creation may take a while
                         //so it's better to move this process to asynctask.
-
-                        //Helper class is created to pass both, response and initial activity so adapter callback can be triggered.
-                        ProcessReadBoardsRespondParams processReadBoardsRespondParams = new ProcessReadBoardsRespondParams(response, pickBoardActivity);
-                        new ProcessReadBoardsRespond().execute(processReadBoardsRespondParams);
+                        new ParseBoardsTask(pickBoardActivity).execute(response);
                     }
                 }, new Response.ErrorListener() {
                     @Override

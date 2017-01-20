@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.library.MyLog;
 
@@ -89,9 +90,7 @@ public class JellyBeanSpanFixTextView extends ClickableLinksTextView {
             SpannableStringBuilder builder = new SpannableStringBuilder(text);
             this.fixSpannedWithSpaces(builder, widthMeasureSpec, heightMeasureSpec);
         } else {
-            if (Constants.DEBUG) {
-                Log.d(TAG, "The text isn't a Spanned");
-            }
+            MyLog.d(TAG, "The text isn't a Spanned");
             this.fallbackToString(widthMeasureSpec, heightMeasureSpec);
         }
     }
@@ -111,7 +110,7 @@ public class JellyBeanSpanFixTextView extends ClickableLinksTextView {
             this.fallbackToString(widthMeasureSpec, heightMeasureSpec);
         }
 
-        if (Constants.DEBUG) {
+        if (BuildConfig.DEBUG) {
             long fixDuration = System.currentTimeMillis() - startFix;
             Log.d(TAG, "fixSpannedWithSpaces() duration in ms: " + fixDuration);
         }
@@ -142,9 +141,7 @@ public class JellyBeanSpanFixTextView extends ClickableLinksTextView {
             } catch (IndexOutOfBoundsException notFixed) {
             }
         }
-        if (Constants.DEBUG) {
-            Log.d(TAG, "Could not fix the Spanned by adding spaces around spans");
-        }
+        MyLog.d(TAG, "Could not fix the Spanned by adding spaces around spans");
         return FixingResult.notFixed();
     }
 
@@ -190,9 +187,7 @@ public class JellyBeanSpanFixTextView extends ClickableLinksTextView {
     }
 
     private void fallbackToString(int widthMeasureSpec, int heightMeasureSpec) {
-        if (Constants.DEBUG) {
-            Log.d(TAG, "Fallback to unspanned text");
-        }
+        MyLog.d(TAG, "Fallback to unspanned text");
         String fallbackText = this.getText().toString();
         this.setTextAndMeasure(fallbackText, widthMeasureSpec, heightMeasureSpec);
     }
