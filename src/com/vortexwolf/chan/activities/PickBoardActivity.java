@@ -59,7 +59,6 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private IUrlBuilder mUrlBuilder;
-
     private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
@@ -117,100 +116,6 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
         if (this.mCurrentSettings.isDisplayAllBoards != prevSettings.isDisplayAllBoards) {
             this.updateVisibleBoards(this.mAdapter);
         }
-    }
-
-    private void getBoards() {
-        VolleyJsonReader volleyJsonReader = VolleyJsonReader.getInstance(this.getApplicationContext());;
-        String boardsUrl = new MakabaUrlBuilder(this.mSettings).getBoardsUrl();
-
-        volleyJsonReader.readBoards(boardsUrl, this);
-    }
-
-    public void updateVisibleBoards(BoardsListAdapter adapter) {
-        adapter.clear();
-
-        String currentCategory = null;
-        ArrayList<BoardModel> mSettingsBoards = mSettings.getBoards();
-
-        if(this.mBoards.isEmpty()){
-            //Okay, there are no boards in the list, app first launch.
-
-            if(!mSettingsBoards.isEmpty()){
-                //but there are boards in settings, we good.
-                for (BoardModel boardModel: mSettingsBoards) {
-                    this.mBoards.add(boardModel);
-                }
-            }else {
-                //Well, no boards loaded yet and no previous settings stored.
-                //Adapter will remain empty.
-                return;
-            }
-        }
-
-        for (BoardModel board : this.mBoards) {
-            if (!board.getCategory().equals("Творчество") && !this.mSettings.isDisplayAllBoards()) {
-                continue; // ignore hidden boards
-            }
-
-            // add group header if necessary
-            if (board.getCategory() != null && !board.getCategory().equals(currentCategory)) {
-                currentCategory = board.getCategory();
-                adapter.add(new SectionEntity(currentCategory));
-            }
-
-            // add item
-            adapter.add(new BoardEntity(board.getId(), board.getName(), board.getBump_limit()));
-        }
-
-        // add favorite boards
-        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
-        for (FavoritesEntity f : favoriteBoards) {
-            String boardName = f.getBoard();
-            adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
-        }
-    }
-
-    private BoardModel findBoardByCode(String id) {
-        for (BoardModel board : this.mBoards) {
-            if (board.getId().equals(id)) {
-                return board;
-            }
-        }
-
-        return null;
-    }
-
-
-
-    private void resetUI() {
-        this.setTheme(this.mSettings.getTheme());
-        this.setContentView(R.layout.pick_board_view);
-
-        this.registerForContextMenu(this.getListView());
-
-        final Button pickBoardButton = (Button) this.findViewById(R.id.pick_board_button);
-        final EditText pickBoardInput = (EditText) this.findViewById(R.id.pick_board_input);
-
-        pickBoardButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String enteredBoard = pickBoardInput.getText().toString().trim();
-                PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
-            }
-        });
-
-        pickBoardInput.setOnKeyListener(new OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    String enteredBoard = pickBoardInput.getText().toString().trim();
-                    PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
-                    return true;
-                }
-                return false;
-            }
-        });
-
     }
 
     @Override
@@ -311,6 +216,118 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
         return true;
     }
 
+    private void getBoards() {
+        VolleyJsonReader volleyJsonReader = VolleyJsonReader.getInstance(this.getApplicationContext());;
+        String boardsUrl = new MakabaUrlBuilder(this.mSettings).getBoardsUrl();
+
+        volleyJsonReader.readBoards(boardsUrl, this);
+    }
+
+    public void updateVisibleBoards(BoardsListAdapter adapter) {
+        adapter.clear();
+
+        ArrayList<BoardModel> mSettingsBoards = mSettings.getBoards();
+
+        if(this.mBoards.isEmpty()){
+            //Okay, there are no boards in the list, app first launch.
+
+            if(!mSettingsBoards.isEmpty()){
+                //However there are boards in settings, we good.
+                for (BoardModel boardModel: mSettingsBoards) {
+                    this.mBoards.add(boardModel);
+                }
+            }else {
+                //Well, no boards loaded yet and no previous settings stored.
+                //Adapter will remain empty.
+                return;
+            }
+        }
+        String[] categorySequenceToBeShown = new String[]{
+                "Игры",
+                "Политика",
+                "Японская культура",
+                "Разное",
+                "Творчество",
+                "Тематика",
+                "Техника и софт",
+                "Взрослым",
+                "Пользовательские"
+                };
+
+        String currentCategory = null;
+
+        for (String category: categorySequenceToBeShown) {
+            for (BoardModel board : this.mBoards) {
+                // ignore all boards except of matching category.
+                if (!board.getCategory().equals(category)) {
+                    continue;
+                }
+//                //ignore invisible boards
+//                if(!board.isVisible() && !this.mSettings.isDisplayAllBoards()){
+//                    continue;
+//                }
+
+                // add group header
+                if (board.getCategory() != null && !board.getCategory().equals(currentCategory)) {
+                    currentCategory = board.getCategory();
+                    adapter.add(new SectionEntity(currentCategory));
+                }
+                // add item
+                adapter.add(new BoardEntity(board.getId(), board.getName(), board.getBump_limit()));
+            }
+        }
+
+
+        // add favorite boards
+        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
+        for (FavoritesEntity f : favoriteBoards) {
+            String boardName = f.getBoard();
+            adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
+        }
+    }
+
+    private BoardModel findBoardByCode(String id) {
+        for (BoardModel board : this.mBoards) {
+            if (board.getId().equals(id)) {
+                return board;
+            }
+        }
+
+        return null;
+    }
+
+    private void resetUI() {
+        this.setTheme(this.mSettings.getTheme());
+        this.setContentView(R.layout.pick_board_view);
+
+        this.registerForContextMenu(this.getListView());
+
+        final Button pickBoardButton = (Button) this.findViewById(R.id.pick_board_button);
+        final EditText pickBoardInput = (EditText) this.findViewById(R.id.pick_board_input);
+
+        pickBoardButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String enteredBoard = pickBoardInput.getText().toString().trim();
+                PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
+            }
+        });
+
+        pickBoardInput.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String enteredBoard = pickBoardInput.getText().toString().trim();
+                    PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+    }
+
+
     private void checkAndNavigateBoard(String boardCode) {
         boardCode = this.fixSlashes(boardCode);
 
@@ -353,15 +370,4 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
         return result;
     }
 
-    public List<BoardModel> getmBoards() {
-        return mBoards;
-    }
-
-    public BoardsListAdapter getmAdapter() {
-        return mAdapter;
-    }
-
-    public ApplicationSettings getmSettings() {
-        return mSettings;
-    }
 }

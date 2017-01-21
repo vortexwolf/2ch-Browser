@@ -4,7 +4,7 @@ import com.vortexwolf.chan.models.domain.BoardModel;
 
 import java.util.ArrayList;
 
-public class SettingsEntity {
+public class SettingsEntity implements Comparable{
     public int theme;
     public boolean isDisplayDate;
     public boolean isLocalDate;
@@ -13,19 +13,23 @@ public class SettingsEntity {
     public boolean isSwipeToRefresh;
 
     @Override
-    public boolean equals(Object obj) {
-        boolean result;
+    public int compareTo(Object obj) {
+        int result;
         if((obj == null) || (getClass() != obj.getClass())){
-            result = false;
+            result = -1;
         }
         else{
             SettingsEntity se = (SettingsEntity)obj;
-            result = (this.theme == se.theme) &&
+            if( (this.theme == se.theme) &&
                     (this.isDisplayDate == se.isDisplayDate) &&
                     (this.isLocalDate == se.isLocalDate) &&
                     (this.isLoadThumbnails == se.isLoadThumbnails) &&
                     (this.isDisplayAllBoards == se.isDisplayAllBoards) &&
-                    (this.isSwipeToRefresh == se.isSwipeToRefresh);
+                    (this.isSwipeToRefresh == se.isSwipeToRefresh)
+                ){
+                result = 0;
+            }
+            result = -1;
         }
         return result;
     }

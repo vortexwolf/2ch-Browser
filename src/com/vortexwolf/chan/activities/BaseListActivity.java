@@ -57,13 +57,11 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         this.requestWindowFeature(Window.FEATURE_PROGRESS);
     }
 
     @Override
     protected void onPause() {
-
         super.onPause();
         this.mVisible = false;
     }
@@ -72,12 +70,12 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
     protected void onResume() {
         SettingsEntity newSettings = mSettings.getCurrentSettings();
 
-        if(!newSettings.equals(settingsEntity)){
+        if(newSettings.compareTo(settingsEntity) != 0){
             //settings has been changed
             settingsEntity = newSettings;
             resetUI();
-
         }
+
         super.onResume();
         this.mVisible = true;
     }
