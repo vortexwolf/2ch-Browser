@@ -20,6 +20,8 @@ import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.BoardsListAdapter;
+import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
+import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.Websites;
@@ -28,12 +30,15 @@ import com.vortexwolf.chan.common.utils.CompatibilityUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
+import com.vortexwolf.chan.interfaces.IBoardsListCallback;
+import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
-import com.vortexwolf.chan.models.presentation.BoardModel;
+import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
 import com.vortexwolf.chan.services.NavigationService;
+import com.vortexwolf.chan.services.http.VolleyJsonReader;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
 import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 import com.vortexwolf.chan.settings.ApplicationSettings;
@@ -44,9 +49,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class PickBoardActivity extends ListActivity {
+public class PickBoardActivity extends ListActivity implements IBoardsListCallback {
 
-    public static final String TAG = "PickBoardActivity";
+    public static final String TAG = PickBoardActivity.class.getSimpleName();
 
     private static final Pattern boardCodePattern = Pattern.compile("^\\w+$");
 
@@ -54,12 +59,16 @@ public class PickBoardActivity extends ListActivity {
     private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private NavigationService mNavigationService = Factory.resolve(NavigationService.class);
     private IUrlBuilder mUrlBuilder;
-
     private IWebsite mWebsite;
     private BoardsListAdapter mAdapter = null;
     private SettingsEntity mCurrentSettings = null;
+    private List<BoardModel> mBoards = new ArrayList<>();
 
-    private final ArrayList<BoardModel> mBoards = new ArrayList<BoardModel>();
+    @Override
+    public void listUpdated(List<BoardModel> newBoards) {
+        this.mBoards = newBoards;
+        updateVisibleBoards(this.mAdapter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +91,8 @@ public class PickBoardActivity extends ListActivity {
         }
 
         this.resetUI();
-
-        this.parseAllBoards();
-
         this.mAdapter = new BoardsListAdapter(this);
+        this.getBoards();
         this.updateVisibleBoards(this.mAdapter);
         this.setListAdapter(this.mAdapter);
 
@@ -109,96 +116,6 @@ public class PickBoardActivity extends ListActivity {
         if (this.mCurrentSettings.isDisplayAllBoards != prevSettings.isDisplayAllBoards) {
             this.updateVisibleBoards(this.mAdapter);
         }
-    }
-
-    private void parseAllBoards() {
-        //TODO: загружать /makaba/mobile.fcgi?task=get_boards
-        this.mBoards.addAll(this.parseBoardsList(R.array.pickboard_boards));
-    }
-
-    private void updateVisibleBoards(BoardsListAdapter adapter) {
-        adapter.clear();
-
-        String currentGroup = null;
-        for (BoardModel board : this.mBoards) {
-            if (!board.isVisible && !this.mSettings.isDisplayAllBoards()) {
-                continue; // ignore hidden boards
-            }
-
-            // add group header if necessary
-            if (board.group != null && !board.group.equals(currentGroup)) {
-                currentGroup = board.group;
-                adapter.add(new SectionEntity(currentGroup));
-            }
-
-            // add item
-            adapter.add(new BoardEntity(board.code, board.title));
-        }
-
-        // add favorite boards
-        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
-        for (FavoritesEntity f : favoriteBoards) {
-            String boardName = f.getBoard();
-            adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
-        }
-    }
-
-    private BoardModel findBoardByCode(String code) {
-        for (BoardModel board : this.mBoards) {
-            if (board.code.equals(code)) {
-                return board;
-            }
-        }
-
-        return null;
-    }
-
-    private ArrayList<BoardModel> parseBoardsList(int arrayId) {
-        ArrayList<BoardModel> boards = new ArrayList<BoardModel>();
-
-        String[] entities = this.getResources().getStringArray(arrayId);
-        String currentGroup = null;
-        for (String entity : entities) {
-            String[] parts = entity.split(";\\s?");
-            if (parts.length == 1) {
-                currentGroup = parts[0];
-            } else if (parts.length >= 2) {
-                boards.add(new BoardModel(parts[0], parts[1], true, currentGroup));
-            }
-        }
-
-        return boards;
-    }
-
-    private void resetUI() {
-        this.setTheme(this.mSettings.getTheme());
-        this.setContentView(R.layout.pick_board_view);
-
-        this.registerForContextMenu(this.getListView());
-
-        final Button pickBoardButton = (Button) this.findViewById(R.id.pick_board_button);
-        final EditText pickBoardInput = (EditText) this.findViewById(R.id.pick_board_input);
-
-        pickBoardButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String enteredBoard = pickBoardInput.getText().toString().trim();
-                PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
-            }
-        });
-
-        pickBoardInput.setOnKeyListener(new OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    String enteredBoard = pickBoardInput.getText().toString().trim();
-                    PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
-                    return true;
-                }
-                return false;
-            }
-        });
-
     }
 
     @Override
@@ -298,6 +215,118 @@ public class PickBoardActivity extends ListActivity {
 
         return true;
     }
+
+    private void getBoards() {
+        VolleyJsonReader volleyJsonReader = VolleyJsonReader.getInstance(this.getApplicationContext());;
+        String boardsUrl = new MakabaUrlBuilder(this.mSettings).getBoardsUrl();
+
+        volleyJsonReader.readBoards(boardsUrl, this);
+    }
+
+    public void updateVisibleBoards(BoardsListAdapter adapter) {
+        adapter.clear();
+
+        ArrayList<BoardModel> mSettingsBoards = mSettings.getBoards();
+
+        if(this.mBoards.isEmpty()){
+            //Okay, there are no boards in the list, app first launch.
+
+            if(!mSettingsBoards.isEmpty()){
+                //However there are boards in settings, we good.
+                for (BoardModel boardModel: mSettingsBoards) {
+                    this.mBoards.add(boardModel);
+                }
+            }else {
+                //Well, no boards loaded yet and no previous settings stored.
+                //Adapter will remain empty.
+                return;
+            }
+        }
+        String[] categorySequenceToBeShown = new String[]{
+                "Игры",
+                "Политика",
+                "Японская культура",
+                "Разное",
+                "Творчество",
+                "Тематика",
+                "Техника и софт",
+                "Взрослым",
+                "Пользовательские"
+                };
+
+        String currentCategory = null;
+
+        for (String category: categorySequenceToBeShown) {
+            for (BoardModel board : this.mBoards) {
+                // ignore all boards except of matching category.
+                if (!board.getCategory().equals(category)) {
+                    continue;
+                }
+//                //ignore invisible boards
+//                if(!board.isVisible() && !this.mSettings.isDisplayAllBoards()){
+//                    continue;
+//                }
+
+                // add group header
+                if (board.getCategory() != null && !board.getCategory().equals(currentCategory)) {
+                    currentCategory = board.getCategory();
+                    adapter.add(new SectionEntity(currentCategory));
+                }
+                // add item
+                adapter.add(new BoardEntity(board.getId(), board.getName(), board.getBump_limit()));
+            }
+        }
+
+
+        // add favorite boards
+        List<FavoritesEntity> favoriteBoards = this.mFavoritesDatasource.getFavoriteBoards();
+        for (FavoritesEntity f : favoriteBoards) {
+            String boardName = f.getBoard();
+            adapter.addItemToFavoritesSection(boardName, this.findBoardByCode(boardName));
+        }
+    }
+
+    private BoardModel findBoardByCode(String id) {
+        for (BoardModel board : this.mBoards) {
+            if (board.getId().equals(id)) {
+                return board;
+            }
+        }
+
+        return null;
+    }
+
+    private void resetUI() {
+        this.setTheme(this.mSettings.getTheme());
+        this.setContentView(R.layout.pick_board_view);
+
+        this.registerForContextMenu(this.getListView());
+
+        final Button pickBoardButton = (Button) this.findViewById(R.id.pick_board_button);
+        final EditText pickBoardInput = (EditText) this.findViewById(R.id.pick_board_input);
+
+        pickBoardButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String enteredBoard = pickBoardInput.getText().toString().trim();
+                PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
+            }
+        });
+
+        pickBoardInput.setOnKeyListener(new OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String enteredBoard = pickBoardInput.getText().toString().trim();
+                    PickBoardActivity.this.checkAndNavigateBoard(enteredBoard);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+    }
+
 
     private void checkAndNavigateBoard(String boardCode) {
         boardCode = this.fixSlashes(boardCode);

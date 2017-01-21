@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 
@@ -411,4 +413,5 @@ public class IoUtils {
 
         return samplings.length == 1 && !samplings[0].equals("1x1");
     }
+
 }
