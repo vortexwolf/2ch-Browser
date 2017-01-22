@@ -14,9 +14,9 @@ public class SettingsEntity implements Comparable{
 
     @Override
     public int compareTo(Object obj) {
-        int result;
+
         if((obj == null) || (getClass() != obj.getClass())){
-            result = -1;
+            return -1;
         }
         else{
             SettingsEntity se = (SettingsEntity)obj;
@@ -27,10 +27,9 @@ public class SettingsEntity implements Comparable{
                     (this.isDisplayAllBoards == se.isDisplayAllBoards) &&
                     (this.isSwipeToRefresh == se.isSwipeToRefresh)
                 ){
-                result = 0;
+                return 0;
             }
-            result = -1;
+            return -1;
         }
-        return result;
     }
 }
