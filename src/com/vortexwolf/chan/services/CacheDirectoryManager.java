@@ -9,6 +9,7 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CacheDirectoryManager {
     private static final String TAG = "CacheManager";
@@ -122,6 +123,9 @@ public class CacheDirectoryManager {
             File externalStorageDir = Environment.getExternalStorageDirectory();
             // {SD_PATH}/Android/data/com.vortexwolf.chan/cache
             File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + this.mPackageName + File.separator + "cache");
+            if(!extStorageAppCachePath.mkdirs()){
+                return null;
+            };
 
             return extStorageAppCachePath;
         }
