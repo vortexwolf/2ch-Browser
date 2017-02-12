@@ -41,7 +41,7 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
     private Button mCaptchaSendButton;
     private CheckCloudflareTask mCurrentCheckTask = null;
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    SettingsEntity settingsEntity = mSettings.getCurrentSettings();
+    private SettingsEntity settingsEntity = mSettings.getCurrentSettings();
 
     protected boolean mVisible = false;
 
@@ -62,18 +62,16 @@ public abstract class BaseListActivity extends ListActivity implements SwipeRefr
 
     @Override
     protected void onPause() {
-
         super.onPause();
         this.mVisible = false;
     }
 
     @Override
     protected void onResume() {
-        SettingsEntity newSettings = mSettings.getCurrentSettings();
 
-        if(newSettings.compareTo(settingsEntity) != 0){
+        if(settingsEntity.compareTo(mSettings.getCurrentSettings()) != 0){
             //settings has been changed
-            settingsEntity = newSettings;
+            settingsEntity = mSettings.getCurrentSettings();
             resetUI();
         }
 

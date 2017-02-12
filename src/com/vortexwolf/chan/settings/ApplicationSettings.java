@@ -358,7 +358,7 @@ public class ApplicationSettings {
         // sometimes users can choose more than 1 captcha type, so I will leave it in settings
         return CaptchaType.DVACH;
     }
-
+    @SuppressWarnings("unchecked")
     public ArrayList<BoardModel> getBoards(){
         try {
             //it might be already deserialized
