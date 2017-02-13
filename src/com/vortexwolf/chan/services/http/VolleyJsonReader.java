@@ -1,5 +1,6 @@
 package com.vortexwolf.chan.services.http;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -10,8 +11,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.vortexwolf.chan.BuildConfig;
-import com.vortexwolf.chan.activities.PickBoardActivity;
 import com.vortexwolf.chan.asynctasks.ParseBoardsTask;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.AppearanceUtils;
+import com.vortexwolf.chan.interfaces.IBoardsListCallback;
 
 import org.json.JSONObject;
 
@@ -20,7 +23,8 @@ import org.json.JSONObject;
 public class VolleyJsonReader {
 
     private static final String LOG_TAG = VolleyJsonReader.class.getSimpleName();
-
+    //Since this is singletone, no context leak expected.
+    @SuppressLint("StaticFieldLeak")
     private static VolleyJsonReader mInstance;
     private RequestQueue mRequestQueue;
     private Context mCtx;
@@ -54,20 +58,20 @@ public class VolleyJsonReader {
         if(BuildConfig.DEBUG) Log.d(LOG_TAG, "Request placed to queue: " + req.toString());
     }
 
-    public void readBoards(String url, final PickBoardActivity pickBoardActivity) {
+    public void readBoards(String url, final IBoardsListCallback callback) {
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         //onResponse method is invoked in main thread but boards object creation may take a while
                         //so it's better to move this process to asynctask.
-                        new ParseBoardsTask(pickBoardActivity).execute(response);
+                        new ParseBoardsTask(callback).execute(response);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-
+                        MyLog.e(LOG_TAG, error);
+                        AppearanceUtils.showToastMessage(mCtx, "Unable to fetch boards list from server");
                     }
                 });
         this.addToRequestQueue(jsObjRequest);
