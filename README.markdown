@@ -11,12 +11,7 @@ Select any board according to your interests and jump right in.
 <img alt="List of tabs" src="https://lh5.ggpht.com/SAfqIvfvia1GewTu_MDiQpsVO0RWEhYnFg8WNamhjvIQs4JL4-JL491Yy0phd58OdMc2" width="200" />
 <img alt="Adding a new post" src="https://lh6.ggpht.com/Sz5T-wP8v3DpObPUVIBg76qtyrKsS_sXzXxd28JY-Uz2-TXBQy10bKnlL6d82KKj-g" width="200" />
 
-## Google Play
-
-You can download the application here: 
-https://play.google.com/store/apps/details?id=com.vortexwolf.chan  
-
-Direct link: 
+Direct link:
 https://dl.dropboxusercontent.com/u/75518900/2ch-Browser-release.apk
 
 ## Building Source Code
