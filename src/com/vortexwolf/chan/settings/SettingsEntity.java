@@ -1,9 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import com.vortexwolf.chan.models.domain.BoardModel;
-
-import java.util.ArrayList;
-
 public class SettingsEntity implements Comparable{
     public int theme;
     public boolean isDisplayDate;
