@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.vortexwolf.chan"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="97"
-    android:versionName="1.5.36"
+    android:versionCode="98"
+    android:versionName="1.5.37"
       android:installLocation="auto"
       >
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25"/>
