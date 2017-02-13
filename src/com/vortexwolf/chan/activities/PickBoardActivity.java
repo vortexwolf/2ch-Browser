@@ -37,6 +37,7 @@ import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
+import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.http.VolleyJsonReader;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
@@ -116,6 +117,7 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
         if (this.mCurrentSettings.isDisplayAllBoards != prevSettings.isDisplayAllBoards) {
             this.updateVisibleBoards(this.mAdapter);
         }
+        CacheDirectoryManager.verifyStoragePermissions(this);
     }
 
     @Override
