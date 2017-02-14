@@ -21,12 +21,11 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 public class ApplicationPreferencesActivity extends PreferenceActivity{
-    private static final String TAG = "ApplicationPreferencesActivity";
+    private static final String TAG = ApplicationPreferencesActivity.class.getSimpleName();
 
     private ApplicationSettings mSettings;
     private SharedPreferences mSharedPreferences;
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener;
-    Resources res ;
 
 
     @Override
@@ -34,24 +33,15 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
         // set theme before creating
         this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.setTheme(this.mSettings.getTheme());
-        res = ApplicationPreferencesActivity.this.getResources();
-        
+
         // create
         super.onCreate(savedInstanceState);
+
+        this.addPreferencesFromResource(R.xml.preferences);
 
         this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
-        this.addPreferencesFromResource(R.xml.preferences);
-
-        getPreferenceManager().findPreference(res.getString(R.string.pref_display_hidden_boards_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(final Preference preference) {
-
-                return true;
-            }
-
-        });
 
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
@@ -79,7 +69,6 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
 
         this.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this.mSharedPreferenceChangeListener);
     }
-
 
     private class SharedPreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
 

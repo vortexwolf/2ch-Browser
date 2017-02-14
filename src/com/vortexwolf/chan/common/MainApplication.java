@@ -59,7 +59,7 @@ public class MainApplication extends Application {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
 
-        ApplicationSettings settings = new ApplicationSettings(this, this.getResources());
+        ApplicationSettings settings = new ApplicationSettings(this.getApplicationContext(), this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());

@@ -24,10 +24,10 @@
             android:summary="@string/pref_mobileapi_summary"
             android:title="@string/pref_mobileapi" />
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="@string/pref_display_hidden_boards_key"
             android:summary="@string/pref_display_all_boards_summary"
-            android:title="@string/pref_display_all_boards" />
+            android:title="@string/pref_display_all_boards"
+            android:defaultValue="false" />
         <EditTextPreference
             android:hint="@string/pref_homepage_hint"
             android:inputType="text"
