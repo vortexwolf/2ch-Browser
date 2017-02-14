@@ -41,7 +41,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
 
         this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
-
+        //TODO fix issue with wrong default values loaded on startup
 
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);

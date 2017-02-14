@@ -146,6 +146,7 @@ public class CacheDirectoryManager {
     }
 
     public static void verifyStoragePermissions(Activity activity) {
+        //TODO rework permissions gain logic
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
