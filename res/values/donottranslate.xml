@@ -90,5 +90,30 @@
         <item>@string/pref_theme_neutron_value</item>
         <item>@string/pref_theme_photon_value</item>
     </string-array>
+    <string-array name="allowed_boards">
+        <item>bi</item>
+        <item>bo</item>
+        <item>cg</item>
+        <item>di</item>
+        <item>diy</item>
+        <item>dom</item>
+        <item>fl</item>
+        <item>ftb</item>
+        <item>hi</item>
+        <item>mlp</item>
+        <item>mov</item>
+        <item>mu</item>
+        <item>mus</item>
+        <item>ne</item>
+        <item>pa</item>
+        <item>psy</item>
+        <item>sf</item>
+        <item>sp</item>
+        <item>trv</item>
+        <item>tv</item>
+        <item>vg</item>
+        <item>w</item>
+        <item>wh</item>
+    </string-array>
 
 </resources>

@@ -52,14 +52,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
             }
 
         });
-//        getPreferenceScreen().setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//
-//            @Override
-//            public boolean onPreferenceClick(Preference preference) {
-//                return false;
-//            }
-//        });
-        
+
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
         this.updateListSummary(R.string.pref_image_preview_key);
