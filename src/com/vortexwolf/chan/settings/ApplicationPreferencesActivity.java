@@ -1,8 +1,11 @@
 package com.vortexwolf.chan.settings;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -17,18 +20,21 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class ApplicationPreferencesActivity extends PreferenceActivity {
+public class ApplicationPreferencesActivity extends PreferenceActivity{
     private static final String TAG = "ApplicationPreferencesActivity";
 
     private ApplicationSettings mSettings;
     private SharedPreferences mSharedPreferences;
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener;
+    Resources res ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // set theme before creating
         this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.setTheme(this.mSettings.getTheme());
+        res = ApplicationPreferencesActivity.this.getResources();
         
         // create
         super.onCreate(savedInstanceState);
@@ -37,6 +43,22 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
         this.addPreferencesFromResource(R.xml.preferences);
+
+        getPreferenceManager().findPreference(res.getString(R.string.pref_display_hidden_boards_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+
+                return true;
+            }
+
+        });
+//        getPreferenceScreen().setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                return false;
+//            }
+//        });
         
         this.updateListSummary(R.string.pref_theme_key);
         this.updateListSummary(R.string.pref_text_size_key);
@@ -65,11 +87,13 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
         this.mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this.mSharedPreferenceChangeListener);
     }
 
+
     private class SharedPreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+
         @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Resources res = ApplicationPreferencesActivity.this.getResources();
-            Preference preference = ApplicationPreferencesActivity.this.getPreferenceManager().findPreference(key);
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
+            final Resources res = ApplicationPreferencesActivity.this.getResources();
+            final Preference preference = ApplicationPreferencesActivity.this.getPreferenceManager().findPreference(key);
 
             if (preference instanceof ListPreference) {
                 ApplicationPreferencesActivity.this.updateListSummary(key);
@@ -79,6 +103,43 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
                 ApplicationPreferencesActivity.this.updateStartPageSummary();
             } else if (key.equals(res.getString(R.string.pref_download_path_key))) {
                 ApplicationPreferencesActivity.this.updateDownloadPathSummary();
+            }else if (key.equals(res.getString(R.string.pref_display_hidden_boards_key))){
+
+                final CheckBoxPreference pref = (CheckBoxPreference) preference;
+                boolean isEnabled = mSharedPreferences.getBoolean(key, true);
+                final SharedPreferences.Editor preferenceEditor = mSharedPreferences.edit();
+                if(isEnabled) {
+                    //Preference has already been changed to "true"
+                    //Prepare rollback and show Warning dialog
+                    preferenceEditor
+                            .putBoolean(preference.getKey(), false);
+                    new AlertDialog.Builder(ApplicationPreferencesActivity.this)
+                            .setTitle(res.getString(R.string.unmoderated_boards_list_popup_title))
+                            .setMessage(res.getString(R.string.unmoderated_boards_list_popup_text))
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //leave it as it is
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //rollback
+                                    preferenceEditor.apply();
+                                    pref.setChecked(false);
+                                }
+                            })
+                            .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialogInterface) {
+                                    //rollback
+                                    preferenceEditor.apply();
+                                    pref.setChecked(false);
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
+                }
             }
             if (key.equals(res.getString(R.string.pref_unsafe_ssl_key))) {
                 ((ExtendedHttpClient)Factory.resolve(DefaultHttpClient.class)).setSafe(!mSettings.isUnsafeSSL());
