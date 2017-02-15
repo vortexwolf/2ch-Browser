@@ -1,56 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.vortexwolf.chan"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="100"
-    android:versionName="1.6.0"
-      android:installLocation="auto"
-      >
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25"/>
+    package="com.vortexwolf.chan"
+    android:installLocation="auto"
+    android:versionCode="101"
+    android:versionName="1.6.1">
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="25" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-feature android:name="android.hardware.camera"
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
-    <application android:name="com.vortexwolf.chan.common.MainApplication" android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name="com.vortexwolf.chan.activities.PickBoardActivity" android:configChanges="keyboardHidden|orientation|screenSize">
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:name=".common.MainApplication">
+        <activity
+            android:name=".activities.LaunchScreenActivity"
+            android:theme="@style/launchScreenTheme">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.vortexwolf.chan.activities.ThreadsListActivity" android:configChanges="keyboardHidden|orientation|screenSize">
-            <meta-data android:name="android.app.default_searchable" android:value="com.vortexwolf.chan.activities.SearchableActivity" />
+
+        <activity
+            android:name=".activities.PickBoardActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
-        <activity android:name="com.vortexwolf.chan.activities.PostsListActivity" android:configChanges="keyboardHidden|orientation|screenSize">
+        <activity
+            android:name=".activities.ThreadsListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.vortexwolf.chan.activities.SearchableActivity" />
         </activity>
-        <activity android:name="com.vortexwolf.chan.activities.SearchableActivity" android:launchMode="singleTop" android:configChanges="keyboardHidden|orientation|screenSize">
+        <activity
+            android:name=".activities.PostsListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+
+        </activity>
+        <activity
+            android:name=".activities.SearchableActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
-        <activity android:name="com.vortexwolf.chan.activities.ExternalUrlHandlerActivity" android:theme="@android:style/Theme.NoDisplay" android:launchMode="singleTask">
+        <activity
+            android:name=".activities.ExternalUrlHandlerActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="2ch.pm" android:pathPattern="/.*" />
-                <data android:scheme="https" android:host="2ch.hk" android:pathPattern="/.*" />
-                <data android:scheme="http" android:host="2ch.hk" android:pathPattern="/.*" />
+
+                <data
+                    android:host="2ch.pm"
+                    android:pathPattern="/.*"
+                    android:scheme="https" />
+                <data
+                    android:host="2ch.hk"
+                    android:pathPattern="/.*"
+                    android:scheme="https" />
+                <data
+                    android:host="2ch.hk"
+                    android:pathPattern="/.*"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
-        <activity android:name="com.vortexwolf.chan.activities.ImageGalleryActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:hardwareAccelerated="true"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.BrowserActivity" android:hardwareAccelerated="true" android:configChanges="keyboardHidden|orientation|screenSize"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.AddPostActivity" android:configChanges="keyboardHidden|orientation|screenSize"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.FilesListActivity" android:configChanges="keyboardHidden|orientation|screenSize"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:noHistory="true"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.TabsHistoryBookmarksCompActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:noHistory="true"></activity>
-        <activity android:name="com.vortexwolf.chan.activities.NewRecaptchaActivity"></activity>
-        <activity android:name="com.vortexwolf.chan.settings.ApplicationPreferencesActivity"></activity>
+        <activity
+            android:name=".activities.ImageGalleryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name=".activities.BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name=".activities.AddPostActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".activities.FilesListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".activities.TabsHistoryBookmarksActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:noHistory="true" />
+        <activity
+            android:name=".activities.TabsHistoryBookmarksCompActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:noHistory="true" />
+        <activity android:name=".activities.NewRecaptchaActivity" />
+        <activity android:name=".settings.ApplicationPreferencesActivity" />
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.example.android.fileprovider"
@@ -58,10 +124,10 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
 
-
     </application>
+
 </manifest>

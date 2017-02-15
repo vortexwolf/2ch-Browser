@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">2ch Browser</string>
-    
+
     <!-- UI Text -->
     <string name="loading">Loading...</string>
     <string name="addpost_sage">Sage</string>
@@ -164,24 +164,24 @@
     <string name="pref_file_cache_no_limit_summary">Remove the limit of cache size of 25Mb</string>
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
-    
+
     <string name="pref_mobileapi">Mobile API</string>
     <string name="pref_mobileapi_summary">Load only new posts without reloading the whole thread</string>
-    
+
     <string name="pref_use_https">Use HTTPS</string>
     <string name="pref_use_https_summary">Enable secure communication by using https:// instead of http://</string>
     <string name="pref_unsafe_ssl">Ignore SSL Certificate Errors</string>
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
-    
+
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
-    
+
     <string name="pref_gif_preview">GIF Viewer</string>
     <string-array name="pref_gif_preview_choices">
         <item>WebView</item>
         <item>libgif.so</item>
     </string-array>
-    
+
     <string name="pref_image_preview">Image Viewer</string>
     <string-array name="pref_image_preview_choices">
         <item>WebView</item>
@@ -196,7 +196,7 @@
         <item>External player, 1 click</item>
         <item>External player, 2 clicks through gallery</item>
     </string-array>
-    
+
     <string-array name="pref_text_size_choices">
         <item>Normal (13sp)</item>
         <item>Normal (14sp)</item>
@@ -285,10 +285,10 @@ If you want to be in read-only, post to /test/.
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
     <string name="notification_video">Tap Video Preview to Play</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
-    
+
     <string-array name="catalog_filters">
-		<item>Sort by Bump order</item>
-		<item>Sort by Creation date</item>
-	</string-array>
+        <item>Sort by Bump order</item>
+        <item>Sort by Creation date</item>
+    </string-array>
 
 </resources>
