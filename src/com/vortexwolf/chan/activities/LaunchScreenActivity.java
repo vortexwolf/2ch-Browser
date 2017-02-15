@@ -23,7 +23,7 @@ public class LaunchScreenActivity extends Activity {
         }else{
             //no permissions grant required, proceed to main activity with minor delay
             try {
-                Thread.sleep(1500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
