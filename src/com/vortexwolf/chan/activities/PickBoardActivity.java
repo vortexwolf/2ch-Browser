@@ -3,7 +3,6 @@ package com.vortexwolf.chan.activities;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -21,7 +20,6 @@ import android.widget.ListView;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.adapters.BoardsListAdapter;
-import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
@@ -32,13 +30,11 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.db.FavoritesDataSource;
 import com.vortexwolf.chan.db.FavoritesEntity;
 import com.vortexwolf.chan.interfaces.IBoardsListCallback;
-import com.vortexwolf.chan.interfaces.IJsonApiReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
-import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.domain.BoardModel;
+import com.vortexwolf.chan.models.presentation.BoardEntity;
 import com.vortexwolf.chan.models.presentation.SectionEntity;
-import com.vortexwolf.chan.services.CacheDirectoryManager;
 import com.vortexwolf.chan.services.NavigationService;
 import com.vortexwolf.chan.services.http.VolleyJsonReader;
 import com.vortexwolf.chan.services.presentation.EditTextDialog;
@@ -119,7 +115,6 @@ public class PickBoardActivity extends ListActivity implements IBoardsListCallba
         if (this.mCurrentSettings.isDisplayAllBoards != prevSettings.isDisplayAllBoards) {
             this.updateVisibleBoards(this.mAdapter);
         }
-        CacheDirectoryManager.verifyStoragePermissions(this);
     }
 
     @Override
