@@ -27,7 +27,7 @@ public class CacheDirectoryManager {
         this.mSettings = settings;
         this.mExternalCacheDir = this.getExternalCachePath();
         this.FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(mSettings.getCacheSize());
-        this.FILE_CACHE_TRIM_AMOUNT = Math.round(FILE_CACHE_THRESHOLD * 0.75);
+        this.FILE_CACHE_TRIM_AMOUNT = Math.round(FILE_CACHE_THRESHOLD * 0.5);
     }
 
     public File getInternalCacheDir() {

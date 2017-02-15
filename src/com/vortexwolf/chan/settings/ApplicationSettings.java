@@ -387,8 +387,8 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_swipe_to_refresh_key), true);
     }
 
-    public long getCacheSize(){
-        return this.mSettings.getLong(this.mResources.getString(R.string.pref_file_cache_limit_key), 30);
+    public int getCacheSize(){
+        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_size_limit_key), 30);
     }
 
     public SettingsEntity getCurrentSettings() {
