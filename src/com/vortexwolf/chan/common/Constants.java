@@ -22,8 +22,6 @@ public class Constants {
     public static final ArrayList<String> COOKIE_REQUIRE_BOARDS = new ArrayList<String>(Arrays.asList(new String[] {
             "h", "ho", "hc", "e", "fet" }));
 
-    public static final long FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(25);
-    public static final long FILE_CACHE_TRIM_AMOUNT = IoUtils.convertMbToBytes(15);
 
     public static final int SDK_VERSION = Integer.parseInt(Build.VERSION.SDK);
 

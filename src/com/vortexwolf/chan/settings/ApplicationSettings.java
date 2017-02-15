@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
@@ -206,7 +205,7 @@ public class ApplicationSettings {
     }
 
     public boolean isUnlimitedCache() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_no_limit_key), false);
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_limit_key), false);
     }
 
     public boolean isUnsafeSSL() {
@@ -386,6 +385,10 @@ public class ApplicationSettings {
 
     public boolean isSwipeToRefresh(){
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_swipe_to_refresh_key), true);
+    }
+
+    public long getCacheSize(){
+        return this.mSettings.getLong(this.mResources.getString(R.string.pref_file_cache_limit_key), 30);
     }
 
     public SettingsEntity getCurrentSettings() {

@@ -160,8 +160,8 @@
     <string name="pref_cut_posts">Long posts</string>
     <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
-    <string name="pref_file_cache_no_limit">Unlimited cache</string>
-    <string name="pref_file_cache_no_limit_summary">Remove the limit of cache size of 25Mb</string>
+    <string name="pref_file_cache_limit">Limited cache</string>
+    <string name="pref_file_cache_limit_summary">Enable cache size limit</string>
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>
     <string name="pref_multithumbnails_in_threads_summary">Display multiple thumbnails in threads list</string>
 
@@ -222,6 +222,8 @@
     <string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
     <string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
     <string name="pref_file_cache_clear">Clear cache</string>
+    <string name="pref_cache_size_limit_title">Limit cache</string>
+    <string name="pref_cache_size_limit_summary">%1$d Mb</string>
     <string name="pref_display_all_boards">Boards list</string>
     <string name="pref_display_all_boards_summary">Show unmoderated boards</string>
     <string name="pref_passcode">Passcode</string>

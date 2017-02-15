@@ -237,8 +237,10 @@
     <string name="pref_passcode_summary">Код для пропуска капчи, администраторы сайта выдают их некоторым пользователям</string>
     <string name="pref_legacy_image_viewer">Просмотр изображений</string>
     <string name="pref_legacy_image_viewer_summary">Не использовать галерею и открывать изображения по одному</string>
-    <string name="pref_file_cache_no_limit">Неограниченный кэш</string>
-    <string name="pref_file_cache_no_limit_summary">Отменить ограничение на размер кэша в 25Мб</string>
+    <string name="pref_file_cache_limit">Ограничение кэша</string>
+    <string name="pref_file_cache_limit_summary">Установить ограничение на размер кэша</string>
+    <string name="pref_cache_size_limit_title">Ограничить кэш</string>
+    <string name="pref_cache_size_limit_summary">%1$d Mb</string>
     <string name="pref_external_video">Внешний видеоплеер</string>
     <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
     <string name="pref_video_mute">Видео без звука</string>

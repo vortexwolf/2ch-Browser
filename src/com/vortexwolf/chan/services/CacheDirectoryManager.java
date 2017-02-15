@@ -13,6 +13,9 @@ import java.io.File;
 public class CacheDirectoryManager {
     private static final String TAG = CacheDirectoryManager.class.getSimpleName();
 
+    public long FILE_CACHE_THRESHOLD;
+    public long FILE_CACHE_TRIM_AMOUNT;
+
     private final String mPackageName;
     private final File mInternalCacheDir;
     private final File mExternalCacheDir;
@@ -23,6 +26,8 @@ public class CacheDirectoryManager {
         this.mInternalCacheDir = internalCacheDir;
         this.mSettings = settings;
         this.mExternalCacheDir = this.getExternalCachePath();
+        this.FILE_CACHE_THRESHOLD = IoUtils.convertMbToBytes(mSettings.getCacheSize());
+        this.FILE_CACHE_TRIM_AMOUNT = Math.round(FILE_CACHE_THRESHOLD * 0.75);
     }
 
     public File getInternalCacheDir() {
@@ -92,10 +97,10 @@ public class CacheDirectoryManager {
             @Override
             public Void doInBackground(Void... params) {
                 long cacheSize = IoUtils.dirSize(CacheDirectoryManager.this.getCurrentCacheDirectory());
-                long maxSize = Constants.FILE_CACHE_THRESHOLD;
+                long maxSize = FILE_CACHE_THRESHOLD;
 
                 if (cacheSize > maxSize) {
-                    long deleteAmount = (cacheSize - maxSize) + Constants.FILE_CACHE_TRIM_AMOUNT;
+                    long deleteAmount = (cacheSize - maxSize) + FILE_CACHE_TRIM_AMOUNT;
                     IoUtils.deleteDirectory(CacheDirectoryManager.this.getReversedCacheDirectory());
                     deleteAmount -= IoUtils.freeSpace(CacheDirectoryManager.this.getImagesCacheDirectory(), deleteAmount);
                     IoUtils.freeSpace(CacheDirectoryManager.this.getCurrentCacheDirectory(), deleteAmount);

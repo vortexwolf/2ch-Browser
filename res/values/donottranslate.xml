@@ -23,6 +23,7 @@
     <string name="pref_theme_photon_value">THEME_PHOTON</string>
     <string name="pref_auto_refresh_key">pref_auto_refresh_key</string>
     <string name="pref_auto_refresh_interval_key">pref_auto_refresh_interval_key</string>
+    <string name="pref_cache_size_limit_key">pref_cache_size_limit_key</string>
     <string name="pref_display_name_key">pref_display_name_key</string>
     <string name="pref_domain_key">pref_domain_key1</string>
     <string name="pref_download_background_key">pref_download_background_key</string>
@@ -32,7 +33,7 @@
     <string name="pref_passcode_key">pref_passcode_key</string>
     <string name="pref_cut_posts_key">pref_cut_posts_key</string>
     <string name="pref_legacy_image_viewer_key">pref_legacy_image_viewer_key</string>
-    <string name="pref_file_cache_no_limit_key">pref_file_cache_no_limit_key</string>
+    <string name="pref_file_cache_limit_key">pref_file_cache_limit_key</string>
     <string name="pref_cf_clearance_cookie_key">pref_cf_clearance_cookie_key</string>
     <string name="pref_cf_clearance_cookie_domain_key">pref_cf_clearance_cookie_domain_key</string>
     <string name="pref_passcode_cookie_key">pref_passcode_cookie_key</string>
