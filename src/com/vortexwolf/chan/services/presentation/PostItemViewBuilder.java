@@ -3,7 +3,6 @@ package com.vortexwolf.chan.services.presentation;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -12,21 +11,17 @@ import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.vortexwolf.chan.R;
-import com.vortexwolf.chan.activities.PostsListActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.controls.ClickableLinksTextView;
@@ -220,7 +215,9 @@ public class PostItemViewBuilder {
             vb.badgeView.setVisibility(View.VISIBLE);
             vb.badgeTitle.setText(badge.title);
 
-            Uri uri = Uri.parse(this.mUrlBuilder.getIconUrl(badge.source));
+            String protectedUri = Uri.encode(badge.source);
+
+            Uri uri = Uri.parse(this.mUrlBuilder.getIconUrl(protectedUri));
             this.mBitmapManager.fetchBitmapOnThread(uri, vb.badgeImage, false, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
