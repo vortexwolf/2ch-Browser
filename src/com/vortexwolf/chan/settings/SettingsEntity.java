@@ -7,6 +7,7 @@ public class SettingsEntity implements Comparable{
     public boolean isLoadThumbnails;
     public boolean isDisplayAllBoards;
     public boolean isSwipeToRefresh;
+    public boolean isDisplayIcons;
 
     @Override
     public int compareTo(Object obj) {
@@ -21,7 +22,8 @@ public class SettingsEntity implements Comparable{
                     (this.isLocalDate == se.isLocalDate) &&
                     (this.isLoadThumbnails == se.isLoadThumbnails) &&
                     (this.isDisplayAllBoards == se.isDisplayAllBoards) &&
-                    (this.isSwipeToRefresh == se.isSwipeToRefresh)
+                    (this.isSwipeToRefresh == se.isSwipeToRefresh) &&
+                    (this.isDisplayIcons == se.isDisplayIcons)
                 ){
                 return 0;
             }

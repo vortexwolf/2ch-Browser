@@ -211,7 +211,7 @@ public class PostItemViewBuilder {
 
         // badge
         BadgeModel badge = item.getBadge();
-        if (badge != null) {
+        if (badge != null && mSettings.isDisplayIcons()) {
             vb.badgeView.setVisibility(View.VISIBLE);
             vb.badgeTitle.setText(badge.title);
 

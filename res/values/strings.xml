@@ -156,6 +156,8 @@
     <string name="pref_popup_link_summary">Open links of the thread in the popup window</string>
     <string name="pref_display_name">Names</string>
     <string name="pref_display_name_summary">Display names of namefags above their posts</string>
+    <string name="pref_display_icons">Icons</string>
+    <string name="pref_display_icons_summary">Display icons</string>
     <string name="pref_text_size">Text size</string>
     <string name="pref_cut_posts">Long posts</string>
     <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>

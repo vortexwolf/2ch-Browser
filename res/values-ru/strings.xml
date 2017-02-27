@@ -167,6 +167,8 @@
     <string name="pref_popup_link_summary">Открывать ссылки текущего треда во всплывающих окнах вместо перехода по ним</string>
     <string name="pref_display_name">Имена</string>
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
+    <string name="pref_display_icons">Иконки</string>
+    <string name="pref_display_icons_summary">Отображать иконки</string>
     <string name="pref_text_size">Размер текста</string>
     <string name="pref_cut_posts">Длинные сообщения</string>
     <string name="pref_cut_posts_hint">0 - не обрезать; 400px по умолчанию</string>

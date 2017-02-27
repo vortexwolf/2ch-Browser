@@ -391,6 +391,10 @@ public class ApplicationSettings {
         return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_size_limit_key), 30);
     }
 
+    public boolean isDisplayIcons(){
+        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_icons_key), false);
+    }
+
     public SettingsEntity getCurrentSettings() {
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();
@@ -399,6 +403,7 @@ public class ApplicationSettings {
         result.isLoadThumbnails = this.isLoadThumbnails();
         result.isDisplayAllBoards = this.isDisplayAllBoards();
         result.isSwipeToRefresh = this.isSwipeToRefresh();
+        result.isDisplayIcons = this.isDisplayIcons();
 
         return result;
     }
