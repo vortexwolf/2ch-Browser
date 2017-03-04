@@ -45,6 +45,7 @@ public class LaunchScreenActivity extends Activity {
 
     private void launchMainActivity(){
         Intent launchPickBoardActivity = new Intent(LaunchScreenActivity.this, PickBoardActivity.class);
+        launchPickBoardActivity.setAction(Intent.ACTION_MAIN);
         LaunchScreenActivity.this.startActivity(launchPickBoardActivity);
         finish();
     }
