@@ -224,7 +224,8 @@ public class ThreadsListActivity extends BaseListActivity {
             this.getListView().setOnScrollListener(new ListViewScrollListener(this.mAdapter));
         }
 
-        boolean preferDeserialized = this.getIntent().getBooleanExtra(Constants.EXTRA_PREFER_DESERIALIZED, false) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+        boolean preferDeserialized = this.getIntent().getBooleanExtra(Constants.EXTRA_PREFER_DESERIALIZED, false) ||
+                savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
 
         if (preferDeserialized) {
             new LoadThreadsTask().execute();

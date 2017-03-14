@@ -1,18 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.http.HttpEntity;
-
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,6 +19,21 @@ import com.vortexwolf.chan.common.library.ProgressInputStream;
 import com.vortexwolf.chan.interfaces.ICancelled;
 import com.vortexwolf.chan.interfaces.IProgressChangeListener;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import org.apache.http.HttpEntity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class IoUtils {
     public static final String TAG = "IoUtils";
@@ -152,29 +154,66 @@ public class IoUtils {
 
     public static long freeSpace(File path, long bytesToRelease) {
         long released = 0;
+        List<File> sortedFilesInCache = getFilesListInDirectory(path);
 
-        if (path != null && path.exists()) {
-            File[] files = path.listFiles();
-            if (files == null) {
-                return 0;
+        if (sortedFilesInCache.isEmpty()) {
+            return released;
+        }
+
+        for (File file : sortedFilesInCache) {
+            long fileLength = file.length();
+            String fileName = file.getAbsolutePath();
+            long lastModified = file.lastModified();
+
+            boolean isDeleted = file.delete();
+            if (!isDeleted) {
+                MyLog.e(TAG, "Error deleting file: " + fileName);
+                continue;
             }
-
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    released += freeSpace(file, bytesToRelease);
-                } else {
-                    released += file.length();
-                    file.delete();
-                }
-
-                if (released > bytesToRelease) {
-                    break;
-                }
+            MyLog.d(TAG, "Deleted file: " + fileName + ", file size: " + fileLength + ", last modified: " + lastModified);
+            released += fileLength;
+            MyLog.d(TAG, "To release: " + (bytesToRelease - released));
+            if (released > bytesToRelease) {
+                break;
             }
         }
 
         return released;
     }
+
+    public static List<File> getFilesListInDirectory(File directoryPath) {
+        List<File> files_list = new ArrayList<>();
+
+        if (directoryPath != null && directoryPath.exists()) {
+            File[] files = directoryPath.listFiles();
+            if (files == null) {
+                return files_list;
+            }
+
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    files_list.addAll(getFilesListInDirectory(file));
+                } else {
+                    files_list.add(file);
+                }
+
+            }
+        }
+        //sort by date created
+        Collections.sort(files_list, new Comparator<File>() {
+            @Override
+            public int compare(File f1, File f2) {
+                if (f1.lastModified() > f2.lastModified()) {
+                    return 1;
+                } else if (f1.lastModified() < f2.lastModified()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        return files_list;
+    }
+
 
     public static double getSizeInMegabytes(File folder1, File folder2) {
         long size1 = IoUtils.dirSize(folder1);
@@ -199,7 +238,7 @@ public class IoUtils {
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         final String column = MediaColumns.DATA;
-        final String[] projection = { column };
+        final String[] projection = {column};
 
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
@@ -254,7 +293,7 @@ public class IoUtils {
                 }
 
                 final String selection = BaseColumns._ID + "=?";
-                final String[] selectionArgs = new String[] { split[1] };
+                final String[] selectionArgs = new String[]{split[1]};
 
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
@@ -326,8 +365,8 @@ public class IoUtils {
         return (long) (mb * 1024 * 1024);
     }
 
-    public static String convertHttpEntityToString(HttpEntity entity){
-        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int)entity.getContentLength());
+    public static String convertHttpEntityToString(HttpEntity entity) {
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int) entity.getContentLength());
         try {
             entity.writeTo(out);
         } catch (IOException e) {
@@ -349,7 +388,7 @@ public class IoUtils {
         int scale = 1;
         Point size = getImageSize(file);
         if (size.x > maxDimension || size.y > maxDimension) {
-            double realScale = Math.max(size.x, size.y) / (double)maxDimension;
+            double realScale = Math.max(size.x, size.y) / (double) maxDimension;
             double roundedScale = Math.pow(2, Math.ceil(Math.log(realScale) / Math.log(2)));
             scale = (int) roundedScale; // 2, 4, 8, 16
         }
@@ -362,7 +401,7 @@ public class IoUtils {
         return b;
     }
 
-    private static byte[] getJpegInfoBytes(File file){
+    private static byte[] getJpegInfoBytes(File file) {
         FileInputStream fis = null;
         byte[] bytes = null;
         try {
