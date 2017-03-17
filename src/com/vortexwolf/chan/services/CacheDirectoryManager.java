@@ -160,10 +160,10 @@ public class CacheDirectoryManager {
                         Math.round(FILE_CACHE_THRESHOLD * 0.4 * 0.5));
             }
 
-            //15% of cache space is reserved for pages. Clear it by 20% if overflowed.
-            if (IoUtils.dirSize(CacheDirectoryManager.this.getPagesCacheDirectory()) > FILE_CACHE_THRESHOLD * 0.15) {
+            //20% of cache space is reserved for pages. Clear it by 20% if overflowed.
+            if (IoUtils.dirSize(CacheDirectoryManager.this.getPagesCacheDirectory()) > FILE_CACHE_THRESHOLD * 0.2) {
                 IoUtils.freeSpace(CacheDirectoryManager.this.getPagesCacheDirectory(),
-                        Math.round(FILE_CACHE_THRESHOLD * 0.15 * 0.2));
+                        Math.round(FILE_CACHE_THRESHOLD * 0.2 * 0.2));
             }
 
             //15% of cache space is reserved for images. Clear it by 20% if overflowed.
@@ -172,10 +172,10 @@ public class CacheDirectoryManager {
                         Math.round(FILE_CACHE_THRESHOLD * 0.15 * 0.2));
             }
 
-            //15% of cache space is reserved for thumbnails. Clear it by 20% if overflowed.
-            if (IoUtils.dirSize(CacheDirectoryManager.this.getThumbnailsCacheDirectory()) > FILE_CACHE_THRESHOLD * 0.15) {
+            //12% of cache space is reserved for thumbnails. Clear it by 20% if overflowed.
+            if (IoUtils.dirSize(CacheDirectoryManager.this.getThumbnailsCacheDirectory()) > FILE_CACHE_THRESHOLD * 0.2) {
                 IoUtils.freeSpace(CacheDirectoryManager.this.getThumbnailsCacheDirectory(),
-                        Math.round(FILE_CACHE_THRESHOLD * 0.15 * 0.2));
+                        Math.round(FILE_CACHE_THRESHOLD * 0.2 * 0.2));
             }
             return null;
         }
