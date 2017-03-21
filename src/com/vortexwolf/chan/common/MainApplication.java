@@ -1,11 +1,15 @@
 package com.vortexwolf.chan.common;
 
+import org.acra.*;
+import org.acra.annotation.*;
+
 import android.app.Application;
 import android.content.res.Resources;
 import android.httpimage.BitmapMemoryCache;
 import android.httpimage.FileSystemPersistence;
 import android.httpimage.HttpImageManager;
 
+import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.boards.makaba.MakabaApiReader;
 import com.vortexwolf.chan.boards.makaba.MakabaModelsMapper;
 import com.vortexwolf.chan.boards.makaba.MakabaUrlBuilder;
@@ -43,6 +47,18 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
 
+@ReportsCrashes(mailTo = "artur.menchenko@gmail.com",
+        customReportContent = {
+                ReportField.APP_VERSION_CODE,
+                ReportField.APP_VERSION_NAME,
+                ReportField.ANDROID_VERSION,
+                ReportField.PHONE_MODEL,
+                ReportField.CUSTOM_DATA,
+                ReportField.STACK_TRACE,
+                ReportField.LOGCAT
+        },
+        mode = ReportingInteractionMode.TOAST,
+        resToastText = R.string.crash_toast_text)
 public class MainApplication extends Application {
 
     public static boolean MULTITOUCH_SUPPORT = false;
@@ -58,7 +74,7 @@ public class MainApplication extends Application {
         if (Constants.SDK_VERSION >= 19) {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
-
+        ACRA.init(this);
         ApplicationSettings settings = new ApplicationSettings(this.getApplicationContext(), this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());

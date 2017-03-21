@@ -4,6 +4,7 @@
     <string name="app_name">2ch Browser</string>
 
     <!-- UI Text -->
+    <string name="crash_toast_text">Что-то сломалось, отправим репорт.</string>
     <string name="loading">Загрузка...</string>
     <string name="addpost_sage">Sage (не поднимать тред)</string>
     <string name="addpost_message_hint">Сообщение</string>
