@@ -186,16 +186,11 @@
                 android:summary="@string/pref_convert_post_date_summary"
                 android:title="@string/pref_convert_post_date" />
         </PreferenceCategory>
-        <PreferenceCategory android:title="@string/pref_category_cache" >
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="@string/pref_file_cache_limit_key"
-                android:summary="@string/pref_file_cache_limit_summary"
-                android:title="@string/pref_file_cache_limit" />
-
+        <PreferenceScreen
+            android:title="@string/pref_screen_cache"
+            android:summary="@string/pref_screen_cache_summary">
             <com.vortexwolf.chan.settings.SeekBarPreference
                 android:defaultValue="60"
-                android:dependency="@string/pref_file_cache_limit_key"
                 android:dialogTitle="@string/pref_cache_size_limit_title"
                 android:key="@string/pref_cache_size_limit_key"
                 android:summary="@string/pref_cache_size_limit_summary"
@@ -204,11 +199,42 @@
                 local:minValue="30"
                 local:step="30"
                 local:valueFormat="@string/pref_cache_size_limit_summary" />
-
+            <EditTextPreference
+                android:key="@string/pref_cache_media_part_limit_key"
+                android:inputType="number"
+                android:defaultValue="60"
+                android:max="100"
+                android:enabled="false"
+                android:singleLine="true"
+                android:title="@string/pref_file_cache_media_limit" />
+            <EditTextPreference
+                android:key="@string/pref_cache_pages_part_limit_key"
+                android:inputType="number"
+                android:defaultValue="20"
+                android:max="100"
+                android:enabled="false"
+                android:singleLine="true"
+                android:title="@string/pref_file_cache_pages_limit" />
+            <EditTextPreference
+                android:key="@string/pref_cache_thumb_part_limit_key"
+                android:inputType="number"
+                android:defaultValue="20"
+                android:max="100"
+                android:enabled="false"
+                android:singleLine="true"
+                android:title="@string/pref_file_cache_thumb_limit" />
+            <EditTextPreference
+                android:key="@string/pref_cache_pages_threshold_limit_key"
+                android:inputType="number"
+                android:defaultValue="7"
+                android:max="30"
+                android:enabled="false"
+                android:singleLine="true"
+                android:title="@string/pref_file_cache_pages_threshold_limit" />
             <com.vortexwolf.chan.settings.CacheSizePreference
                 android:key="@string/pref_clear_cache_key"
                 android:title="@string/pref_file_cache_clear" />
-        </PreferenceCategory>
+        </PreferenceScreen>
         <PreferenceCategory android:title="@string/pref_category_autorefresh" >
             <CheckBoxPreference
                 android:defaultValue="false"

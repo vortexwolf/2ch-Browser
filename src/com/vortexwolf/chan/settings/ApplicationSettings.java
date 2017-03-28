@@ -204,10 +204,6 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_legacy_image_viewer_key), false);
     }
 
-    public boolean isUnlimitedCache() {
-        return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_file_cache_limit_key), false);
-    }
-
     public boolean isUnsafeSSL() {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_unsafe_ssl_key), false);
     }
@@ -389,6 +385,22 @@ public class ApplicationSettings {
 
     public int getCacheSize(){
         return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_size_limit_key), 30);
+    }
+
+    public int getCacheMediaSize(){
+        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_media_part_limit_key), 60);
+    }
+
+    public int getCachePagesSize(){
+        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_pages_part_limit_key), 20);
+    }
+
+    public int getCacheThumbnailsSize(){
+        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_thumb_part_limit_key), 20);
+    }
+
+    public int getCachePagesThresholdSize(){
+        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_pages_threshold_limit_key), 7);
     }
 
     public boolean isDisplayIcons(){

@@ -1,10 +1,14 @@
 package com.vortexwolf.chan.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.services.PermissionManager;
+import com.vortexwolf.chan.settings.ApplicationPreferencesActivity;
 
 public class LaunchScreenActivity extends Activity {
     public static final String LOG_TAG = LaunchScreenActivity.class.getSimpleName();
@@ -18,6 +22,7 @@ public class LaunchScreenActivity extends Activity {
         boolean result = PermissionManager.verifyPermissions(this);
 
         if(!result){
+            PermissionManager.requestPermissions(this);
             //user has been prompted to grant permissions.
             //Waiting for onRequestPermissionsResult()
         }else{

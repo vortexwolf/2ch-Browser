@@ -112,7 +112,7 @@ public class BrowserActivity extends Activity {
                 BrowserLauncher.launchExternalBrowser(this, this.mUri.toString());
                 break;
             case R.id.play_video_menu_id:
-                File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
+                File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(this.mUri);
                 if (cachedFile.exists()) {
                     BrowserLauncher.playVideoExternal(cachedFile, this);
                 }
@@ -167,13 +167,13 @@ public class BrowserActivity extends Activity {
             return;
         }
 
-        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(this.mUri);
+        File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(this.mUri);
         if (cachedFile.exists()) {
             // show from cache
             this.setImage(cachedFile);
         } else {
             // download image and cache it
-            File writeCachedFile = this.mCacheDirectoryManager.getCachedImageFileForWrite(this.mUri);
+            File writeCachedFile = this.mCacheDirectoryManager.getCachedMediaFileForWrite(this.mUri);
             this.mCurrentTask = new DownloadFileTask(this, this.mUri, writeCachedFile, new BrowserDownloadFileView(), false);
             this.mCurrentTask.execute();
         }

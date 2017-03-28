@@ -152,77 +152,14 @@ public class IoUtils {
         }
     }
 
-    public static long freeSpace(File path, long bytesToRelease) {
-        long released = 0;
-        List<File> sortedFilesInCache = getFilesListInDirectory(path);
-
-        if (sortedFilesInCache.isEmpty()) {
-            return released;
-        }
-
-        for (File file : sortedFilesInCache) {
-            long fileLength = file.length();
-            String fileName = file.getAbsolutePath();
-            long lastModified = file.lastModified();
-
-            boolean isDeleted = file.delete();
-            if (!isDeleted) {
-                MyLog.e(TAG, "Error deleting file: " + fileName);
-                continue;
-            }
-            MyLog.d(TAG, "Deleted file: " + fileName + ", file size: " + fileLength + ", last modified: " + lastModified);
-            released += fileLength;
-            MyLog.d(TAG, "To release: " + (bytesToRelease - released));
-            if (released > bytesToRelease) {
-                break;
-            }
-        }
-
-        return released;
-    }
-
-    public static List<File> getFilesListInDirectory(File directoryPath) {
-        List<File> files_list = new ArrayList<>();
-
-        if (directoryPath != null && directoryPath.exists()) {
-            File[] files = directoryPath.listFiles();
-            if (files == null) {
-                return files_list;
-            }
-
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    files_list.addAll(getFilesListInDirectory(file));
-                } else {
-                    files_list.add(file);
-                }
-
-            }
-        }
-        //sort by date created
-        Collections.sort(files_list, new Comparator<File>() {
-            @Override
-            public int compare(File f1, File f2) {
-                if (f1.lastModified() > f2.lastModified()) {
-                    return 1;
-                } else if (f1.lastModified() < f2.lastModified()) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
-        return files_list;
-    }
 
 
-    public static double getSizeInMegabytes(File folder1, File folder2) {
-        long size1 = IoUtils.dirSize(folder1);
-        long size2 = IoUtils.dirSize(folder2);
 
-        double allSizeMb = convertBytesToMb(size1 + size2);
-        double result = Math.round(allSizeMb * 100) / 100d;
+    public static double getSizeInMegabytes(File folder) {
+        long size = IoUtils.dirSize(folder);
+        double allSizeMb = convertBytesToMb(size);
 
-        return result;
+        return Math.round(allSizeMb * 100) / 100d;
     }
 
     public static File getSaveFilePath(Uri uri, ApplicationSettings settings) {

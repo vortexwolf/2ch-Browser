@@ -2,10 +2,13 @@ package com.vortexwolf.chan.settings;
 
 import java.io.File;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.preference.Preference;
 import android.util.AttributeSet;
+import android.util.Pair;
 
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.common.Factory;
@@ -13,17 +16,15 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.services.CacheDirectoryManager;
 
 public class CacheSizePreference extends Preference {
-    private final File mExternalCacheDir;
-    private final File mInternalCacheDir;
+
+    private CacheDirectoryManager cacheManager;
 
     private CalculateCacheSizeTask mCalculateCacheSizeTask;
 
     public CacheSizePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        CacheDirectoryManager cacheManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
-        this.mExternalCacheDir = cacheManager.getExternalCacheDir();
-        this.mInternalCacheDir = cacheManager.getInternalCacheDir();
+        cacheManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
 
         this.updateSummary();
     }
@@ -36,22 +37,40 @@ public class CacheSizePreference extends Preference {
 
     @Override
     protected void onClick() {
-        this.setSummary(this.getContext().getString(R.string.loading));
+        new AlertDialog.Builder(getContext())
+                .setTitle("Warning!")
+                .setMessage("Do you wish to clear cache?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        setSummary(getContext().getString(R.string.loading));
+                        IoUtils.deleteDirectory(cacheManager.getCurrentCacheDirectory());
+                        updateSummary();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
 
-        IoUtils.deleteDirectory(this.mExternalCacheDir);
-        IoUtils.deleteDirectory(this.mInternalCacheDir);
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
 
-        this.updateSummary();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
 
         super.onClick();
+
     }
 
-    private void updateSummary() {
+    public void updateSummary() {
         this.mCalculateCacheSizeTask = new CalculateCacheSizeTask();
         this.mCalculateCacheSizeTask.execute();
     }
 
-    private class CalculateCacheSizeTask extends AsyncTask<Void, Long, Double> {
+    private class CalculateCacheSizeTask extends AsyncTask<Void, Long, Pair<String, Double>[]> {
 
         @Override
         protected void onPreExecute() {
@@ -59,18 +78,38 @@ public class CacheSizePreference extends Preference {
         }
 
         @Override
-        protected void onPostExecute(Double result) {
-            String summary = result + " MB";
-            CacheSizePreference.this.setSummary(summary);
+        @SuppressWarnings("unchecked")
+        protected Pair<String, Double>[] doInBackground(Void... arg0) {
 
-            CacheSizePreference.this.setEnabled(result > 0);
+            double totalCacheSize = IoUtils.getSizeInMegabytes(cacheManager.getCurrentCacheDirectory());
+            double mediaCacheSize = IoUtils.getSizeInMegabytes(cacheManager.getMediaCacheDirectory());
+            double pagesCacheSize = IoUtils.getSizeInMegabytes(cacheManager.getPagesCacheDirectory());
+            double thumbCacheSize = IoUtils.getSizeInMegabytes(cacheManager.getThumbnailsCacheDirectory());
+
+            return new Pair[]{
+                    new Pair("Total", totalCacheSize),
+                    new Pair("Media", mediaCacheSize),
+                    new Pair("Pages", pagesCacheSize),
+                    new Pair("Thumb", thumbCacheSize),
+            };
         }
 
         @Override
-        protected Double doInBackground(Void... arg0) {
-            double cacheSize = IoUtils.getSizeInMegabytes(CacheSizePreference.this.mExternalCacheDir, CacheSizePreference.this.mInternalCacheDir);
+        protected void onPostExecute(Pair<String, Double>[] result) {
+            long mediaCacheUtilized = Math.round( (result[1].second / cacheManager.getCacheSize()) * 100);
+            long pagesCacheUtilized = Math.round( (result[2].second / cacheManager.getCacheSize()) * 100);
+            long thumbCacheUtilized = Math.round( (result[3].second / cacheManager.getCacheSize()) * 100);
 
-            return cacheSize;
+
+            String summary = result[0].first + ": " + result[0].second + " Mb \n" +
+                    result[1].first + ": " + mediaCacheUtilized + "% " +
+                    result[2].first + ": " + pagesCacheUtilized + "% " +
+                    result[3].first + ": " + thumbCacheUtilized + "%";
+
+
+            CacheSizePreference.this.setSummary(summary);
+
+            CacheSizePreference.this.setEnabled(result[0].second > 0);
         }
     }
 }

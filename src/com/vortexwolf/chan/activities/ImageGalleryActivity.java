@@ -187,7 +187,7 @@ public class ImageGalleryActivity extends Activity {
                 }
                 break;
             case R.id.play_video_menu_id:
-                File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(Uri.parse(this.mCurrentImageModel.url));
+                File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(Uri.parse(this.mCurrentImageModel.url));
                 if (cachedFile.exists()) {
                     BrowserLauncher.playVideoExternal(cachedFile, this);
                 }
@@ -254,14 +254,14 @@ public class ImageGalleryActivity extends Activity {
 
         Uri uri = Uri.parse(model.url);
 
-        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(uri);
+        File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(uri);
         if (cachedFile.exists()) {
             // show from cache
             this.setProgressComp(Window.PROGRESS_END);
             this.setImage(cachedFile, viewBag);
         } else {
             // download image and cache it
-            File writeCachedFile = this.mCacheDirectoryManager.getCachedImageFileForWrite(uri);
+            File writeCachedFile = this.mCacheDirectoryManager.getCachedMediaFileForWrite(uri);
             this.mCurrentTask = new DownloadFileTask(this, uri, writeCachedFile, new ImageDownloadView(viewBag), false);
             this.mCurrentTask.execute();
         }

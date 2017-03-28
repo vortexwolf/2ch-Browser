@@ -24,6 +24,10 @@
     <string name="pref_auto_refresh_key">pref_auto_refresh_key</string>
     <string name="pref_auto_refresh_interval_key">pref_auto_refresh_interval_key</string>
     <string name="pref_cache_size_limit_key">pref_cache_size_limit_key</string>
+    <string name="pref_cache_media_part_limit_key">pref_cache_media_part_limit_key</string>
+    <string name="pref_cache_pages_part_limit_key">pref_cache_pages_part_limit_key</string>
+    <string name="pref_cache_pages_threshold_limit_key">pref_cache_pages_threshold_limit_key</string>
+    <string name="pref_cache_thumb_part_limit_key">pref_cache_thumb_part_limit_key</string>
     <string name="pref_display_name_key">pref_display_name_key</string>
     <string name="pref_display_icons_key">pref_display_icons_key</string>
     <string name="pref_domain_key">pref_domain_key1</string>

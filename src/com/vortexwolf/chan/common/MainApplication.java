@@ -130,9 +130,6 @@ public class MainApplication extends Application {
         favoritesDataSource.open();
         hiddenThreadsDataSource.open();
 
-        if (!settings.isUnlimitedCache()) {
-            cacheManager.trimCacheIfNeeded();
-        }
 
         httpClient.setCookie(settings.getCloudflareClearanceCookie());
         httpClient.setCookie(settings.getPassCodeCookie());

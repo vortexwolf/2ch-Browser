@@ -64,7 +64,6 @@ public class FileSystemPersistence implements BitmapCache {
 
     @Override
     public void storeData(String key, Bitmap data) {
-        this.mCacheManager.trimCacheIfNeeded();
         try {
             File file = new File(this.mBaseDir, key);
             this.writeBitmapToFile(data, file);

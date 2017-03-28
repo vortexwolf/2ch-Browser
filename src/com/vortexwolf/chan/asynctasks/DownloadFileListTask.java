@@ -95,7 +95,7 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
     }
 
     private Uri getUriOrCachedFile(Uri from) {
-        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(from);
+        File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(from);
         if (cachedFile.exists()) {
             return Uri.fromFile(cachedFile);
         }

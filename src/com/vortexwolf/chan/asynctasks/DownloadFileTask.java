@@ -145,7 +145,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private Uri getSaveFromUri() {
         Uri from = this.mFrom;
 
-        File cachedFile = this.mCacheDirectoryManager.getCachedImageFileForRead(from);
+        File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(from);
         if (cachedFile.exists()) {
             from = Uri.fromFile(cachedFile);
         }

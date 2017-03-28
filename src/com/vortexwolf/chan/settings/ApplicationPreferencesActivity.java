@@ -20,7 +20,7 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class ApplicationPreferencesActivity extends PreferenceActivity{
+public class ApplicationPreferencesActivity extends PreferenceActivity {
     private static final String TAG = ApplicationPreferencesActivity.class.getSimpleName();
 
     private ApplicationSettings mSettings;
@@ -48,6 +48,10 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
         this.updateListSummary(R.string.pref_image_preview_key);
         this.updateListSummary(R.string.pref_gif_preview_key);
         this.updateListSummary(R.string.pref_video_player_key);
+        this.updateEditTextSummary(R.string.pref_cache_media_part_limit_key, R.string.loading);
+        this.updateEditTextSummary(R.string.pref_cache_thumb_part_limit_key, R.string.loading);
+        this.updateEditTextSummary(R.string.pref_cache_pages_part_limit_key, R.string.loading);
+        this.updateEditTextSummary(R.string.pref_cache_pages_threshold_limit_key, R.string.loading);
         this.updateNameSummary();
         this.updateStartPageSummary();
         this.updateDownloadPathSummary();
@@ -79,18 +83,20 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
 
             if (preference instanceof ListPreference) {
                 ApplicationPreferencesActivity.this.updateListSummary(key);
+            } else if (preference instanceof EditTextPreference) {
+                preference.setSummary(((EditTextPreference) preference).getText());
             } else if (key.equals(res.getString(R.string.pref_name_key))) {
                 ApplicationPreferencesActivity.this.updateNameSummary();
             } else if (key.equals(res.getString(R.string.pref_homepage_key))) {
                 ApplicationPreferencesActivity.this.updateStartPageSummary();
             } else if (key.equals(res.getString(R.string.pref_download_path_key))) {
                 ApplicationPreferencesActivity.this.updateDownloadPathSummary();
-            }else if (key.equals(res.getString(R.string.pref_display_hidden_boards_key))){
+            } else if (key.equals(res.getString(R.string.pref_display_hidden_boards_key))) {
 
                 final CheckBoxPreference pref = (CheckBoxPreference) preference;
                 boolean isEnabled = mSharedPreferences.getBoolean(key, true);
                 final SharedPreferences.Editor preferenceEditor = mSharedPreferences.edit();
-                if(isEnabled) {
+                if (isEnabled) {
                     //Preference has already been changed to "true"
                     //Prepare rollback and show Warning dialog
                     preferenceEditor
@@ -124,9 +130,9 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
                 }
             }
             if (key.equals(res.getString(R.string.pref_unsafe_ssl_key))) {
-                ((ExtendedHttpClient)Factory.resolve(DefaultHttpClient.class)).setSafe(!mSettings.isUnsafeSSL());
+                ((ExtendedHttpClient) Factory.resolve(DefaultHttpClient.class)).setSafe(!mSettings.isUnsafeSSL());
             }
-            
+
         }
     }
 
@@ -159,7 +165,7 @@ public class ApplicationPreferencesActivity extends PreferenceActivity{
             preference.setSummary(this.getString(prefSummary));
         }
     }
-    
+
     private void disablePreference(int prefKey) {
         Preference preference = this.getPreferenceManager().findPreference(this.getString(prefKey));
         preference.setShouldDisableView(true);
