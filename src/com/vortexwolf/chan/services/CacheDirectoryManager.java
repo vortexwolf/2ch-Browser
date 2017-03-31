@@ -39,7 +39,7 @@ public class CacheDirectoryManager implements Runnable {
         }
     }
 
-    public long getCacheSize(){
+    public long getCacheSize() {
         return mSettings.getCacheSize();
     }
 
@@ -162,14 +162,13 @@ public class CacheDirectoryManager implements Runnable {
         private final float MAX_THUMBNAILS_PART;
         private final float MAX_MEDIA_PART;
         private final float MAX_PAGES_PART;
-        private final float TRIM_FACTOR = 0.3f;
 
 
         TrimCache(final ApplicationSettings mSettings) {
-            FILE_CACHE_THRESHOLD = mSettings.getCacheSize();
-            MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize();
-            MAX_MEDIA_PART = mSettings.getCacheMediaSize();
-            MAX_PAGES_PART = mSettings.getCachePagesSize();
+            FILE_CACHE_THRESHOLD = Math.round(IoUtils.convertMbToBytes(mSettings.getCacheSize()));
+            MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize() / 100f;
+            MAX_MEDIA_PART = mSettings.getCacheMediaSize() / 100f;
+            MAX_PAGES_PART = mSettings.getCachePagesSize() / 100f;
         }
 
         @Override
@@ -183,22 +182,25 @@ public class CacheDirectoryManager implements Runnable {
 
             //Trim current cache directory
 
-            if (IoUtils.dirSize(getPagesCacheDirectory()) > FILE_CACHE_THRESHOLD * MAX_PAGES_PART) {
+            File pagesCache = getPagesCacheDirectory();
+            long pagesCacheSize = IoUtils.dirSize(pagesCache);
 
-                released += freeSpace(getFilesListToDelete(getPagesCacheDirectory()), Math.round(FILE_CACHE_THRESHOLD * MAX_PAGES_PART * TRIM_FACTOR));
-
+            if (pagesCacheSize > FILE_CACHE_THRESHOLD * MAX_PAGES_PART) {
+                released += freeSpace(getFilesListToDelete(pagesCache), Math.round(pagesCacheSize - (FILE_CACHE_THRESHOLD * MAX_PAGES_PART)));
             }
 
-            if (IoUtils.dirSize(getMediaCacheDirectory()) > FILE_CACHE_THRESHOLD * MAX_MEDIA_PART) {
+            File mediaCache = getMediaCacheDirectory();
+            long mediaCacheSize = IoUtils.dirSize(mediaCache);
 
-                released += freeSpace(getFilesListToDelete(getMediaCacheDirectory()), Math.round(FILE_CACHE_THRESHOLD * MAX_MEDIA_PART * TRIM_FACTOR));
-
+            if (mediaCacheSize > FILE_CACHE_THRESHOLD * MAX_MEDIA_PART) {
+                released += freeSpace(getFilesListToDelete(mediaCache), Math.round(mediaCacheSize - (FILE_CACHE_THRESHOLD * MAX_MEDIA_PART)));
             }
 
-            if (IoUtils.dirSize(getThumbnailsCacheDirectory()) > FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART) {
+            File thumbnailsCache = getThumbnailsCacheDirectory();
+            long thumbnailsCacheSize = IoUtils.dirSize(thumbnailsCache);
 
-                released += freeSpace(getFilesListToDelete(getThumbnailsCacheDirectory()), Math.round(FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART * TRIM_FACTOR));
-
+            if (thumbnailsCacheSize > FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART) {
+                released += freeSpace(getFilesListToDelete(thumbnailsCache), Math.round(thumbnailsCacheSize - (FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART)));
             }
             return released;
         }

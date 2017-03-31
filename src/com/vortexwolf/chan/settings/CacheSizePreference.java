@@ -1,7 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import java.io.File;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -96,9 +94,9 @@ public class CacheSizePreference extends Preference {
 
         @Override
         protected void onPostExecute(Pair<String, Double>[] result) {
-            long mediaCacheUtilized = Math.round( (result[1].second / cacheManager.getCacheSize()) * 100);
-            long pagesCacheUtilized = Math.round( (result[2].second / cacheManager.getCacheSize()) * 100);
-            long thumbCacheUtilized = Math.round( (result[3].second / cacheManager.getCacheSize()) * 100);
+            long mediaCacheUtilized = Math.round((result[1].second / cacheManager.getCacheSize()) * 100);
+            long pagesCacheUtilized = Math.round((result[2].second / cacheManager.getCacheSize()) * 100);
+            long thumbCacheUtilized = Math.round((result[3].second / cacheManager.getCacheSize()) * 100);
 
 
             String summary = result[0].first + ": " + result[0].second + " Mb \n" +

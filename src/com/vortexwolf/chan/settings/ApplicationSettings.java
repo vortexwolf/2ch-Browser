@@ -388,19 +388,19 @@ public class ApplicationSettings {
     }
 
     public int getCacheMediaSize(){
-        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_media_part_limit_key), 60);
+        return Integer.parseInt(this.mSettings.getString(this.mResources.getString(R.string.pref_cache_media_part_limit_key), "60"));
     }
 
     public int getCachePagesSize(){
-        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_pages_part_limit_key), 20);
+        return Integer.parseInt(this.mSettings.getString(this.mResources.getString(R.string.pref_cache_pages_part_limit_key), "20"));
     }
 
     public int getCacheThumbnailsSize(){
-        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_thumb_part_limit_key), 20);
+        return Integer.parseInt(this.mSettings.getString(this.mResources.getString(R.string.pref_cache_thumb_part_limit_key), "20"));
     }
 
     public int getCachePagesThresholdSize(){
-        return this.mSettings.getInt(this.mResources.getString(R.string.pref_cache_pages_threshold_limit_key), 7);
+        return Integer.parseInt(this.mSettings.getString(this.mResources.getString(R.string.pref_cache_pages_threshold_limit_key), "7"));
     }
 
     public boolean isDisplayIcons(){
