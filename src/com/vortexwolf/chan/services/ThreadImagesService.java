@@ -1,10 +1,10 @@
 package com.vortexwolf.chan.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.vortexwolf.chan.models.presentation.AttachmentInfo;
 import com.vortexwolf.chan.models.presentation.ThreadImageModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ThreadImagesService {
     private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<String, ArrayList<ThreadImageModel>>();

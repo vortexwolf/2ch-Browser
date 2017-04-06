@@ -1,13 +1,5 @@
 package com.vortexwolf.chan.common.utils;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,6 +19,14 @@ import com.vortexwolf.chan.services.BitmapManager;
 import com.vortexwolf.chan.services.BrowserLauncher;
 import com.vortexwolf.chan.services.ThreadImagesService;
 import com.vortexwolf.chan.settings.ApplicationSettings;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ThreadPostUtils {
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);

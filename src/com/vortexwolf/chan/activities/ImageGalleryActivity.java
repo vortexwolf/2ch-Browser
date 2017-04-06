@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +44,7 @@ import com.vortexwolf.chan.settings.ApplicationSettings;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImageGalleryActivity extends Activity {
     public static final String TAG = "ImageGalleryActivity";
@@ -61,6 +65,8 @@ public class ImageGalleryActivity extends Activity {
     private TextView mImageText;
     private ProgressBar mProgressBar;
     private int mBackgroundColor;
+
+    private Uri fileToBeShared;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,8 +130,21 @@ public class ImageGalleryActivity extends Activity {
         if (this.mCurrentImageViewBag != null) {
             this.mCurrentImageViewBag.clear();
         }
+        if (this.fileToBeShared != null) {
+            this.revokeFileReadPermission(this.fileToBeShared);
+            this.fileToBeShared = null;
+        }
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        if (this.fileToBeShared != null) {
+            this.revokeFileReadPermission(this.fileToBeShared);
+            this.fileToBeShared = null;
+        }
+        super.onResume();
     }
 
     @Override
@@ -196,15 +215,23 @@ public class ImageGalleryActivity extends Activity {
                 if (this.mImageLoadedFile == null) {
                     break;
                 }
-                Uri fileUri = Uri.fromFile(this.mImageLoadedFile);
+                fileToBeShared = FileProvider.getUriForFile(this.getApplicationContext(), this.getApplicationContext().getPackageName() + ".fileprovider", this.mImageLoadedFile);
 
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
-                if (UriUtils.isImageUri(fileUri)) {
+                if (UriUtils.isImageUri(fileToBeShared)) {
                     shareImageIntent.setType("image/jpeg");
-                } else if (UriUtils.isWebmUri(fileUri)) {
+                } else if (UriUtils.isWebmUri(fileToBeShared)) {
                     shareImageIntent.setType("video/webm");
                 }
-                shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileToBeShared);
+                shareImageIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                List<ResolveInfo> resInfoList = this.getApplicationContext().getPackageManager().queryIntentActivities(shareImageIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    this.getApplicationContext().grantUriPermission(packageName, fileToBeShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
                 break;
             case R.id.share_link_menu_id:
@@ -229,6 +256,10 @@ public class ImageGalleryActivity extends Activity {
         }
 
         return true;
+    }
+
+    public void revokeFileReadPermission(Uri fileBeenShared) {
+        this.getApplicationContext().revokeUriPermission(fileBeenShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
     }
 
     private void loadImage(ThreadImageModel model, GalleryItemViewBag viewBag) {
@@ -278,7 +309,7 @@ public class ImageGalleryActivity extends Activity {
         thumbnailView.setBackgroundColor(ImageGalleryActivity.this.mBackgroundColor);
         viewBag.layout.removeAllViews();
         viewBag.layout.addView(thumbnailView);
-        thumbnailView.setOnClickListener(new OnClickListener(){
+        thumbnailView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 ThreadPostUtils.openExternalAttachment(attachment, ImageGalleryActivity.this);
@@ -414,9 +445,9 @@ public class ImageGalleryActivity extends Activity {
         @Override
         public void showError(String error) {
             this.mViewBag.switchToErrorView(
-                error != null
-                ? error
-                : ImageGalleryActivity.this.getString(R.string.error_unknown));
+                    error != null
+                            ? error
+                            : ImageGalleryActivity.this.getString(R.string.error_unknown));
         }
 
         @Override

@@ -1,16 +1,17 @@
 package com.vortexwolf.chan.services;
 
-import java.io.File;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Browser;
+import android.support.v4.content.FileProvider;
 
 import com.vortexwolf.chan.activities.BrowserActivity;
 import com.vortexwolf.chan.common.Constants;
 import com.vortexwolf.chan.common.utils.AppearanceUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
+
+import java.io.File;
 
 public class BrowserLauncher {
     public static void launchExternalBrowser(Context context, String url) {
@@ -42,8 +43,9 @@ public class BrowserLauncher {
 
     public static void playVideoExternal(File file, Context context) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), "video/*");
+        intent.setDataAndType(FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".fileprovider", file), "video/*");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
     }
 }
