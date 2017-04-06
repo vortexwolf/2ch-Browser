@@ -4,7 +4,7 @@
     <string name="app_name">2ch Browser</string>
 
     <!-- UI Text -->
-    <string name="crash_toast_text">Sending crash report</string>
+    <string name="crash_toast_text">Aww, crash. Send the report?</string>
     <string name="loading">Loading...</string>
     <string name="addpost_sage">Sage</string>
     <string name="addpost_message_hint">Message</string>
