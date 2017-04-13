@@ -626,7 +626,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                     // Continue only if the File was successfully created
                     if (instantPhotoTempFile != null) {
                         Uri photoURI = FileProvider.getUriForFile(this,
-                                "com.example.android.fileprovider",
+                                "com.vortexwolf.chan.fileprovider",
                                 instantPhotoTempFile);
                         instantPhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         this.startActivityForResult(instantPhoto, Constants.REQUEST_CODE_INSTANT_PHOTO);
