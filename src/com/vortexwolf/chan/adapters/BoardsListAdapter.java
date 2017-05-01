@@ -97,8 +97,17 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         }
 
         this.mFavoritesCount++;
-        BoardEntity newItem = new BoardEntity(boardName, boardModel != null ? boardModel.getName() : null,
-                boardModel.getBump_limit() != null ? boardModel.getBump_limit() : "?");
+
+        BoardEntity newItem;
+        if (boardModel != null) {
+            newItem = new BoardEntity(boardName,
+                    boardModel.getName() != null ? boardModel.getName() : null,
+                    boardModel.getBump_limit() != null ? boardModel.getBump_limit() : "?");
+        }else{
+            newItem = new BoardEntity(boardName, boardName, "?");
+        }
+
+
         this.insert(newItem, this.mFavoritesCount);
     }
 

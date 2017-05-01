@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.vortexwolf.chan"
     android:installLocation="auto"
-    android:versionCode="112"
-    android:versionName="1.6.8.2">
+    android:versionCode="113"
+    android:versionName="1.6.8.3">
 
     <uses-sdk
         android:minSdkVersion="9"
