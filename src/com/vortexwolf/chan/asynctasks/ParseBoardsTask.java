@@ -12,6 +12,7 @@ import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.json.JSONObject;
@@ -38,6 +39,7 @@ public class ParseBoardsTask extends AsyncTask<JSONObject, Void, ArrayList<Board
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(SerializationConfig.Feature.USE_ANNOTATIONS, true);
+        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         ArrayList<BoardModel> models = new ArrayList<>();
         try {
