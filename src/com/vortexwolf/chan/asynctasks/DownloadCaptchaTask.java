@@ -2,6 +2,7 @@ package com.vortexwolf.chan.asynctasks;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.vortexwolf.chan.common.Factory;
 import com.vortexwolf.chan.common.utils.StringUtils;
@@ -19,7 +20,7 @@ import com.vortexwolf.chan.services.RecaptchaService;
 import com.vortexwolf.chan.services.http.HttpBitmapReader;
 
 public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implements ICancelled {
-    private static final String TAG = "DownloadCaptchaTask";
+    private static final String TAG = DownloadCaptchaTask.class.getSimpleName();
 
     private final ICaptchaView mView;
     private final IWebsite mWebsite;
@@ -71,6 +72,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
 
     @Override
     protected Boolean doInBackground(String... params) {
+        Log.d(TAG, "doInBackground()");
         String referer = UriUtils.getBoardOrThreadUrl(this.mWebsite.getUrlBuilder(), this.mBoardName, 0, this.mThreadNumber);
 
         //если это не новый тред проверим апкаптчу и если она работает вернем качпу с кодом
@@ -82,11 +84,13 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
                 this.mCaptcha = new CaptchaEntity();
                 mCaptcha.setKey(acresult.captchaKey);
                 mCaptcha.setCaptchaType(CaptchaType.APP);
+                Log.d(TAG, "APP captcha successful");
 
                 return true;
             }
         }
         //иначе используем обычную капчу
+        Log.d(TAG, "Using captcha: " + this.mCaptchaType);
         HtmlCaptchaChecker.CaptchaResult result =
             this.mHtmlCaptchaChecker.canSkipCaptcha(this.mWebsite, this.mCaptchaType, this.mBoardName, this.mThreadNumber);
         this.mCanSkip = result.canSkip;

@@ -30,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.vortexwolf.chan.BuildConfig;
 import com.vortexwolf.chan.R;
 import com.vortexwolf.chan.asynctasks.CheckCloudflareTask;
 import com.vortexwolf.chan.asynctasks.CheckPasscodeTask;
@@ -75,7 +74,7 @@ import java.util.Date;
 import java.util.List;
 
 public class AddPostActivity extends Activity implements IPostSendView, ICaptchaView {
-    public static final String TAG = "AddPostActivity";
+    public static final String LOG_TAG = "AddPostActivity";
 
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final DraftPostsStorage mDraftPostsStorage = Factory.resolve(DraftPostsStorage.class);
@@ -178,6 +177,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
         this.mCommentView.setSelection(commentBuilder.length());
 
         // Загружаем и показываем капчу
+        Log.d(LOG_TAG, "Captcha view: " + this.mCurrentCaptchaView);
         if (this.mCurrentCaptchaView == null) {
             this.refreshCaptcha();
         }
@@ -201,7 +201,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
     @Override
     protected void onPause() {
-        MyLog.v(TAG, "save state");
+        MyLog.v(LOG_TAG, "save state");
         if (!this.mFinishedSuccessfully) {
             DraftPostModel draft = new DraftPostModel(this.mCommentView.getText().toString(), this.getAttachments(), this.mSageCheckBox.isChecked(), this.mCurrentCaptchaView, this.mCaptcha, this.mCaptchaBitmap, this.mCaptchaInfoType);
 
@@ -241,7 +241,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                 this.mPoliticsView.setVisibility(View.VISIBLE);
                 isPoliticsBoard = true;
             }
-        } catch (Exception e) { MyLog.e(TAG, e); }
+        } catch (Exception e) { MyLog.e(LOG_TAG, e); }
 
         View.OnClickListener formatButtonListener = new View.OnClickListener() {
             @Override
@@ -621,7 +621,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
                         instantPhotoTempFile = createImageFile();
                     } catch (IOException ex) {
                         // Error occurred while creating the File
-                        Log.i(TAG, "IOException");
+                        Log.i(LOG_TAG, "IOException");
                     }
                     // Continue only if the File was successfully created
                     if (instantPhotoTempFile != null) {
@@ -773,6 +773,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptcha() {
+        Log.d(LOG_TAG, "refreshCaptcha()");
         if (this.mCurrentCaptchaView == CaptchaViewType.INFO) {
             this.refreshCaptchaSkipView();
         } else {
@@ -781,6 +782,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptchaSkipView() {
+        Log.d(LOG_TAG, "refreshCaptchaSkipView()");
         if (this.mCurrentCheckPasscodeTask != null) {
             this.mCurrentCheckPasscodeTask.cancel(true);
         }
@@ -790,6 +792,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     }
 
     private void refreshCaptchaImageView() {
+        Log.d(LOG_TAG, "refreshCaptchaImageView()");
         if (this.mCurrentDownloadCaptchaTask != null) {
             this.mCurrentDownloadCaptchaTask.cancel(true);
         }
@@ -858,6 +861,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     private class CheckPasscodeView implements ICheckPasscodeView {
         @Override
         public void onPasscodeRemoved() {
+            Log.d(LOG_TAG, "onPasscodeRemoved()");
             AddPostActivity activity = AddPostActivity.this;
             activity.switchToCaptchaView(null);
             activity.refreshCaptcha();
@@ -865,6 +869,7 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
 
         @Override
         public void onPasscodeChecked(boolean isSuccess, String errorMessage) {
+            Log.d(LOG_TAG, "onPasscodeChecked()");
             AddPostActivity activity = AddPostActivity.this;
             if (isSuccess) {
                 activity.showCaptchaInfo(CaptchaInfoType.PASSCODE_SUCCESS);
