@@ -1,22 +1,17 @@
 package com.vortexwolf.chan.services;
 
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import android.net.Uri;
-
 import com.vortexwolf.chan.BuildConfig;
-import com.vortexwolf.chan.common.Websites;
 import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
 import com.vortexwolf.chan.interfaces.IUrlBuilder;
 import com.vortexwolf.chan.interfaces.IWebsite;
 import com.vortexwolf.chan.models.domain.CaptchaType;
 import com.vortexwolf.chan.settings.ApplicationSettings;
 import com.wildflyforcer.utils.CaptchaResultNew;
+
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;

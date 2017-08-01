@@ -37,7 +37,7 @@ public class Constants {
     public static final String MULTIPART_BOUNDARY = "----WebKitFormBoundaryyD8qfvcSfpRMHx9M";
 
     public static final String CF_CLEARANCE_COOKIE = "cf_clearance";
-    public static final String USERCODE_NOCAPTCHA_COOKIE = "usercode_nocaptcha";
+    public static final String USERCODE_NOCAPTCHA_COOKIE = "passcode_auth";
     public static final String ADULT_ACCESS_COOKIE = "usercode_auth";
 
     // После этого числа порядковый номер поста становится красного цвета

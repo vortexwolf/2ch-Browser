@@ -1,7 +1,17 @@
 package com.vortexwolf.chan.asynctasks;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.net.Uri;
+import android.os.AsyncTask;
+
+import com.vortexwolf.chan.common.Constants;
+import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.ExtendedHttpClient;
+import com.vortexwolf.chan.common.library.MyLog;
+import com.vortexwolf.chan.common.utils.StringUtils;
+import com.vortexwolf.chan.common.utils.UriUtils;
+import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
+import com.vortexwolf.chan.interfaces.IWebsite;
+import com.vortexwolf.chan.settings.ApplicationSettings;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -13,19 +23,8 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import com.vortexwolf.chan.common.Constants;
-import com.vortexwolf.chan.common.Factory;
-import com.vortexwolf.chan.common.library.ExtendedHttpClient;
-import com.vortexwolf.chan.common.library.MyLog;
-import com.vortexwolf.chan.common.utils.StringUtils;
-import com.vortexwolf.chan.common.utils.UriUtils;
-import com.vortexwolf.chan.interfaces.ICheckPasscodeView;
-import com.vortexwolf.chan.interfaces.IUrlBuilder;
-import com.vortexwolf.chan.interfaces.IWebsite;
-import com.vortexwolf.chan.settings.ApplicationSettings;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
     private final ICheckPasscodeView mCheckPasscodeView;
