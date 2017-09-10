@@ -1,100 +1,26 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-def keystorePropertiesFile = rootProject.file("keystore.secrets");
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
 
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta7'
     }
 }
 
-repositories {
-    jcenter()
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
+        maven {
+            url "https://maven.google.com"
+        }
+    }
 }
 
-apply plugin: 'com.android.application'
-
-dependencies {
-    compile fileTree(include: '*.jar', dir: 'libs')
-    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.6'
-    compile group: 'org.ccil.cowan.tagsoup', name: 'tagsoup', version: '1.2.1'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.7.3'
-    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.1.2'
-    compile 'com.android.support:support-v4:25.1.1'
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
-    compile 'com.android.volley:volley:1.0.0'
-    compile 'ch.acra:acra:4.9.2'
-}
-configurations {
-    all*.exclude group: 'commons-logging', module: 'commons-logging'
-}
-
-android {
-    signingConfigs {
-        config {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
-    }
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
-    defaultConfig {
-        // You need to create a new gradle.properties file in the root of the project and add
-        // CAPTCHA_API_PUBLIC_KEY="your api key goes here"
-        buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", CAPTCHA_API_PUBLIC_KEY)
-        buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", CAPTCHA_API_PRIVATE_KEY)
-    }
-    useLibrary 'org.apache.http.legacy'
-    packagingOptions {
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/ASL2.0'
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-            signingConfig signingConfigs.config
-        }
-        release {
-            minifyEnabled false
-            signingConfig signingConfigs.config
-        }
-    }
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-            jniLibs.srcDir 'libs'
-
-            java.srcDirs += 'tests/src';
-        }
-
-        // Move the tests to tests/java, tests/res, etc...
-        instrumentTest.setRoot('tests')
-
-        // Move the build types to build-types/<type>
-        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
-        // This moves them out of them default location under src/<type>/... which would
-        // conflict with src/ being used by the main source set.
-        // Adding new build types or product flavors should be accompanied
-        // by a similar customization.
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
-    }
-    lintOptions {
-        disable 'ResAuto'
-    }
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

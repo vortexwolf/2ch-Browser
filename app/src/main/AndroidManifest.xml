@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ua.in.quireg.chan"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:name="ua.in.quireg.chan.common.MainApplication"
+        android:allowBackup="false">
+        <!--<activity-->
+            <!--android:name=".ui.activities.LaunchScreenActivity"-->
+            <!--android:theme="@style/launchScreenTheme">-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.BaseActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.SearchableActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.ExternalUrlHandlerActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="2ch.pm"
+                    android:pathPattern="/.*"
+                    android:scheme="https" />
+                <data
+                    android:host="2ch.hk"
+                    android:pathPattern="/.*"
+                    android:scheme="https" />
+                <data
+                    android:host="2ch.hk"
+                    android:pathPattern="/.*"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.ImageGalleryActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.AddPostActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name="ua.in.quireg.chan.ui.activities.FilesListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <activity android:name="ua.in.quireg.chan.ui.activities.NewRecaptchaActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="ua.in.quireg.chan.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+
+    </application>
+
+</manifest>
