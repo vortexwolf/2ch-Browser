@@ -48,8 +48,8 @@ android {
     defaultConfig {
         // You need to create a new gradle.properties file in the root of the project and add
         // CAPTCHA_API_PUBLIC_KEY="your api key goes here"
-        buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", CAPTCHA_API_PUBLIC_KEY)
-        buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", CAPTCHA_API_PRIVATE_KEY)
+        buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", keystoreProperties['CAPTCHA_API_PUBLIC_KEY'])
+        buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", keystoreProperties['CAPTCHA_API_PRIVATE_KEY'])
     }
     useLibrary 'org.apache.http.legacy'
     packagingOptions {
