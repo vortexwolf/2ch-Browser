@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme_Photon_Base"
+    tools:context=".ui.activities.BaseActivity">
+
+    <LinearLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_activity_toolbar_size">
+        </android.support.v7.widget.Toolbar>
+
+        <View
+            android:id="@+id/top_shadowline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/bottom_shadow"
+            />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_layout"
+        android:layout_above="@+id/bottom_tab_layout"
+        />
+
+    <LinearLayout
+        android:id="@+id/bottom_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true"
+        android:layout_alignParentBottom="true">
+
+        <View
+            android:id="@+id/bottom_shadowline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/bottom_shadow" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/bottom_tab"
+            style="@style/BottomTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tab_layout_size"
+            android:background="@color/white" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

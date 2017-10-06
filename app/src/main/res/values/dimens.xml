@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="image_gallery_top_panel_size">44dp</dimen>
+    <dimen name="image_gallery_bottom_panel_size">44dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="image_activity_toolbar_size">44dp</dimen>
+    <dimen name="tab_layout_size">44dp</dimen>
+    <dimen name="bottom_panel_size">44dp</dimen>
+    <dimen name="navigation_button_size">40dp</dimen>
+    <dimen name="navigation_button_padding">4dp</dimen>
+
+    <dimen name="thumbnail_size">64dp</dimen>
+    <dimen name="filelist_frame_size">56dp</dimen>
+    <dimen name="filelist_thumbnail_size">48dp</dimen>
+    <dimen name="badge_size">16dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+</resources>
