@@ -8,21 +8,6 @@ import android.widget.TextView;
 import ua.in.quireg.chan.common.Constants;
 
 public class CompatibilityUtils {
-    public static void setDisplayHomeAsUpEnabled(Activity activity) {
-        if (Constants.SDK_VERSION < 11) {
-            return;
-        }
-
-        CompatibilityUtilsImpl.setDisplayHomeAsUpEnabled(activity);
-    }
-
-    public static boolean hasHardwareMenu(Context context) {
-        if (Constants.SDK_VERSION < 11) {
-            return true;
-        }
-
-        return CompatibilityUtilsImpl.hasHardwareMenu(context, Constants.SDK_VERSION);
-    }
 
     public static boolean isTextSelectable(TextView textView) {
         if (Constants.SDK_VERSION < 11) {

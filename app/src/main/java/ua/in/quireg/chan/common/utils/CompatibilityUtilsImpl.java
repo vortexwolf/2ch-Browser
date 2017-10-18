@@ -3,7 +3,6 @@ package ua.in.quireg.chan.common.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.text.Spannable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.webkit.WebSettings;
@@ -21,12 +19,12 @@ import android.webkit.WebView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.util.concurrent.Executor;
+
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.ui.controls.MyLeadingMarginSpan2;
-
-import java.util.concurrent.Executor;
 
 import static ua.in.quireg.chan.ui.fragments.PostsListFragment.handleContextMenuItemClick;
 import static ua.in.quireg.chan.ui.fragments.PostsListFragment.populateContextMenu;
@@ -38,14 +36,10 @@ import static ua.in.quireg.chan.ui.fragments.PostsListFragment.populateContextMe
 @SuppressLint("NewApi")
 public class CompatibilityUtilsImpl {
 
-    public static boolean hasMultitouchSupport(PackageManager packageManager) {
-        return packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
-    }
-    
     public static String getDocumentId(Uri uri) {
         return DocumentsContract.getDocumentId(uri);
     }
-    
+
     public static boolean isDocumentUri(Context context, Uri uri) {
         return DocumentsContract.isDocumentUri(context, uri);
     }
@@ -53,44 +47,15 @@ public class CompatibilityUtilsImpl {
     public static void setScrollbarFadingEnabled(WebView webView, boolean fadeScrollbars) {
         webView.setScrollbarFadingEnabled(fadeScrollbars);
     }
-    
-    public static void setDefaultZoomFAR(WebSettings settings) {
-        settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
-    }
-    
-    public static void setDefaultZoomCLOSE(WebSettings settings) {
-        settings.setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
-    }
-    
-    public static void setDefaultZoomMEDIUM(WebSettings settings) {
-        settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);
-    }
-    
-    public static void setLoadWithOverviewMode(WebSettings settings, boolean overview) {
-        settings.setLoadWithOverviewMode(overview);
-    }
-    
+
     public static void setBlockNetworkLoads(WebSettings settings, boolean flag) {
         settings.setBlockNetworkLoads(flag);
     }
-    
+
     public static void setDisplayZoomControls(WebSettings settings, boolean enabled) {
         settings.setDisplayZoomControls(enabled);
     }
-    
-    public static void setDisplayHomeAsUpEnabled(Activity activity) {
-        activity.getActionBar().setDisplayHomeAsUpEnabled(true);
-    }
 
-    public static boolean hasHardwareMenu(Context context, int currentVersion) {
-        if (currentVersion < 11) {
-            return true;
-        } else if (currentVersion >= 11 && currentVersion <= 13) {
-            return false;
-        }
-
-        return ViewConfiguration.get(context).hasPermanentMenuKey();
-    }
 
     public static boolean isTextSelectable(TextView textView) {
         return textView.isTextSelectable();
@@ -106,7 +71,7 @@ public class CompatibilityUtilsImpl {
             clipboard.setPrimaryClip(clip);
         }
     }
-    
+
     public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
         view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
     }
@@ -120,7 +85,7 @@ public class CompatibilityUtilsImpl {
             AsyncTask.class.getMethod("setDefaultExecutor", Executor.class).invoke(null, AsyncTask.SERIAL_EXECUTOR);
         } catch (Exception e) {
             MyLog.e("setDefaultExecutor", e);
-        }        
+        }
     }
 
     public static class API4 {

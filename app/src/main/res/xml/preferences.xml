@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res/ua.in.quireg.chan">
-    <PreferenceScreen
+
+    <!--General (2ch.hk)-->
+    <android.support.v7.preference.PreferenceScreen
         android:key="pref_screen_dvach_key"
         android:summary="@string/pref_screen_dvach_summary"
         android:title="@string/pref_screen_dvach">
-        <PreferenceCategory android:title="@string/pref_screen_dvach_summary">
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_screen_dvach_summary">
             <EditTextPreference
                 android:hint="@string/pref_name_hint"
                 android:inputType="text"
@@ -20,11 +25,6 @@
                 android:summary="@string/pref_passcode_summary"
                 android:title="@string/pref_passcode" />
             <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="@string/pref_mobileapi_key"
-                android:summary="@string/pref_mobileapi_summary"
-                android:title="@string/pref_mobileapi" />
-            <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="@string/pref_display_hidden_boards_key"
                 android:summary="@string/pref_display_all_boards_summary"
@@ -36,6 +36,52 @@
                 android:singleLine="true"
                 android:summary="@string/pref_homepage_summary"
                 android:title="@string/pref_homepage" />
+        </android.support.v7.preference.PreferenceCategory>
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_category_datetime">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="@string/pref_convert_post_date_key"
+                android:summary="@string/pref_convert_post_date_summary"
+                android:title="@string/pref_convert_post_date" />
+        </android.support.v7.preference.PreferenceCategory>
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_category_autorefresh">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_auto_refresh_key"
+                android:summary="@string/pref_auto_refresh_summary"
+                android:title="@string/pref_auto_refresh" />
+            <SeekBarPreference
+                android:defaultValue="60"
+                android:dependency="@string/pref_auto_refresh_key"
+                android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"
+                android:key="@string/pref_auto_refresh_interval_key"
+                android:summary="@string/pref_auto_refresh_interval_summary"
+                android:title="@string/pref_auto_refresh_interval"
+                local:maxValue="150"
+                local:minValue="30"
+                local:step="10"
+                local:valueFormat="@string/pref_auto_refresh_interval_summary" />
+        </android.support.v7.preference.PreferenceCategory>
+
+    </android.support.v7.preference.PreferenceScreen>
+
+    <!--Networking-->
+    <android.support.v7.preference.PreferenceScreen
+        android:key="pref_screen_network_key"
+        android:summary="@string/pref_screen_network_summary"
+        android:title="@string/pref_screen_network">
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_screen_network_summary">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="@string/pref_mobileapi_key"
+                android:summary="@string/pref_mobileapi_summary"
+                android:title="@string/pref_mobileapi" />
             <EditTextPreference
                 android:hint="@string/pref_domain_hint"
                 android:inputType="textUri"
@@ -54,14 +100,18 @@
                 android:key="@string/pref_unsafe_ssl_key"
                 android:summary="@string/pref_unsafe_ssl_summary"
                 android:title="@string/pref_unsafe_ssl" />
-        </PreferenceCategory>
-    </PreferenceScreen>
 
-    <PreferenceScreen
+        </android.support.v7.preference.PreferenceCategory>
+    </android.support.v7.preference.PreferenceScreen>
+
+    <!--Style-->
+    <android.support.v7.preference.PreferenceScreen
         android:key="pref_screen_style_key"
         android:summary="@string/pref_screen_style_summary"
         android:title="@string/pref_screen_style">
-        <PreferenceCategory android:title="@string/pref_screen_style">
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_screen_style">
             <ListPreference
                 android:defaultValue="@string/pref_text_size_13_value"
                 android:dialogTitle="@string/pref_text_size"
@@ -108,14 +158,17 @@
                 android:singleLine="true"
                 android:summary="@string/pref_cut_posts_summary"
                 android:title="@string/pref_cut_posts" />
-        </PreferenceCategory>
-    </PreferenceScreen>
+        </android.support.v7.preference.PreferenceCategory>
 
-    <PreferenceScreen
-        android:key="pref_screen_images_key"
-        android:summary="@string/pref_screen_images_summary"
-        android:title="@string/pref_screen_images">
-        <PreferenceCategory android:title="@string/pref_screen_images">
+    </android.support.v7.preference.PreferenceScreen>
+
+    <!--Media-->
+    <android.support.v7.preference.PreferenceScreen
+        android:key="pref_screen_media_key"
+        android:summary="@string/pref_screen_media_summary"
+        android:title="@string/pref_screen_media">
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_screen_media">
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_load_thumbnails_key"
@@ -138,8 +191,10 @@
                 android:key="@string/pref_download_background_key"
                 android:summary="@string/pref_download_background_summary"
                 android:title="@string/pref_download_background" />
-        </PreferenceCategory>
-        <PreferenceCategory android:title="@string/pref_category_image_viewer">
+        </android.support.v7.preference.PreferenceCategory>
+
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_category_image_viewer">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:disableDependentsState="true"
@@ -177,13 +232,16 @@
                 android:key="@string/pref_disable_zoom_controls_key"
                 android:summary="@string/pref_disable_zoom_controls_summary"
                 android:title="@string/pref_disable_zoom_controls" />
-        </PreferenceCategory>
-    </PreferenceScreen>
-    <PreferenceScreen
+        </android.support.v7.preference.PreferenceCategory>
+    </android.support.v7.preference.PreferenceScreen>
+
+    <!--Cache-->
+    <android.support.v7.preference.PreferenceScreen
         android:key="pref_screen_cache_key"
         android:summary="@string/pref_screen_cache_summary"
         android:title="@string/pref_screen_cache">
-        <PreferenceCategory android:title="@string/pref_screen_cache_summary">
+        <android.support.v7.preference.PreferenceCategory
+            android:title="@string/pref_screen_cache_summary">
             <SeekBarPreference
                 android:defaultValue="60"
                 android:dialogTitle="@string/pref_cache_size_limit_title"
@@ -229,38 +287,28 @@
             <ua.in.quireg.chan.settings.CacheSizePreference
                 android:key="@string/pref_clear_cache_key"
                 android:title="@string/pref_file_cache_clear" />
-        </PreferenceCategory>
-    </PreferenceScreen>
-    <PreferenceScreen
-        android:key="pref_screen_other_key"
-        android:summary="@string/pref_screen_other_summary"
-        android:title="@string/pref_screen_other">
-        <PreferenceCategory android:title="@string/pref_category_datetime">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="@string/pref_convert_post_date_key"
-                android:summary="@string/pref_convert_post_date_summary"
-                android:title="@string/pref_convert_post_date" />
-        </PreferenceCategory>
+        </android.support.v7.preference.PreferenceCategory>
+    </android.support.v7.preference.PreferenceScreen>
 
-        <PreferenceCategory android:title="@string/pref_category_autorefresh">
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="@string/pref_auto_refresh_key"
-                android:summary="@string/pref_auto_refresh_summary"
-                android:title="@string/pref_auto_refresh" />
+    <!--Other-->
+    <!--<android.support.v7.preference.PreferenceScreen-->
+        <!--android:key="pref_screen_other_key"-->
+        <!--android:summary="@string/pref_screen_other_summary"-->
+        <!--android:title="@string/pref_screen_other">-->
+    <!--</android.support.v7.preference.PreferenceScreen>-->
 
-            <SeekBarPreference
-                android:defaultValue="60"
-                android:dependency="@string/pref_auto_refresh_key"
-                android:dialogTitle="@string/pref_auto_refresh_interval_dialog_title"
-                android:key="@string/pref_auto_refresh_interval_key"
-                android:summary="@string/pref_auto_refresh_interval_summary"
-                android:title="@string/pref_auto_refresh_interval"
-                local:maxValue="150"
-                local:minValue="30"
-                local:step="10"
-                local:valueFormat="@string/pref_auto_refresh_interval_summary" />
-        </PreferenceCategory>
-    </PreferenceScreen>
-</PreferenceScreen>
+    <!--About-->
+    <android.support.v7.preference.PreferenceScreen
+        android:key="pref_screen_about_key"
+        android:summary="@string/pref_screen_about_summary"
+        android:title="@string/pref_screen_about">
+        <EditTextPreference
+            android:title="@string/pref_screen_about_version"
+            android:key="pref_screen_about_version_key"
+            android:enabled="false">
+        </EditTextPreference>
+    </android.support.v7.preference.PreferenceScreen>
+
+
+
+</android.support.v7.preference.PreferenceScreen>

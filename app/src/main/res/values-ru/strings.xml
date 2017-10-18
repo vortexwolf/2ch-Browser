@@ -141,10 +141,13 @@
     <string name="pref_screen_dvach_summary">Настройки имиджборды 2ch.hk</string>
     <string name="pref_screen_style">Стиль</string>
     <string name="pref_screen_style_summary">Темы, размеры шрифтов, интерфейс</string>
-    <string name="pref_screen_images">Изображения</string>
-    <string name="pref_screen_images_summary">Просмотр и загрузка изображений</string>
+    <string name="pref_screen_media">Медиа</string>
+    <string name="pref_screen_media_summary">Просмотр и загрузка медиа контента</string>
     <string name="pref_screen_other">Другие настройки</string>
     <string name="pref_screen_other_summary">Все остальное</string>
+    <string name="pref_screen_about">О приложении</string>
+    <string name="pref_screen_about_summary">Информация о приложении и лицензии</string>
+    <string name="pref_screen_about_version">2ch Browser</string>
     <string name="pref_category_image_viewer">Просмотрщик изображений</string>
     <string name="pref_category_autorefresh">Автообновление</string>
     <string name="pref_category_datetime">Дата и время</string>
@@ -254,6 +257,8 @@
     <string name="pref_file_cache_pages_limit">Размер кэша страниц, %</string>
     <string name="pref_file_cache_thumb_limit">Размер кэша превью, %</string>
     <string name="pref_file_cache_pages_threshold_limit">Не удалять страницы созданые ранее чем N дней</string>
+    <string name="pref_screen_network">Сеть</string>
+    <string name="pref_screen_network_summary">Настройки сети</string>
     <string name="pref_external_video">Внешний видеоплеер</string>
     <string name="pref_external_video_summary">Использовать внешний видеоплеер для webm видео</string>
     <string name="pref_video_mute">Видео без звука</string>

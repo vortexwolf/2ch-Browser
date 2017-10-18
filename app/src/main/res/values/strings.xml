@@ -130,14 +130,29 @@
     <string name="pref_screen_dvach_summary">2ch.hk specific options</string>
     <string name="pref_screen_style">Style</string>
     <string name="pref_screen_style_summary">Set themes, font sizes, UI</string>
-    <string name="pref_screen_images">Images</string>
-    <string name="pref_screen_images_summary">Images specific options</string>
+    <string name="pref_screen_media">Media</string>
+    <string name="pref_screen_media_summary">Media specific options</string>
     <string name="pref_screen_other">Other</string>
     <string name="pref_screen_other_summary">Everything else</string>
+    <string name="pref_screen_about">About</string>
+    <string name="pref_screen_about_summary">App info and licenses</string>
+    <string name="pref_screen_about_version">2ch Browser</string>
+
     <string name="pref_category_image_viewer">Image viewer</string>
     <string name="pref_category_autorefresh">AutoRefresh</string>
+
     <string name="pref_screen_cache">Cache</string>
     <string name="pref_screen_cache_summary">Cache settings</string>
+    <string name="pref_file_cache_limit">Limited cache</string>
+    <string name="pref_file_cache_limit_summary">Enable cache size limit</string>
+    <string name="pref_file_cache_media_limit">Media cache size, %</string>
+    <string name="pref_file_cache_pages_limit">Pages cache size, %</string>
+    <string name="pref_file_cache_thumb_limit">Thumbnails cache size, %</string>
+    <string name="pref_file_cache_pages_threshold_limit">Keep pages newer than N days</string>
+
+    <string name="pref_screen_network">Network</string>
+    <string name="pref_screen_network_summary">Network settings</string>
+
     <string name="pref_category_datetime">Date &amp; Time</string>
     <string name="pref_homepage">Default start page</string>
     <string name="pref_homepage_summary">Change the start page</string>
@@ -169,12 +184,7 @@
     <string name="pref_cut_posts">Long posts</string>
     <string name="pref_cut_posts_hint">0 - do not cut; 400px by default</string>
     <string name="pref_cut_posts_summary">Cut long posts if they are longer than the specified value</string>
-    <string name="pref_file_cache_limit">Limited cache</string>
-    <string name="pref_file_cache_limit_summary">Enable cache size limit</string>
-    <string name="pref_file_cache_media_limit">Media cache size, %</string>
-    <string name="pref_file_cache_pages_limit">Pages cache size, %</string>
-    <string name="pref_file_cache_thumb_limit">Thumbnails cache size, %</string>
-    <string name="pref_file_cache_pages_threshold_limit">Keep pages newer than N days</string>
+
 
 
     <string name="pref_multithumbnails_in_threads">Multiple Thumbnails</string>

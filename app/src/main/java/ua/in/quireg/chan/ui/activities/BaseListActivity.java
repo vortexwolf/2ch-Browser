@@ -120,12 +120,6 @@ public abstract class BaseListActivity extends BaseActivity implements SwipeRefr
         this.switchToView(this.mCurrentView);
     }
 
-    /**
-     * Returns the main class of the application
-     */
-    protected MainApplication getMainApplication() {
-        return (MainApplication) super.getApplication();
-    }
 
     /**
      * Shows the loading indicator

@@ -73,7 +73,7 @@ public class SearchableActivity extends BaseListActivity {
     protected void resetUI() {
         super.resetUI();
 
-        CompatibilityUtils.setDisplayHomeAsUpEnabled(this);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         this.registerForContextMenu(this.getListView());
     }
 

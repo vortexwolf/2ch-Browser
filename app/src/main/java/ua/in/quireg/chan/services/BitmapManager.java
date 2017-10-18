@@ -1,8 +1,10 @@
 package ua.in.quireg.chan.services;
 
 import android.graphics.Bitmap;
-import android.httpimage.HttpImageManager;
-import android.httpimage.HttpImageManager.LoadRequest;
+
+import httpimage.HttpImageManager;
+import httpimage.HttpImageManager.LoadRequest;
+
 import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;

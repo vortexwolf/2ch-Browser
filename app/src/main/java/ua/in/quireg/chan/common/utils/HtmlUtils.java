@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.httpimage.HttpImageManager;
+
+import httpimage.HttpImageManager;
+
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
@@ -24,6 +26,7 @@ import ua.in.quireg.chan.interfaces.IUrlBuilder;
 
 public class HtmlUtils {
     private static final Pattern styleColorPattern = Pattern.compile(".*?color: rgb\\((\\d+), (\\d+), (\\d+)\\);.*");
+
     // Картинки со смайликами во время всяких праздников
     public static MyHtml.ImageGetter getImageGetter(final IUrlBuilder urlBuilder) {
         return new MyHtml.ImageGetter() {
@@ -49,7 +52,9 @@ public class HtmlUtils {
         return builder;
     }
 
-    /** Добавляет обработчики событий к ссылкам */
+    /**
+     * Добавляет обработчики событий к ссылкам
+     */
     public static SpannableStringBuilder replaceUrls(SpannableStringBuilder builder, IURLSpanClickListener listener, Theme theme) {
         URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
 

@@ -1,4 +1,4 @@
-package android.httpimage;
+package httpimage;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

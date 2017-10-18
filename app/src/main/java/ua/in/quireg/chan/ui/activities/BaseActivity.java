@@ -24,7 +24,7 @@ import ua.in.quireg.chan.ui.fragments.BoardsListFragment;
 import ua.in.quireg.chan.ui.fragments.FavoritesFragment;
 import ua.in.quireg.chan.ui.fragments.HistoryFragment;
 import ua.in.quireg.chan.ui.fragments.OpenTabsFragment;
-import ua.in.quireg.chan.ui.fragments.SettingsFragment;
+import ua.in.quireg.chan.ui.fragments.PreferenceFragment;
 
 import butterknife.BindArray;
 import butterknife.BindView;
@@ -200,7 +200,7 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
             case FragNavController.TAB4:
                 return new HistoryFragment();
             case FragNavController.TAB5:
-                return new SettingsFragment();
+                return new PreferenceFragment();
 
         }
         throw new IllegalStateException("Need to send an index that we know");

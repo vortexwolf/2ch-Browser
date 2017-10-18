@@ -4,10 +4,11 @@ import org.acra.*;
 import org.acra.annotation.*;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.httpimage.BitmapMemoryCache;
-import android.httpimage.FileSystemPersistence;
-import android.httpimage.HttpImageManager;
+import httpimage.BitmapMemoryCache;
+import httpimage.FileSystemPersistence;
+import httpimage.HttpImageManager;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
@@ -46,7 +47,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
 
-@ReportsCrashes(mailTo = "artur.menchenko@gmail.com",
+@ReportsCrashes(mailTo = "2chbrowsergreatagain@gmail.com",
         customReportContent = {
                 ReportField.APP_VERSION_CODE,
                 ReportField.APP_VERSION_NAME,
@@ -69,6 +70,8 @@ public class MainApplication extends Application {
         return mComponent;
     }
 
+    protected ApplicationSettings settings;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -76,17 +79,18 @@ public class MainApplication extends Application {
         if(!Constants.LOGGING){
             ACRA.init(this);
         }
+
+        settings = new ApplicationSettings(getApplicationContext(), getResources());
+
         mComponent = buildComponent();
 
-        MULTITOUCH_SUPPORT = CompatibilityUtilsImpl.hasMultitouchSupport(this.getPackageManager());
+        MULTITOUCH_SUPPORT = getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH);
 
         if (Constants.SDK_VERSION >= 19) {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
 
 
-
-        ApplicationSettings settings = new ApplicationSettings(this.getApplicationContext(), this.getResources());
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());
@@ -156,10 +160,11 @@ public class MainApplication extends Application {
         return Factory.getContainer().resolve(CacheDirectoryManager.class).getCurrentCacheDirectory();
     }
 
+
     protected AppComponent buildComponent(){
         return DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .netModule(new NetModule("https://2ch.hk"))
+                .appModule(new AppModule(this, settings))
+                .netModule(new NetModule())
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package android.httpimage;
+package httpimage;
 
 import android.graphics.Bitmap;
 

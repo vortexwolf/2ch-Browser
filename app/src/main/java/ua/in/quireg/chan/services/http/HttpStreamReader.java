@@ -38,20 +38,20 @@ public class HttpStreamReader {
     private final HashMap<String, String> mIfModifiedMap = new HashMap<String, String>();
 
     public HttpStreamReader(DefaultHttpClient httpClient, Resources resources) {
-        this.mHttpClient = httpClient;
-        this.mResources = resources;
+        mHttpClient = httpClient;
+        mResources = resources;
     }
 
     public HttpStreamModel fromUri(String uri) throws HttpRequestException {
-        return this.fromUri(uri, null);
+        return fromUri(uri, null);
     }
 
     public HttpStreamModel fromUri(String uri, Header[] customHeaders) throws HttpRequestException {
-        return this.fromUri(uri, customHeaders, null, null);
+        return fromUri(uri, customHeaders, null, null);
     }
 
     public HttpStreamModel fromUri(String uri, Header[] customHeaders, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
-        return this.fromUri(uri, true, customHeaders, listener, task);
+        return fromUri(uri, true, customHeaders, listener, task);
     }
 
     public HttpStreamModel fromUri(String uri, boolean checkModified, Header[] customHeaders, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
@@ -61,8 +61,8 @@ public class HttpStreamReader {
         boolean wasNotModified = false;
 
         try {
-            request = this.createPrivateRequest(uri, checkModified, customHeaders);
-            response = this.getPrivateResponse(request);
+            request = createPrivateRequest(uri, checkModified, customHeaders);
+            response = getPrivateResponse(request);
 
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() == 304) {
@@ -70,7 +70,7 @@ public class HttpStreamReader {
             } else if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
                 throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
             } else {
-                stream = this.fromResponse(response, listener, task);
+                stream = fromResponse(response, listener, task);
             }
 
         } catch (HttpRequestException e) {
@@ -94,21 +94,21 @@ public class HttpStreamReader {
         InputStream stream = null;
 
         try {
-            request = this.createRequest(uri, headersList, entity);
+            request = createRequest(uri, headersList, entity);
             try {
-                response = this.getResponse(request);
+                response = getResponse(request);
             } catch (SSLException e) {
-                throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
+                throw new HttpRequestException(mResources.getString(R.string.error_unsafe_ssl));
             } catch (Exception e) {
                 MyLog.e(TAG, e.getMessage());
-                throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
+                throw new HttpRequestException(mResources.getString(R.string.error_download_data));
             }
 
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() != 200 && status.getStatusCode() != 403) {
                 throw new HttpRequestException(status.getStatusCode() + " - " + status.getReasonPhrase());
             } else {
-                stream = this.fromResponse(response, listener, task);
+                stream = fromResponse(response, listener, task);
             }
 
         } catch (HttpRequestException e) {
@@ -126,7 +126,7 @@ public class HttpStreamReader {
     }
 
     public InputStream fromResponse(HttpResponse response) throws HttpRequestException {
-        return this.fromResponse(response, null, null);
+        return fromResponse(response, null, null);
     }
 
     public InputStream fromResponse(HttpResponse response, IProgressChangeListener listener, ICancelled task) throws HttpRequestException {
@@ -139,12 +139,12 @@ public class HttpStreamReader {
         } catch (Exception e) {
             MyLog.e(TAG, e);
             ExtendedHttpClient.releaseResponse(response);
-            throw new HttpRequestException(this.mResources.getString(R.string.error_read_response), e);
+            throw new HttpRequestException(mResources.getString(R.string.error_read_response), e);
         }
     }
 
     public void removeIfModifiedForUri(String uri) {
-        this.mIfModifiedMap.remove(uri);
+        mIfModifiedMap.remove(uri);
     }
 
     public HttpGet createRequest(String uri, List<Header> customHeaders) throws IllegalArgumentException {
@@ -191,7 +191,7 @@ public class HttpStreamReader {
         // try several times if exception, break the loop after a successful read
         for (int i = 0; i < 3; i++) {
             try {
-                response = this.mHttpClient.execute(request);
+                response = mHttpClient.execute(request);
 
                 responseException = null;
                 break;
@@ -219,13 +219,13 @@ public class HttpStreamReader {
     private HttpGet createPrivateRequest(String uri, boolean checkModified, Header[] customHeaders) throws HttpRequestException {
         List<Header> headersList = customHeaders != null ? Arrays.asList(customHeaders) : new ArrayList<Header>();
 
-        if (checkModified && this.mIfModifiedMap.containsKey(uri)) {
-            headersList.add(new BasicHeader("If-Modified-Since", this.mIfModifiedMap.get(uri)));
+        if (checkModified && mIfModifiedMap.containsKey(uri)) {
+            headersList.add(new BasicHeader("If-Modified-Since", mIfModifiedMap.get(uri)));
         }
 
-        HttpGet request = this.createRequest(uri, headersList);
+        HttpGet request = createRequest(uri, headersList);
         if (request == null) {
-            throw new HttpRequestException(this.mResources.getString(R.string.error_create_request));
+            throw new HttpRequestException(mResources.getString(R.string.error_create_request));
         }
 
         return request;
@@ -234,19 +234,19 @@ public class HttpStreamReader {
     private HttpResponse getPrivateResponse(HttpGet request) throws HttpRequestException {
         HttpResponse response = null;
         try {
-            response = this.getResponse(request);
+            response = getResponse(request);
         } catch (SSLException e) {
-            throw new HttpRequestException(this.mResources.getString(R.string.error_unsafe_ssl));
+            throw new HttpRequestException(mResources.getString(R.string.error_unsafe_ssl));
         } catch (Exception e) {
             MyLog.e(TAG, e.getMessage());
-            throw new HttpRequestException(this.mResources.getString(R.string.error_download_data));
+            throw new HttpRequestException(mResources.getString(R.string.error_download_data));
         }
 
         if (response.getStatusLine().getStatusCode() == 200) {
             // save the last modified date
             Header header = response.getFirstHeader("Last-Modified");
             if (header != null) {
-                this.mIfModifiedMap.put(request.getURI().toString(), header.getValue());
+                mIfModifiedMap.put(request.getURI().toString(), header.getValue());
             }
         }
 

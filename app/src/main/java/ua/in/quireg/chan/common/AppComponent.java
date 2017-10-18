@@ -10,6 +10,6 @@ import dagger.Component;
 @Singleton
 @Component(modules={AppModule.class, NetModule.class})
 public interface AppComponent {
-    void inject(BaseActivity activity);
+    //void inject(BaseActivity activity);
     void inject(BoardsListFragment activity);
 }

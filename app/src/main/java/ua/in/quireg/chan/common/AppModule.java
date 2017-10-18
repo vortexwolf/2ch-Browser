@@ -6,19 +6,30 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
 public class AppModule {
 
-    Application mApplication;
+    MainApplication mApplication;
+    ApplicationSettings mApplicationSettings;
 
-    public AppModule(Application application) {
+    public AppModule(MainApplication application, ApplicationSettings Settings) {
         mApplication = application;
+        mApplicationSettings = Settings;
     }
 
     @Provides
     @Singleton
-    Application providesApplication() {
+    MainApplication providesApplication() {
         return mApplication;
     }
+
+    @Provides
+    @Singleton
+    ApplicationSettings providesApplicationSettings() {
+        return mApplicationSettings;
+    }
+
+
 }

@@ -1,4 +1,4 @@
-package android.httpimage;
+package httpimage;
 
 import java.io.File;
 import java.io.FileInputStream;

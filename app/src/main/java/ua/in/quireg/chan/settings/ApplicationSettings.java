@@ -410,6 +410,14 @@ public class ApplicationSettings {
         return this.mSettings.getBoolean(this.mResources.getString(R.string.pref_display_icons_key), false);
     }
 
+    public boolean isUseProxy(){
+        return false;
+    }
+
+    public boolean isUseProxyAuthentication(){
+        return false;
+    }
+
     public SettingsEntity getCurrentSettings() {
         SettingsEntity result = new SettingsEntity();
         result.theme = this.getTheme();

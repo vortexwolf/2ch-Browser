@@ -75,7 +75,7 @@ public class BoardsListFragment extends BaseListFragment {
     private Observable<Boolean> updateBoardsListFromServer;
 
     @Inject
-    protected OkHttpClient client;
+    protected OkHttpClient okHttpClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,7 +164,7 @@ public class BoardsListFragment extends BaseListFragment {
                     .url(mWebsite.getUrlBuilder().getBoardsUrl())
                     .build();
 
-            updateBoardsListFromServer = Observable.fromCallable(() -> client.newCall(request))
+            updateBoardsListFromServer = Observable.fromCallable(() -> okHttpClient.newCall(request))
                     .subscribeOn(Schedulers.io())
                     .map(Call::execute)
                     .map(this::parseBoardsResponse)
@@ -299,10 +299,10 @@ public class BoardsListFragment extends BaseListFragment {
         }
 
         //Now let's check if received array differs from one that is currently stored in settings.
-        if (!GeneralUtils.equalLists(boards, mSettings.getBoards())) {
+        if (GeneralUtils.equalLists(boards, mSettings.getBoards()) && !mSettings.getBoards().isEmpty()) {
             MyLog.d(LOG_TAG, "Boards list has not been modified since last check");
         } else {
-            MyLog.d(LOG_TAG, "Boards list have been modified, updating...");
+            MyLog.d(LOG_TAG, "Boards list has been modified, updating...");
             mSettings.setBoards((ArrayList<BoardModel>) boards);
         }
         return true;
@@ -397,11 +397,8 @@ public class BoardsListFragment extends BaseListFragment {
     }
 
     private boolean validateBoardCode(String boardCode) {
-        if (!StringUtils.isEmpty(boardCode) && boardCodePattern.matcher(boardCode).matches()) {
-            return true;
-        }
+        return !StringUtils.isEmpty(boardCode) && boardCodePattern.matcher(boardCode).matches();
 
-        return false;
     }
 
     private String fixSlashes(String boardCode) {
