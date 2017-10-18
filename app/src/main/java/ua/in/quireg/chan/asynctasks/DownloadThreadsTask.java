@@ -67,7 +67,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
             this.mUserError = e.getMessage();
 
             if (StringUtils.areEqual(this.mUserError, "404 - Not Found") &&
-                Constants.COOKIE_REQUIRE_BOARDS.contains(this.mBoard)) {
+                    Constants.COOKIE_REQUIRE_BOARDS.contains(this.mBoard)) {
                 this.mUserError = this.mActivity.getString(R.string.error_cookie_require_board);
             }
         }
@@ -89,7 +89,7 @@ public class DownloadThreadsTask extends AsyncTask<Void, Long, Boolean> implemen
         // Обновляем список или отображаем ошибку
         if (success) {
             this.mView.setData(this.mThreadsList);
-        } else if (!success) {
+        } else {
             if (this.mRecaptcha != null) {
                 this.mView.showCaptcha(this.mRecaptcha);
             } else {

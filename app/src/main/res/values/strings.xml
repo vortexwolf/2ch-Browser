@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">2ch Browser</string>
+    <string name="app_name">2ch Browser New</string>
 
     <!-- UI Text -->
     <string name="crash_toast_text">Aww, crash. Send the report?</string>

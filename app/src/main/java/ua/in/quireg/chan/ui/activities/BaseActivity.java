@@ -14,8 +14,15 @@ import android.widget.ImageView;
 
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavTransactionOptions;
+
+import javax.inject.Inject;
+
+import butterknife.BindArray;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
@@ -25,10 +32,6 @@ import ua.in.quireg.chan.ui.fragments.FavoritesFragment;
 import ua.in.quireg.chan.ui.fragments.HistoryFragment;
 import ua.in.quireg.chan.ui.fragments.OpenTabsFragment;
 import ua.in.quireg.chan.ui.fragments.PreferenceFragment;
-
-import butterknife.BindArray;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 public class BaseActivity extends AppCompatActivity implements FragNavController.TransactionListener, FragNavController.RootFragmentListener {
@@ -40,7 +43,9 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private ApplicationSettings mApplicationSettings;
+    @Inject
+    protected ApplicationSettings mApplicationSettings;
+
     private FragNavController mNavController;
     private FragmentHistory fragmentHistory;
 
@@ -62,10 +67,9 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainApplication.getComponent().inject(this);
 
-        this.mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-
-        setTheme(this.mApplicationSettings.getTheme());
+        setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.base_activity);
 
         ButterKnife.bind(this);
@@ -223,6 +227,9 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
     }
 
     private void updateToolbar() {
+        if (getSupportActionBar() == null) {
+            return;
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(!mNavController.isRootFragment());
         getSupportActionBar().setDisplayShowHomeEnabled(!mNavController.isRootFragment());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);

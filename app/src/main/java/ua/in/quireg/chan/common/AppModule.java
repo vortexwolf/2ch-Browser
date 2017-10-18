@@ -1,7 +1,5 @@
 package ua.in.quireg.chan.common;
 
-import android.app.Application;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -30,6 +28,5 @@ public class AppModule {
     ApplicationSettings providesApplicationSettings() {
         return mApplicationSettings;
     }
-
 
 }

@@ -263,6 +263,9 @@ public class ThreadsListFragment extends BaseListFragment{
             case R.id.menu_catalog_id:
                 navigateToCatalog();
                 break;
+            case android.R.id.home:
+                ;
+                break;
             case R.id.add_remove_favorites_menu_id:
                 if (mFavoritesDatasource.hasFavorites(mWebsite.name(), mBoardName, null)) {
                     mFavoritesDatasource.removeFromFavorites(mWebsite.name(), mBoardName, null);
