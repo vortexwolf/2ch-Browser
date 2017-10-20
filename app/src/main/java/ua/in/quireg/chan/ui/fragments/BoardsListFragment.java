@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import okhttp3.ResponseBody;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.adapters.BoardsListAdapter;
 import ua.in.quireg.chan.boards.makaba.MakabaModelsMapper;
@@ -265,8 +266,7 @@ public class BoardsListFragment extends BaseListFragment {
     private List<BoardModel> parseBoardsResponse(Response response) throws IOException {
         MyLog.d(LOG_TAG, "parseBoardsResponse()");
 
-
-        if (!response.isSuccessful() || response.body() == null) {
+        if (!response.isSuccessful()) {
             response.close();
             throw new IOException("Server response cannot be proceeded");
         }
@@ -274,8 +274,13 @@ public class BoardsListFragment extends BaseListFragment {
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        JsonNode result = mapper.readValue(response.body().string(), JsonNode.class);
+        ResponseBody responseBody = response.body();
+        String responseString = "";
 
+        if(responseBody != null){
+            responseString = responseBody.string();
+        }
+        JsonNode result = mapper.readValue(responseString, JsonNode.class);
         response.close();
 
         //Parse each category as single JsonNode
@@ -286,7 +291,6 @@ public class BoardsListFragment extends BaseListFragment {
             JsonNode node = (JsonNode) iterator.next();
             MakabaBoardInfo[] data = mapper.convertValue(node, MakabaBoardInfo[].class);
             BoardModel[] tempBoardModels = MakabaModelsMapper.mapBoardModels(data);
-
             models.addAll(Arrays.asList(tempBoardModels));
         }
         return models;
@@ -299,7 +303,7 @@ public class BoardsListFragment extends BaseListFragment {
         }
 
         //Now let's check if received array differs from one that is currently stored in settings.
-        if (GeneralUtils.equalLists(boards, mSettings.getBoards()) && !mSettings.getBoards().isEmpty()) {
+        if (!mSettings.getBoards().isEmpty() && GeneralUtils.equalLists(boards, mSettings.getBoards())) {
             MyLog.d(LOG_TAG, "Boards list has not been modified since last check");
         } else {
             MyLog.d(LOG_TAG, "Boards list has been modified, updating...");

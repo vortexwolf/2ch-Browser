@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res/ua.in.quireg.chan">
 
     <!--General (2ch.hk)-->
@@ -9,8 +8,7 @@
         android:summary="@string/pref_screen_dvach_summary"
         android:title="@string/pref_screen_dvach">
 
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_screen_dvach_summary">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_screen_dvach_summary">
             <EditTextPreference
                 android:hint="@string/pref_name_hint"
                 android:inputType="text"
@@ -38,8 +36,7 @@
                 android:title="@string/pref_homepage" />
         </android.support.v7.preference.PreferenceCategory>
 
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_category_datetime">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_category_datetime">
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_convert_post_date_key"
@@ -47,8 +44,7 @@
                 android:title="@string/pref_convert_post_date" />
         </android.support.v7.preference.PreferenceCategory>
 
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_category_autorefresh">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_category_autorefresh">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="@string/pref_auto_refresh_key"
@@ -101,6 +97,43 @@
                 android:summary="@string/pref_unsafe_ssl_summary"
                 android:title="@string/pref_unsafe_ssl" />
 
+            <android.support.v7.preference.PreferenceScreen
+                android:key="pref_proxy_settings_key"
+                android:summary="@string/pref_proxy_settings_summary"
+                android:title="@string/pref_proxy_settings">
+
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:key="@string/pref_use_proxy_key"
+                    android:summary="@string/pref_use_proxy_summary"
+                    android:title="@string/pref_use_proxy" />
+                <EditTextPreference
+                    android:dependency="@string/pref_use_proxy_key"
+                    android:key="@string/pref_proxy_address_key"
+                    android:summary="@string/pref_proxy_address_summary"
+                    android:title="@string/pref_proxy_address_title" />
+                <EditTextPreference
+                    android:dependency="@string/pref_use_proxy_key"
+                    android:key="@string/pref_proxy_port_key"
+                    android:summary="@string/pref_proxy_port_summary"
+                    android:title="@string/pref_proxy_port_title" />
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:dependency="@string/pref_use_proxy_key"
+                    android:key="@string/pref_proxy_auth_key"
+                    android:summary="@string/pref_proxy_auth_summary"
+                    android:title="@string/pref_proxy_auth_title" />
+                <EditTextPreference
+                    android:dependency="@string/pref_proxy_auth_key"
+                    android:key="@string/pref_proxy_auth_login_key"
+                    android:summary="@string/pref_proxy_auth_login_summary"
+                    android:title="@string/pref_proxy_auth_login_title" />
+                <EditTextPreference
+                    android:dependency="@string/pref_proxy_auth_key"
+                    android:key="@string/pref_proxy_auth_pass_key"
+                    android:summary="@string/pref_proxy_auth_pass_summary"
+                    android:title="@string/pref_proxy_auth_pass_title" />
+            </android.support.v7.preference.PreferenceScreen>
         </android.support.v7.preference.PreferenceCategory>
     </android.support.v7.preference.PreferenceScreen>
 
@@ -110,8 +143,7 @@
         android:summary="@string/pref_screen_style_summary"
         android:title="@string/pref_screen_style">
 
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_screen_style">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_screen_style">
             <ListPreference
                 android:defaultValue="@string/pref_text_size_13_value"
                 android:dialogTitle="@string/pref_text_size"
@@ -167,8 +199,7 @@
         android:key="pref_screen_media_key"
         android:summary="@string/pref_screen_media_summary"
         android:title="@string/pref_screen_media">
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_screen_media">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_screen_media">
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_load_thumbnails_key"
@@ -193,8 +224,7 @@
                 android:title="@string/pref_download_background" />
         </android.support.v7.preference.PreferenceCategory>
 
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_category_image_viewer">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_category_image_viewer">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:disableDependentsState="true"
@@ -240,8 +270,7 @@
         android:key="pref_screen_cache_key"
         android:summary="@string/pref_screen_cache_summary"
         android:title="@string/pref_screen_cache">
-        <android.support.v7.preference.PreferenceCategory
-            android:title="@string/pref_screen_cache_summary">
+        <android.support.v7.preference.PreferenceCategory android:title="@string/pref_screen_cache_summary">
             <SeekBarPreference
                 android:defaultValue="60"
                 android:dialogTitle="@string/pref_cache_size_limit_title"
@@ -292,9 +321,9 @@
 
     <!--Other-->
     <!--<android.support.v7.preference.PreferenceScreen-->
-        <!--android:key="pref_screen_other_key"-->
-        <!--android:summary="@string/pref_screen_other_summary"-->
-        <!--android:title="@string/pref_screen_other">-->
+    <!--android:key="pref_screen_other_key"-->
+    <!--android:summary="@string/pref_screen_other_summary"-->
+    <!--android:title="@string/pref_screen_other">-->
     <!--</android.support.v7.preference.PreferenceScreen>-->
 
     <!--About-->
@@ -303,12 +332,10 @@
         android:summary="@string/pref_screen_about_summary"
         android:title="@string/pref_screen_about">
         <EditTextPreference
-            android:title="@string/pref_screen_about_version"
+            android:enabled="false"
             android:key="pref_screen_about_version_key"
-            android:enabled="false">
-        </EditTextPreference>
+            android:title="@string/pref_screen_about_version"></EditTextPreference>
     </android.support.v7.preference.PreferenceScreen>
-
 
 
 </android.support.v7.preference.PreferenceScreen>

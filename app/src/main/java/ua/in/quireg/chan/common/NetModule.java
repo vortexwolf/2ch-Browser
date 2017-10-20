@@ -2,6 +2,7 @@ package ua.in.quireg.chan.common;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
@@ -33,6 +34,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
+import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
@@ -41,7 +43,7 @@ public class NetModule {
     @Provides
     @Singleton
         // Application reference must come from AppModule.class
-    SharedPreferences providesSharedPreferences(Application application) {
+    SharedPreferences providesSharedPreferences(MainApplication application) {
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
@@ -62,19 +64,25 @@ public class NetModule {
         builder.connectionPool(new ConnectionPool(10,3, TimeUnit.MINUTES));
 
         if (applicationSettings.isUseProxy()) {
-            builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.187", 808)));
+
+            ApplicationSettings.ProxySettings proxySettings = applicationSettings.getProxySettings();
+
+            if(!proxySettings.getServer().isEmpty() && !(proxySettings.getPort() == -1)){
+                builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxySettings.getServer(), proxySettings.getPort())));
+            }
+
+            if(proxySettings.isUseAuth()){
+
+                builder.proxyAuthenticator((route, response) -> {
+                    Request.Builder newRequest = response.request().newBuilder();
+                    return newRequest
+                            .header("Proxy-Authorization", Credentials.basic(proxySettings.getLogin(), proxySettings.getPassword()))
+                            .build();
+                });
+
+            }
         }
 
-        if(applicationSettings.isUseProxyAuthentication()){
-
-            builder.proxyAuthenticator((route, response) -> {
-                Request.Builder newRequest = response.request().newBuilder();
-                return newRequest
-                        .header("Proxy-Authorization", Credentials.basic("root", "rootroot"))
-                        .build();
-            });
-
-        }
         if(applicationSettings.isUnsafeSSL()){
             try {
                 // Create a trust manager that does not validate certificate chains

@@ -30,11 +30,7 @@
 
         <activity
             android:name="ua.in.quireg.chan.ui.activities.BaseActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            android:windowSoftInputMode="adjustPan">
         </activity>
 
         <activity

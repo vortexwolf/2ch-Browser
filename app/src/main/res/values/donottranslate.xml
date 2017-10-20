@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="pref_proxy_settings_key">pref_proxy_settings_key</string>
+    <string name="pref_use_proxy_key">pref_use_proxy_key</string>
+    <string name="pref_proxy_address_key">pref_proxy_address_key</string>
+    <string name="pref_proxy_port_key">pref_proxy_port_key</string>
+    <string name="pref_proxy_auth_key">pref_proxy_auth_key</string>
+    <string name="pref_proxy_auth_login_key">pref_proxy_auth_login_key</string>
+    <string name="pref_proxy_auth_pass_key">pref_proxy_auth_pass_key</string>
     <string name="pref_homepage_key">pref_homepage_key</string>
     <string name="pref_load_thumbnails_key">pref_load_thumbnails_key</string>
     <string name="pref_download_path_key">pref_download_path_key</string>

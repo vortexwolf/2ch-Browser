@@ -198,6 +198,25 @@
     <string name="pref_unsafe_ssl">Ignore SSL Certificate Errors</string>
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
 
+
+    <string name="pref_proxy_settings">Proxy</string>
+    <string name="pref_proxy_settings_summary">Proxy configuration</string>
+    <string name="pref_use_proxy">Use Proxy</string>
+    <string name="pref_use_proxy_summary">Use Proxy for connection</string>
+    <string name="pref_proxy_address_title">Proxy address</string>
+    <string name="pref_proxy_address_summary">E.g. 127.0.0.1</string>
+    <string name="pref_proxy_port_title">Proxy port</string>
+    <string name="pref_proxy_port_summary">E.g. 808</string>
+    <string name="pref_proxy_auth_title">Use Proxy Authentication</string>
+    <string name="pref_proxy_auth_summary">Connect to proxy using login\\password</string>
+    <string name="pref_proxy_auth_login_title">Login</string>
+    <string name="pref_proxy_auth_login_summary">Login goes here</string>
+    <string name="pref_proxy_auth_pass_title">Password</string>
+    <string name="pref_proxy_auth_pass_summary">Password goes here</string>
+
+
+
+
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>
 

@@ -1,7 +1,6 @@
 package ua.in.quireg.chan.ui.fragments;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -19,14 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.library.ExtendedHttpClient;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import static android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences;
 
@@ -40,7 +39,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-         mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
+        mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        if(getArguments() != null){
+        if (getArguments() != null) {
             rootKey = getArguments().getString("rootKey");
         }
         setPreferencesFromResource(R.xml.preferences, rootKey);
@@ -106,9 +105,10 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
             final Preference preference = getPreferenceManager().findPreference(key);
-            if(preference == null){
+            if (preference == null) {
                 return;
             }
+            preference.setShouldDisableView(!preference.isEnabled());
 
             final Resources res = getActivity().getResources();
 
@@ -159,15 +159,16 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
 
         }
     }
+
     private void updateAppVersionPreference() {
         try {
             EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_screen_about_version_key));
-            if(preference == null){
+            if (preference == null) {
                 return;
             }
             PackageInfo pinfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
             String versionName = pinfo.versionName;
-            if(!versionName.isEmpty()){
+            if (!versionName.isEmpty()) {
                 preference.setSummary(versionName);
             }
 
@@ -196,7 +197,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
 
     private void updateListSummary(String prefKey) {
         ListPreference preference = (ListPreference) getPreferenceManager().findPreference(prefKey);
-        if(preference == null){
+        if (preference == null) {
             return;
         }
         preference.setSummary(preference.getEntry());
@@ -204,7 +205,7 @@ public class PreferenceFragment extends PreferenceFragmentCompat {
 
     private void updateEditTextSummary(int prefKey, int prefSummary) {
         EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(prefKey));
-        if(preference == null){
+        if (preference == null) {
             return;
         }
         if (!StringUtils.isEmpty(preference.getText())) {

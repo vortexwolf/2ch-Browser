@@ -3,9 +3,12 @@ package ua.in.quireg.chan.common;
 import org.acra.*;
 import org.acra.annotation.*;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.support.annotation.IdRes;
+
 import httpimage.BitmapMemoryCache;
 import httpimage.FileSystemPersistence;
 import httpimage.HttpImageManager;
@@ -80,7 +83,7 @@ public class MainApplication extends Application {
             ACRA.init(this);
         }
 
-        settings = new ApplicationSettings(getApplicationContext(), getResources());
+        settings = new ApplicationSettings(getApplicationContext());
 
         mComponent = buildComponent();
 
@@ -92,11 +95,11 @@ public class MainApplication extends Application {
 
 
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!settings.isUnsafeSSL());
-        HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, this.getResources());
-        HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, this.getResources());
+        HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, getResources());
+        HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, getResources());
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
         HttpBitmapReader httpBitmapReader = new HttpBitmapReader(httpBytesReader);
-        JsonHttpReader jsonApiReader = new JsonHttpReader(this.getResources(), new ExtendedObjectMapper(), httpStreamReader);
+        JsonHttpReader jsonApiReader = new JsonHttpReader(getResources(), new ExtendedObjectMapper(), httpStreamReader);
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dbHelper);
@@ -159,7 +162,6 @@ public class MainApplication extends Application {
         // NOTE: this method is used in Android 2.2 and higher
         return Factory.getContainer().resolve(CacheDirectoryManager.class).getCurrentCacheDirectory();
     }
-
 
     protected AppComponent buildComponent(){
         return DaggerAppComponent.builder()
