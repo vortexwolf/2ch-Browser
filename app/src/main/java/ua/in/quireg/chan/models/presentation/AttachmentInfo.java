@@ -89,7 +89,7 @@ public class AttachmentInfo {
     }
 
     public boolean isVideo() {
-        return this.mImageUrl != null && UriUtils.isWebmUri(Uri.parse(this.mImageUrl));
+        return this.mImageUrl != null && UriUtils.isVideoUri(Uri.parse(this.mImageUrl));
     }
 
     public boolean isDisplayableInGallery() {

@@ -288,7 +288,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         refreshMenuItem.setVisible(!mImageLoaded);
         if (mCurrentImageModel != null) {
             boolean isImageUrl = UriUtils.isImageUri(Uri.parse(mCurrentImageModel.url));
-            boolean isVideoUrl = UriUtils.isWebmUri(Uri.parse(mCurrentImageModel.url));
+            boolean isVideoUrl = UriUtils.isVideoUri(Uri.parse(mCurrentImageModel.url));
             playVideoMenuItem.setVisible(mImageLoaded && isVideoUrl &&
                     !(mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK));
             searchTineyeMenuItem.setVisible(isImageUrl);
@@ -334,6 +334,8 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                     shareImageIntent.setType("image/jpeg");
                 } else if (UriUtils.isWebmUri(fileToBeShared)) {
                     shareImageIntent.setType("video/webm");
+                } else if (UriUtils.isMP4Uri(fileToBeShared)) {
+                    shareImageIntent.setType("video/mp4");
                 }
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileToBeShared);
                 shareImageIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -387,7 +389,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             mCurrentTask.cancel(true);
         }
 
-        if (UriUtils.isWebmUri(Uri.parse(model.url)) && mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
+        if (UriUtils.isVideoUri(Uri.parse(model.url)) && mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
             if (model.attachment != null) {
                 setThumbnail(model.attachment, viewBag);
                 mImageLoaded = true;
@@ -448,7 +450,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     private void setImage(File file, GalleryItemViewBag viewBag) {
         if (UriUtils.isImageUri(Uri.fromFile(file))) {
             AppearanceUtils.setImage(file, getActivity(), viewBag.layout, mBackgroundColor);
-        } else if (UriUtils.isWebmUri(Uri.fromFile(file))) {
+        } else if (UriUtils.isVideoUri(Uri.fromFile(file))) {
             AppearanceUtils.setVideoFile(file, getActivity(), viewBag, mBackgroundColor, getActivity().getTheme());
         }
 
