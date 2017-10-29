@@ -324,7 +324,7 @@ public class AppearanceUtils {
         if (UriUtils.isImageUri(uri)) {
             AppearanceUtils.prepareWebViewForImage(webView, background);
             webView.loadDataWithBaseURL(null, createHtmlForImage(uri), "text/html", HTTP.UTF_8, null);
-        } else if (UriUtils.isWebmUri(uri)) {
+        } else if (UriUtils.isVideoUri(uri)) {
             String mutedAttr = settings.isVideoMute() ? "muted" : "";
             String attributes = String.format("src='%1$s' controls autoplay %2$s", uri, mutedAttr);
 

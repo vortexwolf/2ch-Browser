@@ -76,7 +76,7 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
             ArrayList<String> downloadedImagePaths = new ArrayList<String>();
             for (File file : this.mDownloadedFiles) {
                 Uri uri = Uri.fromFile(file);
-                if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {
+                if (UriUtils.isImageUri(uri) || UriUtils.isVideoUri(uri)) {
                     downloadedImagePaths.add(file.getAbsolutePath());
                 }
             }

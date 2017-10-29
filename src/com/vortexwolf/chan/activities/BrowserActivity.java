@@ -129,6 +129,8 @@ public class BrowserActivity extends Activity {
                     shareImageIntent.setType("image/jpeg");
                 } else if (UriUtils.isWebmUri(this.mUri)) {
                     shareImageIntent.setType("video/webm");
+                } else if (UriUtils.isMP4Uri(this.mUri)) {
+                    shareImageIntent.setType("video/mp4");
                 }
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(this.mLoadedFile));
                 this.startActivity(Intent.createChooser(shareImageIntent, this.getString(R.string.share_via)));
@@ -162,7 +164,7 @@ public class BrowserActivity extends Activity {
             this.mCurrentTask.cancel(true);
         }
 
-        if (UriUtils.isWebmUri(this.mUri) && this.mSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
+        if (UriUtils.isVideoUri(this.mUri) && this.mSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
             this.switchToErrorView(this.getString(R.string.error_video_playing));
             return;
         }
@@ -182,7 +184,7 @@ public class BrowserActivity extends Activity {
     private void setImage(File file) {
         this.mLoadedFile = file;
 
-        if (UriUtils.isWebmUri(this.mUri)) {
+        if (UriUtils.isVideoUri(this.mUri)) {
             GalleryItemViewBag vb = new GalleryItemViewBag();
             vb.layout = this.mContentView;
             vb.loading = this.mLoadingView;
@@ -215,7 +217,7 @@ public class BrowserActivity extends Activity {
         saveMenuItem.setVisible(this.mImageLoaded);
         shareMenuItem.setVisible(this.mImageLoaded);
         refreshMenuItem.setVisible(this.mViewType == ViewType.ERROR);
-        playVideoMenuItem.setVisible(this.mImageLoaded && UriUtils.isWebmUri(this.mUri));
+        playVideoMenuItem.setVisible(this.mImageLoaded && UriUtils.isVideoUri(this.mUri));
         searchTineyeMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
         searchGoogleMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
         imageOpsMenuItem.setVisible(UriUtils.isImageUri(this.mUri));
