@@ -25,6 +25,10 @@ public class UriUtils {
         return RegexUtils.isImagePathString(uri.toString());
     }
 
+    public static boolean isVideoUri(Uri uri) {
+        return isWebmUri(uri) || isMP4Uri(uri);
+    }
+
     public static boolean isWebmUri(Uri uri) {
         if (uri == null) {
             return false;
@@ -32,6 +36,15 @@ public class UriUtils {
 
         String extension = RegexUtils.getFileExtension(uri.toString());
         return extension != null && extension.equalsIgnoreCase("webm");
+    }
+
+    public static boolean isMP4Uri(Uri uri) {
+        if (uri == null) {
+            return false;
+        }
+
+        String extension = RegexUtils.getFileExtension(uri.toString());
+        return extension != null && extension.equalsIgnoreCase("mp4");
     }
 
     public static boolean isYoutubeUri(Uri uri) {

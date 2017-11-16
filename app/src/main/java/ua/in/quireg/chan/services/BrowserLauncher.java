@@ -31,7 +31,7 @@ public class BrowserLauncher {
         Uri uri = Uri.parse(url);
 
         if (UriUtils.isImageUri(uri) ||
-                (UriUtils.isWebmUri(uri) && Constants.SDK_VERSION >= 10)) {
+                (UriUtils.isVideoUri(uri) && Constants.SDK_VERSION >= 10)) {
             Intent browser = new Intent(context, BrowserActivity.class);
             browser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             browser.setData(uri);
