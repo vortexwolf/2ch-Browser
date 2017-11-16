@@ -47,7 +47,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
 
-@ReportsCrashes(mailTo = "artur.menchenko@gmail.com",
+@ReportsCrashes(mailTo = "2chbrowsergreatagain@gmail.com",
         customReportContent = {
                 ReportField.APP_VERSION_CODE,
                 ReportField.APP_VERSION_NAME,
