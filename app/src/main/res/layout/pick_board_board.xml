@@ -9,18 +9,18 @@
     android:paddingRight="6dp">
 
     <TextView
-        android:text="TextView"
+        android:text="Random"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/pick_board_name" />
 
     <TextView
-        android:text="TextView"
+        android:text="500"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

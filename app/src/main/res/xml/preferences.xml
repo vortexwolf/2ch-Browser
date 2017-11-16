@@ -334,7 +334,7 @@
         <EditTextPreference
             android:enabled="false"
             android:key="pref_screen_about_version_key"
-            android:title="@string/pref_screen_about_version"></EditTextPreference>
+            android:title="@string/pref_screen_about_version" />
     </android.support.v7.preference.PreferenceScreen>
 
 

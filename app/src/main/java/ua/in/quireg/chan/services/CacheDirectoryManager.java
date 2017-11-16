@@ -1,9 +1,14 @@
 package ua.in.quireg.chan.services;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.IoUtils;
 import ua.in.quireg.chan.settings.ApplicationSettings;
@@ -13,70 +18,145 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
-public class CacheDirectoryManager implements Runnable {
+import javax.inject.Inject;
+
+public class CacheDirectoryManager {
+
     private static final String LOG_TAG = CacheDirectoryManager.class.getSimpleName();
+
+    private static final int WORKER_INTERVAL = 60000; // 60 seconds
+
+    @Inject
+    protected ApplicationSettings mSettings;
 
     private final String mPackageName;
     private final File mInternalCacheDir;
     private final File mExternalCacheDir;
-    private final ApplicationSettings mSettings;
-    private TrimCache trimCache;
 
+    private Handler mHandler;
 
-    public CacheDirectoryManager(File internalCacheDir, String packageName, ApplicationSettings settings) {
-        this.mPackageName = packageName;
-        this.mInternalCacheDir = new File(internalCacheDir, "cache");
-        this.mSettings = settings;
-        this.mExternalCacheDir = this.getExternalCachePath();
-        new Thread(this).start();
-    }
+    public CacheDirectoryManager(Context context) {
 
-    @Override
-    public void run() {
-        while (true) {
-            trimCacheIfNeeded();
-        }
+        MainApplication.getComponent().inject(this);
+
+        mPackageName = context.getPackageName();
+
+        mExternalCacheDir = getExternalCachePath();
+        mInternalCacheDir = new File(context.getCacheDir(), "cache");
+
+        HandlerThread mHandlerThread = new HandlerThread("CacheWorkerThread");
+        mHandlerThread.start();
+
+        mHandler = new Handler(mHandlerThread.getLooper());
+        mHandler.postDelayed(mWorkerRunnable, WORKER_INTERVAL);
+
     }
 
     public long getCacheSize() {
         return mSettings.getCacheSize();
     }
 
-    public File getInternalCacheDir() {
-        return this.mInternalCacheDir;
-    }
-
-    public File getExternalCacheDir() {
-        return this.mExternalCacheDir;
-    }
-
     public File getCurrentCacheDirectory() {
         File currentDirectory;
 
-        if (this.mExternalCacheDir != null && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            currentDirectory = this.mExternalCacheDir;
+        if (mExternalCacheDir != null && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            currentDirectory = mExternalCacheDir;
         } else {
-            currentDirectory = this.mInternalCacheDir;
+            currentDirectory = mInternalCacheDir;
         }
 
         return currentDirectory;
     }
 
     public File getThumbnailsCacheDirectory() {
-        return this.getCacheDirectory("thumbnails");
+        return getCacheDirectory("thumbnails");
     }
 
     public File getPagesCacheDirectory() {
-        return this.getCacheDirectory("pages");
+        return getCacheDirectory("pages");
     }
 
     public File getMediaCacheDirectory() {
-        return this.getCacheDirectory("images");
+        return getCacheDirectory("images");
+    }
+
+    public File getCachedMediaFileForWrite(Uri uri) {
+        String fileName = uri.getLastPathSegment();
+
+        return new File(getMediaCacheDirectory(), fileName);
+    }
+
+    public File getCachedMediaFileForRead(Uri uri) {
+        File cachedFile = getCachedMediaFileForWrite(uri);
+        if (!cachedFile.exists()) {
+            cachedFile = IoUtils.getSaveFilePath(uri, mSettings);
+        }
+
+        return cachedFile;
+    }
+
+    private Runnable mWorkerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                trimCacheIfNeeded();
+            } finally {
+                mHandler.postDelayed(mWorkerRunnable, WORKER_INTERVAL);
+            }
+        }
+    };
+
+    private void trimCacheIfNeeded() {
+
+        long cacheSize = IoUtils.dirSize(getCurrentCacheDirectory());
+        long maxSize = IoUtils.convertMbToBytes(getCacheSize());
+
+        if (cacheSize < maxSize) {
+            //Cache is not full yet
+            return;
+        }
+
+        final long FILE_CACHE_THRESHOLD = Math.round(IoUtils.convertMbToBytes(mSettings.getCacheSize()));
+        final float MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize() / 100f;
+        final float MAX_MEDIA_PART = mSettings.getCacheMediaSize() / 100f;
+        final float MAX_PAGES_PART = mSettings.getCachePagesSize() / 100f;
+
+        //Delete cache directory that might be previously used by user.
+        IoUtils.deleteDirectory(getReversedCacheDirectory());
+
+        long released = 0;
+
+        //Trim current cache directory
+
+        File pagesCache = getPagesCacheDirectory();
+        long pagesCacheSize = IoUtils.dirSize(pagesCache);
+
+        if (pagesCacheSize > FILE_CACHE_THRESHOLD * MAX_PAGES_PART) {
+            released += freeSpace(getFilesListToDelete(pagesCache), Math.round(pagesCacheSize - (FILE_CACHE_THRESHOLD * MAX_PAGES_PART)));
+        }
+
+        File mediaCache = getMediaCacheDirectory();
+        long mediaCacheSize = IoUtils.dirSize(mediaCache);
+
+        if (mediaCacheSize > FILE_CACHE_THRESHOLD * MAX_MEDIA_PART) {
+            released += freeSpace(getFilesListToDelete(mediaCache), Math.round(mediaCacheSize - (FILE_CACHE_THRESHOLD * MAX_MEDIA_PART)));
+        }
+
+        File thumbnailsCache = getThumbnailsCacheDirectory();
+        long thumbnailsCacheSize = IoUtils.dirSize(thumbnailsCache);
+
+        if (thumbnailsCacheSize > FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART) {
+            released += freeSpace(getFilesListToDelete(thumbnailsCache), Math.round(thumbnailsCacheSize - (FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART)));
+        }
+
+        MyLog.d(LOG_TAG, String.format(Locale.getDefault(), "Released %d bytes from cache", released));
+
     }
 
     private File getCacheDirectory(String subFolder) {
-        File file = new File(this.getCurrentCacheDirectory(), subFolder);
+        File file = new File(getCurrentCacheDirectory(), subFolder);
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -84,61 +164,10 @@ public class CacheDirectoryManager implements Runnable {
         return file;
     }
 
-    public File getCachedMediaFileForWrite(Uri uri) {
-        String fileName = uri.getLastPathSegment();
-
-        return new File(this.getMediaCacheDirectory(), fileName);
-    }
-
-    public File getCachedMediaFileForRead(Uri uri) {
-        File cachedFile = this.getCachedMediaFileForWrite(uri);
-        if (!cachedFile.exists()) {
-            cachedFile = IoUtils.getSaveFilePath(uri, this.mSettings);
-        }
-
-        return cachedFile;
-    }
-
-    public void trimCacheIfNeeded() {
-        long cacheSize = IoUtils.dirSize(getCurrentCacheDirectory());
-        long maxSize = IoUtils.convertMbToBytes(mSettings.getCacheSize());
-
-        if (cacheSize > maxSize) {
-            if (trimCache == null) {
-                trimCache = new TrimCache(mSettings);
-                trimCache.execute();
-            } else {
-                switch (trimCache.getStatus()) {
-                    case PENDING:
-                    case RUNNING:
-                        MyLog.d(LOG_TAG, "Cache trimming in progress, sleeping for next 60 seconds");
-                        try {
-                            Thread.sleep(60 * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case FINISHED:
-                        trimCache = new TrimCache(mSettings);
-                        trimCache.execute();
-                        break;
-
-                }
-            }
-        } else {
-            MyLog.d(LOG_TAG, "Cache trimming is not required, sleeping for next 60 seconds");
-            try {
-                Thread.sleep(60 * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private File getReversedCacheDirectory() {
-        return this.getCurrentCacheDirectory().equals(this.mExternalCacheDir)
-                ? this.mInternalCacheDir
-                : this.mExternalCacheDir;
+        return getCurrentCacheDirectory().equals(mExternalCacheDir)
+                ? mInternalCacheDir
+                : mExternalCacheDir;
     }
 
     private File getExternalCachePath() {
@@ -148,7 +177,7 @@ public class CacheDirectoryManager implements Runnable {
             // storage
             File externalStorageDir = Environment.getExternalStorageDirectory();
             // {SD_PATH}/Android/data/ua.in.quireg.chan/cache
-            File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + this.mPackageName + File.separator + "cache");
+            File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + mPackageName + File.separator + "cache");
             extStorageAppCachePath.mkdirs();
 
             return extStorageAppCachePath;
@@ -157,57 +186,7 @@ public class CacheDirectoryManager implements Runnable {
         return null;
     }
 
-    private class TrimCache extends AsyncTask<Void, Void, Long> {
-        private final long FILE_CACHE_THRESHOLD;
-        private final float MAX_THUMBNAILS_PART;
-        private final float MAX_MEDIA_PART;
-        private final float MAX_PAGES_PART;
-
-
-        TrimCache(final ApplicationSettings mSettings) {
-            FILE_CACHE_THRESHOLD = Math.round(IoUtils.convertMbToBytes(mSettings.getCacheSize()));
-            MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize() / 100f;
-            MAX_MEDIA_PART = mSettings.getCacheMediaSize() / 100f;
-            MAX_PAGES_PART = mSettings.getCachePagesSize() / 100f;
-        }
-
-        @Override
-        public Long doInBackground(Void... params) {
-            MyLog.d(LOG_TAG, "Trimming cache");
-
-            //Delete cache directory that might be previously used by user.
-            IoUtils.deleteDirectory(getReversedCacheDirectory());
-
-            long released = 0;
-
-            //Trim current cache directory
-
-            File pagesCache = getPagesCacheDirectory();
-            long pagesCacheSize = IoUtils.dirSize(pagesCache);
-
-            if (pagesCacheSize > FILE_CACHE_THRESHOLD * MAX_PAGES_PART) {
-                released += freeSpace(getFilesListToDelete(pagesCache), Math.round(pagesCacheSize - (FILE_CACHE_THRESHOLD * MAX_PAGES_PART)));
-            }
-
-            File mediaCache = getMediaCacheDirectory();
-            long mediaCacheSize = IoUtils.dirSize(mediaCache);
-
-            if (mediaCacheSize > FILE_CACHE_THRESHOLD * MAX_MEDIA_PART) {
-                released += freeSpace(getFilesListToDelete(mediaCache), Math.round(mediaCacheSize - (FILE_CACHE_THRESHOLD * MAX_MEDIA_PART)));
-            }
-
-            File thumbnailsCache = getThumbnailsCacheDirectory();
-            long thumbnailsCacheSize = IoUtils.dirSize(thumbnailsCache);
-
-            if (thumbnailsCacheSize > FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART) {
-                released += freeSpace(getFilesListToDelete(thumbnailsCache), Math.round(thumbnailsCacheSize - (FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART)));
-            }
-            return released;
-        }
-
-    }
-
-    private static long freeSpace(List<File> files, long bytesToRelease) {
+    private long freeSpace(List<File> files, long bytesToRelease) {
         long released = 0;
 
         if (files.isEmpty()) {

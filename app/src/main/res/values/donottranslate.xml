@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="pref_boards_serialization_tag">pref_boards_serialization_tag</string>
     <string name="pref_proxy_settings_key">pref_proxy_settings_key</string>
     <string name="pref_use_proxy_key">pref_use_proxy_key</string>
     <string name="pref_proxy_address_key">pref_proxy_address_key</string>

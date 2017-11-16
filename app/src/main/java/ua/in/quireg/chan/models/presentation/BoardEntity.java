@@ -15,24 +15,12 @@ public class BoardEntity implements IBoardListEntity {
         return this.code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getTitle() {
         return this.title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getBumpLimit() {
         return bump_limit;
-    }
-
-    public void setBumpLimit(String bump_limit) {
-        this.bump_limit = bump_limit;
     }
 
     @Override

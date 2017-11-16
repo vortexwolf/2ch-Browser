@@ -13,10 +13,12 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.ObjectSerializer;
+import ua.in.quireg.chan.common.ObjectToStringSerializer;
+import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.UriUtils;
 import ua.in.quireg.chan.models.domain.BoardModel;
@@ -24,7 +26,7 @@ import ua.in.quireg.chan.models.domain.CaptchaType;
 
 public class ApplicationSettings {
 
-    public static final String TAG = "ApplicationSettings";
+    private static final String LOG_TAG = ApplicationSettings.class.getSimpleName();
 
     private final SharedPreferences mSharedPrefs;
     private final Resources mResources;
@@ -351,7 +353,6 @@ public class ApplicationSettings {
         return CaptchaType.DVACH;
     }
 
-    @SuppressWarnings("unchecked")
     public ArrayList<BoardModel> getBoards(){
 
         //they might be already in memory
@@ -360,7 +361,9 @@ public class ApplicationSettings {
         }
 
         try {
-            mBoards = (ArrayList<BoardModel>) ObjectSerializer.deserialize(mSharedPrefs.getString("boards", null));
+            mBoards = (ArrayList<BoardModel>) ObjectToStringSerializer.deserialize(
+                    mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), null)
+            );
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -368,16 +371,15 @@ public class ApplicationSettings {
         return mBoards != null ? mBoards : new ArrayList<>();
     }
 
-    public boolean setBoards(ArrayList<BoardModel> boards) {
+    public void setBoards(ArrayList<BoardModel> boards) {
         mBoards = boards;
         SharedPreferences.Editor editor = mSharedPrefs.edit();
         try {
-            editor.putString("boards", ObjectSerializer.serialize(boards));
-            return editor.commit();
+            editor.putString(mResources.getString(R.string.pref_text_size_key), ObjectToStringSerializer.serialize(boards));
+            editor.apply();
         } catch (IOException e) {
-            e.printStackTrace();
+            MyLog.d(LOG_TAG, e.getMessage());
         }
-        return false;
     }
 
     public boolean isSwipeToRefresh(){

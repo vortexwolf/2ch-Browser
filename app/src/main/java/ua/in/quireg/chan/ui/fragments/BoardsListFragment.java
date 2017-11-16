@@ -26,6 +26,7 @@ import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
+import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.common.utils.GeneralUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
@@ -64,19 +65,22 @@ import okhttp3.Response;
 
 public class BoardsListFragment extends BaseListFragment {
 
-    public static final String LOG_TAG = BoardsListFragment.class.getSimpleName();
+    private static final String LOG_TAG = BoardsListFragment.class.getSimpleName();
 
     private static final Pattern boardCodePattern = Pattern.compile("^\\w+$");
 
     private FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
-    private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
-    private BoardsListAdapter mAdapter = null;
+
+    private BoardsListAdapter mAdapter;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private Observable<Boolean> updateBoardsListFromServer;
 
     @Inject
     protected OkHttpClient okHttpClient;
+
+    @Inject
+    protected ApplicationSettings mSettings;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,8 +113,6 @@ public class BoardsListFragment extends BaseListFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
 
         mListView.setAdapter(mAdapter);
 
@@ -156,6 +158,7 @@ public class BoardsListFragment extends BaseListFragment {
 
     private void requestBoardsListFromServer() {
         MyLog.d(LOG_TAG, "requestBoardsListFromServer()");
+        MyLog.d(LOG_TAG, Thread.currentThread().getName());
 
 
         //Initialize observable that emits BoardModel list from server.
@@ -204,14 +207,14 @@ public class BoardsListFragment extends BaseListFragment {
         BoardEntity model = (BoardEntity) mListView.getItemAtPosition(menuInfo.position);
 
         switch (item.getItemId()) {
-//            case Constants.CONTEXT_MENU_COPY_URL: {
-//                String uri = mUrlBuilder.getPageUrlHtml(model.getCode(), 0);
-//
-//                CompatibilityUtils.copyText(getActivity(), uri, uri);
-//
-//                AppearanceUtils.showToastMessage(getActivity(), uri);
-//                return true;
-//            }
+            case Constants.CONTEXT_MENU_COPY_URL: {
+                String uri = mWebsite.getUrlBuilder().getPageUrlHtml(model.getCode(), 0);
+
+                CompatibilityUtils.copyText(getActivity(), uri, uri);
+
+                AppearanceUtils.showToastMessage(getActivity(), uri);
+                return true;
+            }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
                 addToFavorites(model.getCode());
                 return true;
@@ -237,16 +240,16 @@ public class BoardsListFragment extends BaseListFragment {
 
         switch (item.getItemId()) {
             case R.id.menu_add_board_id:
+
                 final EditTextDialog dialog = new EditTextDialog(getActivity());
+
                 dialog.setTitle(getString(R.string.menu_add_favorites));
                 dialog.setHint(getString(R.string.pick_board_input_hint));
-
                 dialog.setPositiveButtonListener((d, which) -> {
                     String boardCode = dialog.getText();
                     boardCode = fixSlashes(boardCode);
-                    boolean success = validateBoardCode(boardCode);
 
-                    if (success) {
+                    if (validateBoardCode(boardCode)) {
                         addToFavorites(boardCode);
                     } else {
                         AppearanceUtils.showToastMessage(getActivity(), getString(R.string.warning_enter_board));
@@ -265,6 +268,7 @@ public class BoardsListFragment extends BaseListFragment {
 
     private List<BoardModel> parseBoardsResponse(Response response) throws IOException {
         MyLog.d(LOG_TAG, "parseBoardsResponse()");
+        MyLog.d(LOG_TAG, Thread.currentThread().getName());
 
         if (!response.isSuccessful()) {
             response.close();
@@ -297,23 +301,32 @@ public class BoardsListFragment extends BaseListFragment {
     }
 
     private boolean validateBoardsList(List<BoardModel> boards) {
-        MyLog.d(LOG_TAG, "validateBoardsList()");
+        MyLog.d(LOG_TAG, Thread.currentThread().getName());
+
+
         if (boards.isEmpty()) {
             MyLog.e(LOG_TAG, "Received empty boards list!");
+
         }
 
-        //Now let's check if received array differs from one that is currently stored in settings.
+        //Check if received array differs from one that is currently stored in settings.
         if (!mSettings.getBoards().isEmpty() && GeneralUtils.equalLists(boards, mSettings.getBoards())) {
+
             MyLog.d(LOG_TAG, "Boards list has not been modified since last check");
+
         } else {
+
             MyLog.d(LOG_TAG, "Boards list has been modified, updating...");
+
             mSettings.setBoards((ArrayList<BoardModel>) boards);
+
         }
         return true;
     }
 
     private boolean updateBoardsUIList() {
-        MyLog.d(LOG_TAG, "updateBoardsUIList()");
+        MyLog.d(LOG_TAG, Thread.currentThread().getName());
+
 
         List<BoardModel> boards = mSettings.getBoards();
 
@@ -356,7 +369,7 @@ public class BoardsListFragment extends BaseListFragment {
                     mAdapter.add(new SectionEntity(currentCategory));
                 }
                 // add item
-                mAdapter.add(new BoardEntity(board.getId(), board.getName(), board.getBump_limit()));
+                mAdapter.add(new BoardEntity(board.getId(), board.getName(), board.getBumpLimit()));
             }
         }
 

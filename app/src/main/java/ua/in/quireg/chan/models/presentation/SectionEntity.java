@@ -1,14 +1,17 @@
 package ua.in.quireg.chan.models.presentation;
 
+import android.support.annotation.NonNull;
+
 public class SectionEntity implements IBoardListEntity {
     private final String mTitle;
 
-    public SectionEntity(String title) {
-        this.mTitle = title;
+    public SectionEntity(@NonNull String title) {
+        mTitle = title;
     }
 
+    @NonNull
     public String getTitle() {
-        return this.mTitle;
+        return mTitle;
     }
 
     @Override

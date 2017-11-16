@@ -1,6 +1,7 @@
 package ua.in.quireg.chan.common.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -17,6 +18,7 @@ import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.settings.ApplicationSettings;
+import ua.in.quireg.chan.ui.activities.ImageGalleryActivity;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -125,12 +127,13 @@ public class ThreadPostUtils {
             BrowserLauncher.launchExternalBrowser(context, url);
         } else {
             // open a gallery fragment
-            NavigationService.getInstance().navigateGallery(uri, attachment.getThreadUrl());
-//            Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
-//            imageGallery.setData(uri);
-//            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
-//            context.startActivity(imageGallery);
+            //TODO not forget to clean this
+            //NavigationService.getInstance().navigateGallery(uri, attachment.getThreadUrl());
+            Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
+            imageGallery.setData(uri);
+            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
+            context.startActivity(imageGallery);
         }
     }
 

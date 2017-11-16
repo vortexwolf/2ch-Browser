@@ -1,5 +1,7 @@
 package ua.in.quireg.chan.ui.activities;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -21,7 +23,6 @@ import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.services.NavigationService;
@@ -116,22 +117,21 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
     }
 
     private void initTab() {
-        if (bottomTabLayout != null) {
-            for (int i = 0; i < TABS.length; i++) {
-                bottomTabLayout.addTab(bottomTabLayout.newTab());
-                TabLayout.Tab tab = bottomTabLayout.getTabAt(i);
-                if (tab != null)
-                    tab.setCustomView(getTabView(i));
-            }
+        for (int i = 0; i < TABS.length; i++) {
+            bottomTabLayout.addTab(bottomTabLayout.newTab());
+            TabLayout.Tab tab = bottomTabLayout.getTabAt(i);
+            if (tab != null)
+                tab.setCustomView(getTabView(i));
         }
     }
 
-
+    @SuppressLint("InflateParams")
     private View getTabView(int position) {
-        View view = LayoutInflater.from(BaseActivity.this).inflate(R.layout.tab_item_bottom, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.tab_item_bottom, null);
 
         ImageView icon = (ImageView) view.findViewById(R.id.tab_icon);
-        icon.setImageDrawable(AppearanceUtils.setDrawableSelector(BaseActivity.this, mTabIconsSelected[position]));
+        Drawable stateListDrawable = AppearanceUtils.getStateListDrawable(this, mTabIconsSelected[position]);
+        icon.setImageDrawable(stateListDrawable);
 
         return view;
     }

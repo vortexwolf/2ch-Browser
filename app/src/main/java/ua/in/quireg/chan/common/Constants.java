@@ -1,12 +1,12 @@
 package ua.in.quireg.chan.common;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
+import android.os.Build;
 
 import org.apache.http.protocol.HTTP;
 
-import android.os.Build;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import ua.in.quireg.chan.BuildConfig;
 

@@ -9,12 +9,13 @@ import ua.in.quireg.chan.common.library.MyLog;
 
 public class IconsList {
     private static final String fileName = "politics_icons";
-    private static final String TAG = "IconsList";
-            
+    private static final String TAG = IconsList.class.getSimpleName();
+
     private HashMap<String, String[]> data;
     private SerializationService mSerializationService = new SerializationService();
     private CacheDirectoryManager mCacheManager = Factory.resolve(CacheDirectoryManager.class);
-    
+
+    @SuppressWarnings("unchecked")
     public IconsList() {
         try {
             File folder = mCacheManager.getCurrentCacheDirectory();
@@ -23,33 +24,31 @@ public class IconsList {
             }
             File file = new File(folder, fileName);
             data = (HashMap<String, String[]>) mSerializationService.deserializeObject(file);
-            if (data == null) data = new HashMap<String, String[]>();
+
         } catch (Exception e) {
             MyLog.e(TAG, e);
-            data = new HashMap<String, String[]>();
+        } finally {
+            if (data == null) {
+                data = new HashMap<>();
+            }
         }
     }
-    
+
     public String[] getData(String boardName) {
-        try {
-            return data.get(boardName);
-        } catch (Exception e) {
-            MyLog.e(TAG, e);
-            return null;
-        }
+        return data.get(boardName);
     }
-    
-    public void setData(String boardName, String[] data) {
+
+    public void setData(String boardName, String[] newData) {
         try {
-            if (!Arrays.equals(data, getData(boardName))) {
-                this.data.put(boardName, data);
+            if (!Arrays.equals(newData, getData(boardName))) {
+                data.put(boardName, newData);
                 save();
             }
         } catch (Exception e) {
             MyLog.e(TAG, e);
         }
     }
-    
+
     private void save() {
         try {
             File folder = mCacheManager.getCurrentCacheDirectory();
@@ -57,7 +56,7 @@ public class IconsList {
                 folder.mkdirs();
             }
             File file = new File(folder, fileName);
-            
+
             mSerializationService.serializeObject(file, data);
         } catch (Exception e) {
             MyLog.e(TAG, e);

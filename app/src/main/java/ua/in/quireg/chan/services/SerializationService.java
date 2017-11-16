@@ -12,7 +12,7 @@ import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.IoUtils;
 
 public class SerializationService {
-    private static final String TAG = "SerializingService";
+    private static final String TAG = SerializationService.class.getSimpleName();
 
     public SerializationService() {
     }
@@ -30,9 +30,8 @@ public class SerializationService {
         ObjectInputStream is = null;
         try {
             is = new ObjectInputStream(new FileInputStream(file));
-            Object obj = is.readObject();
 
-            return obj;
+            return is.readObject();
         } catch (Exception e) {
             MyLog.e(TAG, e);
         } finally {

@@ -29,9 +29,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 
-public class ObjectSerializer {
+public class ObjectToStringSerializer {
 
-    private static final String LOG_TAG = ObjectSerializer.class.getSimpleName();
+    private static final String LOG_TAG = ObjectToStringSerializer.class.getSimpleName();
 
     public static String serialize(Serializable obj) throws IOException {
         if (obj == null) return "";
@@ -59,18 +59,18 @@ public class ObjectSerializer {
         }
     }
 
-    public static String encodeBytes(byte[] bytes) {
-        StringBuffer strBuf = new StringBuffer();
+    private static String encodeBytes(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < bytes.length; i++) {
-            strBuf.append((char) (((bytes[i] >> 4) & 0xF) + ((int) 'a')));
-            strBuf.append((char) (((bytes[i]) & 0xF) + ((int) 'a')));
+        for (byte aByte : bytes) {
+            stringBuilder.append((char) (((aByte >> 4) & 0xF) + ((int) 'a')));
+            stringBuilder.append((char) (((aByte) & 0xF) + ((int) 'a')));
         }
 
-        return strBuf.toString();
+        return stringBuilder.toString();
     }
 
-    public static byte[] decodeBytes(String str) {
+    private static byte[] decodeBytes(String str) {
         byte[] bytes = new byte[str.length() / 2];
         for (int i = 0; i < str.length(); i+=2) {
             char c = str.charAt(i);

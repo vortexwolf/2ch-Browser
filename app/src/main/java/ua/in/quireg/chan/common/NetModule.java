@@ -42,13 +42,6 @@ public class NetModule {
 
     @Provides
     @Singleton
-        // Application reference must come from AppModule.class
-    SharedPreferences providesSharedPreferences(MainApplication application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
-    }
-
-    @Provides
-    @Singleton
     Cache provideOkHttpCache(MainApplication application) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(application.getCacheDir(), cacheSize);
@@ -61,7 +54,6 @@ public class NetModule {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.retryOnConnectionFailure(true);
         builder.cache(cache);
-        builder.connectionPool(new ConnectionPool(10,3, TimeUnit.MINUTES));
 
         if (applicationSettings.isUseProxy()) {
 

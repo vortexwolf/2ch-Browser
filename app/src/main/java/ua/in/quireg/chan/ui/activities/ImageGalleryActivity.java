@@ -46,6 +46,7 @@ import ua.in.quireg.chan.ui.controls.SelectiveViewPager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ImageGalleryActivity extends AppCompatActivity implements SelectiveViewPager.OnSingleClickListener {
     public static final String LOG_TAG = ImageGalleryActivity.class.getSimpleName();
@@ -86,11 +87,11 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
         setContentView(R.layout.image_gallery_view);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
         bottomPanel = findViewById(R.id.image_gallery_bottom_bar);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //setSupportActionBar(toolbar);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String imageUrl = getIntent().getData().toString();
         mThreadUri = getIntent().getStringExtra(Constants.EXTRA_THREAD_URL);
@@ -250,7 +251,7 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
 
         switch (item.getItemId()) {
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(this, mCurrentImageModel.url.toString());
+                BrowserLauncher.launchExternalBrowser(this, mCurrentImageModel.url);
                 break;
             case R.id.save_menu_id:
                 new DownloadFileTask(this, Uri.parse(mCurrentImageModel.url)).execute();
@@ -292,8 +293,8 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
             case R.id.share_link_menu_id:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
                 shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, mCurrentImageModel.url.toString());
-                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, mCurrentImageModel.url.toString());
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, mCurrentImageModel.url);
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, mCurrentImageModel.url);
                 startActivity(Intent.createChooser(shareLinkIntent, getString(R.string.share_via)));
                 break;
             case R.id.menu_search_tineye_id:
@@ -366,12 +367,7 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
         thumbnailView.setBackgroundColor(mBackgroundColor);
         viewBag.layout.removeAllViews();
         viewBag.layout.addView(thumbnailView);
-        thumbnailView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ThreadPostUtils.openExternalAttachment(attachment, ImageGalleryActivity.this);
-            }
-        });
+        thumbnailView.setOnClickListener(v -> ThreadPostUtils.openExternalAttachment(attachment, ImageGalleryActivity.this));
 
         String thumbnailUrl = attachment.getThumbnailUrl();
         if (thumbnailUrl != null) {
@@ -419,7 +415,7 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
         private final LayoutInflater mInflater;
 
-        public ImageGalleryAdapter(Context context, ArrayList<ThreadImageModel> images) {
+        ImageGalleryAdapter(Context context, ArrayList<ThreadImageModel> images) {
             super(context, images);
             mInflater = LayoutInflater.from(context);
         }
@@ -449,7 +445,14 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
             GalleryItemViewBag vb = (GalleryItemViewBag) view.getTag();
             loadImage(imageModel, vb);
 
-            mImageText.setText((position + 1) + "/" + getCount() + " (" + imageModel.size + getResources().getString(R.string.data_file_size_measure) + ")");
+            mImageText.setText(String.format(
+                    Locale.getDefault(),
+                    "%d/%d (%s%s)",
+                    position + 1,
+                    getCount(),
+                    imageModel.size,
+                    getResources().getString(R.string.data_file_size_measure)
+            ));
         }
     }
 
@@ -457,7 +460,7 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
         private final GalleryItemViewBag mViewBag;
         private double mMaxValue = -1;
 
-        public ImageDownloadView(GalleryItemViewBag viewBag) {
+        ImageDownloadView(GalleryItemViewBag viewBag) {
             mViewBag = viewBag;
         }
 

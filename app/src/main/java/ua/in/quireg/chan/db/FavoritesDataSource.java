@@ -25,27 +25,27 @@ public class FavoritesDataSource {
     private boolean mModified = false;
 
     public FavoritesDataSource(DvachSqlHelper dbHelper) {
-        this.mDbHelper = dbHelper;
+        mDbHelper = dbHelper;
     }
 
-    public void open() throws SQLException {
-        this.mDatabase = this.mDbHelper.getWritableDatabase();
+    public void open() {
+        mDatabase = mDbHelper.getWritableDatabase();
     }
 
     public void close() {
-        this.mDbHelper.close();
+        mDbHelper.close();
     }
 
     public boolean isModified() {
-        return this.mModified;
+        return mModified;
     }
 
     public void resetModifiedState() {
-        this.mModified = false;
+        mModified = false;
     }
 
     public void addToFavorites(String website, String board, String thread, String title) {
-        if (!this.hasFavorites(website, board, thread)) {
+        if (!hasFavorites(website, board, thread)) {
             ContentValues values = new ContentValues();
             values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
             values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
@@ -53,8 +53,8 @@ public class FavoritesDataSource {
             values.put(DvachSqlHelper.COLUMN_TITLE, title);
 
             try {
-                this.mDatabase.insertOrThrow(TABLE, null, values);
-                this.mModified = true;
+                mDatabase.insertOrThrow(TABLE, null, values);
+                mModified = true;
             } catch (Exception e) {
                 MyLog.e("FavoritesDataSource", e);
             }
@@ -62,21 +62,21 @@ public class FavoritesDataSource {
     }
 
     public void removeFromFavorites(String website, String board, String thread) {
-        this.mDatabase.delete(TABLE,
+        mDatabase.delete(TABLE,
                 DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
                 new String[] { website, board, StringUtils.emptyIfNull(thread) });
-        this.mModified = true;
+        mModified = true;
     }
 
-    public List<FavoritesEntity> getAllFavorites() {
+    private List<FavoritesEntity> getAllFavorites() {
         List<FavoritesEntity> favorites = new ArrayList<FavoritesEntity>();
 
-        Cursor cursor = this.mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID + " desc");
+        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID + " desc");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            FavoritesEntity he = this.createFavoritesEntity(cursor);
+            FavoritesEntity he = createFavoritesEntity(cursor);
             favorites.add(he);
 
             cursor.moveToNext();
@@ -87,7 +87,7 @@ public class FavoritesDataSource {
     }
 
     public List<FavoritesEntity> getFavoriteThreads() {
-        List<FavoritesEntity> favorites = this.getAllFavorites();
+        List<FavoritesEntity> favorites = getAllFavorites();
         List<FavoritesEntity> threadFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
@@ -100,7 +100,7 @@ public class FavoritesDataSource {
     }
 
     public List<FavoritesEntity> getFavoriteBoards() {
-        List<FavoritesEntity> favorites = this.getAllFavorites();
+        List<FavoritesEntity> favorites = getAllFavorites();
         List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
 
         for (FavoritesEntity f : favorites) {
@@ -113,7 +113,7 @@ public class FavoritesDataSource {
     }
 
     public boolean hasFavorites(String website, String board, String thread) {
-        Cursor cursor = this.mDatabase.rawQuery(
+        Cursor cursor = mDatabase.rawQuery(
                 "select count(*) from " + TABLE +
                 " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
@@ -133,7 +133,7 @@ public class FavoritesDataSource {
         String board = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_BOARD_NAME));
         String thread = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_THREAD_NUMBER));
         String title = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_TITLE));
-        return this.createFavoritesEntity(id, website, board, thread, title);
+        return createFavoritesEntity(id, website, board, thread, title);
     }
 
     private FavoritesEntity createFavoritesEntity(long id, String website, String board, String thread, String title) {

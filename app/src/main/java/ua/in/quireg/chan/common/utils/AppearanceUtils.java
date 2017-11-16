@@ -1,9 +1,5 @@
 package ua.in.quireg.chan.common.utils;
 
-import java.io.File;
-import java.util.Locale;
-
-import pl.droidsonroids.gif.GifDrawable;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -18,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,31 +30,34 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
+import org.apache.http.protocol.HTTP;
+
+import java.io.File;
+import java.util.Locale;
+
+import pl.droidsonroids.gif.GifDrawable;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.ui.controls.TouchGifView;
-import ua.in.quireg.chan.ui.controls.WebViewFixed;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.models.presentation.GalleryItemViewBag;
 import ua.in.quireg.chan.services.TimerService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-
-import org.apache.http.protocol.HTTP;
+import ua.in.quireg.chan.ui.controls.TouchGifView;
+import ua.in.quireg.chan.ui.controls.WebViewFixed;
 
 public class AppearanceUtils {
 
-    private static final String TAG = "AppearanceUtils";
+    private static final String TAG = AppearanceUtils.class.getSimpleName();
 
     private static Toast toast;
 
-    public final static ViewGroup.LayoutParams MATCH_PARAMS = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
     public static void showToastMessage(Context context, String msg) {
-        if(toast != null){
+        if (toast != null) {
             toast.cancel();
         }
         toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
@@ -74,8 +74,7 @@ public class AppearanceUtils {
             top = (v == null) ? 0 : v.getTop();
         }
 
-        ListViewPosition position = new ListViewPosition(index, top);
-        return position;
+        return new ListViewPosition(index, top);
     }
 
     public static View getListItemAtPosition(ListView listView, int position) {
@@ -140,10 +139,8 @@ public class AppearanceUtils {
         if (Constants.SDK_VERSION >= 8) {
             CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
         }
-        if (MainApplication.MULTITOUCH_SUPPORT && Constants.SDK_VERSION >= 11) {
-            boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
-            CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
-        }
+        boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
+        CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
     }
 
     public static void prepareWebViewForVideo(WebView webView, int backgroundColor) {
@@ -205,7 +202,7 @@ public class AppearanceUtils {
                         gifView = new ImageView(context);
                     }
                     gifView.setImageDrawable(gifDrawable);
-                    gifView.setLayoutParams(MATCH_PARAMS);
+                    gifView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                     gifView.setBackgroundColor(background);
                     layout.addView(gifView);
                     isDone = true;
@@ -220,13 +217,14 @@ public class AppearanceUtils {
                     public void onTileLoadError(Exception e) {
                         AppearanceUtils.setImage(file, context, layout, background, true);
                     }
+
                     @Override
                     public void onImageLoadError(Exception e) {
                         AppearanceUtils.setImage(file, context, layout, background, true);
                     }
                 });
 
-                imageView.setLayoutParams(MATCH_PARAMS);
+                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 imageView.setBackgroundColor(background);
                 imageView.setMaxScale(4F);
                 layout.addView(imageView);
@@ -272,7 +270,7 @@ public class AppearanceUtils {
                     public void run() {
                         try {
                             videoViewViewBag.durationView.setText(formatVideoTime(mp.getCurrentPosition()) +
-                                " / " + formatVideoTime(mp.getDuration()));
+                                    " / " + formatVideoTime(mp.getDuration()));
                         } catch (Exception e) {
                             viewBag.timer.stop();
                         }
@@ -316,7 +314,7 @@ public class AppearanceUtils {
 
     public static void setWebViewFile(File file, Activity context, FrameLayout layout, int background) {
         WebViewFixed webView = new WebViewFixed(context);
-        webView.setLayoutParams(MATCH_PARAMS);
+        webView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         layout.addView(webView);
 
         ApplicationSettings settings = Factory.getContainer().resolve(ApplicationSettings.class);
@@ -338,9 +336,9 @@ public class AppearanceUtils {
 
     private static String createHtmlForVideo(String attributes) {
         String elementHtml = "<video" +
-            " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes + ">" +
-            "HTML5 video is not supported." +
-            "</video>";
+                " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes + ">" +
+                "HTML5 video is not supported." +
+                "</video>";
 
         return "<body style='margin:0;'>" + elementHtml + "</body>";
     }
@@ -376,11 +374,11 @@ public class AppearanceUtils {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
-    public static void callWhenLoaded(final View view, final Runnable runnable){
+    public static void callWhenLoaded(final View view, final Runnable runnable) {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(Constants.SDK_VERSION < 16) {
+                if (Constants.SDK_VERSION < 16) {
                     view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 } else {
                     CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
@@ -394,36 +392,29 @@ public class AppearanceUtils {
     /**
      * Method creates StateListDrawable with original
      * and grayscale bitmap to use with selector
-     * @param context - app context
+     *
+     * @param context  - app context
      * @param drawable - initial drawable
      * @return StateListDrawable with initial and faded drawables
      */
-    public static Drawable setDrawableSelector(Context context, int drawable) {
+    public static StateListDrawable getStateListDrawable(Context context, @DrawableRes int drawable) {
 
+        Drawable stateSelected = ContextCompat.getDrawable(context, drawable);
+        Drawable stateUnselected = stateSelected.getConstantState().newDrawable();
 
-        Drawable stateNormal = ContextCompat.getDrawable(context, drawable);
-        Drawable statePressed = ContextCompat.getDrawable(context, drawable);
-
-        Bitmap state_normal_bitmap = ((BitmapDrawable)stateNormal).getBitmap();
-
-
-        // Setting alpha directly just didn't work, so we draw a new bitmap!
-        Bitmap statePressedBitmap = Bitmap.createBitmap(
-                stateNormal.getIntrinsicWidth(),
-                stateNormal.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(statePressedBitmap);
-
-        Paint paint = new Paint();
-        paint.setAlpha(126);
-        canvas.drawBitmap(state_normal_bitmap, 0, 0, paint);
-
-        BitmapDrawable state_normal_drawable = new BitmapDrawable(context.getResources(), statePressedBitmap);
+        stateUnselected.mutate();
+        stateUnselected.setAlpha(126);
 
         StateListDrawable stateListDrawable = new StateListDrawable();
-        stateListDrawable.addState(new int[]{android.R.attr.state_selected},
-                statePressed);
-        stateListDrawable.addState(new int[]{android.R.attr.state_enabled},
-                state_normal_drawable);
+
+        stateListDrawable.addState(
+                new int[]{android.R.attr.state_selected},
+                stateSelected
+        );
+        stateListDrawable.addState(
+                new int[]{android.R.attr.state_enabled},
+                stateUnselected
+        );
 
         return stateListDrawable;
     }
@@ -452,9 +443,9 @@ public class AppearanceUtils {
 
             VideoViewViewBag vb = new VideoViewViewBag();
             vb.container = container;
-            vb.videoView = (VideoView)container.findViewById(R.id.video_view);
-            vb.durationView = (TextView)container.findViewById(R.id.video_duration);
-            vb.muteButton = (ImageButton)container.findViewById(R.id.mute_speaker_image);
+            vb.videoView = (VideoView) container.findViewById(R.id.video_view);
+            vb.durationView = (TextView) container.findViewById(R.id.video_duration);
+            vb.muteButton = (ImageButton) container.findViewById(R.id.mute_speaker_image);
 
             return vb;
         }

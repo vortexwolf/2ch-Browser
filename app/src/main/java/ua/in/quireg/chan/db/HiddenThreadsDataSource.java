@@ -19,25 +19,25 @@ public class HiddenThreadsDataSource {
     private SQLiteDatabase mDatabase;
 
     public HiddenThreadsDataSource(DvachSqlHelper dbHelper) {
-        this.mDbHelper = dbHelper;
+        mDbHelper = dbHelper;
     }
 
-    public void open() throws SQLException {
-        this.mDatabase = this.mDbHelper.getWritableDatabase();
+    public void open() {
+        mDatabase = mDbHelper.getWritableDatabase();
     }
 
     public void close() {
-        this.mDbHelper.close();
+        mDbHelper.close();
     }
 
     public void addToHiddenThreads(String website, String board, String thread) {
-        if (!this.isHidden(website, board, thread)) {
+        if (!isHidden(website, board, thread)) {
             ContentValues values = new ContentValues();
             values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
             values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
             values.put(DvachSqlHelper.COLUMN_THREAD_NUMBER, thread);
             try {
-                this.mDatabase.insertOrThrow(TABLE, null, values);
+                mDatabase.insertOrThrow(TABLE, null, values);
             } catch (Exception e) {
                 MyLog.e("HiddenThreadsDataSource", e);
             }
@@ -45,7 +45,7 @@ public class HiddenThreadsDataSource {
     }
 
     public void removeFromHiddenThreads(String website, String board, String thread) {
-        this.mDatabase.delete(TABLE,
+        mDatabase.delete(TABLE,
             DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
             " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
             " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
@@ -53,7 +53,7 @@ public class HiddenThreadsDataSource {
     }
 
     public boolean isHidden(String website, String board, String thread) {
-        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE +
+        Cursor cursor = mDatabase.rawQuery("select count(*) from " + TABLE +
                 " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",

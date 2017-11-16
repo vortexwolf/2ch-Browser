@@ -6,10 +6,26 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
+    <LinearLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_activity_toolbar_size">
+        </android.support.v7.widget.Toolbar>
+
+
+    </LinearLayout>
+
     <ua.in.quireg.chan.ui.controls.SelectiveViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <LinearLayout
         android:id="@+id/image_gallery_bottom_bar"

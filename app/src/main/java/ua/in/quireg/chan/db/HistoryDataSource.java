@@ -26,22 +26,22 @@ public class HistoryDataSource {
     private SQLiteDatabase mDatabase;
 
     public HistoryDataSource(DvachSqlHelper dbHelper) {
-        this.mDbHelper = dbHelper;
+        mDbHelper = dbHelper;
     }
 
-    public void open() throws SQLException {
-        this.mDatabase = this.mDbHelper.getWritableDatabase();
+    public void open() {
+        mDatabase = mDbHelper.getWritableDatabase();
     }
 
     public void close() {
-        this.mDbHelper.close();
+        mDbHelper.close();
     }
 
     public void addHistory(String website, String board, String thread, String title) {
         long currentTime = new Date().getTime();
 
         // добавляю только если не было такой же ссылки последние 24 часа
-        if (!this.hasHistoryLastDay(website, board, thread, currentTime)) {
+        if (!hasHistoryLastDay(website, board, thread, currentTime)) {
             ContentValues values = new ContentValues();
             values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
             values.put(DvachSqlHelper.COLUMN_BOARD_NAME, board);
@@ -50,7 +50,7 @@ public class HistoryDataSource {
             values.put(DvachSqlHelper.COLUMN_CREATED, currentTime);
 
             try {
-                this.mDatabase.insertOrThrow(TABLE, null, values);
+                mDatabase.insertOrThrow(TABLE, null, values);
             } catch (Exception e) {
                 MyLog.e("HistoryDataSource", e);
             }
@@ -61,7 +61,7 @@ public class HistoryDataSource {
         ContentValues values = new ContentValues();
         values.put(DvachSqlHelper.COLUMN_TITLE, title);
 
-        this.mDatabase.update(TABLE, values,
+        mDatabase.update(TABLE, values,
                 DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
@@ -71,10 +71,10 @@ public class HistoryDataSource {
     public List<HistoryEntity> getAllHistory() {
         List<HistoryEntity> history = new ArrayList<HistoryEntity>();
 
-        Cursor cursor = this.mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", QUERY_LIMIT + "");
+        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_CREATED + " desc", QUERY_LIMIT + "");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            HistoryEntity he = this.createHistoryEntity(cursor);
+            HistoryEntity he = createHistoryEntity(cursor);
             history.add(he);
 
             cursor.moveToNext();
@@ -85,13 +85,13 @@ public class HistoryDataSource {
     }
 
     public void deleteAllHistory() {
-        this.mDatabase.delete(TABLE, null, null);
+        mDatabase.delete(TABLE, null, null);
     }
 
     private boolean hasHistoryLastDay(String website, String board, String thread, long currentTime) {
         long dayAgo = currentTime - 24 * 3600 * 1000;
 
-        Cursor cursor = this.mDatabase.rawQuery("select count(*) from " + TABLE +
+        Cursor cursor = mDatabase.rawQuery("select count(*) from " + TABLE +
                 " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
                 " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?" +
@@ -111,7 +111,7 @@ public class HistoryDataSource {
         String board = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_BOARD_NAME));
         String thread = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_THREAD_NUMBER));
         String title = c.getString(c.getColumnIndex(DvachSqlHelper.COLUMN_TITLE));
-        return this.createHistoryEntity(id, website, board, thread, title);
+        return createHistoryEntity(id, website, board, thread, title);
     }
 
     private HistoryEntity createHistoryEntity(long id, String website, String board, String thread, String title) {
