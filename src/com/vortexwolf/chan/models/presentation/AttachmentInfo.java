@@ -126,6 +126,8 @@ public class AttachmentInfo {
                 result += "\ngif";
             }else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
                 result += "\nwebm";
+            }else if ("mp4".equalsIgnoreCase(this.mSourceExtension)) {
+                result += "\nmp4";
             }
         }
 
