@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <ua.in.quireg.chan.ui.controls.ExtendedImageView
+    <ua.in.quireg.chan.views.controls.ExtendedImageView
         android:id="@+id/thumbnail"
         android:layout_width="@dimen/thumbnail_size"
         android:layout_height="@dimen/thumbnail_size"

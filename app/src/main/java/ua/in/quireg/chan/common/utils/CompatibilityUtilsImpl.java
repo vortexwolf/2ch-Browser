@@ -24,10 +24,10 @@ import java.util.concurrent.Executor;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
-import ua.in.quireg.chan.ui.controls.MyLeadingMarginSpan2;
+import ua.in.quireg.chan.views.controls.MyLeadingMarginSpan2;
 
-import static ua.in.quireg.chan.ui.fragments.PostsListFragment.handleContextMenuItemClick;
-import static ua.in.quireg.chan.ui.fragments.PostsListFragment.populateContextMenu;
+import static ua.in.quireg.chan.views.fragments.PostsListFragment.handleContextMenuItemClick;
+import static ua.in.quireg.chan.views.fragments.PostsListFragment.populateContextMenu;
 
 /**
  * I use 2 classes because I still support the version 1.5 which throws

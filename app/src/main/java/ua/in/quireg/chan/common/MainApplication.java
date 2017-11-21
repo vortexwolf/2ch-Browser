@@ -3,6 +3,9 @@ package ua.in.quireg.chan.common;
 import android.app.Application;
 import android.content.res.Resources;
 
+import com.squareup.leakcanary.LeakCanary;
+
+import org.acra.ACRA;
 import org.acra.ReportField;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -11,6 +14,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import httpimage.BitmapMemoryCache;
 import httpimage.FileSystemPersistence;
 import httpimage.HttpImageManager;
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.boards.makaba.MakabaModelsMapper;
@@ -69,18 +73,25 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        //TODO enable afterwards
-        //if(Constants.LOGGING) ACRA.init(this);
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            return;
+        }
 
+        if(Constants.LOGGING) {
+            LeakCanary.install(this);
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            ACRA.init(this);
+        }
 
-        ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext());
-
-        mComponent = buildComponent(mSettings);
+        mComponent = buildComponent();
 
         if (Constants.SDK_VERSION >= 19) {
             CompatibilityUtilsImpl.setSerialExecutor();
         }
 
+        ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext());
 
         ExtendedHttpClient httpClient = new ExtendedHttpClient(!mSettings.isUnsafeSSL());
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, getResources());
@@ -144,10 +155,13 @@ public class MainApplication extends Application {
         httpClient.setCookie(mSettings.getAdultAccessCookie());
     }
 
+    public void rebuildAppComponent(){
+        mComponent = buildComponent();
+    }
 
-    protected AppComponent buildComponent(ApplicationSettings settings) {
+    protected AppComponent buildComponent() {
         return DaggerAppComponent.builder()
-                .appModule(new AppModule(this, settings))
+                .appModule(new AppModule(this))
                 .netModule(new NetModule())
                 .build();
     }

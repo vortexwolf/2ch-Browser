@@ -37,7 +37,7 @@ import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.services.presentation.PostItemViewBuilder;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.ui.controls.ClickableURLSpan;
+import ua.in.quireg.chan.views.controls.ClickableURLSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;

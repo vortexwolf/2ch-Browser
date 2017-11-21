@@ -1,40 +1,26 @@
 package ua.in.quireg.chan.common;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.support.v7.preference.PreferenceManager;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.TimeUnit;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Authenticator;
 import okhttp3.Cache;
-import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.Route;
-import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
@@ -59,27 +45,24 @@ public class NetModule {
 
             ApplicationSettings.ProxySettings proxySettings = applicationSettings.getProxySettings();
 
-            if(!proxySettings.getServer().isEmpty() && !(proxySettings.getPort() == -1)){
-                builder.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxySettings.getServer(), proxySettings.getPort())));
+            if (!proxySettings.getServer().isEmpty() && !(proxySettings.getPort() == -1)) {
+                builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(proxySettings.getServer(), proxySettings.getPort())));
             }
 
-            if(proxySettings.isUseAuth()){
-
+            if (proxySettings.isUseAuth()) {
                 builder.proxyAuthenticator((route, response) -> {
                     Request.Builder newRequest = response.request().newBuilder();
                     return newRequest
                             .header("Proxy-Authorization", Credentials.basic(proxySettings.getLogin(), proxySettings.getPassword()))
                             .build();
                 });
-
             }
         }
 
-        if(applicationSettings.isUnsafeSSL()){
+        if (applicationSettings.isUnsafeSSL()) {
             try {
                 // Create a trust manager that does not validate certificate chains
-                @SuppressLint("TrustAllX509TrustManager")
-                final TrustManager[] trustAllCerts = new TrustManager[]{
+                @SuppressLint("TrustAllX509TrustManager") final TrustManager[] trustAllCerts = new TrustManager[]{
                         new X509TrustManager() {
                             @Override
                             public void checkClientTrusted(java.security.cert.X509Certificate[] chain,

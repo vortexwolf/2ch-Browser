@@ -28,10 +28,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import timber.log.Timber;
+
 
 public class ObjectToStringSerializer {
-
-    private static final String LOG_TAG = ObjectToStringSerializer.class.getSimpleName();
 
     public static String serialize(Serializable obj) throws IOException {
         if (obj == null) return "";
@@ -42,7 +42,7 @@ public class ObjectToStringSerializer {
             objStream.close();
             return encodeBytes(serialObj.toByteArray());
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Serialization error: " + e.getMessage());
+            Timber.e("Serialization error: " + e.getMessage());
             return null;
         }
     }
@@ -54,7 +54,7 @@ public class ObjectToStringSerializer {
             ObjectInputStream objStream = new ObjectInputStream(serialObj);
             return objStream.readObject();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Deserialization error: " + e.getMessage());
+            Timber.e("Deserialization error: " + e.getMessage());
             return null;
         }
     }

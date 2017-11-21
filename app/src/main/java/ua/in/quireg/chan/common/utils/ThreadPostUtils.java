@@ -9,7 +9,6 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.models.domain.PostModel;
@@ -18,7 +17,7 @@ import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.ui.activities.ImageGalleryActivity;
+import ua.in.quireg.chan.views.activities.ImageGalleryActivity;
 
 import java.util.Arrays;
 import java.util.Calendar;

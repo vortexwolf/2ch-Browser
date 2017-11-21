@@ -12,7 +12,7 @@ import ua.in.quireg.chan.BuildConfig;
 
 public class Constants {
 
-    public static final boolean LOGGING = BuildConfig.DEBUG;
+    public static final boolean LOGGING = true;
 
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));

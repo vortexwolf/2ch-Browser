@@ -13,11 +13,9 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class AppModule {
 
     private MainApplication mApplication;
-    private ApplicationSettings mApplicationSettings;
 
-    public AppModule(MainApplication application, ApplicationSettings Settings) {
+    public AppModule(MainApplication application) {
         mApplication = application;
-        mApplicationSettings = Settings;
     }
 
     @Provides
@@ -29,7 +27,7 @@ public class AppModule {
     @Provides
     @Singleton
     ApplicationSettings providesApplicationSettings() {
-        return mApplicationSettings;
+        return new ApplicationSettings(mApplication.getApplicationContext());
     }
 
     @Provides

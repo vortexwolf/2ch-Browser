@@ -118,7 +118,7 @@
             android:orientation="horizontal"
             android:visibility="visible">
 
-            <ua.in.quireg.chan.ui.controls.DynamicWidthImageView
+            <ua.in.quireg.chan.views.controls.DynamicWidthImageView
                 android:id="@+id/badge_image"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/badge_size"
@@ -256,7 +256,7 @@
             android:textStyle="bold" 
             android:visibility="gone" />
         
-        <ua.in.quireg.chan.ui.controls.JellyBeanSpanFixTextView
+        <ua.in.quireg.chan.views.controls.JellyBeanSpanFixTextView
             android:id="@+id/comment"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.StringUtils;
@@ -18,8 +19,6 @@ import ua.in.quireg.chan.models.presentation.IBoardListEntity;
 import ua.in.quireg.chan.models.presentation.SectionEntity;
 
 public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
-
-    private static final String LOG_TAG = BoardsListAdapter.class.getSimpleName();
 
     private static final int ITEM_VIEW_TYPE_BOARD = 0;
     private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
@@ -61,7 +60,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
         if(item == null){
             //Stub to return non-null value in case of fire.
-            MyLog.e(LOG_TAG, "Something went wrong - getItem returned null");
+            Timber.e("Something went wrong - getItem returned null");
             return new View(getContext());
         }
 

@@ -7,7 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.ui.controls.MyLeadingMarginSpan2;
+import ua.in.quireg.chan.views.controls.MyLeadingMarginSpan2;
 import ua.in.quireg.chan.models.presentation.FloatImageModel;
 
 public class FlowTextHelper {

@@ -5,7 +5,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.ui.controls.WebViewFixed;
+import ua.in.quireg.chan.views.controls.WebViewFixed;
 import ua.in.quireg.chan.services.TimerService;
 
 public class GalleryItemViewBag {

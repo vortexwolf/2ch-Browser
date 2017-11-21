@@ -6,10 +6,7 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.MediaPlayer;
@@ -39,29 +36,21 @@ import java.io.File;
 import java.util.Locale;
 
 import pl.droidsonroids.gif.GifDrawable;
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.models.presentation.GalleryItemViewBag;
 import ua.in.quireg.chan.services.TimerService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.ui.controls.TouchGifView;
-import ua.in.quireg.chan.ui.controls.WebViewFixed;
+import ua.in.quireg.chan.views.controls.TouchGifView;
+import ua.in.quireg.chan.views.controls.WebViewFixed;
 
 public class AppearanceUtils {
 
-    private static final String TAG = AppearanceUtils.class.getSimpleName();
-
-    private static Toast toast;
-
     public static void showToastMessage(Context context, String msg) {
-        if (toast != null) {
-            toast.cancel();
-        }
-        toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
-        toast.show();
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
     }
 
     public static ListViewPosition getCurrentListPosition(ListView listView) {
@@ -231,9 +220,9 @@ public class AppearanceUtils {
                 isDone = true;
             }
         } catch (Exception e) {
-            MyLog.e(TAG, e);
+            Timber.e(e);
         } catch (OutOfMemoryError e) {
-            MyLog.e(TAG, e);
+            Timber.e(e);
             System.gc();
         }
 
@@ -303,7 +292,7 @@ public class AppearanceUtils {
         videoViewViewBag.videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                MyLog.e(TAG, "Error code: " + what);
+                Timber.e("Error code: " + what);
                 viewBag.switchToErrorView(context.getString(R.string.error_video_playing));
                 return true;
             }
@@ -364,8 +353,7 @@ public class AppearanceUtils {
         img.append("window.addEventListener('resize', updateImageSize, false);");
         img.append("</script>");
 
-        String bodyHtml = "<body style='margin:0;'>" + img + "</body>";
-        return bodyHtml;
+        return "<body style='margin:0;'>" + img + "</body>";
     }
 
     private static String formatVideoTime(int milliseconds) {

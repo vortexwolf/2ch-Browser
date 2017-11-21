@@ -11,6 +11,7 @@
     <string name="bottom_menu_history">History</string>
     <string name="bottom_menu_settings">Settings</string>
     <string name="loading">Loading...</string>
+    <string name="password_string">*****</string>
     <string name="addpost_sage">Sage</string>
     <string name="addpost_message_hint">Message</string>
     <string name="addpost_subject_hint">Subject</string>

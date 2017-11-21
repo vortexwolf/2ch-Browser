@@ -33,7 +33,7 @@
             android:textColor="?android:textColorSecondary" />
     </LinearLayout>
 
-    <ua.in.quireg.chan.ui.controls.NonParentFocusableImageView
+    <ua.in.quireg.chan.views.controls.NonParentFocusableImageView
         android:id="@+id/tabs_item_delete"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"

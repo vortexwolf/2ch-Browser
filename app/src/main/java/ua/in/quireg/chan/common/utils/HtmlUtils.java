@@ -18,7 +18,7 @@ import android.text.style.URLSpan;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.ui.controls.ClickableURLSpan;
+import ua.in.quireg.chan.views.controls.ClickableURLSpan;
 import ua.in.quireg.chan.common.library.MyHtml;
 import ua.in.quireg.chan.common.library.UnknownTagsHandler;
 import ua.in.quireg.chan.interfaces.IURLSpanClickListener;

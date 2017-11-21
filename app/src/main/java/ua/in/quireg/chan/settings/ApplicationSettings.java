@@ -1,32 +1,29 @@
 package ua.in.quireg.chan.settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookie;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookie;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.ObjectToStringSerializer;
-import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.UriUtils;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.models.domain.CaptchaType;
 
 public class ApplicationSettings {
-
-    private static final String LOG_TAG = ApplicationSettings.class.getSimpleName();
 
     private final SharedPreferences mSharedPrefs;
     private final Resources mResources;
@@ -251,10 +248,10 @@ public class ApplicationSettings {
         } else if (value.equals(mResources.getString(R.string.pref_video_player_external_2click_value))) {
             return Constants.VIDEO_PLAYER_EXTERNAL_2CLICK;
         } else if (Constants.SDK_VERSION >= webViewWorkingVersion
-            && value.equals(mResources.getString(R.string.pref_video_player_webview_value))) {
+                && value.equals(mResources.getString(R.string.pref_video_player_webview_value))) {
             return Constants.VIDEO_PLAYER_WEBVIEW;
         } else if (Constants.SDK_VERSION >= videoViewWorkingVersion
-            && value.equals(mResources.getString(R.string.pref_video_player_videoview_value))) {
+                && value.equals(mResources.getString(R.string.pref_video_player_videoview_value))) {
             return Constants.VIDEO_PLAYER_VIDEOVIEW;
         }
 
@@ -345,18 +342,18 @@ public class ApplicationSettings {
             }
         }
 
-        return R.style.Theme_Light_13;
+        return R.style.Theme_Photon_13;
     }
 
     public CaptchaType getCaptchaType() {
         // sometimes users can choose more than 1 captcha type, so I will leave it in settings
         return CaptchaType.DVACH;
     }
-
-    public ArrayList<BoardModel> getBoards(){
+    @SuppressWarnings("unchecked")
+    public ArrayList<BoardModel> getBoards() {
 
         //they might be already in memory
-        if(mBoards != null && !mBoards.isEmpty()){
+        if (mBoards != null && !mBoards.isEmpty()) {
             return mBoards;
         }
 
@@ -364,7 +361,7 @@ public class ApplicationSettings {
             mBoards = (ArrayList<BoardModel>) ObjectToStringSerializer.deserialize(
                     mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), null)
             );
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -378,46 +375,46 @@ public class ApplicationSettings {
             editor.putString(mResources.getString(R.string.pref_text_size_key), ObjectToStringSerializer.serialize(boards));
             editor.apply();
         } catch (IOException e) {
-            MyLog.d(LOG_TAG, e.getMessage());
+            Timber.d(e.getMessage());
         }
     }
 
-    public boolean isSwipeToRefresh(){
+    public boolean isSwipeToRefresh() {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_swipe_to_refresh_key), true);
     }
 
-    public int getCacheSize(){
+    public int getCacheSize() {
         return mSharedPrefs.getInt(mResources.getString(R.string.pref_cache_size_limit_key), 30);
     }
 
-    public int getCacheMediaSize(){
+    public int getCacheMediaSize() {
         return Integer.parseInt(mSharedPrefs.getString(mResources.getString(R.string.pref_cache_media_part_limit_key), "60"));
     }
 
-    public int getCachePagesSize(){
+    public int getCachePagesSize() {
         return Integer.parseInt(mSharedPrefs.getString(mResources.getString(R.string.pref_cache_pages_part_limit_key), "20"));
     }
 
-    public int getCacheThumbnailsSize(){
+    public int getCacheThumbnailsSize() {
         return Integer.parseInt(mSharedPrefs.getString(mResources.getString(R.string.pref_cache_thumb_part_limit_key), "20"));
     }
 
-    public int getCachePagesThresholdSize(){
+    public int getCachePagesThresholdSize() {
         return Integer.parseInt(mSharedPrefs.getString(mResources.getString(R.string.pref_cache_pages_threshold_limit_key), "7"));
     }
 
-    public boolean isDisplayIcons(){
+    public boolean isDisplayIcons() {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_display_icons_key), false);
     }
 
-    public boolean isUseProxy(){
+    public boolean isUseProxy() {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_use_proxy_key), false);
     }
 
-    public ProxySettings getProxySettings(){
+    public ProxySettings getProxySettings() {
         ProxySettings proxySettings = new ProxySettings();
         proxySettings.server = mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_address_key), "");
-        proxySettings.port = mSharedPrefs.getInt(mResources.getString(R.string.pref_proxy_port_key), -1);
+        proxySettings.port = Integer.parseInt(mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_port_key), "-1"));
         proxySettings.useAuth = mSharedPrefs.getBoolean(mResources.getString(R.string.pref_proxy_auth_key), false);
         proxySettings.login = mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_auth_login_key), "");
         proxySettings.password = mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_auth_pass_key), "");
@@ -437,8 +434,8 @@ public class ApplicationSettings {
 
         return result;
     }
-    
-    public class ProxySettings{
+
+    public class ProxySettings {
         String server;
         int port;
         boolean useAuth;
@@ -448,15 +445,19 @@ public class ApplicationSettings {
         public String getServer() {
             return server;
         }
+
         public int getPort() {
             return port;
         }
+
         public boolean isUseAuth() {
             return useAuth;
         }
+
         public String getLogin() {
             return login;
         }
+
         public String getPassword() {
             return password;
         }

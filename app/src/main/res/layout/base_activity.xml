@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme_Photon_Base"
-    tools:context=".ui.activities.BaseActivity">
+    tools:context=".views.activities.BaseActivity">
 
     <LinearLayout
         android:id="@+id/toolbar_layout"

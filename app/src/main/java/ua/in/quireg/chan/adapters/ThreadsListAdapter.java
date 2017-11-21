@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.ui.controls.EllipsizingTextView;
+import ua.in.quireg.chan.views.controls.EllipsizingTextView;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;

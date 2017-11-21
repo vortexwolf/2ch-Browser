@@ -3,7 +3,7 @@ package ua.in.quireg.chan.services.presentation;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
-import ua.in.quireg.chan.ui.controls.ClickableURLSpan;
+import ua.in.quireg.chan.views.controls.ClickableURLSpan;
 import ua.in.quireg.chan.interfaces.IURLSpanClickListener;
 import ua.in.quireg.chan.interfaces.IUrlBuilder;
 import ua.in.quireg.chan.services.BrowserLauncher;
