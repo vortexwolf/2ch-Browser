@@ -19,10 +19,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.adapters.HistoryAdapter;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
@@ -33,31 +35,36 @@ import ua.in.quireg.chan.services.NavigationService;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class HistoryFragment extends BaseListFragment {
-    private HistoryDataSource mDatasource;
-    private FavoritesDataSource mFavoritesDatasource;
+
+    @Inject protected HistoryDataSource mHistoryDataSource;
+    @Inject protected FavoritesDataSource mFavoritesDatasource;
 
 
-    private View mSearchContainer;
-    private EditText mSearchInput;
+    @BindView(R.id.history_search_container) protected View mSearchContainer;
+    @BindView(R.id.history_search_input) protected EditText mSearchInput;
 
     private HistoryAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDatasource = Factory.getContainer().resolve(HistoryDataSource.class);
-        mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
+        MainApplication.getComponent().inject(this);
 
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mAdapter = new HistoryAdapter(getActivity(), mFavoritesDatasource);
+        View view = inflater.inflate(R.layout.history_list_view, container, false);
+        ButterKnife.bind(this, view);
+
+        mAdapter = new HistoryAdapter(getContext());
         new OpenDataSourceTask().execute();
 
-        return inflater.inflate(R.layout.history_list_view, container, false);
+        return view;
     }
 
     @Override
@@ -66,39 +73,26 @@ public class HistoryFragment extends BaseListFragment {
         mListView.setAdapter(mAdapter);
         registerForContextMenu(mListView);
         setTitle(getString(R.string.tabs_history));
-        mSearchContainer = view.findViewById(R.id.history_search_container);
-        mSearchInput = (EditText) view.findViewById(R.id.history_search_input);
 
-        mSearchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    searchHistory();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        ImageButton searchButton = (ImageButton) view.findViewById(R.id.history_search_button);
-        searchButton.setOnClickListener(new ImageButton.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mSearchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 searchHistory();
+                return true;
             }
+            return false;
         });
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                HistoryEntity item = mAdapter.getItem(position);
+        ImageButton searchButton = view.findViewById(R.id.history_search_button);
+        searchButton.setOnClickListener(v -> searchHistory());
 
-                if (StringUtils.isEmpty(item.getThread())) {
-                    NavigationService.getInstance().navigateBoard(item.getWebsite(), item.getBoard());
+        mListView.setOnItemClickListener((adapterView, view1, position, l) -> {
+            HistoryEntity item = mAdapter.getItem(position);
 
-                } else {
-                    NavigationService.getInstance().navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
-                }
+            if (StringUtils.isEmpty(item.getThread())) {
+                NavigationService.getInstance().navigateBoard(item.getWebsite(), item.getBoard());
+
+            } else {
+                NavigationService.getInstance().navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }
@@ -123,7 +117,7 @@ public class HistoryFragment extends BaseListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear_history_id:
-                mDatasource.deleteAllHistory();
+                mHistoryDataSource.deleteAllHistory();
                 mAdapter.clear();
                 break;
         }
@@ -176,7 +170,7 @@ public class HistoryFragment extends BaseListFragment {
     private class OpenDataSourceTask extends AsyncTask<Void, Void, List<HistoryEntity>> {
         @Override
         protected List<HistoryEntity> doInBackground(Void... arg0) {
-            return mDatasource.getAllHistory();
+            return mHistoryDataSource.getAllHistory();
         }
 
         @Override

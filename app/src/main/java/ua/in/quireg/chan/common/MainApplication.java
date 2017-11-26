@@ -2,6 +2,8 @@ package ua.in.quireg.chan.common;
 
 import android.app.Application;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.squareup.leakcanary.LeakCanary;
 
@@ -69,6 +71,8 @@ public class MainApplication extends Application {
         return mComponent;
     }
 
+    private Toast mToast;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -129,7 +133,7 @@ public class MainApplication extends Application {
         container.register(JsonHttpReader.class, jsonApiReader);
         container.register(PostSender.class, new PostSender(httpClient, getResources(), mSettings, httpStringReader));
         container.register(DraftPostsStorage.class, new DraftPostsStorage());
-        container.register(OpenTabsManager.class, new OpenTabsManager(historyDataSource));
+        container.register(OpenTabsManager.class, new OpenTabsManager());
         container.register(CacheDirectoryManager.class, cacheManager);
         container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
@@ -163,6 +167,15 @@ public class MainApplication extends Application {
         return DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .netModule(new NetModule())
+                .dataRepositoryModule(new DataRepositoryModule())
                 .build();
+    }
+
+    public void showToastShort(@NonNull String message) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }

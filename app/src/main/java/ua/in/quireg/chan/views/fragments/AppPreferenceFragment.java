@@ -13,10 +13,15 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 
+import java.util.Date;
+import java.util.Locale;
+
 import javax.inject.Inject;
 
 import timber.log.Timber;
+import ua.in.quireg.chan.BuildConfig;
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
@@ -24,15 +29,12 @@ import ua.in.quireg.chan.services.NavigationService;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
-    @Inject
-    protected MainApplication mMainApplication;
-
-    @Inject
-    protected SharedPreferences mSharedPreferences;
+    @Inject protected MainApplication mMainApplication;
+    @Inject protected SharedPreferences mSharedPreferences;
 
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener;
 
-    private boolean networkConfigChanged = false;
+    private boolean mNetworkConfigChanged = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +89,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         super.onStart();
         Timber.v("onStart()");
 
-        networkConfigChanged = false;
+        mNetworkConfigChanged = false;
     }
 
     @Override
@@ -95,7 +97,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         super.onStop();
         Timber.v("onStop()");
 
-        if (networkConfigChanged) {
+        if (mNetworkConfigChanged) {
             Timber.d("network config changed");
             boolean success = verifyNetworkParameters();
             if (!success) {
@@ -152,7 +154,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
                     key.equals(getString(R.string.pref_proxy_auth_login_key)) ||
                     key.equals(getString(R.string.pref_proxy_auth_pass_key))
                     ) {
-                networkConfigChanged = true;
+                mNetworkConfigChanged = true;
                 if (key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
                     updateProxyPassSummary();
                 }
@@ -169,7 +171,10 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
             PackageInfo pinfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
             String versionName = pinfo.versionName;
             if (!versionName.isEmpty()) {
-                preference.setSummary(versionName);
+                preference.setSummary(String.format(Locale.getDefault(),
+                        "Version: %s-%s, SDK %s, %s",
+                        versionName, BuildConfig.BUILD_TYPE, Constants.SDK_VERSION, new Date(BuildConfig.BUILD_TIMESTAMP).toString()
+                ));
             }
 
         } catch (PackageManager.NameNotFoundException e) {

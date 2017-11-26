@@ -2,10 +2,10 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="25.0dip"
-    android:textAppearance="?android:textAppearanceMedium"
-    android:textStyle="bold"
     android:textColor="?android:textColorSecondary"
     android:gravity="center_vertical"
-    android:background="?listSectionBackground"
     android:paddingLeft="6dp"
-    android:paddingRight="6dp" />
+    android:paddingRight="6dp"
+    android:textAppearance="?android:textAppearanceMedium"
+    android:textStyle="bold"
+    android:background="?listSectionBackground"/>

@@ -38,15 +38,9 @@ import ua.in.quireg.chan.views.fragments.AppPreferenceFragment;
 
 public class BaseActivity extends AppCompatActivity implements FragNavController.TransactionListener, FragNavController.RootFragmentListener {
 
-    private static final String LOG_TAG = BaseActivity.class.getSimpleName();
-
     //TODO add settings change listener
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-
-    @Inject
-    protected ApplicationSettings mApplicationSettings;
+    @Inject protected ApplicationSettings mApplicationSettings;
 
     private FragNavController mNavController;
     private FragmentHistory fragmentHistory;
@@ -60,11 +54,10 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
             R.drawable.browser_history,
             R.drawable.browser_settings};
 
-    @BindArray(R.array.tab_name)
-    String[] TABS;
+    @BindArray(R.array.tab_name) String[] TABS;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.bottom_tab) TabLayout bottomTabLayout;
 
-    @BindView(R.id.bottom_tab)
-    TabLayout bottomTabLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +70,7 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initTab();
 
@@ -128,7 +121,7 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
 
     @SuppressLint("InflateParams")
     private View getTabView(int position) {
-        View view = LayoutInflater.from(this).inflate(R.layout.tab_item_bottom, null);
+        View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.tab_item_bottom, null);
 
         ImageView icon = (ImageView) view.findViewById(R.id.tab_icon);
         Drawable stateListDrawable = AppearanceUtils.getStateListDrawable(this, mTabIconsSelected[position]);

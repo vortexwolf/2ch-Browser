@@ -1,5 +1,6 @@
 package ua.in.quireg.chan.common;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
@@ -26,14 +27,20 @@ public class AppModule {
 
     @Provides
     @Singleton
-    ApplicationSettings providesApplicationSettings() {
-        return new ApplicationSettings(mApplication.getApplicationContext());
+    Context providesApplicationContext() {
+        return mApplication.getApplicationContext();
     }
 
     @Provides
     @Singleton
-    SharedPreferences providesSharedPreferences(MainApplication application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
+    ApplicationSettings providesApplicationSettings(Context context) {
+        return new ApplicationSettings(context);
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferences providesSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
 }

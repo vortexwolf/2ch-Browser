@@ -7,6 +7,7 @@ import org.apache.http.protocol.HTTP;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import ua.in.quireg.chan.BuildConfig;
 
@@ -21,6 +22,7 @@ public class Constants {
     public static final ArrayList<String> COOKIE_REQUIRE_BOARDS = new ArrayList<String>(Arrays.asList(new String[] {
             "h", "ho", "hc", "e", "fet" }));
 
+    public static final Pattern BOARD_CODE_PATTERN = Pattern.compile("^\\w+$");
 
     public static final int SDK_VERSION = Integer.parseInt(Build.VERSION.SDK);
 

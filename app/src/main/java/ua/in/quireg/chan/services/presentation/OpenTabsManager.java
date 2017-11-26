@@ -1,5 +1,6 @@
 package ua.in.quireg.chan.services.presentation;
 
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.interfaces.IWebsite;
@@ -8,40 +9,43 @@ import ua.in.quireg.chan.services.NavigationService;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 public class OpenTabsManager {
-    private final ArrayList<OpenTabModel> mTabs = new ArrayList<OpenTabModel>();
 
-    private final HistoryDataSource mDataSource;
+    @Inject protected HistoryDataSource mDataSource;
 
-    public OpenTabsManager(HistoryDataSource dataSource) {
-        this.mDataSource = dataSource;
+    private ArrayList<OpenTabModel> mTabs = new ArrayList<>();
+
+
+    public OpenTabsManager() {
+        MainApplication.getComponent().inject(this);
     }
 
     public OpenTabModel add(OpenTabModel newTab) {
         // Не добавляем, если уже добавлено
-        for (OpenTabModel openTab : this.mTabs) {
+        for (OpenTabModel openTab : mTabs) {
             if (openTab.isEqualTo(newTab)) {
                 return openTab;
             }
         }
 
-        this.mTabs.add(0, newTab);
-        this.mDataSource.addHistory(newTab.getWebsite().name(), newTab.getBoard(), newTab.getThread(), newTab.getTitle());
+        mTabs.add(0, newTab);
+        mDataSource.addHistory(newTab.getWebsite().name(), newTab.getBoard(), newTab.getThread(), newTab.getTitle());
 
         return newTab;
     }
 
-    @SuppressWarnings("unchecked")
     public ArrayList<OpenTabModel> getOpenTabs() {
-        return (ArrayList<OpenTabModel>) this.mTabs.clone();
+        return new ArrayList<>(mTabs);
     }
 
     public void remove(OpenTabModel tab) {
-        this.mTabs.remove(tab);
+        mTabs.remove(tab);
     }
 
     public void removeAll() {
-        this.mTabs.clear();
+        mTabs.clear();
     }
 
     public void navigate(OpenTabModel tab) {
@@ -54,7 +58,7 @@ public class OpenTabsManager {
     }
 
     public OpenTabModel getByUri(IWebsite website, String board, String thread, int page) {
-        for (OpenTabModel model : this.mTabs) {
+        for (OpenTabModel model : mTabs) {
             if (model.isEqualTo(website, board, thread, page)) {
                 return model;
             }

@@ -9,7 +9,8 @@ import ua.in.quireg.chan.models.domain.BoardModel;
 import java.util.List;
 
 /**
- * Created by Arcturus on 12/15/2016.
+ * Created by Arcturus Mengsk on 12/15/2016, 1:14 AM.
+ * 2ch-Browser
  */
 
 public class GeneralUtils {

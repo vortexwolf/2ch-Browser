@@ -38,38 +38,47 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
     @Override
     public int getItemViewType(int position) {
+
         IBoardListEntity item = getItem(position);
-        if (item != null) {
-            return item.isSection() ? ITEM_VIEW_TYPE_SEPARATOR : ITEM_VIEW_TYPE_BOARD;
+
+        if (item.isSection()){
+            return ITEM_VIEW_TYPE_SEPARATOR;
+        } else {
+            return ITEM_VIEW_TYPE_BOARD;
         }
-        return -1;
     }
 
     @Override
     public boolean isEnabled(int position) {
-        IBoardListEntity item = getItem(position);
-        return item != null && item.isSection();
+        switch (getItemViewType(position)){
+            case ITEM_VIEW_TYPE_SEPARATOR:
+                return false;
+            case ITEM_VIEW_TYPE_BOARD:
+                return true;
+
+        }
+        return false;
     }
 
     @NonNull
     @Override
-    @SuppressLint("InflateParams")
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         IBoardListEntity item = getItem(position);
 
         if(item == null){
             //Stub to return non-null value in case of fire.
-            Timber.e("Something went wrong - getItem returned null");
-            return new View(getContext());
+            Timber.e("Something went wrong - getItem() returned null");
+            throw new RuntimeException();
         }
 
         switch (getItemViewType(position)) {
 
             case ITEM_VIEW_TYPE_SEPARATOR:
                 if (convertView == null) {
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.pick_board_section, null);
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.pick_board_section, parent, false);
                 }
+
                 SectionEntity si = (SectionEntity) item;
 
                 final TextView sectionView = (TextView) convertView;
@@ -79,8 +88,9 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
             case ITEM_VIEW_TYPE_BOARD:
                 if (convertView == null) {
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.pick_board_board, null);
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.pick_board_board, parent, false);
                 }
+
                 BoardEntity bi = (BoardEntity) item;
 
                 final TextView boardName = convertView.findViewById(R.id.pick_board_name);
