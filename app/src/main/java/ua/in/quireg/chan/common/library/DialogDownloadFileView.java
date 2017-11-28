@@ -50,7 +50,7 @@ public class DialogDownloadFileView implements IDownloadFileView {
 
         this.mProgressDialog.show();
 
-        AppearanceUtils.showToastMessage(this.mContext, message);
+        AppearanceUtils.showLongToast(this.mContext, message);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DialogDownloadFileView implements IDownloadFileView {
 
     @Override
     public void showError(String error) {
-        AppearanceUtils.showToastMessage(this.mContext, error);
+        AppearanceUtils.showLongToast(this.mContext, error);
     }
 
     @Override

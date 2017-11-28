@@ -6,9 +6,9 @@ import android.support.v4.app.Fragment;
 
 import com.ncapdevi.fragnav.FragNavController;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.views.fragments.ImageGalleryFragment;
-import ua.in.quireg.chan.views.fragments.PostsListFragment;
-import ua.in.quireg.chan.views.fragments.ThreadsListFragment;
+import ua.in.quireg.chan.ui.fragments.ImageGalleryFragment;
+import ua.in.quireg.chan.ui.fragments.PostsListFragment;
+import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
 
 public class NavigationService {
 
@@ -23,7 +23,6 @@ public class NavigationService {
     public static void init(FragNavController context){
         mNavigationService = new NavigationService(context);
     }
-
 
     public static NavigationService getInstance(){
         if(mNavigationService != null){

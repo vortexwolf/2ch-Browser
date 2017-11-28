@@ -11,14 +11,7 @@ import android.os.Environment;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
-
-import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.library.CancellableInputStream;
-import ua.in.quireg.chan.common.library.MyLog;
-import ua.in.quireg.chan.common.library.ProgressInputStream;
-import ua.in.quireg.chan.interfaces.ICancelled;
-import ua.in.quireg.chan.interfaces.IProgressChangeListener;
-import ua.in.quireg.chan.settings.ApplicationSettings;
+import android.support.annotation.NonNull;
 
 import org.apache.http.HttpEntity;
 
@@ -30,9 +23,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+
+import timber.log.Timber;
+import ua.in.quireg.chan.common.Constants;
+import ua.in.quireg.chan.common.library.CancellableInputStream;
+import ua.in.quireg.chan.common.library.ProgressInputStream;
+import ua.in.quireg.chan.interfaces.ICancelled;
+import ua.in.quireg.chan.interfaces.IProgressChangeListener;
+import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class IoUtils {
-    public static final String TAG = "IoUtils";
+
+    @NonNull
+    public static String sha256(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     public static String convertStreamToString(InputStream stream) throws IOException {
         byte[] bytes = convertStreamToBytes(stream);
@@ -102,7 +122,7 @@ public class IoUtils {
                 stream.close();
             }
         } catch (Exception e) {
-            MyLog.e(TAG, e);
+            Timber.e(e);
         }
     }
 
@@ -148,9 +168,6 @@ public class IoUtils {
         }
     }
 
-
-
-
     public static double getSizeInMegabytes(File folder) {
         long size = IoUtils.dirSize(folder);
         double allSizeMb = convertBytesToMb(size);
@@ -192,7 +209,7 @@ public class IoUtils {
         if (isKitKatDocument(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
-                final String docId = CompatibilityUtilsImpl.getDocumentId(uri);
+                final String docId = CompatibilityUtils.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -205,14 +222,14 @@ public class IoUtils {
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
-                final String id = CompatibilityUtilsImpl.getDocumentId(uri);
+                final String id = CompatibilityUtils.getDocumentId(uri);
                 final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
-                final String docId = CompatibilityUtilsImpl.getDocumentId(uri);
+                final String docId = CompatibilityUtils.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -254,7 +271,7 @@ public class IoUtils {
             return false;
         }
 
-        return CompatibilityUtilsImpl.isDocumentUri(context, uri);
+        return CompatibilityUtils.isDocumentUri(context, uri);
     }
 
     public static boolean isExternalStorageDocument(Uri uri) {
@@ -357,7 +374,7 @@ public class IoUtils {
                 }
             }
         } catch (Exception e) {
-            MyLog.e(TAG, e);
+            Timber.e(e);
         } finally {
             IoUtils.closeStream(fis);
         }

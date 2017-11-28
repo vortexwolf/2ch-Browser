@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.media.MediaPlayer;
@@ -40,16 +39,15 @@ import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.models.presentation.GalleryItemViewBag;
 import ua.in.quireg.chan.services.TimerService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.views.controls.TouchGifView;
-import ua.in.quireg.chan.views.controls.WebViewFixed;
+import ua.in.quireg.chan.ui.views.TouchGifView;
+import ua.in.quireg.chan.ui.views.WebViewFixed;
 
 public class AppearanceUtils {
 
-    public static void showToastMessage(Context context, String msg) {
+    public static void showLongToast(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
     }
 
@@ -90,10 +88,6 @@ public class AppearanceUtils {
         }
     }
 
-    public static void clearImage(ImageView image) {
-        image.setImageResource(android.R.color.transparent);
-    }
-
     public static Bitmap reduceBitmapSize(Resources resources, Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -112,45 +106,6 @@ public class AppearanceUtils {
         return resizedBitmap;
     }
 
-    public static void prepareWebViewForImage(WebView webView, int backgroundColor) {
-        webView.setBackgroundColor(backgroundColor);
-        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-
-        WebSettings settings = webView.getSettings();
-        settings.setBuiltInZoomControls(true);
-        settings.setSupportZoom(true);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setJavaScriptEnabled(true);
-
-        if (Constants.SDK_VERSION >= 5) {
-            CompatibilityUtilsImpl.setScrollbarFadingEnabled(webView, true);
-        }
-        if (Constants.SDK_VERSION >= 8) {
-            CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
-        }
-        boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
-        CompatibilityUtilsImpl.setDisplayZoomControls(settings, isDisplayZoomControls);
-    }
-
-    public static void prepareWebViewForVideo(WebView webView, int backgroundColor) {
-        webView.setBackgroundColor(backgroundColor);
-
-        WebSettings settings = webView.getSettings();
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        if (Constants.SDK_VERSION >= 8) {
-            CompatibilityUtilsImpl.setBlockNetworkLoads(settings, true);
-        }
-    }
-
-    private static Point getImageSize(File file) {
-        return IoUtils.getImageSize(file);
-    }
-
-    private static Point getResolution(View view) {
-        return new Point(view.getWidth(), view.getHeight());
-    }
-
     public static int getThemeColor(Theme theme, int styleableId) {
         TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
         int color = a.getColor(styleableId, 0);
@@ -159,76 +114,8 @@ public class AppearanceUtils {
         return color;
     }
 
-    public static Drawable getThemeDrawable(Theme theme, int styleableId) {
-        TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
-        Drawable drawable = a.getDrawable(styleableId);
-        a.recycle();
-
-        return drawable;
-    }
-
     public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background) {
         setImage(file, context, layout, background, false);
-    }
-
-    public static void setImage(final File file, final Activity context, final FrameLayout layout, final int background, boolean forceWebView) {
-        final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        int gifMethod = forceWebView ? Constants.GIF_WEB_VIEW : mSettings.getGifView();
-        int picMethod = forceWebView ? Constants.IMAGE_VIEW_WEB_VIEW : mSettings.getImageView();
-
-        boolean isDone = false;
-
-        layout.removeAllViews();
-
-        try {
-            if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
-                if (gifMethod == Constants.GIF_NATIVE_LIB) {
-                    GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
-                    ImageView gifView;
-                    if (Constants.SDK_VERSION >= 8) {
-                        gifView = new TouchGifView(context);
-                    } else {
-                        gifView = new ImageView(context);
-                    }
-                    gifView.setImageDrawable(gifDrawable);
-                    gifView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                    gifView.setBackgroundColor(background);
-                    layout.addView(gifView);
-                    isDone = true;
-                }
-            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW
-                    && !IoUtils.isNonStandardGrayscaleImage(file)) {
-                final SubsamplingScaleImageView imageView = new SubsamplingScaleImageView(context);
-
-                imageView.setImage(ImageSource.uri(Uri.fromFile(file)));
-                imageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
-                    @Override
-                    public void onTileLoadError(Exception e) {
-                        AppearanceUtils.setImage(file, context, layout, background, true);
-                    }
-
-                    @Override
-                    public void onImageLoadError(Exception e) {
-                        AppearanceUtils.setImage(file, context, layout, background, true);
-                    }
-                });
-
-                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                imageView.setBackgroundColor(background);
-                imageView.setMaxScale(4F);
-                layout.addView(imageView);
-                isDone = true;
-            }
-        } catch (Exception e) {
-            Timber.e(e);
-        } catch (OutOfMemoryError e) {
-            Timber.e(e);
-            System.gc();
-        }
-
-        if (!isDone) {
-            setWebViewFile(file, context, layout, background);
-        }
     }
 
     public static void setVideoFile(final File file, final Activity context, final GalleryItemViewBag viewBag, final int background, final Theme theme) {
@@ -323,6 +210,111 @@ public class AppearanceUtils {
         }
     }
 
+    public static void callWhenLoaded(final View view, final Runnable runnable) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Constants.SDK_VERSION < 16) {
+                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    CompatibilityUtils.removeOnGlobalLayoutListener(view, this);
+                }
+
+                runnable.run();
+            }
+        });
+    }
+
+    /**
+     * Method creates StateListDrawable with original
+     * and transparent bitmap to use with selector
+     *
+     * @param context  - app context
+     * @param drawable - initial drawable
+     * @return StateListDrawable with initial and transparent drawables
+     */
+    public static StateListDrawable getStateListDrawable(Context context, @DrawableRes int drawable) {
+
+        Drawable stateSelected = ContextCompat.getDrawable(context, drawable);
+        Drawable stateUnselected = stateSelected.getConstantState().newDrawable();
+
+        stateUnselected.mutate();
+        stateUnselected.setAlpha(126);
+
+        StateListDrawable stateListDrawable = new StateListDrawable();
+
+        stateListDrawable.addState(
+                new int[]{android.R.attr.state_selected},
+                stateSelected
+        );
+        stateListDrawable.addState(
+                new int[]{android.R.attr.state_enabled},
+                stateUnselected
+        );
+
+        return stateListDrawable;
+    }
+
+    private static void setImage(final File file, final Activity context, final FrameLayout layout, final int background, boolean forceWebView) {
+        final ApplicationSettings mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
+        int gifMethod = forceWebView ? Constants.GIF_WEB_VIEW : mSettings.getGifView();
+        int picMethod = forceWebView ? Constants.IMAGE_VIEW_WEB_VIEW : mSettings.getImageView();
+
+        boolean isDone = false;
+
+        layout.removeAllViews();
+
+        try {
+            if (RegexUtils.getFileExtension(file.getAbsolutePath()).equalsIgnoreCase("gif")) {
+                if (gifMethod == Constants.GIF_NATIVE_LIB) {
+                    GifDrawable gifDrawable = new GifDrawable(file.getAbsolutePath());
+                    ImageView gifView;
+                    if (Constants.SDK_VERSION >= 8) {
+                        gifView = new TouchGifView(context);
+                    } else {
+                        gifView = new ImageView(context);
+                    }
+                    gifView.setImageDrawable(gifDrawable);
+                    gifView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                    gifView.setBackgroundColor(background);
+                    layout.addView(gifView);
+                    isDone = true;
+                }
+            } else if (picMethod == Constants.IMAGE_VIEW_SUBSCALEVIEW
+                    && !IoUtils.isNonStandardGrayscaleImage(file)) {
+                final SubsamplingScaleImageView imageView = new SubsamplingScaleImageView(context);
+
+                imageView.setImage(ImageSource.uri(Uri.fromFile(file)));
+                imageView.setOnImageEventListener(new SubsamplingScaleImageView.DefaultOnImageEventListener() {
+                    @Override
+                    public void onTileLoadError(Exception e) {
+                        AppearanceUtils.setImage(file, context, layout, background, true);
+                    }
+
+                    @Override
+                    public void onImageLoadError(Exception e) {
+                        AppearanceUtils.setImage(file, context, layout, background, true);
+                    }
+                });
+
+                imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                imageView.setBackgroundColor(background);
+                imageView.setMaxScale(4F);
+                layout.addView(imageView);
+                isDone = true;
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        } catch (OutOfMemoryError e) {
+            Timber.e(e);
+            System.gc();
+        }
+
+        if (!isDone) {
+            setWebViewFile(file, context, layout, background);
+        }
+    }
+
     private static String createHtmlForVideo(String attributes) {
         String elementHtml = "<video" +
                 " style='position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:100%;height:100%;' " + attributes + ">" +
@@ -362,50 +354,45 @@ public class AppearanceUtils {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
-    public static void callWhenLoaded(final View view, final Runnable runnable) {
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (Constants.SDK_VERSION < 16) {
-                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    CompatibilityUtilsImpl.removeOnGlobalLayoutListener(view, this);
-                }
+    private static void prepareWebViewForVideo(WebView webView, int backgroundColor) {
+        webView.setBackgroundColor(backgroundColor);
 
-                runnable.run();
-            }
-        });
+        WebSettings settings = webView.getSettings();
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        if (Constants.SDK_VERSION >= 8) {
+            CompatibilityUtils.setBlockNetworkLoads(settings, true);
+        }
     }
 
-    /**
-     * Method creates StateListDrawable with original
-     * and grayscale bitmap to use with selector
-     *
-     * @param context  - app context
-     * @param drawable - initial drawable
-     * @return StateListDrawable with initial and faded drawables
-     */
-    public static StateListDrawable getStateListDrawable(Context context, @DrawableRes int drawable) {
+    private static Drawable getThemeDrawable(Theme theme, int styleableId) {
+        TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
+        Drawable drawable = a.getDrawable(styleableId);
+        a.recycle();
 
-        Drawable stateSelected = ContextCompat.getDrawable(context, drawable);
-        Drawable stateUnselected = stateSelected.getConstantState().newDrawable();
-
-        stateUnselected.mutate();
-        stateUnselected.setAlpha(126);
-
-        StateListDrawable stateListDrawable = new StateListDrawable();
-
-        stateListDrawable.addState(
-                new int[]{android.R.attr.state_selected},
-                stateSelected
-        );
-        stateListDrawable.addState(
-                new int[]{android.R.attr.state_enabled},
-                stateUnselected
-        );
-
-        return stateListDrawable;
+        return drawable;
     }
+
+    private static void prepareWebViewForImage(WebView webView, int backgroundColor) {
+        webView.setBackgroundColor(backgroundColor);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+
+        WebSettings settings = webView.getSettings();
+        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setJavaScriptEnabled(true);
+
+        if (Constants.SDK_VERSION >= 5) {
+            CompatibilityUtils.setScrollbarFadingEnabled(webView, true);
+        }
+        if (Constants.SDK_VERSION >= 8) {
+            CompatibilityUtils.setBlockNetworkLoads(settings, true);
+        }
+        boolean isDisplayZoomControls = Factory.getContainer().resolve(ApplicationSettings.class).isDisplayZoomControls();
+        CompatibilityUtils.setDisplayZoomControls(settings, isDisplayZoomControls);
+    }
+
 
     public static class ListViewPosition {
 

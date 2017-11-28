@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.IoUtils;
@@ -117,6 +118,7 @@ public class CacheDirectoryManager {
             //Cache is not full yet
             return;
         }
+        Timber.v("Cache size: %dMb, cleanup started", IoUtils.convertBytesToMb(cacheSize));
 
         final long FILE_CACHE_THRESHOLD = Math.round(IoUtils.convertMbToBytes(mSettings.getCacheSize()));
         final float MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize() / 100f;

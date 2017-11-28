@@ -7,6 +7,7 @@ import ua.in.quireg.chan.boards.makaba.MakabaWebsite;
 import ua.in.quireg.chan.interfaces.IWebsite;
 
 public class Websites {
+
     public static IWebsite getDefault() {
         return Factory.resolve(MakabaWebsite.class);
     }

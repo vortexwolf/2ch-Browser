@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="launchScreenTheme" parent="@android:style/Theme.Black.NoTitleBar">
-        <item name="android:windowBackground">@drawable/launch_screen</item>
-    </style>
-
     <style name="TextFormatButton">
         <item name="android:background">@null</item>
         <item name="android:padding">5dip</item>
@@ -17,16 +13,19 @@
         <item name="android:layout_width">62dip</item>
     </style>
 
+    <style name="AppActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="android:theme">@style/ThemeOverlay.AppCompat</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
     <style name="BottomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorHeight">0dp</item>
-        <item name="tabPaddingStart">-5dp</item>
-        <item name="tabPaddingTop">-5dp</item>
-        <item name="tabPaddingEnd">-5dp</item>
-        <item name="tabPaddingBottom">-5dp</item>
-        <item name="tabGravity">center</item>
-        <item name="tabMode">fixed</item>
-
+        <item name="tabPaddingStart">-6dp</item>
+        <item name="tabPaddingTop">-6dp</item>
+        <item name="tabPaddingEnd">-6dp</item>
+        <item name="tabPaddingBottom">-6dp</item>
     </style>
+
     <!--
 ==================
 Light theme 

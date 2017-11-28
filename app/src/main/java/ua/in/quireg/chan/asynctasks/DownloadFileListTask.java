@@ -65,7 +65,7 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
 
     @Override
     public void onPreExecute() {
-        AppearanceUtils.showToastMessage(this.mContext,
+        AppearanceUtils.showLongToast(this.mContext,
             this.mContext.getResources().getQuantityString(R.plurals.data_files_download_start_quantity,
                 this.mFromList.size(), this.mFromList.size(), this.mSaveFolder));
     }
@@ -84,10 +84,10 @@ public class DownloadFileListTask extends AsyncTask<Void, Long, Integer> impleme
             ListMediaScanner scanner = new ListMediaScanner(this.mContext, downloadedImagePaths.toArray(new String[downloadedImagePaths.size()]));
             scanner.scan();
 
-            AppearanceUtils.showToastMessage(this.mContext, this.mContext.getResources()
+            AppearanceUtils.showLongToast(this.mContext, this.mContext.getResources()
                     .getQuantityString(R.plurals.data_downloaded_files_quantity, downloadedCount, downloadedCount));
         } else {
-            AppearanceUtils.showToastMessage(this.mContext,
+            AppearanceUtils.showLongToast(this.mContext,
                     !StringUtils.isEmpty(this.mUserError)
                             ? this.mUserError
                             : this.mContext.getResources().getQuantityString(R.plurals.data_downloaded_files_quantity, 0, 0));

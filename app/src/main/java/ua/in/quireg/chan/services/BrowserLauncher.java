@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.provider.Browser;
 import android.support.v4.content.FileProvider;
 
-import ua.in.quireg.chan.views.activities.BrowserActivity;
+import ua.in.quireg.chan.ui.activities.BrowserActivity;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.UriUtils;
@@ -23,7 +23,7 @@ public class BrowserLauncher {
         try {
             context.startActivity(browser);
         } catch (Exception e) {
-            AppearanceUtils.showToastMessage(context, e.getMessage());
+            AppearanceUtils.showLongToast(context, e.getMessage());
         }
     }
 

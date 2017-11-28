@@ -8,6 +8,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
@@ -17,42 +25,34 @@ import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.views.activities.ImageGalleryActivity;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import ua.in.quireg.chan.ui.activities.ImageGalleryActivity;
 
 public class ThreadPostUtils {
+
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
-    private static final String[] sMonthNames = new String[] { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг",
-            "Сен", "Окт", "Ноя", "Дек" };
 
-    private static final List<String> sExtendedBumpLimit = Arrays.asList(new String[] {
-        "vg", "ukr", "wm", "mobi", "vn"
-    });
+    private static final String[] sMonthNames = new String[]
+            {"Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"};
 
-    public static String getDateFromTimestamp(Context context, long timeInMiliseconds, TimeZone timeZone) {
+    private static final List<String> sExtendedBumpLimit = Arrays.asList("vg", "ukr", "wm", "mobi", "vn");
+
+    public static String getDateFromTimestamp(Context context, long timeInMilliseconds, TimeZone timeZone) {
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
         dateFormat.setTimeZone(timeZone);
 
         java.text.DateFormat timeFormat = DateFormat.getTimeFormat(context);
         timeFormat.setTimeZone(timeZone);
 
-        Date date = new Date(timeInMiliseconds);
+        Date date = new Date(timeInMilliseconds);
         return dateFormat.format(date) + ", " + timeFormat.format(date);
     }
 
-    public static String getMoscowDateFromTimestamp(Context context, long timeInMiliseconds) {
-        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getTimeZone("GMT+3"));
+    public static String getMoscowDateFromTimestamp(Context context, long timeInMilliseconds) {
+        return getDateFromTimestamp(context, timeInMilliseconds, TimeZone.getTimeZone("GMT+3"));
     }
 
-    public static String getLocalDateFromTimestamp(Context context, long timeInMiliseconds) {
-        return getDateFromTimestamp(context, timeInMiliseconds, TimeZone.getDefault());
+    public static String getLocalDateFromTimestamp(Context context, long timeInMilliseconds) {
+        return getDateFromTimestamp(context, timeInMilliseconds, TimeZone.getDefault());
     }
 
     //text = "Птн 12 Апр 2013 12:37:12";
@@ -84,8 +84,7 @@ public class ThreadPostUtils {
         int offset = TimeZone.getDefault().getOffset(cal.getTimeInMillis());
         cal.add(Calendar.MILLISECOND, offset);
 
-        long result = cal.getTimeInMillis();
-        return result;
+        return cal.getTimeInMillis();
     }
 
     /**
@@ -93,12 +92,13 @@ public class ThreadPostUtils {
      * строки
      */
     public static String removeLinksFromComment(String comment) {
-        String result = comment.replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1");
 
-        return result;
+        return comment.replaceAll("(^|\n)(>>\\d+(\n|\\s)?)+", "$1");
     }
 
-    /** Проверяет, прикреплен ли к посту какой-либо файл */
+    /**
+     * Проверяет, прикреплен ли к посту какой-либо файл
+     */
     public static boolean hasAttachment(PostModel item) {
         return item.getAttachments().size() > 0;
     }
@@ -136,7 +136,9 @@ public class ThreadPostUtils {
         }
     }
 
-    /** Будет отображать другим цветом посты после бамплимита */
+    /**
+     * Будет отображать другим цветом посты после бамплимита
+     */
     public static int getBumpLimitNumber(String boardName) {
         if (isExtendedBumpLimit(boardName)) return Constants.BUMP_LIMIT_EXTENDED;
         return Constants.BUMP_LIMIT;

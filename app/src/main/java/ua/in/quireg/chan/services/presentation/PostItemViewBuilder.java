@@ -24,12 +24,9 @@ import android.widget.TextView;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.views.controls.ClickableLinksTextView;
-import ua.in.quireg.chan.views.controls.MyLinkMovementMethod;
 import ua.in.quireg.chan.common.library.MyHtml;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.CompatibilityUtils;
-import ua.in.quireg.chan.common.utils.CompatibilityUtilsImpl;
 import ua.in.quireg.chan.common.utils.HtmlUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.ThreadPostUtils;
@@ -41,6 +38,8 @@ import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.settings.ApplicationSettings;
+import ua.in.quireg.chan.ui.views.ClickableLinksTextView;
+import ua.in.quireg.chan.ui.views.MyLinkMovementMethod;
 
 public class PostItemViewBuilder {
     private final LayoutInflater mInflater;
@@ -196,7 +195,7 @@ public class PostItemViewBuilder {
         }
 
         vb.commentView.setText(item.getSpannedComment());
-        if (item.hasUrls() && !CompatibilityUtils.isTextSelectable(vb.commentView)) {
+        if (item.hasUrls() && !vb.commentView.isTextSelectable()) {
             vb.commentView.setMovementMethod(MyLinkMovementMethod.getInstance());
         }
 
@@ -284,7 +283,7 @@ public class PostItemViewBuilder {
         ImageView menuButton = (ImageView) view.findViewById(R.id.post_item_menu);
         if (Constants.SDK_VERSION >= 11) {
             menuButton.setVisibility(View.VISIBLE);
-            menuButton.setOnClickListener(CompatibilityUtilsImpl.createClickListenerShowPostMenu(activity, model, view));
+            menuButton.setOnClickListener(CompatibilityUtils.createClickListenerShowPostMenu(activity, model, view));
         }
 
         // Перемещаем текст в ScrollView
@@ -303,7 +302,7 @@ public class PostItemViewBuilder {
         currentDialog.show();
 
         if (coordinates != null)
-            AppearanceUtils.callWhenLoaded(view, new Runnable(){
+            AppearanceUtils.callWhenLoaded(view, new Runnable() {
                 @Override
                 public void run() {
                     final float dimAmount = 0.1f;
@@ -335,8 +334,9 @@ public class PostItemViewBuilder {
                     params.y = y;
                     params.gravity = gravity;
                     currentDialog.getWindow().setAttributes(params);
-                    if (Constants.SDK_VERSION >= 14) CompatibilityUtilsImpl.setDimAmount(currentDialog.getWindow(), dimAmount);
-                    else currentDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+                    CompatibilityUtils.setDimAmount(currentDialog.getWindow(), dimAmount);
+
                     currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     currentDialog.setCanceledOnTouchOutside(true);
                     currentDialog.setContentView(view);

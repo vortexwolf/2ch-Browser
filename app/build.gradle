@@ -7,20 +7,28 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 ext {
     supportLibraryVersion = '26.1.0'
     butterknifeVersion = "8.8.1"
+    leakCanaryVersion = "1.5.4"
     dagger2Version = "2.11"
+    moxyVersion = "1.5.3"
 }
 
 dependencies {
+
     //Triage this:
     implementation fileTree(include: '*.jar', dir: 'libs')
     implementation group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.6'
     implementation group: 'org.ccil.cowan.tagsoup', name: 'tagsoup', version: '1.2.1'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.7.3'
     implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.1.2'
+
+    //Support lib
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support:preference-v7:$supportLibraryVersion"
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+
+    //Design
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.6.0'
@@ -32,8 +40,8 @@ dependencies {
     implementation 'ch.acra:acra:4.9.2'
 
     //Leaks detection
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
 
     //Logging
     implementation 'com.jakewharton.timber:timber:4.6.0'
@@ -56,9 +64,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
 
     //MVP
-    implementation 'com.arello-mobile:moxy:1.5.3'
-    implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
-    annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
+    implementation "com.arello-mobile:moxy:$moxyVersion"
+    implementation "com.arello-mobile:moxy-app-compat:$moxyVersion"
+    annotationProcessor "com.arello-mobile:moxy-compiler:$moxyVersion"
 
 }
 configurations {
@@ -66,6 +74,7 @@ configurations {
 }
 
 android {
+    useLibrary 'org.apache.http.legacy'
 
 //    signingConfigs {
 //        config {
@@ -90,7 +99,6 @@ android {
         buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", keystoreProperties['CAPTCHA_API_PRIVATE_KEY'])
         buildConfigField "long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L"
     }
-    useLibrary 'org.apache.http.legacy'
     packagingOptions {
 
         exclude 'META-INF/NOTICE'
@@ -109,9 +117,6 @@ android {
         }
     }
 
-    lintOptions {
-        disable 'ResAuto'
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

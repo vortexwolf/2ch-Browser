@@ -12,39 +12,33 @@ public class PagesSerializationService {
     private static final String sExtension = ".2ch";
 
     private final CacheDirectoryManager mCacheManager;
-    private final SerializationService mSerializationService;
 
-    public PagesSerializationService(CacheDirectoryManager cacheManager, SerializationService serializationService) {
+    public PagesSerializationService(CacheDirectoryManager cacheManager) {
         this.mCacheManager = cacheManager;
-        this.mSerializationService = serializationService;
     }
 
     public void serializeThreads(String website, String boardName, int pageNumber, ThreadModel[] threads) {
         File file = this.getBoardFilePath(website, boardName, pageNumber);
 
-        this.mSerializationService.serializeObject(file, threads);
+        SerializationService.serializeToFile(file, threads);
     }
 
     public void serializePosts(String website, String boardName, String threadNumber, PostModel[] posts) {
         File file = this.getThreadFilePath(website, boardName, threadNumber);
 
-        this.mSerializationService.serializeObject(file, posts);
+        SerializationService.serializeToFile(file, posts);
     }
 
     public ThreadModel[] deserializeThreads(String website, String boardName, int pageNumber) {
         File file = this.getBoardFilePath(website, boardName, pageNumber);
 
-        ThreadModel[] threads = (ThreadModel[]) this.mSerializationService.deserializeObject(file);
-
-        return threads;
+        return (ThreadModel[]) SerializationService.deserializeFromFile(file);
     }
     
     public PostModel[] deserializePosts(String website, String boardName, String threadNumber) {
         File file = this.getThreadFilePath(website, boardName, threadNumber);
 
-        PostModel[] posts = (PostModel[]) this.mSerializationService.deserializeObject(file);
-
-        return posts;
+        return (PostModel[]) SerializationService.deserializeFromFile(file);
     }
 
     private File getBoardFilePath(String website, String boardName, int pageNumber) {

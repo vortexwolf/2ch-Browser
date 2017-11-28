@@ -4,8 +4,9 @@ package ua.in.quireg.chan.models.domain;
 import java.io.Serializable;
 
 import ua.in.quireg.chan.boards.makaba.models.MakabaIconInfo;
+import ua.in.quireg.chan.models.presentation.IBoardListEntity;
 
-public class BoardModel implements Serializable {
+public class BoardModel implements Serializable, IBoardListEntity {
 
     private String bump_limit;
     private String category;
@@ -20,7 +21,6 @@ public class BoardModel implements Serializable {
     private int tripcodes;
     private boolean isVisible;
     private MakabaIconInfo[] icons;
-
 
     public String getBumpLimit() {
         return bump_limit;
@@ -124,5 +124,10 @@ public class BoardModel implements Serializable {
 
     public void setIcons(MakabaIconInfo[] icons) {
         this.icons = icons;
+    }
+
+    @Override
+    public boolean isSection() {
+        return false;
     }
 }

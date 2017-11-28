@@ -17,7 +17,7 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.models.domain.CaptchaType;
 import ua.in.quireg.chan.models.domain.SendPostModel;
 import ua.in.quireg.chan.services.RecaptchaService;
-import com.wildflyforcer.utils.Digest;
+import ua.in.quireg.chan.common.utils.IoUtils;
 
 public class MakabaSendPostMapper {
     private static final String TAG = "MakabaSendPostMapper";
@@ -70,7 +70,7 @@ public class MakabaSendPostMapper {
             this.addStringValue(multipartEntity, "captcha_type", "app");
             this.addStringValue(multipartEntity, "app_response_id", model.getCaptchaKey());
             this.addStringValue(multipartEntity, "app_response",
-                Digest.sha256(model.getCaptchaKey() + "|" + BuildConfig.CAPTCHA_API_PRIVATE_KEY));
+                IoUtils.sha256(model.getCaptchaKey() + "|" + BuildConfig.CAPTCHA_API_PRIVATE_KEY));
         }
 
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());

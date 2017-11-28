@@ -34,7 +34,6 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
 import ua.in.quireg.chan.common.utils.HtmlUtils;
-import ua.in.quireg.chan.common.utils.XmlUtils;
 
 public class HtmlToSpannedConverter implements ContentHandler {
 
@@ -503,11 +502,54 @@ public class HtmlToSpannedConverter implements ContentHandler {
             return i;
         } else {
             try {
-                return XmlUtils.convertValueToInt(color, -1);
+                return convertValueToInt(color, -1);
             } catch (NumberFormatException nfe) {
                 return -1;
             }
         }
+    }
+
+    private static int convertValueToInt(CharSequence charSeq, int defaultValue) {
+        if (null == charSeq) {
+            return defaultValue;
+        }
+
+        String nm = charSeq.toString();
+
+        // XXX This code is copied from Integer.decode() so we don't
+        // have to instantiate an Integer!
+
+        int sign = 1;
+        int index = 0;
+        int len = nm.length();
+        int base = 10;
+
+        if ('-' == nm.charAt(0)) {
+            sign = -1;
+            index++;
+        }
+
+        if ('0' == nm.charAt(index)) {
+            // Quick check for a zero by itself
+            if (index == (len - 1)) {
+                return 0;
+            }
+
+            char c = nm.charAt(index + 1);
+
+            if ('x' == c || 'X' == c) {
+                index += 2;
+                base = 16;
+            } else {
+                index++;
+                base = 8;
+            }
+        } else if ('#' == nm.charAt(index)) {
+            index++;
+            base = 16;
+        }
+
+        return Integer.parseInt(nm.substring(index), base) * sign;
     }
 
 }

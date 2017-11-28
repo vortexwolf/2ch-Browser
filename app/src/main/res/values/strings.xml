@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">2ch Browser New</string>
+    <string name="app_name">2ch Browser</string>
 
     <!-- UI Text -->
     <string name="crash_toast_text">Aww, crash. Send the report?</string>
@@ -76,7 +76,7 @@
     <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string>
     <string name="data_add_thread_title">/%1$s/ - Add new thread</string>
     <string name="data_add_post_title">/%1$s/%2$s - Add new post</string>
-    <string name="data_add_post_attachment_info">%1$sKB, %2$dx%3$d</string>
+    <string name="data_add_post_attachment_info">%1$dKB, %2$dx%3$d</string>
     <string name="data_search_posts_title">Search /%1$s/: %2$s</string>
 
     <!-- Menus -->
@@ -315,7 +315,7 @@ If you want to be in read-only, post to /test/.
     <!-- Warnings -->
     <string name="warning_enter_captcha">Enter the confirmation code.</string>
     <string name="warning_write_comment">Write a comment.</string>
-    <string name="warning_enter_board">Enter a valid board name.</string>
+    <string name="warning_enter_board">Invalid board.</string>
     <string name="warning_attach_file_new_thread">Attach a file to create a new thread.</string>
     <string name="warning_maximum_attachments">Cannot attach more files.</string>
 

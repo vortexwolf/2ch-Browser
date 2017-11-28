@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="Launch_Screen_Theme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
     <style name="Theme_Light_Switch" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="iconRefresh">@drawable/ic_menu_refresh</item>
         <item name="iconSave">@drawable/ic_menu_save</item>

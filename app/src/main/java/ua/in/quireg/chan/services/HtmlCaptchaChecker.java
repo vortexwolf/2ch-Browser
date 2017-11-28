@@ -7,7 +7,7 @@ import ua.in.quireg.chan.interfaces.IUrlBuilder;
 import ua.in.quireg.chan.interfaces.IWebsite;
 import ua.in.quireg.chan.models.domain.CaptchaType;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import com.wildflyforcer.utils.CaptchaResultNew;
+import ua.in.quireg.chan.models.domain.CaptchaResultNew;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -15,11 +15,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class HtmlCaptchaChecker {
     private final IHttpStringReader mHttpStringReader;
-    private final ApplicationSettings mApplicationSettings;
 
-    public HtmlCaptchaChecker(IHttpStringReader httpStringReader, ApplicationSettings settings) {
+    public HtmlCaptchaChecker(IHttpStringReader httpStringReader) {
         this.mHttpStringReader = httpStringReader;
-        this.mApplicationSettings = settings;
     }
 
     public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String boardName, String threadNumber) {

@@ -146,14 +146,8 @@ public class JsonHttpReader {
 
     private InputStreamReader createStreamReaderForParsing(byte[] bytes, IJsonProgressChangeListener listener, ICancelled task) throws IllegalStateException, IOException {
         InputStream memoryStream = IoUtils.modifyInputStream(new ByteArrayInputStream(bytes), listener.getContentLength(), listener, task);
-        // Maybe I don't need these replacements anymore because if InputStreamReader. I need to check.
-        //Map<byte[], byte[]> replacements = new HashMap<byte[],byte[]>();
-        //replacements.put(new byte[] {(byte)'\\', (byte)'v'}, new byte[] {(byte)'\\', (byte)'n'});
-        //memoryStream = new ReplaceFilterInputStream (memoryStream, replacements);
 
-        InputStreamReader streamReader = new InputStreamReader(memoryStream, Constants.UTF8_CHARSET.name());
-
-        return streamReader;
+        return new InputStreamReader(memoryStream, Constants.UTF8_CHARSET.name());
     }
 
     private static class CancelTaskException extends Exception {

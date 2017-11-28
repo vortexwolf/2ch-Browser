@@ -12,7 +12,6 @@ public class IconsList {
     private static final String TAG = IconsList.class.getSimpleName();
 
     private HashMap<String, String[]> data;
-    private SerializationService mSerializationService = new SerializationService();
     private CacheDirectoryManager mCacheManager = Factory.resolve(CacheDirectoryManager.class);
 
     @SuppressWarnings("unchecked")
@@ -23,7 +22,7 @@ public class IconsList {
                 folder.mkdirs();
             }
             File file = new File(folder, fileName);
-            data = (HashMap<String, String[]>) mSerializationService.deserializeObject(file);
+            data = (HashMap<String, String[]>) SerializationService.deserializeFromFile(file);
 
         } catch (Exception e) {
             MyLog.e(TAG, e);
@@ -57,7 +56,7 @@ public class IconsList {
             }
             File file = new File(folder, fileName);
 
-            mSerializationService.serializeObject(file, data);
+            SerializationService.serializeToFile(file, data);
         } catch (Exception e) {
             MyLog.e(TAG, e);
         }

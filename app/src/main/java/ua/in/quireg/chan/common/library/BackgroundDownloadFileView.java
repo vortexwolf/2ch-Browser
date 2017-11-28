@@ -33,7 +33,7 @@ public class BackgroundDownloadFileView implements IDownloadFileView {
     @Override
     public void showLoading(String message) {
         if (this.mShowNotifications) {
-            AppearanceUtils.showToastMessage(this.mContext, message);
+            AppearanceUtils.showLongToast(this.mContext, message);
         }
     }
 
@@ -52,7 +52,7 @@ public class BackgroundDownloadFileView implements IDownloadFileView {
     @Override
     public void showError(String error) {
         if (this.mShowNotifications) {
-            AppearanceUtils.showToastMessage(this.mContext, error);
+            AppearanceUtils.showLongToast(this.mContext, error);
         }
     }
 

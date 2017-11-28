@@ -18,44 +18,38 @@ import android.text.style.URLSpan;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.views.controls.ClickableURLSpan;
+import ua.in.quireg.chan.ui.views.ClickableURLSpan;
 import ua.in.quireg.chan.common.library.MyHtml;
 import ua.in.quireg.chan.common.library.UnknownTagsHandler;
 import ua.in.quireg.chan.interfaces.IURLSpanClickListener;
 import ua.in.quireg.chan.interfaces.IUrlBuilder;
 
 public class HtmlUtils {
+
     private static final Pattern styleColorPattern = Pattern.compile(".*?color: rgb\\((\\d+), (\\d+), (\\d+)\\);.*");
 
     // Картинки со смайликами во время всяких праздников
-    public static MyHtml.ImageGetter getImageGetter(final IUrlBuilder urlBuilder) {
-        return new MyHtml.ImageGetter() {
-            @Override
-            public Drawable getDrawable(String ref) {
-                Uri uri = Uri.parse(urlBuilder.makeAbsolute(ref));
-                Bitmap cached = Factory.resolve(HttpImageManager.class).loadImage(uri);
-                if (cached != null) {
-                    Bitmap bmp = cached;
-                    Drawable d = new BitmapDrawable(bmp);
-                    d.setBounds(0, 0, Math.max(d.getIntrinsicWidth(), bmp.getWidth()), Math.max(d.getIntrinsicHeight(), bmp.getHeight()));
-                    return d;
-                }
-
-                return Factory.resolve(Resources.class).getDrawable(R.drawable.a_empty);
+    private static MyHtml.ImageGetter getImageGetter(final IUrlBuilder urlBuilder) {
+        return ref -> {
+            Uri uri = Uri.parse(urlBuilder.makeAbsolute(ref));
+            Bitmap cached = Factory.resolve(HttpImageManager.class).loadImage(uri);
+            if (cached != null) {
+                Drawable d = new BitmapDrawable(cached);
+                d.setBounds(0, 0, Math.max(d.getIntrinsicWidth(), cached.getWidth()), Math.max(d.getIntrinsicHeight(), cached.getHeight()));
+                return d;
             }
+
+            return Factory.resolve(Resources.class).getDrawable(R.drawable.a_empty);
         };
     }
 
     public static SpannableStringBuilder createSpannedFromHtml(String htmlText, Theme theme, IUrlBuilder urlBuilder) {
-        SpannableStringBuilder builder = (SpannableStringBuilder) MyHtml.fromHtml(StringUtils.emptyIfNull(htmlText), getImageGetter(urlBuilder), new UnknownTagsHandler(theme));
 
-        return builder;
+        return (SpannableStringBuilder) MyHtml.fromHtml(StringUtils.emptyIfNull(htmlText), getImageGetter(urlBuilder), new UnknownTagsHandler(theme));
     }
 
-    /**
-     * Добавляет обработчики событий к ссылкам
-     */
-    public static SpannableStringBuilder replaceUrls(SpannableStringBuilder builder, IURLSpanClickListener listener, Theme theme) {
+    // Добавляет обработчики событий к ссылкам
+    public static void replaceUrls(SpannableStringBuilder builder, IURLSpanClickListener listener, Theme theme) {
         URLSpan[] spans = builder.getSpans(0, builder.length(), URLSpan.class);
 
         if (spans.length > 0) {
@@ -65,8 +59,6 @@ public class HtmlUtils {
                 newSpan.setOnClickListener(listener);
             }
         }
-
-        return builder;
     }
 
     public static String fixHtmlTags(String htmlText) {
@@ -107,9 +99,8 @@ public class HtmlUtils {
             Integer n1 = Integer.valueOf(m.group(1));
             Integer n2 = Integer.valueOf(m.group(2));
             Integer n3 = Integer.valueOf(m.group(3));
-            int c = Color.rgb(n1, n2, n3);
 
-            return c;
+            return Color.rgb(n1, n2, n3);
         }
         return null;
     }

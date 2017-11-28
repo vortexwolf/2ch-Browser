@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/refresh_menu_id"
         android:alphabeticShortcut="r"
         android:icon="?iconRefresh"
         android:title="@string/menu_refresh"/>
-    <item
-        android:id="@+id/menu_add_board_id"
-        android:icon="@drawable/ic_menu_add"
-        android:title="@string/menu_add_board"/>
-
+    <!--<item-->
+        <!--android:id="@+id/menu_add_board_id"-->
+        <!--android:alphabeticShortcut="a"-->
+        <!--android:icon="@drawable/ic_menu_add"-->
+        <!--android:title="@string/menu_add_board"/>-->
 </menu>

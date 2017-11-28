@@ -25,11 +25,16 @@ import ua.in.quireg.chan.boards.makaba.MakabaUrlParser;
 import ua.in.quireg.chan.boards.makaba.MakabaWebsite;
 import ua.in.quireg.chan.common.library.ExtendedHttpClient;
 import ua.in.quireg.chan.common.library.ExtendedObjectMapper;
-import ua.in.quireg.chan.common.utils.CompatibilityUtilsImpl;
+import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.db.DvachSqlHelper;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
+import ua.in.quireg.chan.di.AppComponent;
+import ua.in.quireg.chan.di.AppModule;
+import ua.in.quireg.chan.di.DaggerAppComponent;
+import ua.in.quireg.chan.di.DataRepositoryModule;
+import ua.in.quireg.chan.di.NetModule;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.DvachCaptchaService;
@@ -67,11 +72,11 @@ public class MainApplication extends Application {
 
     private static AppComponent mComponent;
 
+    private Toast mToast;
+
     public static AppComponent getComponent() {
         return mComponent;
     }
-
-    private Toast mToast;
 
     @Override
     public void onCreate() {
@@ -92,7 +97,7 @@ public class MainApplication extends Application {
         mComponent = buildComponent();
 
         if (Constants.SDK_VERSION >= 19) {
-            CompatibilityUtilsImpl.setSerialExecutor();
+            CompatibilityUtils.setSerialExecutor();
         }
 
         ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext());
@@ -135,7 +140,7 @@ public class MainApplication extends Application {
         container.register(DraftPostsStorage.class, new DraftPostsStorage());
         container.register(OpenTabsManager.class, new OpenTabsManager());
         container.register(CacheDirectoryManager.class, cacheManager);
-        container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager, new SerializationService()));
+        container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
         container.register(HttpImageManager.class, imageManager);
         container.register(BitmapManager.class, new BitmapManager(imageManager));
@@ -144,7 +149,7 @@ public class MainApplication extends Application {
         container.register(HiddenThreadsDataSource.class, hiddenThreadsDataSource);
         container.register(DownloadFileService.class, downloadFileService);
         container.register(ThreadImagesService.class, new ThreadImagesService());
-        container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader, mSettings));
+        container.register(HtmlCaptchaChecker.class, new HtmlCaptchaChecker(httpStringReader));
         container.register(IconsList.class, new IconsList());
         container.register(MailruCaptchaService.class, new MailruCaptchaService(httpStringReader));
         container.register(DvachCaptchaService.class, new DvachCaptchaService());
@@ -171,7 +176,7 @@ public class MainApplication extends Application {
                 .build();
     }
 
-    public void showToastShort(@NonNull String message) {
+    public void showShortToast(@NonNull String message) {
         if (mToast != null) {
             mToast.cancel();
         }

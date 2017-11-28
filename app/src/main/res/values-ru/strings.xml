@@ -86,7 +86,7 @@
     <string name="data_thread_withsubject_title">/%1$s/ - %2$s</string>
     <string name="data_add_thread_title">/%1$s/ - Новый тред</string>
     <string name="data_add_post_title">/%1$s/%2$s - Новое сообщение</string>
-    <string name="data_add_post_attachment_info">%1$sКб, %2$dx%3$d</string>
+    <string name="data_add_post_attachment_info">%1$dКб, %2$dx%3$d</string>
     <string name="data_search_posts_title">Поиск /%1$s/: %2$s</string>
 
     <!-- Menus -->

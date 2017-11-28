@@ -47,10 +47,10 @@ public class PasscodePreference extends EditTextPreference {
         public void onPasscodeChecked(boolean isSuccess, String errorMessage) {
             Context context = PasscodePreference.this.getContext();
             if (isSuccess) {
-                AppearanceUtils.showToastMessage(context, context.getString(R.string.notification_passcode_correct));
+                AppearanceUtils.showLongToast(context, context.getString(R.string.notification_passcode_correct));
             } else {
                 String error = !StringUtils.isEmpty(errorMessage) ? errorMessage : context.getString(R.string.notification_passcode_incorrect);
-                AppearanceUtils.showToastMessage(context, error);
+                AppearanceUtils.showLongToast(context, error);
             }
         }
     }

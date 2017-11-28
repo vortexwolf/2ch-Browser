@@ -16,13 +16,13 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/image_activity_toolbar_size">
+            android:layout_height="@dimen/toolbar_height">
         </android.support.v7.widget.Toolbar>
 
 
     </LinearLayout>
 
-    <ua.in.quireg.chan.views.controls.SelectiveViewPager
+    <ua.in.quireg.chan.ui.views.SelectiveViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

@@ -7,14 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ThreadImagesService {
-    private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<String, ArrayList<ThreadImageModel>>();
+
+    private HashMap<String, ArrayList<ThreadImageModel>> mThreadImages = new HashMap<>();
 
     public void addThreadImage(String threadUrl, AttachmentInfo attachment) {
         if (attachment == null || !attachment.isDisplayableInGallery()) {
             return;
         }
 
-        ArrayList<ThreadImageModel> imagesList = this.getOrCreateImagesList(threadUrl);
+        ArrayList<ThreadImageModel> imagesList = getOrCreateImagesList(threadUrl);
 
         ThreadImageModel model = new ThreadImageModel();
         model.position = imagesList.size() + 1;
@@ -26,27 +27,27 @@ public class ThreadImagesService {
     }
 
     public void clearThreadImages(String threadUrl) {
-        if (this.mThreadImages.containsKey(threadUrl)) {
-            this.mThreadImages.remove(threadUrl);
-        }
+        mThreadImages.remove(threadUrl);
     }
 
-    // returns a copy instead of a real list
+    // returns a copy
     public ArrayList<ThreadImageModel> getImagesList(String threadUrl) {
-        if (!this.mThreadImages.containsKey(threadUrl)) {
-            return new ArrayList<ThreadImageModel>();
+
+        if (mThreadImages.containsKey(threadUrl)) {
+            return new ArrayList<>(mThreadImages.get(threadUrl));
+        } else {
+            return new ArrayList<>();
         }
 
-        return (ArrayList<ThreadImageModel>) this.mThreadImages.get(threadUrl).clone();
     }
 
     public boolean hasThreadImages(String threadUrl) {
-        return this.mThreadImages.containsKey(threadUrl);
+        return mThreadImages.containsKey(threadUrl);
     }
 
     public boolean hasImage(String threadUrl, String imageUrl) {
-        if (this.mThreadImages.containsKey(threadUrl)) {
-            ThreadImageModel model = this.getImageByUrl(this.mThreadImages.get(threadUrl), imageUrl);
+        if (mThreadImages.containsKey(threadUrl)) {
+            ThreadImageModel model = getImageByUrl(mThreadImages.get(threadUrl), imageUrl);
             return model != null;
         }
 
@@ -64,12 +65,10 @@ public class ThreadImagesService {
     }
 
     private ArrayList<ThreadImageModel> getOrCreateImagesList(String threadUrl) {
-        if (!this.mThreadImages.containsKey(threadUrl)) {
-            ArrayList<ThreadImageModel> newValue = new ArrayList<ThreadImageModel>();
-            this.mThreadImages.put(threadUrl, newValue);
-            return newValue;
+        if (!mThreadImages.containsKey(threadUrl)) {
+            mThreadImages.put(threadUrl, new ArrayList<>());
         }
 
-        return this.mThreadImages.get(threadUrl);
+        return mThreadImages.get(threadUrl);
     }
 }

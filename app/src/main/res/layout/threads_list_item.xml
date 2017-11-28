@@ -64,7 +64,7 @@
         android:textStyle="bold"
         android:visibility="gone" />"
 
-    <ua.in.quireg.chan.views.controls.EllipsizingTextView
+    <ua.in.quireg.chan.ui.views.EllipsizingTextView
         android:id="@+id/comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

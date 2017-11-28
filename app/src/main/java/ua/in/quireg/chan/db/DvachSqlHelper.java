@@ -4,15 +4,17 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.services.SqlCreateTableScriptBuilder;
 
 public class DvachSqlHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "dvach.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
 
     public static final String TABLE_HISTORY = "history";
     public static final String TABLE_FAVORITES = "favorites";
     public static final String TABLE_HIDDEN_THREADS = "hiddenThreads";
+    public static final String TABLE_BOARDS = "boards";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_CREATED = "created";
@@ -23,6 +25,7 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
     private static final SqlCreateTableScriptBuilder mHistorySqlBuilder = new SqlCreateTableScriptBuilder(TABLE_HISTORY);
     private static final SqlCreateTableScriptBuilder mFavoritesSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_FAVORITES);
     private static final SqlCreateTableScriptBuilder mHiddenThreadsSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_HIDDEN_THREADS);
+    private static final SqlCreateTableScriptBuilder mBoardsSqlBuilder = new SqlCreateTableScriptBuilder(TABLE_BOARDS);
 
     public DvachSqlHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,26 +33,35 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        this.createHistoryTable(db);
-        this.createFavoritesTable(db);
-        this.createHiddenThreadsTable(db);
+        createHistoryTable(db);
+        createFavoritesTable(db);
+        createHiddenThreadsTable(db);
+        createBoardsTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (newVersion >= 5) {
-            this.drop(db);
-            this.onCreate(db);
-        } else if (newVersion == 4) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_HIDDEN_THREADS);
-            this.createHiddenThreadsTable(db);
+        Timber.d("Database upgrade from %d to %d version", oldVersion, newVersion);
+
+        if (oldVersion < 5) {
+            drop(db);
+            onCreate(db);
+        }
+
+        if(oldVersion >= 5){
+            createBoardsTable(db);
+        }
+        if(oldVersion >= 6){
+            //The way it should work.
+            //Incremental updates, older one first.
         }
     }
 
-    public void drop(SQLiteDatabase db) {
+    private void drop(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HIDDEN_THREADS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOARDS);
     }
 
     private void createHiddenThreadsTable(SQLiteDatabase db) {
@@ -83,5 +95,16 @@ public class DvachSqlHelper extends SQLiteOpenHelper {
                 .addColumn(COLUMN_TITLE, "text", true)
                 .toSql();
         db.execSQL(createFavoritesTableSql);
+    }
+    
+    private void createBoardsTable(SQLiteDatabase db) {
+        String createBoardsTableSql = mBoardsSqlBuilder
+                .addPrimaryKey(COLUMN_ID)
+                .addColumn(COLUMN_WEBSITE, "text", false)
+                .addColumn(COLUMN_BOARD_NAME, "text", false)
+                .addColumn(COLUMN_THREAD_NUMBER, "text", false)
+                .addColumn(COLUMN_TITLE, "text", true)
+                .toSql();
+        db.execSQL(createBoardsTableSql);
     }
 }

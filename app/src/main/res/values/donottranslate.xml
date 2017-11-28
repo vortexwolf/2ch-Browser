@@ -132,11 +132,11 @@
     </string-array>
 
     <string-array name="tab_name">
-        <item>Home</item>
-        <item>Search</item>
-        <item>Share</item>
-        <item>News</item>
-        <item>Profile</item>
+        <item>Browse</item>
+        <item>Tabs</item>
+        <item>Favorites</item>
+        <item>History</item>
+        <item>Settings</item>
     </string-array>
 
 </resources>

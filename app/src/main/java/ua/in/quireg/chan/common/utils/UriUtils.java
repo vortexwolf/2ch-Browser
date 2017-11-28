@@ -18,11 +18,8 @@ public class UriUtils {
     }
 
     public static boolean isImageUri(Uri uri) {
-        if (uri == null) {
-            return false;
-        }
+        return uri != null && RegexUtils.isImagePathString(uri.toString());
 
-        return RegexUtils.isImagePathString(uri.toString());
     }
 
     public static boolean isVideoUri(Uri uri) {

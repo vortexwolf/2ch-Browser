@@ -1,6 +1,6 @@
 package ua.in.quireg.chan.interfaces;
 
-import ua.in.quireg.chan.views.controls.ClickableURLSpan;
+import ua.in.quireg.chan.ui.views.ClickableURLSpan;
 
 import android.view.View;
 

@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.StyleRes;
 
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -13,21 +14,22 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.ObjectToStringSerializer;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.UriUtils;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.models.domain.CaptchaType;
+import ua.in.quireg.chan.services.SerializationService;
 
 public class ApplicationSettings {
 
     private final SharedPreferences mSharedPrefs;
     private final Resources mResources;
-    private ArrayList<BoardModel> mBoards = null;
+    private List<BoardModel> mBoards = null;
 
     public ApplicationSettings(Context context) {
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -269,78 +271,79 @@ public class ApplicationSettings {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_mobileapi_key), true);
     }
 
-    public int getTheme() {
-//        final String defaultTextSizeValue = mResources.getString(R.string.pref_text_size_13_value);
-//        final String defaultThemeValue = mResources.getString(R.string.pref_theme_white_value);
-//
-//        String theme = mSharedPrefs.getString(mResources.getString(R.string.pref_theme_key), defaultThemeValue);
-//        String textSize = mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), defaultTextSizeValue);
-//
-//        if (theme.equals(mResources.getString(R.string.pref_theme_white_value))) {
-//            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
-//                return R.style.Theme_Light_13;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
-//                return R.style.Theme_Light_14;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
-//                return R.style.Theme_Light_15;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
-//                return R.style.Theme_Light_16;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
-//                return R.style.Theme_Light_18;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
-//                return R.style.Theme_Light_20;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
-//                return R.style.Theme_Light_24;
-//            }
-//        } else if (theme.equals(mResources.getString(R.string.pref_theme_black_value))) {
-//            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
-//                return R.style.Theme_Black_13;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
-//                return R.style.Theme_Black_14;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
-//                return R.style.Theme_Black_15;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
-//                return R.style.Theme_Black_16;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
-//                return R.style.Theme_Black_18;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
-//                return R.style.Theme_Black_20;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
-//                return R.style.Theme_Black_24;
-//            }
-//        } else if (theme.equals(mResources.getString(R.string.pref_theme_neutron_value))) {
-//            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
-//                return R.style.Theme_Neutron_13;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
-//                return R.style.Theme_Neutron_14;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
-//                return R.style.Theme_Neutron_15;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
-//                return R.style.Theme_Neutron_16;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
-//                return R.style.Theme_Neutron_18;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
-//                return R.style.Theme_Neutron_20;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
-//                return R.style.Theme_Neutron_24;
-//            }
-//        } else if (theme.equals(mResources.getString(R.string.pref_theme_photon_value))) {
-//            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
-//                return R.style.Theme_Photon_13;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
-//                return R.style.Theme_Photon_14;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
-//                return R.style.Theme_Photon_15;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
-//                return R.style.Theme_Photon_16;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
-//                return R.style.Theme_Photon_18;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
-//                return R.style.Theme_Photon_20;
-//            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
-//                return R.style.Theme_Photon_24;
-//            }
-//        }
+    public @StyleRes int getTheme() {
+
+        final String defaultTextSizeValue = mResources.getString(R.string.pref_text_size_13_value);
+        final String defaultThemeValue = mResources.getString(R.string.pref_theme_white_value);
+
+        String theme = mSharedPrefs.getString(mResources.getString(R.string.pref_theme_key), defaultThemeValue);
+        String textSize = mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), defaultTextSizeValue);
+
+        if (theme.equals(mResources.getString(R.string.pref_theme_white_value))) {
+            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Light_13;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Light_14;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Light_15;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Light_16;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
+                return R.style.Theme_Light_18;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Light_20;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Light_24;
+            }
+        } else if (theme.equals(mResources.getString(R.string.pref_theme_black_value))) {
+            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Black_13;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Black_14;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Black_15;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Black_16;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
+                return R.style.Theme_Black_18;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Black_20;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Black_24;
+            }
+        } else if (theme.equals(mResources.getString(R.string.pref_theme_neutron_value))) {
+            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Neutron_13;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Neutron_14;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Neutron_15;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Neutron_16;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
+                return R.style.Theme_Neutron_18;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Neutron_20;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Neutron_24;
+            }
+        } else if (theme.equals(mResources.getString(R.string.pref_theme_photon_value))) {
+            if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
+                return R.style.Theme_Photon_13;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
+                return R.style.Theme_Photon_14;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_15_value))) {
+                return R.style.Theme_Photon_15;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_16_value))) {
+                return R.style.Theme_Photon_16;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_18_value))) {
+                return R.style.Theme_Photon_18;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_20_value))) {
+                return R.style.Theme_Photon_20;
+            } else if (textSize.equals(mResources.getString(R.string.pref_text_size_24_value))) {
+                return R.style.Theme_Photon_24;
+            }
+        }
 
         return R.style.Theme_Photon_13;
     }
@@ -350,7 +353,7 @@ public class ApplicationSettings {
         return CaptchaType.DVACH;
     }
     @SuppressWarnings("unchecked")
-    public ArrayList<BoardModel> getBoards() {
+    public List<BoardModel> getBoards() {
 
         //they might be already in memory
         if (mBoards != null && !mBoards.isEmpty()) {
@@ -358,8 +361,8 @@ public class ApplicationSettings {
         }
 
         try {
-            mBoards = (ArrayList<BoardModel>) ObjectToStringSerializer.deserialize(
-                    mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), null)
+            mBoards = (ArrayList<BoardModel>) SerializationService.deserializeFromString(
+                    mSharedPrefs.getString(mResources.getString(R.string.pref_boards_serialization_tag), null)
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -368,11 +371,14 @@ public class ApplicationSettings {
         return mBoards != null ? mBoards : new ArrayList<>();
     }
 
-    public void setBoards(ArrayList<BoardModel> boards) {
+    public void setBoards(List<BoardModel> boards) {
         mBoards = boards;
         SharedPreferences.Editor editor = mSharedPrefs.edit();
         try {
-            editor.putString(mResources.getString(R.string.pref_text_size_key), ObjectToStringSerializer.serialize(boards));
+            editor.putString(
+                    mResources.getString(R.string.pref_boards_serialization_tag),
+                    SerializationService.serializeToString((ArrayList<BoardModel>) boards)
+            );
             editor.apply();
         } catch (IOException e) {
             Timber.d(e.getMessage());

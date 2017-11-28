@@ -4,7 +4,6 @@
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -17,11 +16,12 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:name="ua.in.quireg.chan.common.MainApplication"
-        android:allowBackup="false">
-        <activity
-            android:name=".views.activities.LaunchScreenActivity"
-            android:theme="@style/launchScreenTheme">
+        android:allowBackup="false"
+        android:theme="@style/Theme.AppCompat.NoActionBar">
 
+        <activity
+            android:name=".ui.activities.LaunchScreenActivity"
+            android:theme="@style/Launch_Screen_Theme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,12 +29,12 @@
         </activity>
 
         <activity
-            android:name="ua.in.quireg.chan.views.activities.BaseActivity"
+            android:name="ua.in.quireg.chan.ui.activities.BaseActivity"
             android:windowSoftInputMode="adjustPan">
         </activity>
 
         <activity
-            android:name="ua.in.quireg.chan.views.activities.SearchableActivity"
+            android:name="ua.in.quireg.chan.ui.activities.SearchableActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTop">
             <intent-filter>
@@ -46,7 +46,7 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name="ua.in.quireg.chan.views.activities.ExternalUrlHandlerActivity"
+            android:name="ua.in.quireg.chan.ui.activities.ExternalUrlHandlerActivity"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
@@ -70,22 +70,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ua.in.quireg.chan.views.activities.ImageGalleryActivity"
+            android:name="ua.in.quireg.chan.ui.activities.ImageGalleryActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:hardwareAccelerated="true" />
         <activity
-            android:name="ua.in.quireg.chan.views.activities.BrowserActivity"
+            android:name="ua.in.quireg.chan.ui.activities.BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:hardwareAccelerated="true" />
         <activity
-            android:name="ua.in.quireg.chan.views.activities.AddPostActivity"
+            android:name="ua.in.quireg.chan.ui.activities.AddPostActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name="ua.in.quireg.chan.views.activities.FilesListActivity"
+            android:name="ua.in.quireg.chan.ui.activities.FilesListActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
-        <activity android:name="ua.in.quireg.chan.views.activities.NewRecaptchaActivity" />
+        <activity android:name="ua.in.quireg.chan.ui.activities.NewRecaptchaActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
