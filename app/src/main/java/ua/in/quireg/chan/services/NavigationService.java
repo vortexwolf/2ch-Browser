@@ -16,12 +16,12 @@ public class NavigationService {
 
     private FragNavController mNavController;
 
-    private NavigationService(FragNavController context) {
-        mNavController = context;
+    private NavigationService(FragNavController fragNavController) {
+        mNavController = fragNavController;
     }
 
-    public static void init(FragNavController context){
-        mNavigationService = new NavigationService(context);
+    public static void init(FragNavController fragNavController){
+        mNavigationService = new NavigationService(fragNavController);
     }
 
     public static NavigationService getInstance(){

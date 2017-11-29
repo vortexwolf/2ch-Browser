@@ -17,6 +17,7 @@
         <item name="iconOverflow">@drawable/ic_action_overflow</item>
         <item name="iconSearch">@drawable/ic_menu_search</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="actionbarStyle">@style/AppActionBar</item>
     </style>
 
     <style name="Theme_Dark_Switch" parent="Theme.AppCompat.NoActionBar">
@@ -31,6 +32,8 @@
         <item name="iconOverflow">@drawable/ic_action_overflow_dark</item>
         <item name="iconSearch">@drawable/ic_menu_search</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="actionbarStyle">@style/AppActionBar</item>
+
     </style>
 
     <style name="Theme_Black_Switch" parent="@style/Theme_Dark_Switch">

@@ -274,12 +274,13 @@ public class ApplicationSettings {
     public @StyleRes int getTheme() {
 
         final String defaultTextSizeValue = mResources.getString(R.string.pref_text_size_13_value);
-        final String defaultThemeValue = mResources.getString(R.string.pref_theme_white_value);
+        final String defaultThemeValue = mResources.getString(R.string.pref_theme_photon_value);
 
         String theme = mSharedPrefs.getString(mResources.getString(R.string.pref_theme_key), defaultThemeValue);
         String textSize = mSharedPrefs.getString(mResources.getString(R.string.pref_text_size_key), defaultTextSizeValue);
 
         if (theme.equals(mResources.getString(R.string.pref_theme_white_value))) {
+
             if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
                 return R.style.Theme_Light_13;
             } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
@@ -296,6 +297,7 @@ public class ApplicationSettings {
                 return R.style.Theme_Light_24;
             }
         } else if (theme.equals(mResources.getString(R.string.pref_theme_black_value))) {
+
             if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
                 return R.style.Theme_Black_13;
             } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
@@ -312,6 +314,7 @@ public class ApplicationSettings {
                 return R.style.Theme_Black_24;
             }
         } else if (theme.equals(mResources.getString(R.string.pref_theme_neutron_value))) {
+
             if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
                 return R.style.Theme_Neutron_13;
             } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {
@@ -328,6 +331,7 @@ public class ApplicationSettings {
                 return R.style.Theme_Neutron_24;
             }
         } else if (theme.equals(mResources.getString(R.string.pref_theme_photon_value))) {
+
             if (textSize.equals(mResources.getString(R.string.pref_text_size_13_value))) {
                 return R.style.Theme_Photon_13;
             } else if (textSize.equals(mResources.getString(R.string.pref_text_size_14_value))) {

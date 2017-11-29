@@ -34,7 +34,7 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.6.0'
 
     //Fragment navigation
-    implementation 'com.ncapdevi:frag-nav:2.2.1'
+    implementation 'com.ncapdevi:frag-nav:2.4.0'
 
     //Crash reporting
     implementation 'ch.acra:acra:4.9.2'

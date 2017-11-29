@@ -2,6 +2,7 @@
 <resources>
 
     <declare-styleable name="Theme">
+        <attr name="actionbarStyle" format="color|reference" />
         <attr name="activityRootBackground" format="color|reference" />
         <attr name="threadTitleForeground" format="color|reference" />
         <attr name="itemInfoForeground" format="color|reference" />

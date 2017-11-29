@@ -147,17 +147,18 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
             } else if (key.equals(getString(R.string.pref_display_hidden_boards_key))) {
                 showFullBoardsListWarning(preference);
             } else if (key.equals(getString(R.string.pref_unsafe_ssl_key)) ||
-                    key.equals(getString(R.string.pref_use_proxy_key)) ||
-                    key.equals(getString(R.string.pref_proxy_address_key)) ||
-                    key.equals(getString(R.string.pref_proxy_port_key)) ||
-                    key.equals(getString(R.string.pref_proxy_auth_key)) ||
-                    key.equals(getString(R.string.pref_proxy_auth_login_key)) ||
-                    key.equals(getString(R.string.pref_proxy_auth_pass_key))
-                    ) {
-                mNetworkConfigChanged = true;
-                if (key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
-                    updateProxyPassSummary();
-                }
+                    key.equals(getString(R.string.pref_use_proxy_key)) || key.equals(getString(R.string.pref_proxy_address_key)) ||
+                    key.equals(getString(R.string.pref_proxy_port_key)) ||  key.equals(getString(R.string.pref_proxy_auth_key)) ||
+                    key.equals(getString(R.string.pref_proxy_auth_login_key)) || key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
+
+                        mNetworkConfigChanged = true;
+
+                        if (key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
+                            updateProxyPassSummary();
+                        }
+
+            } else if (key.equals(getString(R.string.pref_theme_key)) || key.equals(getString(R.string.pref_text_size_key))) {
+                getActivity().recreate();
             }
         }
     }

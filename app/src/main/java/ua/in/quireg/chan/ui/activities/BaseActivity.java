@@ -53,13 +53,13 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
             R.drawable.browser_tabs,
             R.drawable.browser_favourites,
             R.drawable.browser_history,
-            R.drawable.browser_settings};
+            R.drawable.browser_settings
+    };
 
     boolean mDoubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         MainApplication.getComponent().inject(this);
 
         setTheme(mApplicationSettings.getTheme());
@@ -68,12 +68,14 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setLogo(R.mipmap.browser_logo);
+        getSupportActionBar().setLogo(R.drawable.browser_logo_drawable);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         updateToolbar(true);
-
         initBottomTabs();
+
+        super.onCreate(savedInstanceState);
+
 
         mFragmentHistory = new FragmentHistory();
         FragNavTransactionOptions options = FragNavTransactionOptions.newBuilder()
@@ -196,14 +198,6 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
                 tab.setCustomView(getTabView(i));
         }
     }
-
-//    private void initToolbar(){
-//        if (getSupportActionBar() == null) {
-//            return;
-//        }
-//        getSupportActionBar().setLogo(R.mipmap.browser_logo);
-//        //getSupportActionBar().setTitle(R.string.app_name);
-//    }
 
     private void updateToolbar(boolean isRootFrag) {
         if (getSupportActionBar() == null) {
