@@ -14,6 +14,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import timber.log.Timber;
@@ -360,20 +361,31 @@ public class ApplicationSettings {
         // sometimes users can choose more than 1 captcha type, so I will leave it in settings
         return CaptchaType.DVACH;
     }
+
+
+    public List<String> getAllowedBoardsIds() {
+        return Arrays.asList(mResources.getStringArray(R.array.allowed_boards));
+    }
+
     @SuppressWarnings("unchecked")
     public List<BoardModel> getBoards() {
 
-        //they might be already in memory
+        //try to return in-memory list
         if (mBoards != null && !mBoards.isEmpty()) {
             return mBoards;
         }
 
+        //try to return from previously serialized
         try {
             mBoards = (ArrayList<BoardModel>) SerializationService.deserializeFromString(
-                    mSharedPrefs.getString(mResources.getString(R.string.pref_boards_serialization_tag), null)
-            );
+                    mSharedPrefs.getString(mResources.getString(R.string.pref_boards_serialization_tag), null));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        //return from assets
+        if (mBoards == null) {
+
         }
 
         return mBoards != null ? mBoards : new ArrayList<>();

@@ -44,6 +44,7 @@ public class NavigationController implements FragNavController.RootFragmentListe
 
     public void init(FragmentManager fragmentManager,
                      FragNavController.TransactionListener transactionListener, MainActivityPresenter presenter) {
+
         mActivityPresenter = presenter;
 
         Bundle savedInstanceState = new Bundle();
@@ -57,6 +58,7 @@ public class NavigationController implements FragNavController.RootFragmentListe
                 .transition(FragmentTransaction.TRANSIT_NONE)
                 //.transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .build();
+
 
         mFragNavController = FragNavController.newBuilder(savedInstanceState, fragmentManager, R.id.container)
                 .transactionListener(transactionListener)
@@ -102,7 +104,7 @@ public class NavigationController implements FragNavController.RootFragmentListe
     public boolean isRootFragment() {
         if (!isInitialized) {
             Timber.e("Attempt to use navigation without init");
-            return false;
+            return true;
         }
         return mFragNavController.isRootFragment();
     }

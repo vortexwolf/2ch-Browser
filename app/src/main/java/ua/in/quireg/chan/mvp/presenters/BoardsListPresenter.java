@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
@@ -14,11 +15,10 @@ import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.mvp.models.BoardsListModel;
 import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.mvp.models.BoardsListModel;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
 import ua.in.quireg.chan.services.NavigationController;
-import ua.in.quireg.chan.services.NavigationService;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 5:06 PM.
@@ -52,33 +52,31 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
             mFirstViewAttached = true;
             requestBoards(false);
         }
-
     }
 
     @Override
-    public void onDestroy() {
-        Timber.v("onDestroy()");
+    public void detachView(BoardsListView view) {
+        super.detachView(view);
+        Timber.v("detachView()");
         compositeDisposable.clear();
-        super.onDestroy();
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     public void requestBoards(boolean localOnly) {
         Timber.v("requestBoards()");
 
-        compositeDisposable.clear();
-
         compositeDisposable.add(
-                mBoardsListModel.getBoards(localOnly)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                (boards) -> {
-                                    getViewState().clearBoards();
-                                    getViewState().setBoards(boards);
-                                },
-                                (ex) -> Timber.e(ex),
-                                () -> updateFavoriteBoards()
-                        )
+                Observable.combineLatest(
+                        mBoardsListModel.getBoards(localOnly).observeOn(AndroidSchedulers.mainThread()),
+                        mBoardsListModel.getFavoriteBoards().observeOn(AndroidSchedulers.mainThread()),
+                        (boards, favBoards) -> {
+
+                            getViewState().clearBoards();
+                            getViewState().setBoards(boards);
+                            getViewState().setFavBoards(favBoards);
+
+                            return boards;
+                        })
+                        .subscribe()
         );
     }
 
@@ -102,9 +100,9 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
     }
 
     public boolean isFavoriteBoard(BoardModel boardModel) {
-        Timber.v("isFavoriteBoard()");
+        Timber.v("isFavorite()");
 
-        return mBoardsListModel.isFavoriteBoard(boardModel);
+        return mBoardsListModel.isFavorite(boardModel);
     }
 
     public void addToFavorites(BoardModel boardModel) {
@@ -129,13 +127,4 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
     }
 
-    private void updateFavoriteBoards() {
-        compositeDisposable.add(
-                mBoardsListModel.getFavBoards()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                (favBoards) -> getViewState().setFavBoards(favBoards)
-                        )
-        );
-    }
 }

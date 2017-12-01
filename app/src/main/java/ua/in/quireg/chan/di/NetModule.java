@@ -22,10 +22,19 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.domain.NetworkResponseReader;
+import ua.in.quireg.chan.domain.NetworkResponseReaderImpl;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
 public class NetModule {
+
+    @Provides
+    @Singleton
+    NetworkResponseReader providesNetworkResponseReader() {
+        return new NetworkResponseReaderImpl();
+    }
+
 
     @Provides
     @Singleton

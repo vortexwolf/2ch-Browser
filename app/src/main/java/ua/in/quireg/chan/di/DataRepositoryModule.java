@@ -2,18 +2,17 @@ package ua.in.quireg.chan.di;
 
 import android.content.Context;
 
-import java.util.List;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.Observable;
+import okhttp3.OkHttpClient;
 import ua.in.quireg.chan.db.DvachSqlHelper;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
-import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.domain.NetworkResponseReader;
+import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 /**
@@ -25,8 +24,11 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class DataRepositoryModule {
 
     @Provides
-    Observable<List<BoardModel>> providesBoards(ApplicationSettings settings) {
-        return Observable.just(settings.getBoards());
+    @Singleton
+    BoardsRepository providesBoardsRepository(ApplicationSettings applicationSettings,
+                                              NetworkResponseReader networkResponseReader,
+                                              OkHttpClient okHttpClient) {
+        return new BoardsRepository(applicationSettings, networkResponseReader, okHttpClient);
     }
 
     @Provides
