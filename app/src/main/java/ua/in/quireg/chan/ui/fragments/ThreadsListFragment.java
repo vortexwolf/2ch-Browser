@@ -394,7 +394,7 @@ public class ThreadsListFragment extends BaseListFragment{
 
     private void navigateToPageNumber(int pageNumber) {
         //TODO
-        //mNavigationService.navigateBoard(getFragmentManager(), null, mWebsite.name(), mBoardName, pageNumber, false);
+        //mNavigationService.onBoardClick(getFragmentManager(), null, mWebsite.name(), mBoardName, pageNumber, false);
     }
 
     private void refreshThreads(boolean checkModified) {

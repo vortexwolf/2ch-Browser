@@ -29,7 +29,7 @@
         </activity>
 
         <activity
-            android:name="ua.in.quireg.chan.ui.activities.BaseActivity"
+            android:name="ua.in.quireg.chan.ui.activities.MainActivity"
             android:windowSoftInputMode="adjustPan">
         </activity>
 

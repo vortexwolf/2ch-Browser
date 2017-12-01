@@ -49,7 +49,7 @@ public class HistoryFragment extends BaseListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
 
         setHasOptionsMenu(true);
     }

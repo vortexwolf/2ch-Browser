@@ -19,7 +19,7 @@ public class OpenTabsManager {
 
 
     public OpenTabsManager() {
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
     }
 
     public OpenTabModel add(OpenTabModel newTab) {

@@ -35,6 +35,7 @@ dependencies {
 
     //Fragment navigation
     implementation 'com.ncapdevi:frag-nav:2.4.0'
+    implementation 'ru.terrakok.cicerone:cicerone:2.1.0'
 
     //Crash reporting
     implementation 'ch.acra:acra:4.9.2'

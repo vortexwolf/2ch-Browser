@@ -29,7 +29,7 @@ public class HistoryAdapter extends ArrayAdapter<HistoryEntity> {
 
     public HistoryAdapter(@NonNull Context context) {
         super(context, -1);
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
     }
 
     @Override

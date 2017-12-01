@@ -7,24 +7,37 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.MvpAppCompatActivity;
+import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavTransactionOptions;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.terrakok.cicerone.Navigator;
+import ru.terrakok.cicerone.NavigatorHolder;
+import ru.terrakok.cicerone.android.SupportFragmentNavigator;
+import ru.terrakok.cicerone.commands.Command;
+import ru.terrakok.cicerone.commands.Forward;
+import ru.terrakok.cicerone.commands.Replace;
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.Screens;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
+import ua.in.quireg.chan.mvp.views.MainActivityView;
 import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.views.FragmentHistory;
@@ -35,15 +48,61 @@ import ua.in.quireg.chan.ui.fragments.OpenTabsFragment;
 import ua.in.quireg.chan.ui.fragments.AppPreferenceFragment;
 
 
-public class BaseActivity extends AppCompatActivity implements FragNavController.TransactionListener, FragNavController.RootFragmentListener {
+public class MainActivity extends MvpAppCompatActivity implements MainActivityView, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
 
     //TODO add settings change listener
 
     @Inject protected ApplicationSettings mApplicationSettings;
 
+    @InjectPresenter MainActivityPresenter mMainActivityPresenter;
+
     @BindArray(R.array.tab_name) protected String[] TABS;
     @BindView(R.id.toolbar) protected Toolbar mToolbar;
     @BindView(R.id.bottom_tab) protected TabLayout mBottomTabLayout;
+
+    @Inject NavigatorHolder mNavigatorHolder;
+
+    private Toast mToast;
+
+    private Navigator mNavigator = new SupportFragmentNavigator(getSupportFragmentManager(), R.id.container) {
+        @Override
+        protected Fragment createFragment(String screenKey, Object data) {
+            switch (screenKey) {
+                case Screens.BOARDS_LIST:
+                    return new BoardsListFragment();
+                case Screens.TABS:
+                    return new OpenTabsFragment();
+                case Screens.FAVORITES:
+                    return new FavoritesFragment();
+                case Screens.HISTORY:
+                    return new HistoryFragment();
+                case Screens.PREFERENCES:
+                    return new AppPreferenceFragment();
+                default:
+                    Timber.e("Unknown screen key %s", screenKey);
+                    return null;
+            }
+        }
+
+        @Override
+        protected void showSystemMessage(String message) {
+            if(mToast != null) {
+                mToast.cancel();
+            }
+            mToast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT);
+            mToast.show();
+        }
+
+        @Override
+        protected void exit() {
+            finish();
+        }
+
+        @Override
+        public void applyCommand(Command command) {
+            super.applyCommand(command);
+        }
+    };
 
     private FragNavController mNavController;
     private FragmentHistory mFragmentHistory;
@@ -60,7 +119,7 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
 
         setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.base_activity);
@@ -75,6 +134,13 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
         initBottomTabs();
 
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            mNavigator.applyCommand(new Forward(Screens.BOARDS_LIST, null));
+        } else {
+            screenNames = (List<String>) savedInstanceState.getSerializable(STATE_SCREEN_NAMES);
+            printScreensScheme();
+        }
 
 
         mFragmentHistory = new FragmentHistory();
@@ -112,6 +178,19 @@ public class BaseActivity extends AppCompatActivity implements FragNavController
         });
 
     }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        mNavigatorHolder.setNavigator(mNavigator);
+    }
+
+    @Override
+    protected void onPause() {
+        mNavigatorHolder.removeNavigator();
+        super.onPause();
+    }
+
 
     @Override
     public void onBackPressed() {

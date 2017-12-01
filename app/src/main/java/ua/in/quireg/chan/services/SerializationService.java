@@ -18,6 +18,7 @@ import ua.in.quireg.chan.common.utils.IoUtils;
 public class SerializationService {
 
     public static void serializeToFile(File file, Serializable obj) {
+
         Timber.v("serializeToFile() - %s", file.toString());
         Completable.create(
                 e -> {
@@ -29,7 +30,6 @@ public class SerializationService {
                         e.onComplete();
                     } catch (IOException ex) {
                         Timber.e(ex, "serialization failed for %s", file.toString());
-                        e.onError(ex);
                     } finally {
                         IoUtils.closeStream(os);
                     }
@@ -68,7 +68,7 @@ public class SerializationService {
             objStream.close();
             return encodeBytes(serialObj.toByteArray());
         } catch (Exception e) {
-            Timber.e("Serialization error: " + e.getMessage());
+            Timber.e("Serialization error: %s", e.getMessage());
             return null;
         }
     }

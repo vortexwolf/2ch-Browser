@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.EditTextPreference;
@@ -26,23 +27,23 @@ import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.services.NavigationService;
+import ua.in.quireg.chan.settings.SeekBarDialogPreference;
+import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
 
-    private SharedPreferenceChangeListener mSharedPreferenceChangeListener;
+    private SharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
     private boolean mNetworkConfigChanged = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainApplication.getAppComponent().inject(this);
+
         super.onCreate(savedInstanceState);
-
-        MainApplication.getComponent().inject(this);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.menu_preferences));
     }
 
     @Override
@@ -52,26 +53,40 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         }
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
-
         updateListSummary(R.string.pref_theme_key);
         updateListSummary(R.string.pref_text_size_key);
         updateListSummary(R.string.pref_image_preview_key);
         updateListSummary(R.string.pref_gif_preview_key);
         updateListSummary(R.string.pref_video_player_key);
+
         updateEditTextSummary(R.string.pref_cache_media_part_limit_key, R.string.loading);
         updateEditTextSummary(R.string.pref_cache_thumb_part_limit_key, R.string.loading);
         updateEditTextSummary(R.string.pref_cache_pages_part_limit_key, R.string.loading);
         updateEditTextSummary(R.string.pref_cache_pages_threshold_limit_key, R.string.loading);
-        updateEditTextSummary(R.string.pref_proxy_address_key);
-        updateEditTextSummary(R.string.pref_proxy_port_key);
-        updateEditTextSummary(R.string.pref_proxy_auth_login_key);
-        updateProxyPassSummary();
+
         updateNameSummary();
         updateStartPageSummary();
         updateDownloadPathSummary();
-        updateAppVersionPreference();
 
+        updateProxyAddressSummary();
+        updateProxyPortSummary();
+        updateProxyLoginSummary();
+        updateProxyPassSummary();
+
+        updateAppVersion();
+
+    }
+
+    @Override
+    public void onDisplayPreferenceDialog(Preference preference) {
+        if (preference instanceof SeekBarDialogPreference) {
+            DialogFragment dialogFragment = SeekBarDialogPreferenceFragment.newInstance(preference);
+            dialogFragment.setTargetFragment(this, 0);
+            dialogFragment.show(getFragmentManager(),
+                    "android.support.v7.preference.PreferenceFragment.DIALOG");
+        } else {
+            super.onDisplayPreferenceDialog(preference);
+        }
     }
 
     @Override
@@ -89,7 +104,8 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         super.onStart();
         Timber.v("onStart()");
 
-        mNetworkConfigChanged = false;
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.menu_preferences));
+
     }
 
     @Override
@@ -97,15 +113,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         super.onStop();
         Timber.v("onStop()");
 
-        if (mNetworkConfigChanged) {
-            Timber.d("network config changed");
-            boolean success = verifyNetworkParameters();
-            if (!success) {
-                disableProxyConfig();
-                Timber.w("cannot apply new proxy settings, proxy disabled");
-            }
-            mMainApplication.rebuildAppComponent();
-        }
+        restartNetworkingIfChanged();
     }
 
     @Override
@@ -128,42 +136,58 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
         @Override
         public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
+
             final Preference preference = getPreferenceManager().findPreference(key);
 
+            //Disable preference view if needed
             preference.setShouldDisableView(!preference.isEnabled());
 
             if (preference instanceof ListPreference) {
+
+                //Update any ListPreference summary with it's entry name
                 preference.setSummary(((ListPreference) preference).getEntry());
+
             } else if (preference instanceof EditTextPreference) {
+
+                //Update any EditTextPreference summary with it's value
                 preference.setSummary(((EditTextPreference) preference).getText());
+
             }
 
             if (key.equals(getString(R.string.pref_name_key))) {
+
                 updateNameSummary();
+
             } else if (key.equals(getString(R.string.pref_homepage_key))) {
+
                 updateStartPageSummary();
+
             } else if (key.equals(getString(R.string.pref_download_path_key))) {
+
                 updateDownloadPathSummary();
+
             } else if (key.equals(getString(R.string.pref_display_hidden_boards_key))) {
+
                 showFullBoardsListWarning(preference);
-            } else if (key.equals(getString(R.string.pref_unsafe_ssl_key)) ||
-                    key.equals(getString(R.string.pref_use_proxy_key)) || key.equals(getString(R.string.pref_proxy_address_key)) ||
-                    key.equals(getString(R.string.pref_proxy_port_key)) ||  key.equals(getString(R.string.pref_proxy_auth_key)) ||
-                    key.equals(getString(R.string.pref_proxy_auth_login_key)) || key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
 
-                        mNetworkConfigChanged = true;
+            } else if (isNetworkPreference(key)) {
 
-                        if (key.equals(getString(R.string.pref_proxy_auth_pass_key))) {
-                            updateProxyPassSummary();
-                        }
+                updateProxyAddressSummary();
+                updateProxyPortSummary();
+                updateProxyLoginSummary();
+                updateProxyPassSummary();
+
+                mNetworkConfigChanged = true;
 
             } else if (key.equals(getString(R.string.pref_theme_key)) || key.equals(getString(R.string.pref_text_size_key))) {
+
                 getActivity().recreate();
+
             }
         }
     }
 
-    private void updateAppVersionPreference() {
+    private void updateAppVersion() {
         try {
             EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_screen_about_version_key));
             if (preference == null) {
@@ -196,20 +220,26 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         updateEditTextSummary(R.string.pref_download_path_key, R.string.pref_download_path_summary);
     }
 
+    private void updateProxyAddressSummary() {
+        updateEditTextSummary(R.string.pref_proxy_address_key, R.string.pref_proxy_address_summary);
+    }
+
+    private void updateProxyPortSummary() {
+        updateEditTextSummary(R.string.pref_proxy_port_key, R.string.pref_proxy_port_summary);
+    }
+
+    private void updateProxyLoginSummary() {
+        updateEditTextSummary(R.string.pref_proxy_auth_login_key, R.string.pref_proxy_auth_login_summary);
+    }
+
+    private void updateProxyPassSummary() {
+        updateEditTextSummary(R.string.pref_proxy_auth_pass_key, R.string.pref_proxy_auth_pass_summary);
+    }
+
     private void updateListSummary(int prefKeyId) {
         ListPreference preference = (ListPreference) getPreferenceManager().findPreference(getString(prefKeyId));
         if (preference != null) {
             preference.setSummary(preference.getEntry());
-        }
-    }
-
-    private void updateEditTextSummary(int prefKey) {
-        EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(prefKey));
-        if (preference == null) {
-            return;
-        }
-        if (!StringUtils.isEmpty(preference.getText())) {
-            preference.setSummary(preference.getText());
         }
     }
 
@@ -222,18 +252,6 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
             preference.setSummary(preference.getText());
         } else {
             preference.setSummary(getString(prefSummary));
-        }
-    }
-
-    private void updateProxyPassSummary() {
-        EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_proxy_auth_pass_key));
-        if (preference == null) {
-            return;
-        }
-        if (!StringUtils.isEmpty(preference.getText())) {
-            preference.setSummary(getString(R.string.password_string));
-        } else {
-            preference.setSummary(getString(R.string.pref_proxy_auth_pass_summary));
         }
     }
 
@@ -264,13 +282,14 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
                         preferenceEditor.apply();
                         pref.setChecked(false);
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.browser_logo)
                     .show();
 
         }
     }
 
-    private boolean verifyNetworkParameters() {
+    private boolean verifyProxyConfig() {
+        //TODO add strings to general file and add translations
 
         if (mSharedPreferences.getBoolean(getString(R.string.pref_use_proxy_key), true)) {
 
@@ -321,11 +340,35 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         return true;
     }
 
-    private void disableProxyConfig() {
-        mSharedPreferences.edit().putBoolean(getString(R.string.pref_use_proxy_key), false).apply();
-        mSharedPreferences.edit().putBoolean(getString(R.string.pref_proxy_auth_key), false).apply();
+    private boolean isNetworkPreference(String key) {
+        return key.equals(getString(R.string.pref_unsafe_ssl_key)) ||
+                key.equals(getString(R.string.pref_use_proxy_key)) ||
+                key.equals(getString(R.string.pref_proxy_address_key)) ||
+                key.equals(getString(R.string.pref_proxy_port_key)) ||
+                key.equals(getString(R.string.pref_proxy_auth_key)) ||
+                key.equals(getString(R.string.pref_proxy_auth_login_key)) ||
+                key.equals(getString(R.string.pref_proxy_auth_pass_key))||
+                key.equals(getString(R.string.pref_use_https_key));
     }
 
+    private void restartNetworkingIfChanged() {
+
+        if (mNetworkConfigChanged) {
+            Timber.d("network config changed");
+
+            mNetworkConfigChanged = false;
+
+            if (!verifyProxyConfig()) {
+                Timber.w("cannot apply new proxy settings, proxy disabled");
+
+                //Disable proxy and proxy auth
+                mSharedPreferences.edit().putBoolean(getString(R.string.pref_use_proxy_key), false).apply();
+                mSharedPreferences.edit().putBoolean(getString(R.string.pref_proxy_auth_key), false).apply();
+            }
+
+            mMainApplication.rebuildAppComponent();
+        }
+    }
 }
 
 

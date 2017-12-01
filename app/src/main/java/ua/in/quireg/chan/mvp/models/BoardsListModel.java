@@ -48,7 +48,7 @@ public class BoardsListModel {
     private List<String> mVisibleBoards;
 
     public BoardsListModel() {
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
         mVisibleBoards = Arrays.asList(mContext.getResources().getStringArray(R.array.allowed_boards));
     }
 

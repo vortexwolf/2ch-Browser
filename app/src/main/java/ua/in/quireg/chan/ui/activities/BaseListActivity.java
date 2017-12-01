@@ -27,7 +27,7 @@ import ua.in.quireg.chan.models.domain.CaptchaEntity;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.settings.SettingsEntity;
 
-public abstract class BaseListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public abstract class BaseListActivity extends MainActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private enum ViewType {
         LIST, LOADING, ERROR, CAPTCHA

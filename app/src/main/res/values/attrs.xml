@@ -39,7 +39,8 @@
         <attr name="iconSoundSpeaker" format="integer|reference" />
     </declare-styleable>
 
-    <declare-styleable name="SeekBarPreference">
+    <declare-styleable name="SeekBarDialogPreference">
+        <attr name="defValue" format="integer" />
         <attr name="minValue" format="integer" />
         <attr name="maxValue" format="integer" />
         <attr name="step" format="integer" />

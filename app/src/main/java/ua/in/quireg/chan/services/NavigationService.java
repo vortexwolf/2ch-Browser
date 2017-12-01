@@ -37,7 +37,7 @@ public class NavigationService {
 //        IUrlParser urlParser = website.getUrlParser();
 //
 //        if (urlParser.isBoardUri(uri)) {
-//            this.navigateBoard(context, website.name(), urlParser.getBoardName(uri), urlParser.getBoardPageNumber(uri), preferDeserialized);
+//            this.onBoardClick(context, website.name(), urlParser.getBoardName(uri), urlParser.getBoardPageNumber(uri), preferDeserialized);
 //        } else if (urlParser.isThreadUri(uri)) {
 //            this.navigateThread(context, null, website.name(), urlParser.getBoardName(uri), urlParser.getThreadNumber(uri), null, urlParser.getPostNumber(uri), preferDeserialized);
 //        } else if (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri)) {

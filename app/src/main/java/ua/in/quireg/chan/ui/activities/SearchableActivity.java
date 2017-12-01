@@ -156,7 +156,7 @@ public class SearchableActivity extends BaseListActivity {
     }
 
     private void navigateToThreads() {
-        //this.mNavigationService.navigateBoard(this, this.mWebsite.name(), this.mBoardName, 0, false);
+        //this.mNavigationService.onBoardClick(this, this.mWebsite.name(), this.mBoardName, 0, false);
     }
 
     private void navigateToThread(String threadNumber, String postNumber) {

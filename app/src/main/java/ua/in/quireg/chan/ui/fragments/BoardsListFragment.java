@@ -56,8 +56,9 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainApplication.getAppComponent().inject(this);
+
         super.onCreate(savedInstanceState);
-        MainApplication.getComponent().inject(this);
 
         setHasOptionsMenu(true);
 
@@ -86,7 +87,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         mListView.setOnItemClickListener((adapterView, view1, i, l) -> {
             BoardModel boardModel = (BoardModel) mListView.getItemAtPosition(i);
-            mBoardsListPresenter.navigateBoard(boardModel);
+            mBoardsListPresenter.onBoardClick(boardModel);
 
         });
 
@@ -100,14 +101,14 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         mPickBoardButton.setOnClickListener(v -> {
             String enteredBoard = mPickBoardInput.getText().toString().trim();
-            mBoardsListPresenter.tryNavigateBoard(enteredBoard);
+            mBoardsListPresenter.onBoardClick(enteredBoard);
         });
 
         mPickBoardInput.setOnKeyListener((v, keyCode, event) -> {
             if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 String enteredBoard = mPickBoardInput.getText().toString().trim();
 
-                mBoardsListPresenter.tryNavigateBoard(enteredBoard);
+                mBoardsListPresenter.onBoardClick(enteredBoard);
                 return true;
             }
             return false;

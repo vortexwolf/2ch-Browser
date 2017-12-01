@@ -70,6 +70,7 @@ public class CheckPasscodeTask extends AsyncTask<Void, Void, String> {
 
             response = this.mHttpClient.execute(post);
             StatusLine status = response.getStatusLine();
+
             if (status.getStatusCode() != 302 && status.getStatusCode() != 301) {
                 this.mErrorMessage = status.getStatusCode() + " - " + status.getReasonPhrase();
                 return null;

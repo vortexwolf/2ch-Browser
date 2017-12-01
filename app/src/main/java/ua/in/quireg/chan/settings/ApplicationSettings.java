@@ -135,11 +135,15 @@ public class ApplicationSettings {
     }
 
     public Uri getDomainUri() {
-        boolean isHttps = mSharedPrefs.getBoolean(mResources.getString(R.string.pref_use_https_key), true);
+
         String domain = mSharedPrefs.getString(mResources.getString(R.string.pref_domain_key), null);
         domain = StringUtils.isEmpty(domain) ? Constants.DEFAULT_DOMAIN : domain;
 
-        return UriUtils.getUriForDomain(domain, isHttps);
+        return UriUtils.getUriForDomain(domain, isSecuredHttp());
+    }
+
+    public boolean isSecuredHttp() {
+        return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_use_https_key), true);
     }
 
     public int getLongPostsMaxHeight() {

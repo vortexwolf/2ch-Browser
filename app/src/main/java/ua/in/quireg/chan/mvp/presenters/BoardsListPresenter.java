@@ -33,7 +33,7 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
     public BoardsListPresenter() {
         super();
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
     }
 
     @Override
@@ -77,19 +77,19 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         );
     }
 
-    public void tryNavigateBoard(String boardCode) {
-        Timber.v("tryNavigateBoard()");
+    public void onBoardClick(String boardCode) {
+        Timber.v("onBoardClick(String)");
 
         if (validateBoardCode(boardCode) && mBoardsListModel.findBoardByCode(boardCode) != null) {
-            navigateBoard(mBoardsListModel.findBoardByCode(boardCode));
+            onBoardClick(mBoardsListModel.findBoardByCode(boardCode));
         } else {
             getViewState().showBoardError(boardCode);
         }
 
     }
 
-    public void navigateBoard(BoardModel boardModel) {
-        Timber.v("navigateBoard()");
+    public void onBoardClick(BoardModel boardModel) {
+        Timber.v("onBoardClick(BoardModel)");
         getViewState().hideSoftKeyboard();
 
         NavigationService.getInstance().navigateBoard(Websites.getDefault().name(), boardModel.getId());

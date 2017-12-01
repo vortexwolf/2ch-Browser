@@ -1,36 +1,29 @@
 package ua.in.quireg.chan.services;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-
-import timber.log.Timber;
-import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.common.library.MyLog;
-import ua.in.quireg.chan.common.utils.IoUtils;
-import ua.in.quireg.chan.settings.ApplicationSettings;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class CacheDirectoryManager {
+import timber.log.Timber;
+import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.common.utils.IoUtils;
+import ua.in.quireg.chan.settings.ApplicationSettings;
 
-    private static final String LOG_TAG = CacheDirectoryManager.class.getSimpleName();
+public class CacheDirectoryManager {
 
     private static final int WORKER_INTERVAL = 60000; // 60 seconds
 
-    @Inject
-    protected ApplicationSettings mSettings;
+    @Inject protected ApplicationSettings mSettings;
 
     private final String mPackageName;
     private final File mInternalCacheDir;
@@ -40,7 +33,7 @@ public class CacheDirectoryManager {
 
     public CacheDirectoryManager(Context context) {
 
-        MainApplication.getComponent().inject(this);
+        MainApplication.getAppComponent().inject(this);
 
         mPackageName = context.getPackageName();
 
@@ -153,7 +146,7 @@ public class CacheDirectoryManager {
             released += freeSpace(getFilesListToDelete(thumbnailsCache), Math.round(thumbnailsCacheSize - (FILE_CACHE_THRESHOLD * MAX_THUMBNAILS_PART)));
         }
 
-        MyLog.d(LOG_TAG, String.format(Locale.getDefault(), "Released %d bytes from cache", released));
+        Timber.d("Released %d bytes from cache", released);
 
     }
 
@@ -202,17 +195,17 @@ public class CacheDirectoryManager {
 
             boolean isDeleted = file.delete();
             if (!isDeleted) {
-                MyLog.e(LOG_TAG, "Error deleting file: " + fileName);
+                Timber.e("Error deleting file: %s", fileName);
                 continue;
             }
-            MyLog.d(LOG_TAG, "Deleted file: " + fileName + ", file size: " + fileLength + ", last modified: " + lastModified);
+            Timber.d("Deleted file: %s, size %s, last modified %s", fileName, fileLength, lastModified);
             released += fileLength;
-            MyLog.d(LOG_TAG, "To release: " + (bytesToRelease - released));
+
+            Timber.d("To release: %d", (bytesToRelease - released));
             if (released > bytesToRelease) {
                 break;
             }
         }
-
         return released;
     }
 

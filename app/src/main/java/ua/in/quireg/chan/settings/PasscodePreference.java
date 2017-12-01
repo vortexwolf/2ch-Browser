@@ -2,7 +2,6 @@ package ua.in.quireg.chan.settings;
 
 import android.content.Context;
 import android.support.v7.preference.EditTextPreference;
-import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
 
 import ua.in.quireg.chan.R;
@@ -20,19 +19,19 @@ public class PasscodePreference extends EditTextPreference {
 
     @Override
     protected void onClick() {
-        this.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                String passcode = getText();
-                sendPasscodeToServer(passcode);
-                return true;
-            }
-        });
-        super.onClick();
 
+        setOnPreferenceChangeListener((preference, newValue) -> {
+            String passcode = getText();
+            if(passcode != null && passcode.length() > 0) {
+                sendPasscodeToServer(passcode);
+            }
+            return true;
+        });
+
+        super.onClick();
     }
 
-    public void sendPasscodeToServer(String passcode) {
+    private void sendPasscodeToServer(String passcode) {
         CheckPasscodeTask task = new CheckPasscodeTask(Websites.getDefault(), new CheckPasscodeView(), passcode);
         task.execute();
     }

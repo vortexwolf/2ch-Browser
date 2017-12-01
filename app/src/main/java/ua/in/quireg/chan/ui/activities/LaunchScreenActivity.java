@@ -40,7 +40,7 @@ public class LaunchScreenActivity extends Activity {
     }
 
     private void launchMainActivity(){
-        Intent baseActivity = new Intent(LaunchScreenActivity.this, BaseActivity.class);
+        Intent baseActivity = new Intent(LaunchScreenActivity.this, MainActivity.class);
         baseActivity.setAction(Intent.ACTION_MAIN);
         LaunchScreenActivity.this.startActivity(baseActivity);
         finish();

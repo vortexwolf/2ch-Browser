@@ -34,6 +34,7 @@ import ua.in.quireg.chan.di.AppComponent;
 import ua.in.quireg.chan.di.AppModule;
 import ua.in.quireg.chan.di.DaggerAppComponent;
 import ua.in.quireg.chan.di.DataRepositoryModule;
+import ua.in.quireg.chan.di.NavigationModule;
 import ua.in.quireg.chan.di.NetModule;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
@@ -74,7 +75,7 @@ public class MainApplication extends Application {
 
     private Toast mToast;
 
-    public static AppComponent getComponent() {
+    public static AppComponent getAppComponent() {
         return mComponent;
     }
 
@@ -173,6 +174,7 @@ public class MainApplication extends Application {
                 .appModule(new AppModule(this))
                 .netModule(new NetModule())
                 .dataRepositoryModule(new DataRepositoryModule())
+                .navigationModule(new NavigationModule())
                 .build();
     }
 

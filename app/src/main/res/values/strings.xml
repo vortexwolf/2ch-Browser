@@ -203,17 +203,17 @@
     <string name="pref_proxy_settings">Proxy</string>
     <string name="pref_proxy_settings_summary">Proxy configuration</string>
     <string name="pref_use_proxy">Use Proxy</string>
-    <string name="pref_use_proxy_summary">Use Proxy for connection</string>
+    <string name="pref_use_proxy_summary">Connect using proxy server</string>
     <string name="pref_proxy_address_title">Proxy address</string>
-    <string name="pref_proxy_address_summary">E.g. 127.0.0.1</string>
+    <string name="pref_proxy_address_summary">IP address or domain</string>
     <string name="pref_proxy_port_title">Proxy port</string>
     <string name="pref_proxy_port_summary">E.g. 808</string>
     <string name="pref_proxy_auth_title">Use Proxy Authentication</string>
-    <string name="pref_proxy_auth_summary">Connect to proxy using login\\password</string>
+    <string name="pref_proxy_auth_summary">Proxy is secured, I have login&amp;password</string>
     <string name="pref_proxy_auth_login_title">Login</string>
-    <string name="pref_proxy_auth_login_summary">Login goes here</string>
+    <string name="pref_proxy_auth_login_summary">Empty</string>
     <string name="pref_proxy_auth_pass_title">Password</string>
-    <string name="pref_proxy_auth_pass_summary">Password goes here</string>
+    <string name="pref_proxy_auth_pass_summary">Empty</string>
 
 
 
@@ -265,7 +265,7 @@
     <string name="pref_auto_refresh_summary">Refresh the current thread</string>
     <string name="pref_auto_refresh_interval">Interval</string>
     <string name="pref_auto_refresh_interval_dialog_title">AutoRefresh Interval</string>
-    <string name="pref_auto_refresh_interval_summary">%1$d seconds</string>
+    <string name="pref_auto_refresh_interval_summary">%1$d secs</string>
     <string name="pref_file_cache_clear">Clear cache</string>
     <string name="pref_cache_size_limit_title">Limit cache</string>
     <string name="pref_cache_size_limit_summary">%1$d Mb</string>
