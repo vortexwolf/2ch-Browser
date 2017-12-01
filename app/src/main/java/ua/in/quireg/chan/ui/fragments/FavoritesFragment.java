@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.services.NavigationController;
+import ua.in.quireg.chan.ui.activities.MainActivity;
 import ua.in.quireg.chan.ui.adapters.FavoritesAdapter;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
@@ -26,17 +29,21 @@ import ua.in.quireg.chan.services.NavigationService;
 
 import java.util.List;
 
-public class FavoritesFragment extends BaseListFragment {
-    private FavoritesDataSource mDatasource;
+import javax.inject.Inject;
 
+public class FavoritesFragment extends BaseListFragment {
+
+
+    @Inject FavoritesDataSource mDatasource;
+    @Inject NavigationController mNavigationController;
 
     private FavoritesAdapter mAdapter;
     private OpenDataSourceTask mCurrentTask = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
-        mDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
         setHasOptionsMenu(true);
     }
 
@@ -62,9 +69,9 @@ public class FavoritesFragment extends BaseListFragment {
             FavoritesEntity item = mAdapter.getItem(position);
 
             if (StringUtils.isEmpty(item.getThread())) {
-                NavigationService.getInstance().navigateBoard(item.getWebsite(), item.getBoard());
+                mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
             } else {
-                NavigationService.getInstance().navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }

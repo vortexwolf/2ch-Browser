@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <style name="TextFormatButton">
         <item name="android:background">@null</item>
@@ -136,8 +136,9 @@ Neutron theme
         <item name="android:colorBackground">@color/neutron_background</item>
         <item name="android:textColorPrimary">@color/neutron_primary_text</item>
         <item name="android:textColorSecondary">@color/neutron_secondary_text</item>
-        <item name="android:colorPrimary">@color/white</item>
-        <item name="android:colorPrimaryDark">@color/grey_trans</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/grey_trans</item>
+
     </style>
     <!--
 ==================
@@ -175,8 +176,9 @@ Photon theme
         <item name="android:colorBackground">@color/photon_background</item>
         <item name="android:textColorPrimary">@color/photon_primary_text</item>
         <item name="android:textColorSecondary">@color/photon_secondary_text</item>
-        <item name="android:colorPrimary">@color/white</item>
-        <item name="android:colorPrimaryDark">@color/grey_trans</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/grey_trans</item>
+
     </style>
 
     <!-- TextAppearance for different font size settings -->

@@ -5,6 +5,8 @@ import com.arellomobile.mvp.MvpPresenter;
 
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
@@ -15,6 +17,7 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.mvp.models.BoardsListModel;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
+import ua.in.quireg.chan.services.NavigationController;
 import ua.in.quireg.chan.services.NavigationService;
 
 /**
@@ -24,6 +27,8 @@ import ua.in.quireg.chan.services.NavigationService;
 
 @InjectViewState
 public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
+
+    @Inject NavigationController mNavigationController;
 
     private boolean mFirstViewAttached = false;
 
@@ -92,7 +97,8 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         Timber.v("onBoardClick(BoardModel)");
         getViewState().hideSoftKeyboard();
 
-        NavigationService.getInstance().navigateBoard(Websites.getDefault().name(), boardModel.getId());
+        mNavigationController.navigateBoard(Websites.getDefault().name(), boardModel.getId());
+
     }
 
     public boolean isFavoriteBoard(BoardModel boardModel) {

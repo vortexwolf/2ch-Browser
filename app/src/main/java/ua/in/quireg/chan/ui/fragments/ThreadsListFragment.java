@@ -16,7 +16,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.services.NavigationController;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 import ua.in.quireg.chan.asynctasks.DownloadThreadsTask;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
@@ -49,11 +53,14 @@ import ua.in.quireg.chan.ui.activities.AddPostActivity;
 
 public class ThreadsListFragment extends BaseListFragment{
 
+    @Inject NavigationController mNavigationController;
+    @Inject ApplicationSettings mSettings;
+    @Inject FavoritesDataSource mFavoritesDatasource;
+    @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
+
+
     private IJsonApiReader mJsonReader = Factory.resolve(MakabaApiReader.class);
-    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
-    private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
-    private final HiddenThreadsDataSource mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
     private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
@@ -77,6 +84,7 @@ public class ThreadsListFragment extends BaseListFragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         mWebsite = Websites.getDefault();
@@ -383,7 +391,7 @@ public class ThreadsListFragment extends BaseListFragment{
 
     private void navigateToThread(String threadNumber, String threadSubject) {
 
-        NavigationService.getInstance().navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
+        mNavigationController.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
 
     }
 

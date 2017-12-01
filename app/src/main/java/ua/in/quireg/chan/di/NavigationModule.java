@@ -4,9 +4,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.terrakok.cicerone.Cicerone;
-import ru.terrakok.cicerone.NavigatorHolder;
-import ru.terrakok.cicerone.Router;
+import ua.in.quireg.chan.services.NavigationController;
 
 /**
  * Created by Arcturus Mengsk on 12/1/2017, 6:52 AM.
@@ -16,21 +14,10 @@ import ru.terrakok.cicerone.Router;
 @Module
 public class NavigationModule {
 
-    private Cicerone<Router> cicerone;
-
-    public NavigationModule() {
-        cicerone = Cicerone.create();
-    }
-
     @Provides
     @Singleton
-    Router provideRouter() {
-        return cicerone.getRouter();
+    NavigationController provideNavigationController() {
+        return new NavigationController();
     }
 
-    @Provides
-    @Singleton
-    NavigatorHolder provideNavigatorHolder() {
-        return cicerone.getNavigatorHolder();
-    }
 }

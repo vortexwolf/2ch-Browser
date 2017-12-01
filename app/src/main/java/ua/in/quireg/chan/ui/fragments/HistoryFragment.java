@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.services.NavigationController;
 import ua.in.quireg.chan.ui.adapters.HistoryAdapter;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -39,6 +40,7 @@ public class HistoryFragment extends BaseListFragment {
 
     @Inject protected HistoryDataSource mHistoryDataSource;
     @Inject protected FavoritesDataSource mFavoritesDatasource;
+    @Inject NavigationController mNavigationController;
 
 
     @BindView(R.id.history_search_container) protected View mSearchContainer;
@@ -87,10 +89,10 @@ public class HistoryFragment extends BaseListFragment {
             HistoryEntity item = mAdapter.getItem(position);
 
             if (StringUtils.isEmpty(item.getThread())) {
-                NavigationService.getInstance().navigateBoard(item.getWebsite(), item.getBoard());
+                mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
 
             } else {
-                NavigationService.getInstance().navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }

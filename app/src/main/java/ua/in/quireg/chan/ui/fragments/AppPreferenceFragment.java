@@ -26,6 +26,7 @@ import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
+import ua.in.quireg.chan.services.NavigationController;
 import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.settings.SeekBarDialogPreference;
 import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
@@ -34,6 +35,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
+    @Inject NavigationController mNavigationController;
 
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -96,7 +98,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         args.putString("rootKey", preferenceScreen.getKey());
         appPreferenceFragment.setArguments(args);
 
-        NavigationService.getInstance().pushFragment(appPreferenceFragment);
+        mNavigationController.pushFragment(appPreferenceFragment);
     }
 
     @Override

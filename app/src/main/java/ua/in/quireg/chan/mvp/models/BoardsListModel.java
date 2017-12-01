@@ -64,10 +64,10 @@ public class BoardsListModel {
                             throw new IOException("Received empty boards list!");
 
                         } else if (areEqual(local, remote)) {
-                            Timber.d("Boards list is up to date");
+                            Timber.d("Boards are up to date ^_^");
                             return new ArrayList<BoardModel>();
                         } else {
-                            Timber.d("Boards list has expired, updating...");
+                            Timber.d("Boards list have expired, updating...");
 
                             //Update local storage and emit new boards list
                             mSettings.setBoards(remote);

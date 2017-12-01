@@ -1,11 +1,10 @@
 package ua.in.quireg.chan.ui.views;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
+import timber.log.Timber;
+
 public class FragmentHistory {
-    private static final String LOG_TAG = FragmentHistory.class.getSimpleName();
 
     private ArrayList<Integer> stackArr;
 
@@ -15,11 +14,11 @@ public class FragmentHistory {
     }
 
     public void push(int entry) {
-        Log.d(LOG_TAG, "push() entry:" + entry);
+        Timber.v("push() entry: %s", entry);
 
         if (isAlreadyExists(entry)) {
             stackArr.remove(Integer.valueOf(entry));
-            Log.d(LOG_TAG, String.format("entry %d exitsts, not pushed", entry));
+            Timber.v("entry %d exists, not pushed", entry);
         }
         stackArr.add(entry);
         printHistoryStack();
@@ -31,7 +30,7 @@ public class FragmentHistory {
 
     public int pop() {
 
-        Log.d(LOG_TAG, "pop()");
+        Timber.v("pop()");
         int entry = -1;
 
         if (!isEmpty()) {
@@ -41,13 +40,13 @@ public class FragmentHistory {
         if(!isEmpty()){
             entry = stackArr.get(stackArr.size() - 1);
         }
-        Log.d(LOG_TAG, String.format("pop() returned %d", entry));
+        Timber.v("pop() returned %d", entry);
         printHistoryStack();
         return entry;
     }
 
     public int popPrevious() {
-        Log.d(LOG_TAG, "popPrevious()");
+        Timber.v("popPrevious()");
 
         int entry = -1;
 
@@ -55,7 +54,7 @@ public class FragmentHistory {
             entry = stackArr.get(stackArr.size() - 2);
             stackArr.remove(stackArr.size() - 2);
         }
-        Log.d(LOG_TAG, String.format("popPrevious() returned %d", entry));
+        Timber.v("popPrevious() returned %d", entry);
         return entry;
     }
 
@@ -90,9 +89,9 @@ public class FragmentHistory {
     }
 
     private void printHistoryStack(){
-        Log.d(LOG_TAG, String.format("history stack: "));
+        Timber.v("history stack: ");
         for (int i = 0; i < stackArr.size(); i++) {
-            Log.d(LOG_TAG, String.format("Position %d, tab: %d", i, stackArr.get(i)));
+            Timber.v("Position %d, tab: %d", i, stackArr.get(i));
         }
     }
 }

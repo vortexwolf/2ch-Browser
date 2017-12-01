@@ -9,5 +9,12 @@ import com.arellomobile.mvp.MvpView;
 
 public interface MainActivityView extends MvpView {
 
+    void updateToolbar(boolean isRootFrag);
+
+    void updateTabSelection(int currentTab);
+
+    void showToast(String message);
+
+    void requestProvideFragmentManager();
 
 }

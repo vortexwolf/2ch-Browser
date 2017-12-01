@@ -1,13 +1,19 @@
 package ua.in.quireg.chan.mvp.presenters;
 
-import com.arellomobile.mvp.MvpPresenter;
-
-import ua.in.quireg.chan.mvp.views.MainActivityView;
+import android.support.v4.app.FragmentManager;
 
 /**
- * Created by Arcturus Mengsk on 12/1/2017, 6:36 AM.
+ * Created by Arcturus Mengsk on 12/1/2017, 10:33 AM.
  * 2ch-Browser
  */
 
-public class MainActivityPresenter extends MvpPresenter<MainActivityView> {
+public interface MainActivityPresenter {
+
+    void updateTabSelection(int position);
+
+    void onBackPressed();
+
+    void showToast(String message);
+
+    void setFragmentManager(FragmentManager fragmentManager);
 }
