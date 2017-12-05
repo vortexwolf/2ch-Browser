@@ -20,7 +20,7 @@ import android.widget.ImageButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.services.NavigationController;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.ui.adapters.HistoryAdapter;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -30,7 +30,6 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.db.HistoryEntity;
-import ua.in.quireg.chan.services.NavigationService;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class HistoryFragment extends BaseListFragment {
 
     @Inject protected HistoryDataSource mHistoryDataSource;
     @Inject protected FavoritesDataSource mFavoritesDatasource;
-    @Inject NavigationController mNavigationController;
+    @Inject MainActivityPresenter mMainActivityPresenter;
 
 
     @BindView(R.id.history_search_container) protected View mSearchContainer;
@@ -89,10 +88,10 @@ public class HistoryFragment extends BaseListFragment {
             HistoryEntity item = mAdapter.getItem(position);
 
             if (StringUtils.isEmpty(item.getThread())) {
-                mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
+                mMainActivityPresenter.navigateBoard(item.getWebsite(), item.getBoard());
 
             } else {
-                mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mMainActivityPresenter.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }

@@ -3,6 +3,7 @@ package ua.in.quireg.chan.common;
 import android.app.Application;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.squareup.leakcanary.LeakCanary;
@@ -30,12 +31,13 @@ import ua.in.quireg.chan.db.DvachSqlHelper;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
+import ua.in.quireg.chan.di.BaseComponent;
 import ua.in.quireg.chan.di.AppComponent;
-import ua.in.quireg.chan.di.AppModule;
-import ua.in.quireg.chan.di.DaggerAppComponent;
+import ua.in.quireg.chan.di.BaseModule;
+import ua.in.quireg.chan.di.DaggerBaseComponent;
 import ua.in.quireg.chan.di.DataRepositoryModule;
-import ua.in.quireg.chan.di.NavigationModule;
 import ua.in.quireg.chan.di.NetModule;
+import ua.in.quireg.chan.di.WebsiteModule;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.DvachCaptchaService;
@@ -43,7 +45,6 @@ import ua.in.quireg.chan.services.HtmlCaptchaChecker;
 import ua.in.quireg.chan.services.IconsList;
 import ua.in.quireg.chan.services.MailruCaptchaService;
 import ua.in.quireg.chan.services.PostSender;
-import ua.in.quireg.chan.services.SerializationService;
 import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.services.http.DownloadFileService;
 import ua.in.quireg.chan.services.http.HttpBitmapReader;
@@ -72,11 +73,16 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class MainApplication extends Application {
 
     private static AppComponent mComponent;
+    private static BaseComponent mBaseComponent;
 
     private Toast mToast;
 
     public static AppComponent getAppComponent() {
         return mComponent;
+    }
+
+    public static BaseComponent getBaseComponent() {
+        return mBaseComponent;
     }
 
     @Override
@@ -94,6 +100,7 @@ public class MainApplication extends Application {
         } else {
             ACRA.init(this);
         }
+        mBaseComponent = buildBaseComponent();
 
         mComponent = buildComponent();
 
@@ -101,9 +108,7 @@ public class MainApplication extends Application {
             CompatibilityUtils.setSerialExecutor();
         }
 
-        ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext());
-
-        ExtendedHttpClient httpClient = new ExtendedHttpClient(!mSettings.isUnsafeSSL());
+        ExtendedHttpClient httpClient = new ExtendedHttpClient(true);
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, getResources());
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, getResources());
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
@@ -121,8 +126,10 @@ public class MainApplication extends Application {
         HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), getResources(), httpBitmapReader);
         DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpStreamReader);
 
-        MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder(mSettings);
-        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, getResources(), mSettings);
+        MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder();
+        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, getResources());
+
+        ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
 
         Container container = Factory.getContainer();
         container.register(Resources.class, getResources());
@@ -137,7 +144,7 @@ public class MainApplication extends Application {
         container.register(HttpStringReader.class, httpStringReader);
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonHttpReader.class, jsonApiReader);
-        container.register(PostSender.class, new PostSender(httpClient, getResources(), mSettings, httpStringReader));
+        container.register(PostSender.class, new PostSender(httpClient, getResources(), httpStringReader));
         container.register(DraftPostsStorage.class, new DraftPostsStorage());
         container.register(OpenTabsManager.class, new OpenTabsManager());
         container.register(CacheDirectoryManager.class, cacheManager);
@@ -170,11 +177,12 @@ public class MainApplication extends Application {
     }
 
     protected AppComponent buildComponent() {
-        return DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .netModule(new NetModule())
-                .dataRepositoryModule(new DataRepositoryModule())
-                .navigationModule(new NavigationModule())
+        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule());
+    }
+
+    public BaseComponent buildBaseComponent() {
+        return DaggerBaseComponent.builder()
+                .baseModule(new BaseModule(this))
                 .build();
     }
 

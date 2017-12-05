@@ -1,13 +1,24 @@
 package ua.in.quireg.chan.mvp.models;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import timber.log.Timber;
+import ua.in.quireg.chan.boards.makaba.MakabaModelsMapper;
+import ua.in.quireg.chan.boards.makaba.models.MakabaBoardInfo;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.db.FavoritesDataSource;
@@ -129,5 +140,36 @@ public class BoardsListModel {
         return mApplicationSettings.isDisplayAllBoards() || mApplicationSettings.getAllowedBoardsIds().contains(board.getId());
     }
 
+    public List<BoardModel> parseBoardsListResponse(Response response) throws IOException {
+        ArrayList<BoardModel> models = new ArrayList<>();
 
+        if (!response.isSuccessful()) {
+            Timber.e("Response was not successful");
+            response.close();
+            return models;
+        }
+
+        ObjectMapper mapper = new ObjectMapper()
+                .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        ResponseBody responseBody = response.body();
+        if (responseBody == null) {
+            Timber.e("responseBody is null");
+            return models;
+        }
+
+        JsonNode result = mapper.readValue(responseBody.string(), JsonNode.class);
+        response.close();
+
+        Iterator iterator = result.getElements();
+
+        while (iterator.hasNext()) {
+            JsonNode node = (JsonNode) iterator.next();
+
+            MakabaBoardInfo[] data = mapper.convertValue(node, MakabaBoardInfo[].class);
+
+            models.addAll(Arrays.asList(MakabaModelsMapper.mapBoardModels(data)));
+        }
+        return models;
+    }
 }

@@ -8,8 +8,7 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import ua.in.quireg.chan.common.Websites;
-import ua.in.quireg.chan.db.FavoritesDataSource;
-import ua.in.quireg.chan.domain.NetworkResponseReader;
+import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
@@ -21,14 +20,14 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class BoardsRepository {
 
     private ApplicationSettings mApplicationSettings;
-    private NetworkResponseReader mNetworkResponseReader;
+    private ApiReader mApiReader;
     private OkHttpClient mOkHttpClient;
 
     public BoardsRepository(ApplicationSettings mApplicationSettings,
-                            NetworkResponseReader networkResponseReader,
+                            ApiReader apiReader,
                             OkHttpClient okHttpClient) {
         this.mApplicationSettings = mApplicationSettings;
-        this.mNetworkResponseReader = networkResponseReader;
+        this.mApiReader = apiReader;
         this.mOkHttpClient = okHttpClient;
     }
 
@@ -45,7 +44,7 @@ public class BoardsRepository {
         return Observable.fromCallable(() -> mOkHttpClient.newCall(request))
                 .subscribeOn(Schedulers.io())
                 .map(Call::execute)
-                .map((r) -> mNetworkResponseReader.parseBoardsListResponse(r));
+                .map((r) -> mApiReader.readBoardsListResponse(r));
     }
 
     public void setLocalBoards(List<BoardModel> boards) {

@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.CheckCloudflareTask;
 import ua.in.quireg.chan.asynctasks.DisplayImageUriTask;
@@ -43,7 +45,8 @@ public abstract class BaseListFragment extends Fragment implements SwipeRefreshL
     private Button mCaptchaSendButton;
     private CheckCloudflareTask mCurrentCheckTask = null;
     protected IWebsite mWebsite = Websites.getDefault();
-    private ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
+
+    @Inject ApplicationSettings mSettings;
 
     protected ListView mListView;
 

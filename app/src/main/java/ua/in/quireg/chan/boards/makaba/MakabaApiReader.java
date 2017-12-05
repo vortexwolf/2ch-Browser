@@ -9,6 +9,8 @@ import org.codehaus.jackson.JsonNode;
 
 import android.content.res.Resources;
 
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.boards.makaba.models.MakabaError;
 import ua.in.quireg.chan.boards.makaba.models.MakabaFoundPostsList;
@@ -17,6 +19,7 @@ import ua.in.quireg.chan.boards.makaba.models.MakabaThreadsList;
 import ua.in.quireg.chan.boards.makaba.models.MakabaThreadsListCatalog;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.exceptions.HtmlNotJsonException;
 import ua.in.quireg.chan.exceptions.JsonApiReaderException;
@@ -37,14 +40,16 @@ public class MakabaApiReader implements IJsonApiReader {
     private final MakabaUrlBuilder mMakabaUriBuilder;
     private final MakabaModelsMapper mMakabaModelsMapper;
     private final Resources mResources;
-    private final ApplicationSettings mApplicationSettings;
 
-    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUrlBuilder makabaUriBuilder, Resources resources, ApplicationSettings applicationSettings) {
+    @Inject protected ApplicationSettings mApplicationSettings;
+
+    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUrlBuilder makabaUriBuilder, Resources resources) {
         this.mJsonReader = jsonReader;
         this.mMakabaModelsMapper = makabaModelsMapper;
         this.mMakabaUriBuilder = makabaUriBuilder;
         this.mResources = resources;
-        this.mApplicationSettings = applicationSettings;
+
+        MainApplication.getAppComponent().inject(this);
     }
 
     @Override

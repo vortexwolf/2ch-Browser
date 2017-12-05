@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.ui.views.EllipsizingTextView;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.ThreadPostUtils;
@@ -28,13 +29,15 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
 
     private final LayoutInflater mInflater;
     private final Theme mTheme;
-    private final ApplicationSettings mSettings;
+    @Inject ApplicationSettings mSettings;
     private final HiddenThreadsDataSource mHiddenThreadsDataSource;
     private final ThreadImagesService mThreadImagesService;
     private final ListView mListView;
@@ -48,12 +51,12 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
     public ThreadsListAdapter(Context context, IWebsite website, String boardName, Theme theme, ListView listView) {
         super(context.getApplicationContext(), 0);
+        MainApplication.getAppComponent().inject(this);
 
         this.mWebsite = website;
         this.mBoardName = boardName;
         this.mTheme = theme;
         this.mInflater = LayoutInflater.from(context);
-        this.mSettings = Factory.resolve(ApplicationSettings.class);
         this.mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
         this.mUrlBuilder = this.mWebsite.getUrlBuilder();
         this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);

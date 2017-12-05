@@ -326,7 +326,7 @@ public class BrowserActivity extends Activity {
         @Override
         public void showFileExists(File file) {
             // it shouldn't be called, because I checked this situation in the
-            // onCreate method
+            // onActivityAttached method
             BrowserActivity.this.setImage(file);
         }
 

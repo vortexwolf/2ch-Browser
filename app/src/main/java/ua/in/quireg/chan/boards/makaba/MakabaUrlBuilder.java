@@ -2,16 +2,21 @@ package ua.in.quireg.chan.boards.makaba;
 
 import android.net.Uri;
 
+import javax.inject.Inject;
+
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.interfaces.IUrlBuilder;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class MakabaUrlBuilder implements IUrlBuilder {
-    private static final String[] CATALOG_FILTERS = { "catalog", "catalog_num" };
-    private final ApplicationSettings mSettings;
 
-    public MakabaUrlBuilder(ApplicationSettings settings) {
-        this.mSettings = settings;
+    @Inject protected ApplicationSettings mSettings;
+
+    private static final String[] CATALOG_FILTERS = { "catalog", "catalog_num" };
+
+    public MakabaUrlBuilder() {
+        MainApplication.getAppComponent().inject(this);
     }
 
     public String getBoardsUrl(){

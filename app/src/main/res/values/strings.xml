@@ -41,9 +41,11 @@
     <string name="tap_to_refresh">Tap to refresh</string>
     <string name="send_post_again">Send your post again</string>
     <string name="search_history_hint">Search text or /board_code/</string>
-    <string name="unmoderated_boards_list_popup_title">Warning!</string>
+    <string name="warning_popup_title">Warning!</string>
     <string name="unmoderated_boards_list_popup_text">This action involves access to adult content.
         By pressing OK you confirm that you are 18 years old and aware about any consequences of viewing mature content.</string>
+    <string name="clear_cache_popup_text">Do you wish to clear cache?</string>
+
 
     <!-- Data strings -->
     <plurals name="data_posts_quantity">
@@ -199,24 +201,20 @@
     <string name="pref_unsafe_ssl">Ignore SSL Certificate Errors</string>
     <string name="pref_unsafe_ssl_summary">Disable Certificate Validation</string>
 
-
     <string name="pref_proxy_settings">Proxy</string>
     <string name="pref_proxy_settings_summary">Proxy configuration</string>
     <string name="pref_use_proxy">Use Proxy</string>
     <string name="pref_use_proxy_summary">Connect using proxy server</string>
     <string name="pref_proxy_address_title">Proxy address</string>
-    <string name="pref_proxy_address_summary">IP address or domain</string>
+    <string name="pref_proxy_address_summary">IP address or Domain</string>
     <string name="pref_proxy_port_title">Proxy port</string>
     <string name="pref_proxy_port_summary">E.g. 808</string>
     <string name="pref_proxy_auth_title">Use Proxy Authentication</string>
-    <string name="pref_proxy_auth_summary">Proxy is secured, I have login&amp;password</string>
+    <string name="pref_proxy_auth_summary">Proxy is secured, enter credentials</string>
     <string name="pref_proxy_auth_login_title">Login</string>
-    <string name="pref_proxy_auth_login_summary">Empty</string>
+    <string name="pref_proxy_auth_login_summary">Not set</string>
     <string name="pref_proxy_auth_pass_title">Password</string>
-    <string name="pref_proxy_auth_pass_summary">Empty</string>
-
-
-
+    <string name="pref_proxy_auth_pass_summary">Not set</string>
 
     <string name="pref_disable_zoom_controls">Disable Zoom Controls</string>
     <string name="pref_disable_zoom_controls_summary">Disable built-in zoom buttons in WebView (only Android 3 and newer)</string>

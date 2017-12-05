@@ -18,7 +18,6 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.mvp.models.BoardsListModel;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
-import ua.in.quireg.chan.services.NavigationController;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 5:06 PM.
@@ -28,7 +27,7 @@ import ua.in.quireg.chan.services.NavigationController;
 @InjectViewState
 public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
-    @Inject NavigationController mNavigationController;
+    @Inject MainActivityPresenter mMainActivityPresenter;
 
     private boolean mFirstViewAttached = false;
 
@@ -76,7 +75,8 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
                             return boards;
                         })
-                        .subscribe()
+                        .map((b) -> "Boards view updated")
+                        .subscribe(Timber::d, Timber::e)
         );
     }
 
@@ -95,7 +95,7 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         Timber.v("onBoardClick(BoardModel)");
         getViewState().hideSoftKeyboard();
 
-        mNavigationController.navigateBoard(Websites.getDefault().name(), boardModel.getId());
+        mMainActivityPresenter.navigateBoard(Websites.getDefault().name(), boardModel.getId());
 
     }
 

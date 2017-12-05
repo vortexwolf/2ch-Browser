@@ -22,29 +22,16 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.domain.NetworkResponseReader;
-import ua.in.quireg.chan.domain.NetworkResponseReaderImpl;
+import ua.in.quireg.chan.domain.ApiReader;
+import ua.in.quireg.chan.domain.ApiReaderImpl;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
 public class NetModule {
 
-    @Provides
-    @Singleton
-    NetworkResponseReader providesNetworkResponseReader() {
-        return new NetworkResponseReaderImpl();
-    }
-
 
     @Provides
-    @Singleton
-    Cache provideOkHttpCache(MainApplication application) {
-        int cacheSize = 10 * 1024 * 1024; // 10 MiB
-        return new Cache(application.getCacheDir(), cacheSize);
-    }
-
-    @Provides
-    @Singleton
+    @AppScope
     OkHttpClient provideOkHttpClient(ApplicationSettings applicationSettings, Cache cache) {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -108,5 +95,13 @@ public class NetModule {
 
         return builder.build();
     }
+
+    @Provides
+    @AppScope
+    Cache provideOkHttpCache(MainApplication application) {
+        int cacheSize = 10 * 1024 * 1024; // 10 MiB
+        return new Cache(application.getCacheDir(), cacheSize);
+    }
+
 
 }

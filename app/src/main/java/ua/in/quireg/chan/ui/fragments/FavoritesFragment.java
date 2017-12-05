@@ -13,29 +13,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.services.NavigationController;
-import ua.in.quireg.chan.ui.activities.MainActivity;
-import ua.in.quireg.chan.ui.adapters.FavoritesAdapter;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
-import ua.in.quireg.chan.services.NavigationService;
-
-import java.util.List;
-
-import javax.inject.Inject;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
+import ua.in.quireg.chan.ui.adapters.FavoritesAdapter;
 
 public class FavoritesFragment extends BaseListFragment {
 
 
     @Inject FavoritesDataSource mDatasource;
-    @Inject NavigationController mNavigationController;
+    @Inject MainActivityPresenter mNavigationController;
 
     private FavoritesAdapter mAdapter;
     private OpenDataSourceTask mCurrentTask = null;

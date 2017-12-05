@@ -11,7 +11,7 @@ import ua.in.quireg.chan.db.DvachSqlHelper;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
-import ua.in.quireg.chan.domain.NetworkResponseReader;
+import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
@@ -24,21 +24,21 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class DataRepositoryModule {
 
     @Provides
-    @Singleton
+    @AppScope
     BoardsRepository providesBoardsRepository(ApplicationSettings applicationSettings,
-                                              NetworkResponseReader networkResponseReader,
+                                              ApiReader apiReader,
                                               OkHttpClient okHttpClient) {
-        return new BoardsRepository(applicationSettings, networkResponseReader, okHttpClient);
+        return new BoardsRepository(applicationSettings, apiReader, okHttpClient);
     }
 
     @Provides
-    @Singleton
+    @AppScope
     DvachSqlHelper providesDvachSqlHelper(Context context) {
         return new DvachSqlHelper(context);
     }
 
     @Provides
-    @Singleton
+    @AppScope
     FavoritesDataSource providesFavoritesDataSource(DvachSqlHelper dvachSqlHelper) {
         FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dvachSqlHelper);
         favoritesDataSource.open();
@@ -46,7 +46,7 @@ public class DataRepositoryModule {
     }
 
     @Provides
-    @Singleton
+    @AppScope
     HistoryDataSource providesHistoryDataSource(DvachSqlHelper dvachSqlHelper) {
         HistoryDataSource historyDataSource = new HistoryDataSource(dvachSqlHelper);
         historyDataSource.open();
@@ -54,7 +54,7 @@ public class DataRepositoryModule {
     }
 
     @Provides
-    @Singleton
+    @AppScope
     HiddenThreadsDataSource providesHiddenThreadsDataSource(DvachSqlHelper dvachSqlHelper) {
         HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dvachSqlHelper);
         hiddenThreadsDataSource.open();

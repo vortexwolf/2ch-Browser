@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.services.NavigationController;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 import ua.in.quireg.chan.asynctasks.DownloadThreadsTask;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
@@ -42,7 +42,6 @@ import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.services.CloudflareCheckService;
-import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.services.presentation.ClickListenersFactory;
 import ua.in.quireg.chan.services.presentation.ListViewScrollListener;
 import ua.in.quireg.chan.services.presentation.OpenTabsManager;
@@ -53,7 +52,7 @@ import ua.in.quireg.chan.ui.activities.AddPostActivity;
 
 public class ThreadsListFragment extends BaseListFragment{
 
-    @Inject NavigationController mNavigationController;
+    @Inject MainActivityPresenter mMainActivityPresenter;
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
     @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
@@ -391,7 +390,7 @@ public class ThreadsListFragment extends BaseListFragment{
 
     private void navigateToThread(String threadNumber, String threadSubject) {
 
-        mNavigationController.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
+        mMainActivityPresenter.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
 
     }
 

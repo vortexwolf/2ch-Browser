@@ -13,6 +13,8 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import java.util.Date;
 import java.util.Locale;
@@ -26,8 +28,7 @@ import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.services.NavigationController;
-import ua.in.quireg.chan.services.NavigationService;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.settings.SeekBarDialogPreference;
 import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
 
@@ -35,7 +36,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
-    @Inject NavigationController mNavigationController;
+    @Inject MainActivityPresenter mMainActivityPresenter;
 
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -98,13 +99,12 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         args.putString("rootKey", preferenceScreen.getKey());
         appPreferenceFragment.setArguments(args);
 
-        mNavigationController.pushFragment(appPreferenceFragment);
+        mMainActivityPresenter.pushFragment(appPreferenceFragment);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Timber.v("onStart()");
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.menu_preferences));
 
@@ -113,24 +113,18 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onStop() {
         super.onStop();
-        Timber.v("onStop()");
-
         restartNetworkingIfChanged();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Timber.v("onResume()");
-
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Timber.v("onPause()");
-
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
 
@@ -236,6 +230,18 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     private void updateProxyPassSummary() {
         updateEditTextSummary(R.string.pref_proxy_auth_pass_key, R.string.pref_proxy_auth_pass_summary);
+
+        EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_proxy_auth_pass_key));
+        if (preference == null) {
+            return;
+        }
+        String value = preference.getText();
+        if (!StringUtils.isEmpty(value)) {
+            String mask = new String(new char[value.length()]).replace("\0", "*");;
+            preference.setSummary(mask);
+        } else {
+            preference.setSummary(getString(R.string.pref_proxy_auth_pass_summary));
+        }
     }
 
     private void updateListSummary(int prefKeyId) {
@@ -264,12 +270,14 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
         final SharedPreferences.Editor preferenceEditor = mSharedPreferences.edit();
         if (isEnabled) {
+
             //Preference has already been changed to "true"
             //Prepare rollback and show Warning dialog
             preferenceEditor
                     .putBoolean(preference.getKey(), false);
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(getString(R.string.unmoderated_boards_list_popup_title))
+
+            AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.warning_popup_title))
                     .setMessage(getString(R.string.unmoderated_boards_list_popup_text))
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         //leave it as it is
@@ -287,6 +295,8 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
                     .setIcon(R.drawable.browser_logo)
                     .show();
 
+            TextView messageView = alertDialog.findViewById(android.R.id.message);
+            messageView.setGravity(Gravity.FILL);
         }
     }
 
@@ -355,19 +365,18 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     private void restartNetworkingIfChanged() {
 
+        if (!verifyProxyConfig()) {
+            Timber.w("cannot apply new proxy settings, proxy disabled");
+
+            //Disable proxy and proxy auth
+            mSharedPreferences.edit().putBoolean(getString(R.string.pref_use_proxy_key), false).apply();
+            mSharedPreferences.edit().putBoolean(getString(R.string.pref_proxy_auth_key), false).apply();
+        }
+
         if (mNetworkConfigChanged) {
             Timber.d("network config changed");
 
             mNetworkConfigChanged = false;
-
-            if (!verifyProxyConfig()) {
-                Timber.w("cannot apply new proxy settings, proxy disabled");
-
-                //Disable proxy and proxy auth
-                mSharedPreferences.edit().putBoolean(getString(R.string.pref_use_proxy_key), false).apply();
-                mSharedPreferences.edit().putBoolean(getString(R.string.pref_proxy_auth_key), false).apply();
-            }
-
             mMainApplication.rebuildAppComponent();
         }
     }

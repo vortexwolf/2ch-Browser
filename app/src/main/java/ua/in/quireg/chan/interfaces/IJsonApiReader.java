@@ -1,12 +1,17 @@
 package ua.in.quireg.chan.interfaces;
 
+import java.util.List;
+
 import ua.in.quireg.chan.exceptions.HtmlNotJsonException;
 import ua.in.quireg.chan.exceptions.JsonApiReaderException;
+import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.models.domain.PostModel;
 import ua.in.quireg.chan.models.domain.SearchPostListModel;
 import ua.in.quireg.chan.models.domain.ThreadModel;
+import ua.in.quireg.chan.mvp.models.BoardsListModel;
 
 public interface IJsonApiReader {
+
     ThreadModel[] readCatalog(String boardName, int filter, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException;
 
     ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException;

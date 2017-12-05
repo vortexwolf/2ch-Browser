@@ -18,14 +18,13 @@ import ua.in.quireg.chan.boards.makaba.models.MakabaBoardInfo;
 import ua.in.quireg.chan.models.domain.BoardModel;
 
 /**
- * Date 12/1/2017.
- *
- * @author Artur Menchenko
+ * Created by Arcturus Mengsk on 12/1/2017, 9:26 AM.
+ * 2ch-Browser
  */
 
-public class NetworkResponseReaderImpl implements NetworkResponseReader {
+public class ApiReaderImpl implements ApiReader {
 
-    public List<BoardModel> parseBoardsListResponse(Response response) throws IOException {
+    public List<BoardModel> readBoardsListResponse(Response response) throws IOException {
         ArrayList<BoardModel> models = new ArrayList<>();
 
         if (!response.isSuccessful()) {

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.StyleRes;
 
 import org.apache.http.cookie.Cookie;
@@ -28,13 +27,14 @@ import ua.in.quireg.chan.services.SerializationService;
 
 public class ApplicationSettings {
 
-    private final SharedPreferences mSharedPrefs;
-    private final Resources mResources;
+    private Resources mResources;
+    private SharedPreferences mSharedPrefs;
+
     private List<BoardModel> mBoards = null;
 
-    public ApplicationSettings(Context context) {
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public ApplicationSettings(Context context, SharedPreferences sharedPreferences)  {
         mResources = context.getResources();
+        mSharedPrefs = sharedPreferences;
     }
 
     public void savePassCodeCookie(Cookie cookie) {

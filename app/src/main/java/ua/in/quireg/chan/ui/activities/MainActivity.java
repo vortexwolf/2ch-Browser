@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
-import com.arellomobile.mvp.presenter.InjectPresenter;
 
 import javax.inject.Inject;
 
@@ -22,17 +20,18 @@ import butterknife.ButterKnife;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenterImpl;
+import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.mvp.views.MainActivityView;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 
-public class MainActivity extends MvpAppCompatActivity implements MainActivityView{
+public class MainActivity extends MvpAppCompatActivity implements MainActivityView {
 
     //TODO add settings change listener
 
     @Inject ApplicationSettings mApplicationSettings;
-    @InjectPresenter MainActivityPresenterImpl mMainActivityPresenterImpl;
+
+    @Inject MainActivityPresenter mMainActivityPresenter;
 
     @BindView(R.id.toolbar) protected Toolbar mToolbar;
     @BindView(R.id.bottom_tab) protected TabLayout mBottomTabLayout;
@@ -50,6 +49,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
+
         MainApplication.getAppComponent().inject(this);
 
         setTheme(mApplicationSettings.getTheme());
@@ -63,10 +64,28 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
 
         initBottomTabs();
 
+
         super.onCreate(savedInstanceState);
 
-        mBottomTabLayout.addOnTabSelectedListener(mMainActivityPresenterImpl);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMainActivityPresenter.onActivityAttached(this);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mBottomTabLayout.clearOnTabSelectedListeners();
+        mMainActivityPresenter.onActivityDetached();
+    }
+
+    @Override
+    public void registerOnTabSelectedListener(TabLayout.OnTabSelectedListener listener) {
+        mBottomTabLayout.addOnTabSelectedListener(listener);
     }
 
     @Override
@@ -100,13 +119,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
     }
 
     @Override
-    public void requestProvideFragmentManager() {
-        mMainActivityPresenterImpl.setFragmentManager(getSupportFragmentManager());
-    }
-
-    @Override
     public void onBackPressed() {
-        mMainActivityPresenterImpl.onBackPressed();
+        mMainActivityPresenter.onBackPressed();
     }
 
     private void initBottomTabs() {

@@ -13,6 +13,7 @@ import android.net.Uri;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.boards.makaba.MakabaSendPostMapper;
 import ua.in.quireg.chan.common.Constants;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.library.ExtendedHttpClient;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.common.utils.UriUtils;
@@ -25,22 +26,25 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class PostSender {
     private static final String TAG = "PostSender";
     private final DefaultHttpClient mHttpClient;
     private final Resources mResources;
     private final HttpStringReader mHttpStringReader;
     private final PostResponseParser mResponseParser;
-    private final ApplicationSettings mApplicationSettings;
+    @Inject protected ApplicationSettings mApplicationSettings;
     private final MakabaSendPostMapper mMakabaSendPostMapper;
 
-    public PostSender(DefaultHttpClient client, Resources resources, ApplicationSettings settings, HttpStringReader httpStringReader) {
+    public PostSender(DefaultHttpClient client, Resources resources, HttpStringReader httpStringReader) {
         this.mHttpClient = client;
         this.mResources = resources;
         this.mResponseParser = new PostResponseParser();
         this.mHttpStringReader = httpStringReader;
-        this.mApplicationSettings = settings;
         this.mMakabaSendPostMapper = new MakabaSendPostMapper();
+
+        MainApplication.getAppComponent().inject(this);
     }
 
     public SendPostResult sendPost(IWebsite website, String boardName, SendPostModel entity) {
