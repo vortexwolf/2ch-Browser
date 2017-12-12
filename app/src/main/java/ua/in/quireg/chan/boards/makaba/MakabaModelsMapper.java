@@ -97,7 +97,7 @@ public class MakabaModelsMapper {
 
         model.setBumpLimit(source.bump_limit);
         model.setCategory(source.category);
-        model.setDefault_name(source.default_name);
+        model.setDefaultName(source.default_name);
         model.setEnableLikes(source.enable_likes);
         model.setEnablePosting(source.enable_posting);
         model.setEnableThreadTags(source.enable_thread_tags);

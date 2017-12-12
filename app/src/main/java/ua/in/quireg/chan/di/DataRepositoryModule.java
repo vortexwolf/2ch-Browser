@@ -27,8 +27,9 @@ public class DataRepositoryModule {
     @AppScope
     BoardsRepository providesBoardsRepository(ApplicationSettings applicationSettings,
                                               ApiReader apiReader,
-                                              OkHttpClient okHttpClient) {
-        return new BoardsRepository(applicationSettings, apiReader, okHttpClient);
+                                              OkHttpClient okHttpClient,
+                                              Context context) {
+        return new BoardsRepository(applicationSettings, apiReader, okHttpClient, context);
     }
 
     @Provides

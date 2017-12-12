@@ -24,6 +24,7 @@ import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.CheckCloudflareTask;
 import ua.in.quireg.chan.asynctasks.DisplayImageUriTask;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.interfaces.ICheckCaptchaView;
@@ -51,6 +52,12 @@ public abstract class BaseListFragment extends Fragment implements SwipeRefreshL
     protected ListView mListView;
 
     protected boolean mVisible = false;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MainApplication.getAppComponent().inject(this);
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {

@@ -218,6 +218,9 @@ public class PostsListFragment extends BaseListFragment {
         }
     }
     private void updateTitle(String title) {
+        if(!isAdded()) {
+            return;
+        }
         String pageTitle = title != null
                 ? String.format(getString(R.string.data_thread_withsubject_title), mBoardName, title)
                 : String.format(getString(R.string.data_thread_title), mBoardName, mThreadNumber);

@@ -1,27 +1,17 @@
 package ua.in.quireg.chan.mvp.models;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import timber.log.Timber;
-import ua.in.quireg.chan.boards.makaba.MakabaModelsMapper;
-import ua.in.quireg.chan.boards.makaba.models.MakabaBoardInfo;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.db.FavoritesDataSource;
+import ua.in.quireg.chan.db.FavoritesEntity;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.settings.ApplicationSettings;
@@ -47,7 +37,9 @@ public class BoardsListModel {
             return getLocalVisibleBoards();
         } else {
             return Observable.zip(
-                    mBoardsRepository.getLocalBoards(), mBoardsRepository.getRemoteBoards(), (local, remote) -> {
+                    mBoardsRepository.getLocalBoards(),
+                    mBoardsRepository.getRemoteBoards(),
+                    (local, remote) -> {
 
                         ArrayList<BoardModel> empty = new ArrayList<>();
 
@@ -55,7 +47,7 @@ public class BoardsListModel {
                             Timber.e("Received empty boards list!");
 
                             return empty;
-                        } else if (!areEqual(local, remote) || local.isEmpty()) {
+                        } else if (!areEqual(remote, local) || local.isEmpty()) {
                             Timber.d("Boards list have expired, updating...");
 
                             mBoardsRepository.setLocalBoards(remote);
@@ -73,21 +65,36 @@ public class BoardsListModel {
 
     public Observable<List<BoardModel>> getFavoriteBoards() {
 
-        return Observable.fromIterable(mFavoritesDataSource.getFavoriteBoards())
+        return Observable.just(mFavoritesDataSource.getFavoriteBoards())
                 .subscribeOn(Schedulers.io())
-                .map((b) -> findBoardByCode(b.getBoard()))
-                .toList()
-                .toObservable();
-    }
+                .zipWith(mBoardsRepository.getLocalBoards(), (favoriteBoardsEntities, localBoards) -> {
 
-    public BoardModel findBoardByCode(String boardCode) {
+                    ArrayList<BoardModel> favoriteBoards = new ArrayList<>();
 
-        for (BoardModel board : mApplicationSettings.getBoards()) {
-            if (board.getId().equals(boardCode)) {
-                return board;
-            }
-        }
-        return null;
+                    for (FavoritesEntity fe: favoriteBoardsEntities) {
+                        boolean matchFound = false;
+
+                        for (BoardModel board : localBoards) {
+                            if (board.getId().equals(fe.getBoard())) {
+                                favoriteBoards.add(board);
+                                matchFound = true;
+                            }
+                        }
+
+                        if(!matchFound) {
+                            BoardModel boardModel = new BoardModel();
+
+                            if (fe.getBoard() != null) {
+                                boardModel.setId(fe.getBoard());
+                            }
+                            if (fe.getTitle() != null) {
+                                boardModel.setName(fe.getTitle());
+                            }
+                        }
+                    }
+                    return favoriteBoards;
+
+                });
     }
 
     public void addToFavorites(BoardModel boardModel) {
@@ -140,36 +147,4 @@ public class BoardsListModel {
         return mApplicationSettings.isDisplayAllBoards() || mApplicationSettings.getAllowedBoardsIds().contains(board.getId());
     }
 
-    public List<BoardModel> parseBoardsListResponse(Response response) throws IOException {
-        ArrayList<BoardModel> models = new ArrayList<>();
-
-        if (!response.isSuccessful()) {
-            Timber.e("Response was not successful");
-            response.close();
-            return models;
-        }
-
-        ObjectMapper mapper = new ObjectMapper()
-                .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        ResponseBody responseBody = response.body();
-        if (responseBody == null) {
-            Timber.e("responseBody is null");
-            return models;
-        }
-
-        JsonNode result = mapper.readValue(responseBody.string(), JsonNode.class);
-        response.close();
-
-        Iterator iterator = result.getElements();
-
-        while (iterator.hasNext()) {
-            JsonNode node = (JsonNode) iterator.next();
-
-            MakabaBoardInfo[] data = mapper.convertValue(node, MakabaBoardInfo[].class);
-
-            models.addAll(Arrays.asList(MakabaModelsMapper.mapBoardModels(data)));
-        }
-        return models;
-    }
 }

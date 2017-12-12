@@ -367,44 +367,6 @@ public class ApplicationSettings {
         return Arrays.asList(mResources.getStringArray(R.array.allowed_boards));
     }
 
-    @SuppressWarnings("unchecked")
-    public List<BoardModel> getBoards() {
-
-        //try to return in-memory list
-        if (mBoards != null && !mBoards.isEmpty()) {
-            return mBoards;
-        }
-
-        //try to return from previously serialized
-        try {
-            mBoards = (ArrayList<BoardModel>) SerializationService.deserializeFromString(
-                    mSharedPrefs.getString(mResources.getString(R.string.pref_boards_serialization_tag), null));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //return from assets
-        if (mBoards == null) {
-
-        }
-
-        return mBoards != null ? mBoards : new ArrayList<>();
-    }
-
-    public void setBoards(List<BoardModel> boards) {
-        mBoards = boards;
-        SharedPreferences.Editor editor = mSharedPrefs.edit();
-        try {
-            editor.putString(
-                    mResources.getString(R.string.pref_boards_serialization_tag),
-                    SerializationService.serializeToString((ArrayList<BoardModel>) boards)
-            );
-            editor.apply();
-        } catch (IOException e) {
-            Timber.d(e.getMessage());
-        }
-    }
-
     public boolean isSwipeToRefresh() {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_swipe_to_refresh_key), true);
     }

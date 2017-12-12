@@ -83,8 +83,10 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
     public void onBoardClick(String boardCode) {
         Timber.v("onBoardClick(String)");
 
-        if (validateBoardCode(boardCode) && mBoardsListModel.findBoardByCode(boardCode) != null) {
-            onBoardClick(mBoardsListModel.findBoardByCode(boardCode));
+        if (validateBoardCode(boardCode)) {
+            BoardModel boardModel = new BoardModel();
+            boardModel.setId(boardCode);
+            onBoardClick(boardModel);
         } else {
             getViewState().showBoardError(boardCode);
         }
