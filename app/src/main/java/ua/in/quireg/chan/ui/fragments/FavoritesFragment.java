@@ -25,14 +25,13 @@ import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.ui.adapters.FavoritesAdapter;
 
 public class FavoritesFragment extends BaseListFragment {
 
 
     @Inject FavoritesDataSource mDatasource;
-    @Inject MainActivityPresenter mNavigationController;
+    //@Inject MainActivityPresenter mNavigationController;
 
     private FavoritesAdapter mAdapter;
     private OpenDataSourceTask mCurrentTask = null;
@@ -66,9 +65,9 @@ public class FavoritesFragment extends BaseListFragment {
             FavoritesEntity item = mAdapter.getItem(position);
 
             if (StringUtils.isEmpty(item.getThread())) {
-                mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
+                //mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
             } else {
-                mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                //mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }

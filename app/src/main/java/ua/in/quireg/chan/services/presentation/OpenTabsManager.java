@@ -1,20 +1,18 @@
 package ua.in.quireg.chan.services.presentation;
 
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.interfaces.IWebsite;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
-
-import java.util.ArrayList;
-
-import javax.inject.Inject;
 
 public class OpenTabsManager {
 
     @Inject HistoryDataSource mDataSource;
-    @Inject MainActivityPresenter mMainActivityPresenter;
 
     private ArrayList<OpenTabModel> mTabs = new ArrayList<>();
 
@@ -51,9 +49,9 @@ public class OpenTabsManager {
 
     public void navigate(OpenTabModel tab) {
         if (StringUtils.isEmpty(tab.getThread())) {
-            mMainActivityPresenter.navigateBoard(tab.getWebsite().name(), tab.getBoard());
+            //mMainActivityPresenter.navigateBoard(tab.getWebsite().name(), tab.getBoard());
         } else {
-            mMainActivityPresenter.navigateThread(tab.getWebsite().name(), tab.getBoard(), tab.getThread(), tab.getTitle(), null, false);
+            //mMainActivityPresenter.navigateThread(tab.getWebsite().name(), tab.getBoard(), tab.getThread(), tab.getTitle(), null, false);
 
         }
     }

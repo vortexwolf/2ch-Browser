@@ -13,7 +13,7 @@ import dagger.Component;
 @Component(modules={BaseModule.class})
 public interface BaseComponent {
 
-    AppComponent plus(NetModule netModule, DataRepositoryModule dataRepositoryModule, WebsiteModule websiteModule);
+    AppComponent plus(NetModule netModule, DataRepositoryModule dataRepositoryModule, WebsiteModule websiteModule, NavigationModule navigationModule);
 
 
 }

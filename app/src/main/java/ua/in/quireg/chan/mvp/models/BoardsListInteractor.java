@@ -13,6 +13,7 @@ import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
 import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.models.presentation.BoardEntity;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
@@ -21,49 +22,49 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
  * 2ch-Browser
  */
 
-public class BoardsListModel {
+public class BoardsListInteractor {
 
     @Inject protected BoardsRepository mBoardsRepository;
     @Inject protected FavoritesDataSource mFavoritesDataSource;
     @Inject protected ApplicationSettings mApplicationSettings;
 
-    public BoardsListModel() {
+    public BoardsListInteractor() {
         MainApplication.getAppComponent().inject(this);
     }
 
-    public Observable<List<BoardModel>> getBoards(boolean localOnly) {
+    public Observable<List<BoardEntity>> getBoards(boolean localOnly) {
 
         if (localOnly) {
             return getLocalVisibleBoards();
-        } else {
-            return Observable.zip(
-                    mBoardsRepository.getLocalBoards(),
-                    mBoardsRepository.getRemoteBoards(),
-                    (local, remote) -> {
-
-                        ArrayList<BoardModel> empty = new ArrayList<>();
-
-                        if (remote == null || remote.isEmpty()) {
-                            Timber.e("Received empty boards list!");
-
-                            return empty;
-                        } else if (!areEqual(remote, local) || local.isEmpty()) {
-                            Timber.d("Boards list have expired, updating...");
-
-                            mBoardsRepository.setLocalBoards(remote);
-                            return remote;
-                        } else {
-                            Timber.d("Boards are up to date ^_^");
-
-                            return empty;
-                        }
-                    })
-                    .startWith(getLocalVisibleBoards())
-                    .filter(boardModels -> !boardModels.isEmpty());
         }
+
+        return Observable.combineLatest(
+                mBoardsRepository.getLocalBoards(),
+                mBoardsRepository.getRemoteBoards(),
+                (local, remote) -> {
+
+                    if (remote == null || remote.isEmpty()) {
+                        Timber.e("Received empty boards list!");
+
+                        return local;
+                    } else if (!areEqual(remote, local) || local.isEmpty()) {
+                        Timber.d("Boards list have expired, updating...");
+
+                        mBoardsRepository.setLocalBoards(remote);
+                        return remote;
+                    } else {
+                        Timber.d("Boards are up to date ^_^");
+
+                        return local;
+                    }
+                })
+                .filter(boards -> !boards.isEmpty())
+                .map(this::removeHiddenBoards)
+                .map(this::mapBoardModelsToEntities);
+
     }
 
-    public Observable<List<BoardModel>> getFavoriteBoards() {
+    public Observable<List<BoardEntity>> getFavoriteBoards() {
 
         return Observable.just(mFavoritesDataSource.getFavoriteBoards())
                 .subscribeOn(Schedulers.io())
@@ -71,7 +72,7 @@ public class BoardsListModel {
 
                     ArrayList<BoardModel> favoriteBoards = new ArrayList<>();
 
-                    for (FavoritesEntity fe: favoriteBoardsEntities) {
+                    for (FavoritesEntity fe : favoriteBoardsEntities) {
                         boolean matchFound = false;
 
                         for (BoardModel board : localBoards) {
@@ -81,36 +82,60 @@ public class BoardsListModel {
                             }
                         }
 
-                        if(!matchFound) {
-                            BoardModel boardModel = new BoardModel();
+                        if (!matchFound) {
+                            BoardEntity boardEntity = new BoardEntity();
 
                             if (fe.getBoard() != null) {
-                                boardModel.setId(fe.getBoard());
+                                boardEntity.id = fe.getBoard();
                             }
                             if (fe.getTitle() != null) {
-                                boardModel.setName(fe.getTitle());
+                                boardEntity.boardName = fe.getTitle();
                             }
                         }
                     }
                     return favoriteBoards;
 
-                });
+                })
+                .map(this::mapBoardModelsToEntities);
     }
 
-    public void addToFavorites(BoardModel boardModel) {
-        mFavoritesDataSource.addToFavorites(Websites.getDefault().name(), boardModel.getId(), null, null);
+    public void addToFavorites(BoardEntity boardEntity) {
+        mFavoritesDataSource.addToFavorites(Websites.getDefault().name(), boardEntity.id, null, null);
     }
 
-    public void removeFromFavorites(BoardModel boardModel) {
-        mFavoritesDataSource.removeFromFavorites(Websites.getDefault().name(), boardModel.getId(), null);
+    public void removeFromFavorites(BoardEntity boardEntity) {
+        mFavoritesDataSource.removeFromFavorites(Websites.getDefault().name(), boardEntity.id, null);
     }
 
-    public boolean isFavorite(BoardModel boardModel) {
-        return !mFavoritesDataSource.hasFavorites(Websites.getDefault().name(), boardModel.getId(), null);
+    public boolean isFavorite(BoardEntity boardEntity) {
+        return !mFavoritesDataSource.hasFavorites(Websites.getDefault().name(), boardEntity.id, null);
     }
 
-    private Observable<List<BoardModel>> getLocalVisibleBoards() {
-        return mBoardsRepository.getLocalBoards().map(this::removeHiddenBoards);
+    private Observable<List<BoardEntity>> getLocalVisibleBoards() {
+        return mBoardsRepository.getLocalBoards()
+                .map(this::removeHiddenBoards)
+                .map(this::mapBoardModelsToEntities);
+
+    }
+
+    private List<BoardEntity> mapBoardModelsToEntities(List<BoardModel> models) {
+        List<BoardEntity> boardEntities = new ArrayList<>();
+
+        for (BoardModel model : models) {
+            boardEntities.add(mapBoardModelToEntity(model));
+        }
+        return boardEntities;
+    }
+
+    private BoardEntity mapBoardModelToEntity(BoardModel model) {
+        BoardEntity e = new BoardEntity();
+
+        e.id = model.getId();
+        e.boardName = model.getBoardName();
+        e.bumpLimit = model.getBumpLimit();
+        e.category = model.getCategory();
+
+        return e;
     }
 
     private List<BoardModel> removeHiddenBoards(List<BoardModel> boards) {

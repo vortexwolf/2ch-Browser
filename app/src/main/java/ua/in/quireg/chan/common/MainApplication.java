@@ -31,11 +31,12 @@ import ua.in.quireg.chan.db.DvachSqlHelper;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
-import ua.in.quireg.chan.di.BaseComponent;
 import ua.in.quireg.chan.di.AppComponent;
+import ua.in.quireg.chan.di.BaseComponent;
 import ua.in.quireg.chan.di.BaseModule;
 import ua.in.quireg.chan.di.DaggerBaseComponent;
 import ua.in.quireg.chan.di.DataRepositoryModule;
+import ua.in.quireg.chan.di.NavigationModule;
 import ua.in.quireg.chan.di.NetModule;
 import ua.in.quireg.chan.di.WebsiteModule;
 import ua.in.quireg.chan.services.BitmapManager;
@@ -177,7 +178,7 @@ public class MainApplication extends Application {
     }
 
     protected AppComponent buildComponent() {
-        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule());
+        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule(), new NavigationModule());
     }
 
     public BaseComponent buildBaseComponent() {

@@ -32,6 +32,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import org.apache.http.protocol.HTTP;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Locale;
 
 import pl.droidsonroids.gif.GifDrawable;
@@ -393,8 +394,7 @@ public class AppearanceUtils {
         CompatibilityUtils.setDisplayZoomControls(settings, isDisplayZoomControls);
     }
 
-
-    public static class ListViewPosition {
+    public static class ListViewPosition implements Serializable {
 
         public ListViewPosition(int position, int top) {
             this.position = position;

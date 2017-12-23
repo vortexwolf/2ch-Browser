@@ -1,29 +1,58 @@
 package ua.in.quireg.chan.mvp.presenters;
 
-import android.net.Uri;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.StringRes;
+import android.support.design.widget.TabLayout;
+
+import com.arellomobile.mvp.InjectViewState;
+import com.arellomobile.mvp.MvpPresenter;
+
+import javax.inject.Inject;
+
+import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
+import ua.in.quireg.chan.mvp.routing.commands.SwitchTab;
+import ua.in.quireg.chan.mvp.views.MainActivityView;
 
 /**
- * Created by Arcturus Mengsk on 12/1/2017, 10:33 AM.
+ * Created by Arcturus Mengsk on 12/1/2017, 6:36 AM.
  * 2ch-Browser
  */
 
-public interface MainActivityPresenter {
+@InjectViewState
+public class MainActivityPresenter extends MvpPresenter<MainActivityView> {
 
-    void onActivityAttached(AppCompatActivity activity);
+    @Inject MainRouter mMainRouter;
 
-    void onActivityDetached();
+    public MainActivityPresenter() {
+        MainApplication.getAppComponent().inject(this);
+    }
 
-    void onBackPressed();
+    public void onTabSelected(TabLayout.Tab tab) {
 
-    void pushFragment(Fragment fragment);
+        getViewState().updateTabSelection(tab.getPosition());
+        mMainRouter.execute(new SwitchTab(tab.getPosition()));
+    }
 
-    void navigateBoard(String website, String board);
+    public void onBackPressed() {
+        mMainRouter.execute(new NavigateBackwards());
+    }
 
-    void navigateThread(String website, String board, String thread, String subject, String post, boolean preferDeserialized);
+    public void updateToolbarControls(boolean isRootFrag) {
+        getViewState().updateToolbarControls(isRootFrag);
+    }
 
-    void navigateGallery(Uri imageUri, String threadUrl);
+    public void updateTabSelection(int currentTab) {
+        getViewState().updateTabSelection(currentTab);
+    }
 
-    void navigateCatalog(String website, String board);
+    public void exitApplication() {
+        getViewState().exitApplication();
+    }
+
+    public void sendShortToast(@StringRes int stringId) {
+        getViewState().showSystemMessage(stringId);
+    }
+
+
 }

@@ -1,13 +1,12 @@
 package ua.in.quireg.chan.mvp.views;
 
 import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.SingleStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
-import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.models.presentation.BoardEntity;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 2:31 PM.
@@ -16,18 +15,18 @@ import ua.in.quireg.chan.models.domain.BoardModel;
 @StateStrategyType(SkipStrategy.class)
 public interface BoardsListView extends MvpView {
 
-    void setBoards(List<BoardModel> boardModels);
+    void setBoards(List<BoardEntity> boardModels);
 
-    void setFavBoards(List<BoardModel> boardModels);
+    void setFavBoards(List<BoardEntity> boardModels);
+
+    void restoreListViewPosition();
 
     void clearBoards();
 
-    void addFavoriteBoard(BoardModel boardModel);
+    void addFavoriteBoard(BoardEntity boardModel);
 
-    void removeFavoriteBoard(BoardModel boardModel);
+    void removeFavoriteBoard(BoardEntity boardModel);
 
     void hideSoftKeyboard();
-
-    void showBoardError(String board);
 
 }

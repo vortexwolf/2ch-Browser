@@ -1,14 +1,14 @@
-package ua.in.quireg.chan.ui.views;
+package ua.in.quireg.chan.mvp.routing;
 
 import java.util.ArrayList;
 
 import timber.log.Timber;
 
-public class FragmentHistory {
+public class TabsTransactionHistory {
 
     private ArrayList<Integer> stackArr;
 
-    public FragmentHistory() {
+    public TabsTransactionHistory() {
         stackArr = new ArrayList<>();
 
     }
@@ -21,44 +21,44 @@ public class FragmentHistory {
             Timber.v("entry %d exists, not pushed", entry);
         }
         stackArr.add(entry);
-        printHistoryStack();
-    }
-
-    private boolean isAlreadyExists(int entry) {
-        return (stackArr.contains(entry));
+        //printHistoryStack();
     }
 
     public int pop() {
-
         Timber.v("pop()");
+
         int entry = -1;
 
         if (!isEmpty()) {
             stackArr.remove(stackArr.size() - 1);
         }
 
-        if(!isEmpty()){
+        if (!isEmpty()) {
             entry = stackArr.get(stackArr.size() - 1);
         }
         Timber.v("pop() returned %d", entry);
-        printHistoryStack();
+        //printHistoryStack();
+
         return entry;
     }
 
-    public int popPrevious() {
-        Timber.v("popPrevious()");
-
-        int entry = -1;
-
-        if (!isEmpty() && stackArr.size() > 2) {
-            entry = stackArr.get(stackArr.size() - 2);
-            stackArr.remove(stackArr.size() - 2);
-        }
-        Timber.v("popPrevious() returned %d", entry);
-        return entry;
+    private boolean isAlreadyExists(int entry) {
+        return (stackArr.contains(entry));
     }
 
-
+//    public int popPrevious() {
+//        Timber.v("popPrevious()");
+//
+//        int entry = -1;
+//
+//        if (!isEmpty() && stackArr.size() > 2) {
+//            entry = stackArr.get(stackArr.size() - 2);
+//            stackArr.remove(stackArr.size() - 2);
+//        }
+//        Timber.v("popPrevious() returned %d", entry);
+//        return entry;
+//    }
+//
     /**
      * This method returns top of the stack
      * without removing it.
@@ -73,22 +73,19 @@ public class FragmentHistory {
         return -1;
     }
 
-
     public boolean isEmpty() {
         return (stackArr.size() == 0);
     }
-
 
     public int getStackSize() {
         return stackArr.size();
     }
 
     public void emptyStack() {
-
         stackArr.clear();
     }
 
-    private void printHistoryStack(){
+    private void printHistoryStack() {
         Timber.v("history stack: ");
         for (int i = 0; i < stackArr.size(); i++) {
             Timber.v("Position %d, tab: %d", i, stackArr.get(i));

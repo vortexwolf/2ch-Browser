@@ -19,14 +19,16 @@ import android.widget.AdapterView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.ui.adapters.PostsListAdapter;
 import ua.in.quireg.chan.asynctasks.DownloadFileListTask;
 import ua.in.quireg.chan.asynctasks.DownloadFileTask;
 import ua.in.quireg.chan.asynctasks.DownloadPostsTask;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.CompatibilityUtils;
@@ -44,8 +46,8 @@ import ua.in.quireg.chan.models.presentation.IPostListEntity;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.StatusIndicatorEntity;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.services.BrowserLauncher;
-import ua.in.quireg.chan.services.NavigationService;
 import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.services.TimerService;
 import ua.in.quireg.chan.services.presentation.ListViewScrollListener;
@@ -54,11 +56,14 @@ import ua.in.quireg.chan.services.presentation.PagesSerializationService;
 import ua.in.quireg.chan.services.presentation.PostItemViewBuilder;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
+import ua.in.quireg.chan.ui.adapters.PostsListAdapter;
 
 import static android.app.Activity.RESULT_OK;
 
 
 public class PostsListFragment extends BaseListFragment {
+
+    @Inject MainRouter mRouter;
 
     private IJsonApiReader mJsonReader;
     private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
@@ -67,7 +72,6 @@ public class PostsListFragment extends BaseListFragment {
     private final HistoryDataSource mHistoryDataSource = Factory.resolve(HistoryDataSource.class);
     private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
-    private final NavigationService mNavigationService = Factory.resolve(NavigationService.class);
 
     private IUrlBuilder mUrlBuilder;
     private PostsListAdapter mAdapter = null;
@@ -87,6 +91,7 @@ public class PostsListFragment extends BaseListFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
 
         //mCurrentSettings = mSettings.getCurrentSettings();
@@ -190,7 +195,8 @@ public class PostsListFragment extends BaseListFragment {
         if (Constants.SDK_VERSION > 7) {
             mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
         }
-        boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED) || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+        boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED)
+                || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
 
         LoadPostsTask task = new LoadPostsTask(preferDeserialized);
         task.execute();
@@ -243,6 +249,9 @@ public class PostsListFragment extends BaseListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                break;
             case R.id.refresh_menu_id:
                 refreshPosts(true);
                 break;

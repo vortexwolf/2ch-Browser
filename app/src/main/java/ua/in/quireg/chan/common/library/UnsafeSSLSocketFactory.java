@@ -1,8 +1,11 @@
 package ua.in.quireg.chan.common.library;
 
+import android.annotation.SuppressLint;
+
+import org.apache.http.conn.ssl.SSLSocketFactory;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -15,28 +18,26 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
-
-/** 
- *  Warning! This omits SSL certificate validation!
- *  Added for compatibility with Android 2.2 and older
+/**
+ * Warning! This omits SSL certificate validation!
  */
 
 public class UnsafeSSLSocketFactory extends SSLSocketFactory {
-    
-    SSLContext sslContext = SSLContext.getInstance("TLS");
-    
+
+    private SSLContext mSslContext = SSLContext.getInstance("TLS");
+
     public static UnsafeSSLSocketFactory getSocketFactory() {
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);
             return new UnsafeSSLSocketFactory(trustStore);
         } catch (Exception e) {
+            return null;
         }
-        return null;
     }
-    
-    public UnsafeSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+
+    @SuppressLint("TrustAllX509TrustManager")
+    private UnsafeSSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
         super(truststore);
 
         TrustManager tm = new X509TrustManager() {
@@ -51,16 +52,16 @@ public class UnsafeSSLSocketFactory extends SSLSocketFactory {
             }
         };
 
-        sslContext.init(null, new TrustManager[] { tm }, null);
+        mSslContext.init(null, new TrustManager[]{tm}, null);
     }
 
     @Override
-    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException {
-        return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+    public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
+        return mSslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
     }
 
     @Override
     public Socket createSocket() throws IOException {
-        return sslContext.getSocketFactory().createSocket();
+        return mSslContext.getSocketFactory().createSocket();
     }
 }

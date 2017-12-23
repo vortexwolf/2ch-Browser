@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 import java.util.Arrays;
@@ -128,6 +127,7 @@ public class ThreadPostUtils {
             // open a gallery fragment
             //TODO not forget to clean this
             //NavigationService.getInstance().navigateGallery(uri, attachment.getThreadUrl());
+
             Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
             imageGallery.setData(uri);
             imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -174,12 +174,8 @@ public class ThreadPostUtils {
         // clear the image content
         imageView.setTag(thumbnailUrl);
         imageView.setImageResource(android.R.color.transparent);
-        imageView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Обработчик события нажатия на картинку
-                ThreadPostUtils.openAttachment(attachment, v.getContext());
-            }
+        imageView.setOnClickListener(v -> {
+            ThreadPostUtils.openAttachment(attachment, v.getContext());
         });
 
         if (isBusy && shouldLoadFromWeb(attachment)) {

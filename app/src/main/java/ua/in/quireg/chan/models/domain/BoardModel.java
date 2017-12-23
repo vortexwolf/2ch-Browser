@@ -1,159 +1,118 @@
 package ua.in.quireg.chan.models.domain;
 
-
-import android.support.annotation.NonNull;
-
 import java.io.Serializable;
 
-import ua.in.quireg.chan.boards.makaba.models.MakabaIconInfo;
-import ua.in.quireg.chan.models.presentation.IBoardListEntity;
+public class BoardModel implements Serializable {
 
-public class BoardModel implements Serializable, IBoardListEntity {
+    private String mId = "?"; // /mov
+    private String mBoardName = "Unknown"; //Movies
+    private String mCategory = "БЕЗНОГNМ"; //Взрослым
+    private String mUserDefaultName = "OP"; //Аноним
 
-    private String id; // /mov
-    private String name; //Movies
-    private String bumpLimit; //500
-    private String category;
-    private String defaultName;
-    private int enableLikes;
-    private int enablePosting;
-    private int enableThreadTags;
-    private int pages;
-    private int sage;
-    private int tripcodes;
-    private MakabaIconInfo[] icons;
+    private int mPagesCount = 0;
+    private int mBumpLimit = 0;
 
-    @NonNull
-    public String getBumpLimit() {
-        if (bumpLimit == null) {
-            return "?";
-        }
-        return bumpLimit;
+    private boolean mLikes = false;
+    private boolean mPosting = false;
+    private boolean mThreadTags = false;
+    private boolean mSage = false;
+    private boolean mTripcodes = false;
+    private BoardIconModel[] mBoardIconModels = new BoardIconModel[1];
+
+    public int getBumpLimit() {
+        return mBumpLimit;
     }
-    @NonNull
+
     public String getCategory() {
-        if (category == null) {
-            return "?";
-        }
-        return category;
-    }
-    @NonNull
-    public String getDefaultName() {
-        if (defaultName == null) {
-            return "?";
-        }
-        return defaultName;
+        return mCategory;
     }
 
-    public int isEnableLikes() {
-        return enableLikes;
+    public String getUserDefaultName() {
+        return mUserDefaultName;
     }
 
-    public int isEnablePosting() {
-        return enablePosting;
+    public boolean isThreadTags() {
+        return mThreadTags;
     }
 
-    public int isEnableThreadTags() {
-        return enableThreadTags;
+    public boolean isLikes() {
+        return mLikes;
     }
-    @NonNull
+
+    public boolean isPosting() {
+        return mPosting;
+    }
+
     public String getId() {
-        if (id == null) {
-            return "-1";
-        }
-        return id;
+        return mId;
     }
-    @NonNull
-    public String getName() {
-        if (name == null) {
-            return "Unknown";
-        }
-        return name;
+
+    public String getBoardName() {
+        return mBoardName;
     }
 
     public int getPages() {
-        return pages;
+        return mPagesCount;
     }
 
-    public int getSage() {
-        return sage;
+    public boolean isSage() {
+        return mSage;
     }
 
-    public int getTripcodes() {
-        return tripcodes;
+    public boolean isTripcodes() {
+        return mTripcodes;
     }
 
-    @NonNull
-    public MakabaIconInfo[] getIcons() {
-        if (icons == null) {
-            return new MakabaIconInfo[1];
-        }
-        return icons;
+    public BoardIconModel[] getIcons() {
+        return mBoardIconModels;
     }
 
-    @Override
-    public boolean isSection() {
-        return false;
+    public void setBumpLimit(int bumpLimit) {
+        this.mBumpLimit = bumpLimit;
     }
-
-
-    public void setBumpLimit(String bump_limit) {
-        this.bumpLimit = bump_limit;
-    }
-
 
     public void setCategory(String category) {
-        this.category = category;
+        this.mCategory = category;
     }
 
-
-    public void setDefaultName(String defaultName) {
-        this.defaultName = defaultName;
+    public void setUserDefaultName(String userDefaultName) {
+        this.mUserDefaultName = userDefaultName;
     }
 
-
-    public void setEnableLikes(int enable_likes) {
-        this.enableLikes = enable_likes;
+    public void setEnableLikes(boolean enableLikes) {
+        this.mLikes = enableLikes;
     }
 
-
-    public void setEnablePosting(int enable_posting) {
-        this.enablePosting = enable_posting;
+    public void setEnablePosting(boolean enablePosting) {
+        this.mPosting = enablePosting;
     }
 
-
-    public void setEnableThreadTags(int enable_thread_tags) {
-        this.enableThreadTags = enable_thread_tags;
+    public void setThreadTags(boolean threadTags) {
+        this.mThreadTags = threadTags;
     }
-
 
     public void setId(String id) {
-        this.id = id;
+        this.mId = id;
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    public void setBoardName(String name) {
+        this.mBoardName = name;
     }
-
 
     public void setPages(int pages) {
-        this.pages = pages;
+        this.mPagesCount = pages;
     }
 
-
-    public void setSage(int sage) {
-        this.sage = sage;
+    public void setSage(boolean sage) {
+        this.mSage = sage;
     }
 
-
-    public void setTripcodes(int tripcodes) {
-        this.tripcodes = tripcodes;
+    public void setTripcodes(boolean tripcodes) {
+        this.mTripcodes = tripcodes;
     }
 
-
-    public void setIcons(MakabaIconInfo[] icons) {
-        this.icons = icons;
+    public void setIcons(BoardIconModel[] icons) {
+        this.mBoardIconModels = icons;
     }
 
 }

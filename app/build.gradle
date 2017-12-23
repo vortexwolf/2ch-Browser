@@ -15,7 +15,6 @@ ext {
 dependencies {
 
     //Triage this:
-    implementation fileTree(include: '*.jar', dir: 'libs')
     implementation group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.6'
     implementation group: 'org.ccil.cowan.tagsoup', name: 'tagsoup', version: '1.2.1'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.7.3'
@@ -29,8 +28,7 @@ dependencies {
 
     //Design
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.9'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.6.0'
 
     //Fragment navigation
@@ -77,14 +75,14 @@ configurations {
 android {
     useLibrary 'org.apache.http.legacy'
 
-//    signingConfigs {
-//        config {
-//            keyAlias keystoreProperties['keyAlias']
-//            keyPassword keystoreProperties['keyPassword']
-//            storeFile file(keystoreProperties['storeFile'])
-//            storePassword keystoreProperties['storePassword']
-//        }
-//    }
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
 
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
@@ -98,10 +96,9 @@ android {
 
         buildConfigField("String", "CAPTCHA_API_PUBLIC_KEY", keystoreProperties['CAPTCHA_API_PUBLIC_KEY'])
         buildConfigField("String", "CAPTCHA_API_PRIVATE_KEY", keystoreProperties['CAPTCHA_API_PRIVATE_KEY'])
-        buildConfigField "long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField("long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L")
     }
     packagingOptions {
-
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/ASL2.0'

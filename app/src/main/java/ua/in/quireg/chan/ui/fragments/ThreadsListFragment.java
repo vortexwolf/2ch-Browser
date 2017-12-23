@@ -1,6 +1,5 @@
 package ua.in.quireg.chan.ui.fragments;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -19,13 +18,11 @@ import android.widget.Spinner;
 import javax.inject.Inject;
 
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
-import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 import ua.in.quireg.chan.asynctasks.DownloadThreadsTask;
 import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
@@ -40,6 +37,8 @@ import ua.in.quireg.chan.models.domain.ThreadModel;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.services.CloudflareCheckService;
 import ua.in.quireg.chan.services.presentation.ClickListenersFactory;
@@ -49,14 +48,15 @@ import ua.in.quireg.chan.services.presentation.PagesSerializationService;
 import ua.in.quireg.chan.services.presentation.PostItemViewBuilder;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
+import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 
 public class ThreadsListFragment extends BaseListFragment{
 
-    @Inject MainActivityPresenter mMainActivityPresenter;
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
     @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
 
+    @Inject MainRouter mRouter;
 
     private IJsonApiReader mJsonReader = Factory.resolve(MakabaApiReader.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
@@ -267,7 +267,7 @@ public class ThreadsListFragment extends BaseListFragment{
                 navigateToCatalog();
                 break;
             case android.R.id.home:
-                ;
+                getActivity().onBackPressed();
                 break;
             case R.id.add_remove_favorites_menu_id:
                 if (mFavoritesDatasource.hasFavorites(mWebsite.name(), mBoardName, null)) {
@@ -389,8 +389,7 @@ public class ThreadsListFragment extends BaseListFragment{
     }
 
     private void navigateToThread(String threadNumber, String threadSubject) {
-
-        mMainActivityPresenter.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
+        mRouter.execute(new NavigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false));
 
     }
 

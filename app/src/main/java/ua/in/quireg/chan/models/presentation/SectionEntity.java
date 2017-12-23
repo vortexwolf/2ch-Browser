@@ -2,7 +2,8 @@ package ua.in.quireg.chan.models.presentation;
 
 import android.support.annotation.NonNull;
 
-public class SectionEntity implements IBoardListEntity {
+public class SectionEntity implements BoardsListEntity {
+
     private final String mTitle;
 
     public SectionEntity(@NonNull String title) {

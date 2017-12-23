@@ -1,6 +1,5 @@
 package ua.in.quireg.chan.ui.fragments;
 
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +29,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.DownloadFileTask;
 import ua.in.quireg.chan.common.Constants;
@@ -48,10 +51,6 @@ import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.views.SelectiveViewPager;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ImageGalleryFragment extends Fragment implements SelectiveViewPager.OnSingleClickListener{
 
@@ -130,7 +129,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        View fragment_container = view.getRootView().findViewById(R.id.container);
+        View fragment_container = view.getRootView().findViewById(R.id.base_activity_container);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) fragment_container.getLayoutParams();
         layoutParams.removeRule(RelativeLayout.BELOW);
         layoutParams.removeRule(RelativeLayout.ABOVE);
@@ -192,7 +191,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     @Override
     public void onDestroyView() {
 
-        View container = getView().getRootView().findViewById(R.id.container);
+        View container = getView().getRootView().findViewById(R.id.base_activity_container);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) container.getLayoutParams();
         layoutParams.addRule(RelativeLayout.BELOW, R.id.toolbar_layout);
         layoutParams.addRule(RelativeLayout.ABOVE, R.id.bottom_tab_layout);

@@ -10,12 +10,11 @@ import android.widget.TextView;
 
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.models.domain.BoardModel;
-import ua.in.quireg.chan.models.presentation.IBoardListEntity;
+import ua.in.quireg.chan.models.presentation.BoardEntity;
+import ua.in.quireg.chan.models.presentation.BoardsListEntity;
 import ua.in.quireg.chan.models.presentation.SectionEntity;
 
-public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
+public class BoardsListAdapter extends ArrayAdapter<BoardsListEntity> {
 
     private static final int ITEM_VIEW_TYPE_BOARD = 0;
     private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
@@ -36,9 +35,9 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
     @Override
     public int getItemViewType(int position) {
 
-        IBoardListEntity item = getItem(position);
+        BoardsListEntity item = getItem(position);
 
-        if (item.isSection()){
+        if (item.isSection()) {
             return ITEM_VIEW_TYPE_SEPARATOR;
         } else {
             return ITEM_VIEW_TYPE_BOARD;
@@ -47,7 +46,7 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
 
     @Override
     public boolean isEnabled(int position) {
-        switch (getItemViewType(position)){
+        switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_SEPARATOR:
                 return false;
             case ITEM_VIEW_TYPE_BOARD:
@@ -61,9 +60,9 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-        IBoardListEntity item = getItem(position);
+        BoardsListEntity item = getItem(position);
 
-        if(item == null){
+        if (item == null) {
             Timber.e("Something went wrong - getItem() returned null");
             return new View(getContext());
         }
@@ -87,18 +86,13 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.pick_board_board, parent, false);
                 }
 
-                BoardModel boardModel = (BoardModel) item;
+                BoardEntity boardEntity = (BoardEntity) item;
 
                 final TextView boardName = convertView.findViewById(R.id.pick_board_name);
                 final TextView boardBumpLimit = convertView.findViewById(R.id.pick_board_bump_limit);
 
-                String description = !StringUtils.isEmpty(boardModel.getName())
-                        ? boardModel.getId() + " - " + boardModel.getName()
-                        : boardModel.getId();
-
-                String bumpLimit = !StringUtils.isEmpty(boardModel.getBumpLimit())
-                        ? boardModel.getBumpLimit()
-                        : "?";
+                String description = String.format("%s - %s", boardEntity.id, boardEntity.boardName);
+                String bumpLimit = String.valueOf(boardEntity.bumpLimit);
 
                 boardName.setText(description);
                 boardBumpLimit.setText(bumpLimit);
@@ -115,18 +109,18 @@ public class BoardsListAdapter extends ArrayAdapter<IBoardListEntity> {
         mFavoritesCount = 0;
     }
 
-    public void addItemToFavoritesSection(BoardModel boardModel) {
+    public void addItemToFavoritesSection(BoardEntity boardEntity) {
         if (mFavoritesCount == 0) {
             insert(new SectionEntity(getContext().getString(R.string.favorites)), FAVORITES_SECTION_POSITION);
         }
         mFavoritesCount++;
 
-        insert(boardModel, mFavoritesCount);
+        insert(boardEntity, mFavoritesCount);
     }
 
-    public void removeItemFromFavoritesSection(BoardModel boardModel) {
+    public void removeItemFromFavoritesSection(BoardEntity boardEntity) {
         mFavoritesCount = Math.max(0, mFavoritesCount - 1);
-        remove(boardModel);
+        remove(boardEntity);
 
         if (mFavoritesCount == 0) {
             remove(getItem(FAVORITES_SECTION_POSITION));

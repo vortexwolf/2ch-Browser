@@ -11,12 +11,16 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
+import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.models.domain.BoardModel;
-import ua.in.quireg.chan.mvp.models.BoardsListModel;
+import ua.in.quireg.chan.models.presentation.BoardEntity;
+import ua.in.quireg.chan.mvp.models.BoardsListInteractor;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
+import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
 
 /**
@@ -27,16 +31,14 @@ import ua.in.quireg.chan.mvp.views.BoardsListView;
 @InjectViewState
 public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
-    @Inject MainActivityPresenter mMainActivityPresenter;
+    @Inject MainRouter mMainRouter;
+
+    private BoardsListInteractor mBoardsListInteractor = new BoardsListInteractor();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private boolean mFirstViewAttached = false;
 
-    private BoardsListModel mBoardsListModel = new BoardsListModel();
-
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     public BoardsListPresenter() {
-        super();
         MainApplication.getAppComponent().inject(this);
     }
 
@@ -65,13 +67,14 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
         compositeDisposable.add(
                 Observable.combineLatest(
-                        mBoardsListModel.getBoards(localOnly).observeOn(AndroidSchedulers.mainThread()),
-                        mBoardsListModel.getFavoriteBoards().observeOn(AndroidSchedulers.mainThread()),
+                        mBoardsListInteractor.getBoards(localOnly).observeOn(AndroidSchedulers.mainThread()),
+                        mBoardsListInteractor.getFavoriteBoards().observeOn(AndroidSchedulers.mainThread()),
                         (boards, favBoards) -> {
 
                             getViewState().clearBoards();
                             getViewState().setBoards(boards);
                             getViewState().setFavBoards(favBoards);
+                            getViewState().restoreListViewPosition();
 
                             return boards;
                         })
@@ -84,41 +87,41 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         Timber.v("onBoardClick(String)");
 
         if (validateBoardCode(boardCode)) {
-            BoardModel boardModel = new BoardModel();
-            boardModel.setId(boardCode);
-            onBoardClick(boardModel);
+            BoardEntity boardEntity = new BoardEntity();
+            boardEntity.id = boardCode;
+            onBoardClick(boardEntity);
         } else {
-            getViewState().showBoardError(boardCode);
+            mMainRouter.execute(new SendShortToast(R.string.warning_enter_board));
         }
 
     }
 
-    public void onBoardClick(BoardModel boardModel) {
+    public void onBoardClick(BoardEntity boardEntity) {
         Timber.v("onBoardClick(BoardModel)");
         getViewState().hideSoftKeyboard();
 
-        mMainActivityPresenter.navigateBoard(Websites.getDefault().name(), boardModel.getId());
+        mMainRouter.execute(new NavigateBoard(Websites.getDefault().name(), boardEntity.id, true));
 
     }
 
-    public boolean isFavoriteBoard(BoardModel boardModel) {
+    public boolean isFavoriteBoard(BoardEntity boardEntity) {
         Timber.v("isFavorite()");
 
-        return mBoardsListModel.isFavorite(boardModel);
+        return mBoardsListInteractor.isFavorite(boardEntity);
     }
 
-    public void addToFavorites(BoardModel boardModel) {
+    public void addToFavorites(BoardEntity boardEntity) {
         Timber.v("addToFavorites()");
 
-        getViewState().addFavoriteBoard(boardModel);
-        mBoardsListModel.addToFavorites(boardModel);
+        getViewState().addFavoriteBoard(boardEntity);
+        mBoardsListInteractor.addToFavorites(boardEntity);
     }
 
-    public void removeFromFavorites(BoardModel boardModel) {
+    public void removeFromFavorites(BoardEntity boardEntity) {
         Timber.v("removeFromFavorites()");
 
-        getViewState().removeFavoriteBoard(boardModel);
-        mBoardsListModel.removeFromFavorites(boardModel);
+        getViewState().removeFavoriteBoard(boardEntity);
+        mBoardsListInteractor.removeFromFavorites(boardEntity);
     }
 
     private boolean validateBoardCode(String boardCode) {

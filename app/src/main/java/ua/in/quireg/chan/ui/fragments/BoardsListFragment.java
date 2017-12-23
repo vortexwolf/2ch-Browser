@@ -19,40 +19,40 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.PresenterType;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.ui.adapters.BoardsListAdapter;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
+import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.CompatibilityUtils;
-import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.models.presentation.BoardEntity;
 import ua.in.quireg.chan.models.presentation.SectionEntity;
 import ua.in.quireg.chan.mvp.presenters.BoardsListPresenter;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
-
+import ua.in.quireg.chan.ui.adapters.BoardsListAdapter;
 
 public class BoardsListFragment extends MvpAppCompatFragment implements BoardsListView {
 
-    @Inject MainApplication mMainApplication;
-    @InjectPresenter BoardsListPresenter mBoardsListPresenter;
+    @InjectPresenter(type = PresenterType.WEAK)
+    BoardsListPresenter mBoardsListPresenter;
 
     @BindView(R.id.pick_board_button) protected Button mPickBoardButton;
     @BindView(R.id.pick_board_input) protected EditText mPickBoardInput;
 
     protected ListView mListView;
     protected BoardsListAdapter mBoardsListAdapter;
-
+    protected AppearanceUtils.ListViewPosition mListViewPosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         setHasOptionsMenu(true);
 
-        mBoardsListAdapter = new BoardsListAdapter(getContext());
     }
 
     @Override
@@ -83,11 +82,20 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (mBoardsListAdapter == null) {
+            mBoardsListAdapter = new BoardsListAdapter(getContext());
+        }
+
         mListView.setAdapter(mBoardsListAdapter);
 
+        if (savedInstanceState != null) {
+            mListViewPosition = (AppearanceUtils.ListViewPosition) savedInstanceState.getSerializable(Constants.EXTRA_LIST_VIEW_POSITION);
+
+        }
+
         mListView.setOnItemClickListener((adapterView, view1, i, l) -> {
-            BoardModel boardModel = (BoardModel) mListView.getItemAtPosition(i);
-            mBoardsListPresenter.onBoardClick(boardModel);
+            BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(i);
+            mBoardsListPresenter.onBoardClick(boardEntity);
 
         });
 
@@ -121,11 +129,11 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        BoardModel boardModel = (BoardModel) mListView.getItemAtPosition(info.position);
+        BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, getString(R.string.cmenu_copy_url));
 
-        if (mBoardsListPresenter.isFavoriteBoard(boardModel)) {
+        if (mBoardsListPresenter.isFavoriteBoard(boardEntity)) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, getString(R.string.cmenu_remove_from_favorites));
@@ -136,29 +144,29 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        BoardModel model = (BoardModel) mListView.getItemAtPosition(menuInfo.position);
+        BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(menuInfo.position);
 
-        if(model == null){
+        if (boardEntity == null) {
             Timber.e("ListView returned null at position %d!", menuInfo.position);
             return false;
         }
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = Websites.getDefault().getUrlBuilder().getPageUrlHtml(model.getId(), 0);
+                String uri = Websites.getDefault().getUrlBuilder().getPageUrlHtml(boardEntity.id, 0);
 
                 CompatibilityUtils.copyText(getActivity(), uri, uri);
 
-                mMainApplication.showShortToast(uri);
+                Toast.makeText(getContext(), uri, Toast.LENGTH_SHORT).show();
 
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
-                mBoardsListPresenter.addToFavorites(model);
+                mBoardsListPresenter.addToFavorites(boardEntity);
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                mBoardsListPresenter.removeFromFavorites(model);
+                mBoardsListPresenter.removeFromFavorites(boardEntity);
                 return true;
             }
         }
@@ -186,10 +194,17 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
-    public void setBoards(List<BoardModel> boardModels) {
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        AppearanceUtils.ListViewPosition position = AppearanceUtils.getCurrentListPosition(mListView);
+        outState.putSerializable(Constants.EXTRA_LIST_VIEW_POSITION, position);
+    }
+
+    @Override
+    public void setBoards(List<BoardEntity> boardEntities) {
         Timber.v("setBoards()");
 
-        if(mBoardsListAdapter == null){
+        if (mBoardsListAdapter == null) {
             Timber.e("No adapter registered");
             return;
         }
@@ -209,18 +224,18 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         String currentCategory = null;
 
         for (String category : categorySequenceToBeShown) {
-            for (BoardModel board : boardModels) {
+            for (BoardEntity boardEntity : boardEntities) {
                 // ignore all boards except of matching category.
-                if (!board.getCategory().equals(category)) {
+                if (!boardEntity.category.equals(category)) {
                     continue;
                 }
                 // add group header
-                if (board.getCategory() != null && !board.getCategory().equals(currentCategory)) {
-                    currentCategory = board.getCategory();
+                if (boardEntity.category != null && !boardEntity.category.equals(currentCategory)) {
+                    currentCategory = boardEntity.category;
                     mBoardsListAdapter.add(new SectionEntity(currentCategory));
                 }
                 // add item
-                mBoardsListAdapter.add(board);
+                mBoardsListAdapter.add(boardEntity);
             }
         }
         mBoardsListAdapter.notifyDataSetChanged();
@@ -228,49 +243,56 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
-    public void setFavBoards(List<BoardModel> favBoards) {
+    public void setFavBoards(List<BoardEntity> favBoards) {
         Timber.v("setFavBoards()");
 
-        if(mBoardsListAdapter == null){
+        if (mBoardsListAdapter == null) {
             Timber.e("No adapter registered");
             return;
         }
-        for (BoardModel favBoard:favBoards) {
+
+        for (BoardEntity favBoard : favBoards) {
             mBoardsListAdapter.addItemToFavoritesSection(favBoard);
         }
+
         mBoardsListAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void clearBoards() {
-        if(mBoardsListAdapter != null){
-            mBoardsListAdapter.clear();
-        }else {
-            Timber.e("Illegal state");
+    public void restoreListViewPosition() {
+        if (mListViewPosition != null) {
+            mListView.setSelectionFromTop(mListViewPosition.position, mListViewPosition.top);
         }
     }
 
     @Override
-    public void addFavoriteBoard(BoardModel boardModel) {
-        mBoardsListAdapter.addItemToFavoritesSection(boardModel);
+    public void clearBoards() {
 
+        if (mBoardsListAdapter == null) {
+            Timber.e("No adapter registered");
+            return;
+        }
+
+        mBoardsListAdapter.clear();
+        mBoardsListAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void removeFavoriteBoard(BoardModel boardModel) {
-        mBoardsListAdapter.removeItemFromFavoritesSection(boardModel);
+    public void addFavoriteBoard(BoardEntity b) {
+        mBoardsListAdapter.addItemToFavoritesSection(b);
+    }
+
+    @Override
+    public void removeFavoriteBoard(BoardEntity b) {
+        mBoardsListAdapter.removeItemFromFavoritesSection(b);
     }
 
     @Override
     public void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(imm != null && getView() != null && getView().getRootView() != null){
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getView() != null && getView().getRootView() != null) {
             imm.hideSoftInputFromWindow(getView().getRootView().getWindowToken(), 0);
         }
     }
 
-    @Override
-    public void showBoardError(String board) {
-        mMainApplication.showShortToast(getString(R.string.warning_enter_board));
-    }
 }

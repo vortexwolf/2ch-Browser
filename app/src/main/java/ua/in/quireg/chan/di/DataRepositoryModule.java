@@ -2,8 +2,6 @@ package ua.in.quireg.chan.di;
 
 import android.content.Context;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -13,7 +11,6 @@ import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
-import ua.in.quireg.chan.settings.ApplicationSettings;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 2:04 PM.
@@ -25,11 +22,10 @@ public class DataRepositoryModule {
 
     @Provides
     @AppScope
-    BoardsRepository providesBoardsRepository(ApplicationSettings applicationSettings,
-                                              ApiReader apiReader,
+    BoardsRepository providesBoardsRepository(ApiReader apiReader,
                                               OkHttpClient okHttpClient,
                                               Context context) {
-        return new BoardsRepository(applicationSettings, apiReader, okHttpClient, context);
+        return new BoardsRepository(apiReader, okHttpClient, context);
     }
 
     @Provides

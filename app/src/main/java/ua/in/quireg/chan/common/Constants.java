@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import ua.in.quireg.chan.BuildConfig;
-
 public class Constants {
 
     public static final boolean LOGGING = true;
@@ -48,6 +46,10 @@ public class Constants {
     public static final int MAX_ATTACHMENTS = 8;
 
     public static final int OP_POST_POSITION = 0;
+
+    public static final String FRAGMENT_TITLE = "fragment_title";
+    public static final String EXTRA_LIST_VIEW_POSITION = "ExtraListViewPosition";
+
 
     // Request-коды для запуска метода startActivityForResult
     public static final int REQUEST_CODE_PICK_BOARD_ACTIVITY = 0;

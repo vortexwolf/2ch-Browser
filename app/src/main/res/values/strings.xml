@@ -5,6 +5,7 @@
 
     <!-- UI Text -->
     <string name="crash_toast_text">Aww, crash. Send the report?</string>
+    <string name="confirm_exit">Press again to exit</string>
     <string name="bottom_menu_browse">Browse</string>
     <string name="bottom_menu_tabs">Tabs</string>
     <string name="bottom_menu_favourites">Favourites</string>

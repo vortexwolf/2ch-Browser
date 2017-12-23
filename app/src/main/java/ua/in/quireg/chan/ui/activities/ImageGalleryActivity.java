@@ -24,6 +24,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.DownloadFileTask;
 import ua.in.quireg.chan.common.Constants;
@@ -43,13 +48,7 @@ import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.views.SelectiveViewPager;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 public class ImageGalleryActivity extends AppCompatActivity implements SelectiveViewPager.OnSingleClickListener {
-    public static final String LOG_TAG = ImageGalleryActivity.class.getSimpleName();
 
     private ThreadImagesService mThreadImagesService;
     private CacheDirectoryManager mCacheDirectoryManager;
@@ -74,8 +73,6 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
     private Uri fileToBeShared;
 
     private Toast mToast;
-
-    //private boolean isPanelsVisible = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

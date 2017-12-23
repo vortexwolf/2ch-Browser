@@ -28,7 +28,8 @@ import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
+import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.settings.SeekBarDialogPreference;
 import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
 
@@ -36,7 +37,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
-    @Inject MainActivityPresenter mMainActivityPresenter;
+    @Inject MainRouter mRouter;
 
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -99,7 +100,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         args.putString("rootKey", preferenceScreen.getKey());
         appPreferenceFragment.setArguments(args);
 
-        mMainActivityPresenter.pushFragment(appPreferenceFragment);
+        mRouter.execute(new PushFragment(appPreferenceFragment));
     }
 
     @Override
@@ -237,7 +238,8 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         }
         String value = preference.getText();
         if (!StringUtils.isEmpty(value)) {
-            String mask = new String(new char[value.length()]).replace("\0", "*");;
+            String mask = new String(new char[value.length()]).replace("\0", "*");
+            ;
             preference.setSummary(mask);
         } else {
             preference.setSummary(getString(R.string.pref_proxy_auth_pass_summary));
@@ -359,7 +361,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
                 key.equals(getString(R.string.pref_proxy_port_key)) ||
                 key.equals(getString(R.string.pref_proxy_auth_key)) ||
                 key.equals(getString(R.string.pref_proxy_auth_login_key)) ||
-                key.equals(getString(R.string.pref_proxy_auth_pass_key))||
+                key.equals(getString(R.string.pref_proxy_auth_pass_key)) ||
                 key.equals(getString(R.string.pref_use_https_key));
     }
 

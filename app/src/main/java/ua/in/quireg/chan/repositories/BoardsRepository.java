@@ -28,7 +28,6 @@ import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.SerializationService;
-import ua.in.quireg.chan.settings.ApplicationSettings;
 
 /**
  * Created by Arcturus Mengsk on 11/28/2017, 1:31 PM.
@@ -38,7 +37,6 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class BoardsRepository {
 
     private Context mContext;
-    private ApplicationSettings mApplicationSettings;
     private ApiReader mApiReader;
     private OkHttpClient mOkHttpClient;
     private CacheDirectoryManager mCacheManager;
@@ -47,11 +45,9 @@ public class BoardsRepository {
 
     private List<BoardModel> mBoards = null;
 
-    public BoardsRepository(ApplicationSettings mApplicationSettings,
-                            ApiReader apiReader,
+    public BoardsRepository(ApiReader apiReader,
                             OkHttpClient okHttpClient,
                             Context context) {
-        this.mApplicationSettings = mApplicationSettings;
         this.mApiReader = apiReader;
         this.mOkHttpClient = okHttpClient;
         this.mContext = context;

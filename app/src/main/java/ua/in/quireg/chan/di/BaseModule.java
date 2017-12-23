@@ -9,10 +9,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.domain.ApiReader;
-import ua.in.quireg.chan.domain.ApiReaderImpl;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenterImpl;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
@@ -38,21 +34,14 @@ public class BaseModule {
 
     @Provides
     @Singleton
-    ApplicationSettings providesApplicationSettings(Context context, SharedPreferences preferences) {
-        return new ApplicationSettings(context, preferences);
-    }
-    @Provides
-    @Singleton
     SharedPreferences providesSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Provides
     @Singleton
-    MainActivityPresenter provideMainActivityPresenter() {
-        return new MainActivityPresenterImpl();
+    ApplicationSettings providesApplicationSettings(Context context, SharedPreferences preferences) {
+        return new ApplicationSettings(context, preferences);
     }
-
-
 
 }

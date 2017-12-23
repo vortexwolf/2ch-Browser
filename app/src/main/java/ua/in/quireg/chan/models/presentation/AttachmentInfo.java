@@ -1,9 +1,9 @@
 package ua.in.quireg.chan.models.presentation;
 
-import java.util.HashMap;
-
 import android.content.res.Resources;
 import android.net.Uri;
+
+import java.util.HashMap;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
@@ -15,6 +15,7 @@ import ua.in.quireg.chan.interfaces.IWebsite;
 import ua.in.quireg.chan.models.domain.AttachmentModel;
 
 public class AttachmentInfo {
+
     private static final HashMap<String, Integer> sDefaultThumbnails;
 
     private final AttachmentModel mModel;
@@ -28,7 +29,7 @@ public class AttachmentInfo {
     private IUrlBuilder mUrlBuilder;
 
     static {
-        sDefaultThumbnails = new HashMap<String, Integer>();
+        sDefaultThumbnails = new HashMap<>();
         sDefaultThumbnails.put("mp3", R.drawable.page_white_sound_4x);
         sDefaultThumbnails.put("pdf", R.drawable.page_white_acrobat_4x);
         sDefaultThumbnails.put("swf", R.drawable.page_white_flash_4x);
@@ -62,7 +63,7 @@ public class AttachmentInfo {
     }
 
     public String getSourceUrl() {
-        if (!this.mIsEmpty){
+        if (!this.mIsEmpty) {
             return this.mImageUrl;
         }
         return null;
@@ -122,8 +123,10 @@ public class AttachmentInfo {
 
             if ("gif".equalsIgnoreCase(this.mSourceExtension)) {
                 result += "\ngif";
-            }else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
+            } else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
                 result += "\nwebm";
+            } else if ("mp4".equalsIgnoreCase(this.mSourceExtension)) {
+                result += "\nmp4";
             }
         }
 
@@ -150,6 +153,7 @@ public class AttachmentInfo {
     }
 
     private class SourceWithThumbnailModel {
+
         public String imageUrl;
         public String thumbnailUrl;
     }
