@@ -13,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.PresenterType;
 
 import javax.inject.Inject;
 
@@ -25,20 +23,12 @@ import ru.terrakok.cicerone.NavigatorHolder;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
-import ua.in.quireg.chan.mvp.views.MainActivityView;
+import ua.in.quireg.chan.mvp.routing.commands.SwitchTab;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
-public class MainActivity extends MvpAppCompatActivity implements MainActivityView {
-
-    @InjectPresenter(type = PresenterType.WEAK)
-    MainActivityPresenter mMainActivityPresenter;
-
-    public MainActivityPresenter getPresenter() {
-        return mMainActivityPresenter;
-    }
+public class MainActivity extends MvpAppCompatActivity {
 
     @Inject NavigatorHolder mNavigatorHolder;
     @Inject MainRouter mMainRouter;
@@ -72,8 +62,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
         mBottomTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mMainActivityPresenter.onTabSelected(tab);
-
+                mMainRouter.switchTab(tab.getPosition());
             }
 
             @Override
@@ -87,7 +76,28 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
             }
         });
 
-        mNavigator = new MainNavigator(this);
+        mNavigator = new MainNavigator(this) {
+
+            @Override
+            public void updateTabSelection(int activeTabPosition) {
+                MainActivity.this.updateTabSelection(activeTabPosition);
+            }
+
+            @Override
+            public void updateToolbarControls(boolean isRootFrag) {
+                MainActivity.this.updateToolbarControls(isRootFrag);
+            }
+
+            @Override
+            public void sendShortToast(int stringId) {
+                MainActivity.this.showSystemMessage(stringId);
+            }
+
+            @Override
+            public void exitApplication() {
+                MainActivity.this.finish();
+            }
+        };
 
     }
 
@@ -111,7 +121,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
         }
     }
 
-    @Override
     public void updateToolbarControls(boolean isRootFrag) {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayUseLogoEnabled(isRootFrag);
@@ -119,7 +128,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
         }
     }
 
-    @Override
     public void updateTabSelection(int currentTab) {
         for (int i = 0; i < TABS.length; i++) {
             TabLayout.Tab selectedTab = mBottomTabLayout.getTabAt(i);
@@ -131,7 +139,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
         }
     }
 
-    @Override
     public void showSystemMessage(@StringRes int id) {
         if (mToast != null) {
             mToast.cancel();
@@ -141,16 +148,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainActivityVi
     }
 
     @Override
-    public void exitApplication() {
-        finish();
-    }
-
-    @Override
     public void onBackPressed() {
-        mMainActivityPresenter.onBackPressed();
+        mMainRouter.onBackPressed();
     }
 
-    @Override
     public void updateToolbarTitle(@NonNull String title) {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);

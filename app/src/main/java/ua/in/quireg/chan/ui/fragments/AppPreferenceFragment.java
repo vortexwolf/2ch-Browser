@@ -14,6 +14,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -29,6 +30,7 @@ import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.settings.SeekBarDialogPreference;
 import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
@@ -37,7 +39,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
-    @Inject MainRouter mRouter;
+    @Inject protected MainRouter mRouter;
 
     private SharedPreferenceChangeListener mSharedPreferenceChangeListener = new SharedPreferenceChangeListener();
 
@@ -46,7 +48,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         MainApplication.getAppComponent().inject(this);
-
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
     }
 
@@ -99,8 +101,16 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         Bundle args = new Bundle();
         args.putString("rootKey", preferenceScreen.getKey());
         appPreferenceFragment.setArguments(args);
+        mRouter.pushFragment(appPreferenceFragment);
+    }
 
-        mRouter.execute(new PushFragment(appPreferenceFragment));
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            mRouter.onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -5,7 +5,6 @@ import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.boards.makaba.MakabaUrlBuilder;
 import ua.in.quireg.chan.mvp.models.BoardsListInteractor;
 import ua.in.quireg.chan.mvp.presenters.BoardsListPresenter;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.PostSender;
@@ -38,7 +37,6 @@ public interface AppComponent {
     void inject(HistoryFragment historyFragment);
     void inject(HistoryAdapter historyAdapter);
 
-    void inject(MainActivityPresenter mainActivityPresenter);
     void inject(FavoritesFragment favoritesFragment);
     void inject(ThreadsListFragment threadsListFragment);
     void inject(MakabaUrlBuilder makabaUrlBuilder);

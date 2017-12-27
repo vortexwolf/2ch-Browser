@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
@@ -18,8 +19,6 @@ import ru.terrakok.cicerone.commands.Command;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.mvp.presenters.MainActivityPresenter;
-import ua.in.quireg.chan.mvp.routing.commands.ExitApp;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoardsList;
@@ -43,19 +42,18 @@ import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
  * 2ch-Browser
  */
 
-public class MainNavigator implements Navigator, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
+public abstract class MainNavigator implements Navigator, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
+
+    private static final int BOTTOM_TABS_AMOUNT = 5;
 
     @Inject TabsTransactionHistory mTabsTransactionHistory;
     @Inject Bundle mSavedInstanceState;
     @Inject Context mContext;
 
-    MainActivityPresenter mMainActivityPresenter;
     FragNavController mFragNavController;
 
     public MainNavigator(MainActivity activity) {
         MainApplication.getAppComponent().inject(this);
-
-        mMainActivityPresenter = activity.getPresenter();
 
         FragNavTransactionOptions mFragNavTransactionOptions = FragNavTransactionOptions.newBuilder()
                 .transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -64,7 +62,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
         mFragNavController = FragNavController.newBuilder(mSavedInstanceState, activity.getSupportFragmentManager(), R.id.base_activity_container)
                 .transactionListener(this)
-                .rootFragmentListener(this, 5)
+                .rootFragmentListener(this, BOTTOM_TABS_AMOUNT)
                 .defaultTransactionOptions(mFragNavTransactionOptions)
                 .build();
     }
@@ -101,26 +99,31 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             return;
         }
         mTabsTransactionHistory.push(i);
-        mMainActivityPresenter.updateTabSelection(i);
-        mMainActivityPresenter.updateToolbarControls(mFragNavController.isRootFragment());
+        updateTabSelection(i);
+        updateToolbarControls(mFragNavController.isRootFragment());
 
         //mMainActivityPresenter.updateToolbarTitle(fragment.getArguments().getString(Constants.FRAGMENT_TITLE));
     }
 
     @Override
     public void onFragmentTransaction(Fragment fragment, FragNavController.TransactionType transactionType) {
-        mMainActivityPresenter.updateToolbarControls(mFragNavController.isRootFragment());
+        updateToolbarControls(mFragNavController.isRootFragment());
 
     }
+
+    public abstract void updateTabSelection(int activeTabPosition);
+
+    public abstract void updateToolbarControls(boolean isRootFrag);
+
+    public abstract void sendShortToast(@StringRes int stringId);
+
+    public abstract void exitApplication();
 
     @Override
     public void applyCommand(Command command) {
 
         if (command instanceof SendShortToast) {
-            mMainActivityPresenter.sendShortToast(((SendShortToast) command).getToast());
-        }
-        if (command instanceof ExitApp) {
-            mMainActivityPresenter.exitApplication();
+            sendShortToast(((SendShortToast) command).getToast());
         }
         if (command instanceof NavigateBackwards) {
             onBackPressed();
@@ -129,7 +132,11 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             mFragNavController.pushFragment(((PushFragment) command).getFragment());
         }
         if (command instanceof SwitchTab) {
-            mFragNavController.switchTab(((SwitchTab) command).getTabPosition());
+            int activeTabPosition = ((SwitchTab) command).getTabPosition();
+            mFragNavController.switchTab(activeTabPosition);
+            updateTabSelection(activeTabPosition);
+            updateToolbarControls(mFragNavController.isRootFragment());
+
         }
         if (command instanceof NavigateBoardsList) {
             navigateBoardsList(
@@ -176,7 +183,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             if (mTabsTransactionHistory.isEmpty()) {
                 //No history, proceed with exit
                 if (mDoubleBackToExitPressedOnce) {
-                    mMainActivityPresenter.exitApplication();
+                    exitApplication();
                     return;
                 }
                 waitForAnotherPressToExit();
@@ -187,7 +194,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
                     int position = mTabsTransactionHistory.pop();
 
                     mFragNavController.switchTab(position);
-                    mMainActivityPresenter.updateTabSelection(position);
+                    updateTabSelection(position);
 
                 } else {
                     //single fragment in stack, go to home fragment.
@@ -205,7 +212,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
     private void waitForAnotherPressToExit() {
         mDoubleBackToExitPressedOnce = true;
 
-        mMainActivityPresenter.sendShortToast(R.string.confirm_exit);
+        sendShortToast(R.string.confirm_exit);
 
         new Handler().postDelayed(() -> mDoubleBackToExitPressedOnce = false, 2000);
     }

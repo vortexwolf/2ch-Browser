@@ -19,8 +19,6 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.models.presentation.BoardEntity;
 import ua.in.quireg.chan.mvp.models.BoardsListInteractor;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
-import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
-import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
 import ua.in.quireg.chan.mvp.views.BoardsListView;
 
 /**
@@ -91,7 +89,7 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
             boardEntity.id = boardCode;
             onBoardClick(boardEntity);
         } else {
-            mMainRouter.execute(new SendShortToast(R.string.warning_enter_board));
+            mMainRouter.showSystemMessage(R.string.warning_enter_board);
         }
 
     }
@@ -100,7 +98,7 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         Timber.v("onBoardClick(BoardModel)");
         getViewState().hideSoftKeyboard();
 
-        mMainRouter.execute(new NavigateBoard(Websites.getDefault().name(), boardEntity.id, true));
+        mMainRouter.navigateBoard(Websites.getDefault().name(), boardEntity.id, true);
 
     }
 

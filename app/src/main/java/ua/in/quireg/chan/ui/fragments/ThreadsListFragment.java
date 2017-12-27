@@ -389,7 +389,7 @@ public class ThreadsListFragment extends BaseListFragment{
     }
 
     private void navigateToThread(String threadNumber, String threadSubject) {
-        mRouter.execute(new NavigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false));
+        mRouter.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
 
     }
 

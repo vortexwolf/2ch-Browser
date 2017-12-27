@@ -83,8 +83,6 @@ public class CacheSizePreference extends Preference {
         })
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe((summary) -> {
-            setSummary(String.valueOf(summary));
-        });
+        .subscribe((summary) -> setSummary(String.valueOf(summary)));
     }
 }
