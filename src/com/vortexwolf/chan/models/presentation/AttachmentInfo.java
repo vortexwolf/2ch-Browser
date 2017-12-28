@@ -91,7 +91,7 @@ public class AttachmentInfo {
     }
 
     public boolean isVideo() {
-        return this.mImageUrl != null && UriUtils.isWebmUri(Uri.parse(this.mImageUrl));
+        return this.mImageUrl != null && UriUtils.isVideoUri(Uri.parse(this.mImageUrl));
     }
 
     public boolean isDisplayableInGallery() {
@@ -126,6 +126,8 @@ public class AttachmentInfo {
                 result += "\ngif";
             }else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
                 result += "\nwebm";
+            }else if ("mp4".equalsIgnoreCase(this.mSourceExtension)) {
+                result += "\nmp4";
             }
         }
 

@@ -13,7 +13,7 @@ import com.vortexwolf.chan.common.utils.IoUtils;
 
 public class Constants {
 
-    public static final boolean LOGGING = BuildConfig.DEBUG;
+    public static final boolean LOGGING = false;
 
     public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
             "jpeg", "png", "gif" }));

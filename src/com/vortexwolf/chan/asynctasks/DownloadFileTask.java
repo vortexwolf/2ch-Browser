@@ -108,7 +108,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
         if (success) {
             Uri uri = Uri.fromFile(this.mSaveTo);
-            if (this.mUpdateGallery && (UriUtils.isImageUri(uri) || UriUtils.isWebmUri(uri))) {
+            if (this.mUpdateGallery && (UriUtils.isImageUri(uri) || UriUtils.isVideoUri(uri))) {
                 SingleMediaScanner scanner = new SingleMediaScanner(this.mContext, this.mSaveTo);
                 scanner.scan();
             }
