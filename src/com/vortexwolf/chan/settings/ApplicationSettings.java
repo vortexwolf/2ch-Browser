@@ -1,12 +1,5 @@
 package com.vortexwolf.chan.settings;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.cookie.BasicClientCookie;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -21,6 +14,13 @@ import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
 import com.vortexwolf.chan.models.domain.BoardModel;
 import com.vortexwolf.chan.models.domain.CaptchaType;
+
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookie;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class ApplicationSettings {
 
@@ -350,8 +350,17 @@ public class ApplicationSettings {
     }
 
     public CaptchaType getCaptchaType() {
-        // sometimes users can choose more than 1 captcha type, so I will leave it in settings
-        return CaptchaType.DVACH;
+        String captcha = this.mSettings.getString(this.mResources.getString(R.string.pref_captcha_type_key), mResources.getString(R.string.pref_captcha_type_recaptcha));
+        if (captcha.equals(mResources.getString(R.string.pref_captcha_type_dvach))) {
+            return CaptchaType.DVACH;
+        } else if (captcha.equals(mResources.getString(R.string.pref_captcha_type_recaptcha))) {
+            return CaptchaType.RECAPTCHA_V2;
+        } else if (captcha.equals(mResources.getString(R.string.pref_captcha_type_mailru))) {
+            return CaptchaType.MAILRU;
+        } else {
+            throw new RuntimeException("No valid captcha provided");
+        }
+
     }
     @SuppressWarnings("unchecked")
     public ArrayList<BoardModel> getBoards(){

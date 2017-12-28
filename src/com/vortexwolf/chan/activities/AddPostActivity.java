@@ -651,23 +651,21 @@ public class AddPostActivity extends Activity implements IPostSendView, ICaptcha
     //@SuppressLint("NewApi")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.REQUEST_CODE_RECAPTCHA) {
-            if (resultCode == NewRecaptchaActivity.OK) {
-                String hash = data.getStringExtra("hash");
-                if (hash != null && hash.length() != 0) {
-                    if (this.mCurrentPostSendTask != null) {
-                        this.mCurrentPostSendTask.cancel(true);
-                    }
-                    this.mCachedSendPostModel.setRecaptchaHash(hash);
-                    this.mCurrentPostSendTask = new SendPostTask(this, this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mCachedSendPostModel);
-                    this.mCachedSendPostModel = null;
-                    this.mCurrentPostSendTask.execute();
-                }
-            }
-            return;
-        }
+
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
+                case Constants.REQUEST_CODE_RECAPTCHA:
+                    String hash = data.getStringExtra("hash");
+                    if (hash != null && hash.length() != 0) {
+                        if (this.mCurrentPostSendTask != null) {
+                            this.mCurrentPostSendTask.cancel(true);
+                        }
+                        this.mCachedSendPostModel.setRecaptchaHash(hash);
+                        this.mCurrentPostSendTask = new SendPostTask(this, this, this.mWebsite, this.mBoardName, this.mThreadNumber, this.mCachedSendPostModel);
+                        this.mCachedSendPostModel = null;
+                        this.mCurrentPostSendTask.execute();
+                    }
+                    break;
                 case Constants.REQUEST_CODE_FILE_LIST_ACTIVITY:
 
                     SerializableFileModel fileModel = data.getParcelableExtra(this.getPackageName() + Constants.EXTRA_SELECTED_FILE);

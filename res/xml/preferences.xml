@@ -12,6 +12,13 @@
             android:summary="@string/pref_name_summary"
             android:inputType="text"
             android:singleLine="true" />
+        <ListPreference
+            android:defaultValue="@string/pref_captcha_type_recaptcha"
+            android:dialogTitle="@string/pref_captcha_type_title"
+            android:entries="@array/pref_captcha_type_choices"
+            android:entryValues="@array/pref_captcha_type_values"
+            android:key="@string/pref_captcha_type_key"
+            android:title="@string/pref_captcha_type_title" />
         <com.vortexwolf.chan.settings.PasscodePreference
             android:key="@string/pref_passcode_key"
             android:title="@string/pref_passcode"

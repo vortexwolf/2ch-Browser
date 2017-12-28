@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="pref_captcha_type_key">pref_captcha_type_key</string>
+
+    <string name="pref_captcha_type_mailru">mailru</string>
+    <string name="pref_captcha_type_recaptcha">recaptcha</string>
+    <string name="pref_captcha_type_dvach">dvach</string>
+
+
+    <string-array name="pref_captcha_type_values" translatable="false">
+        <item>@string/pref_captcha_type_dvach</item>
+        <item>@string/pref_captcha_type_recaptcha</item>
+        <item>@string/pref_captcha_type_mailru</item>
+    </string-array>
 
     <string name="pref_homepage_key">pref_homepage_key</string>
     <string name="pref_load_thumbnails_key">pref_load_thumbnails_key</string>

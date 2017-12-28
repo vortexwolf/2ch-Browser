@@ -121,6 +121,14 @@
     <string name="cmenu_open_thread">Open thread</string>
 
     <!-- Preferences -->
+
+    <string name="pref_captcha_type_title">Captcha type</string>
+    <string-array name="pref_captcha_type_choices">
+        <item>Dvach</item>
+        <item>ReCaptcha_v2(google)</item>
+        <item>MailRu</item>
+    </string-array>
+
     <string name="pref_screen_dvach">2ch</string>
     <string name="pref_screen_dvach_summary">2ch.hk specific options</string>
     <string name="pref_screen_style">Style</string>
