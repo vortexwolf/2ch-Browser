@@ -58,6 +58,7 @@ public class BoardsListInteractor {
                         return local;
                     }
                 })
+                .startWith(mBoardsRepository.getLocalBoards())
                 .filter(boards -> !boards.isEmpty())
                 .map(this::removeHiddenBoards)
                 .map(this::mapBoardModelsToEntities);

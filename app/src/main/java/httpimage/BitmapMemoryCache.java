@@ -2,7 +2,6 @@ package httpimage;
 
 import android.graphics.Bitmap;
 
-import ua.in.quireg.chan.common.library.LruCache;
 import ua.in.quireg.chan.common.library.MyLog;
 import ua.in.quireg.chan.interfaces.ILruCacheListener;
 

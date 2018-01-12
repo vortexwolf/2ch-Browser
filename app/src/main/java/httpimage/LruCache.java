@@ -1,4 +1,4 @@
-package ua.in.quireg.chan.common.library;
+package httpimage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
