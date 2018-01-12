@@ -7,6 +7,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.IoUtils;
 import com.vortexwolf.chan.exceptions.HttpRequestException;
 import com.vortexwolf.chan.interfaces.IHttpStringReader;
@@ -30,6 +31,7 @@ public class HttpStringReader implements IHttpStringReader {
         byte[] bytes = this.mHttpBytesReader.fromUri(uri, customHeaders);
 
         String result = IoUtils.convertBytesToString(bytes);
+        MyLog.d("fromUri string: ", result);
         return result;
     }
 

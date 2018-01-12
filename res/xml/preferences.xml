@@ -13,7 +13,7 @@
             android:inputType="text"
             android:singleLine="true" />
         <ListPreference
-            android:defaultValue="@string/pref_captcha_type_recaptcha"
+            android:defaultValue="@string/pref_captcha_type_mailru"
             android:dialogTitle="@string/pref_captcha_type_title"
             android:entries="@array/pref_captcha_type_choices"
             android:entryValues="@array/pref_captcha_type_values"

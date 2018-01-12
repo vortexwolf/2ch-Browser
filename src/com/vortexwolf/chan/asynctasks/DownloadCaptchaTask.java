@@ -109,7 +109,7 @@ public class DownloadCaptchaTask extends AsyncTask<String, Void, Boolean> implem
         } else if (this.mCaptchaType == CaptchaType.RECAPTCHA_V1) {
             this.mCaptcha = RecaptchaService.loadPostingRecaptcha(captchaKey, referer);
         } else if (this.mCaptchaType == CaptchaType.MAILRU) {
-            this.mCaptcha = this.mMailruCaptchaService.loadCaptcha(captchaKey, referer);
+            this.mCaptcha = this.mMailruCaptchaService.loadCaptcha(referer);
         } else if (this.mCaptchaType == CaptchaType.DVACH) {
             this.mCaptcha = this.mDvachCaptchaService.loadCaptcha(captchaKey, this.mWebsite);
         } else {

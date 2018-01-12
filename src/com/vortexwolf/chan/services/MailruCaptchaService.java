@@ -1,6 +1,7 @@
 package com.vortexwolf.chan.services;
 
 import com.vortexwolf.chan.common.Factory;
+import com.vortexwolf.chan.common.library.MyLog;
 import com.vortexwolf.chan.common.utils.RegexUtils;
 import com.vortexwolf.chan.common.utils.StringUtils;
 import com.vortexwolf.chan.common.utils.UriUtils;
@@ -18,6 +19,8 @@ public class MailruCaptchaService {
     public static final String DATA_URI = "https://api-nocaptcha.mail.ru/captcha?public_key=";
     public static final String IMAGE_URI = "https://api-nocaptcha.mail.ru/c/1";
 
+    public static final String MAILRU_PUBLIC_KEY = "033bbbe453f794e3cb39f856277cd3ec";
+
     private static final Pattern dataPattern = Pattern.compile("var data = \\{(.*?)\\}", Pattern.DOTALL);
     private static final Pattern dataIdPattern = Pattern.compile("id: \"(.*?)\"");
     private static final Pattern dataIsVerifiedPattern = Pattern.compile("is_verified: \"(.*?)\"");
@@ -31,10 +34,11 @@ public class MailruCaptchaService {
         this.mHttpStringReader = httpStringReader;
     }
 
-    public CaptchaEntity loadCaptcha(String key, String referer) {
+    public CaptchaEntity loadCaptcha(String referer) {
         try {
             Header[] extraHeaders = new Header[] { new BasicHeader("Referer", referer) };
-            String response = this.mHttpStringReader.fromUri(DATA_URI + key, extraHeaders);
+            String response = this.mHttpStringReader.fromUri(DATA_URI + MAILRU_PUBLIC_KEY, extraHeaders);
+            MyLog.d("MailruCaptchaService response: ", response);
             CaptchaEntity captcha = getCaptchaFromJavascript(response);
             return captcha;
         } catch (HttpRequestException e) {
