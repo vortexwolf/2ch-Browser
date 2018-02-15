@@ -1,6 +1,5 @@
 package ua.in.quireg.chan.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -14,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -116,6 +114,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 String enteredBoard = mPickBoardInput.getText().toString().trim();
 
+                mPickBoardInput.clearFocus();
                 mBoardsListPresenter.onBoardClick(enteredBoard);
                 return true;
             }
@@ -133,7 +132,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, getString(R.string.cmenu_copy_url));
 
-        if (mBoardsListPresenter.isFavoriteBoard(boardEntity)) {
+        if (!boardEntity.isFavorite) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, getString(R.string.cmenu_remove_from_favorites));
@@ -176,7 +175,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
         inflater.inflate(R.menu.pickboard, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -186,7 +184,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         switch (item.getItemId()) {
             case R.id.refresh_menu_id:
-                mBoardsListPresenter.requestBoards(false);
+                mBoardsListPresenter.updateBoardsList(true);
                 return true;
         }
 
@@ -202,71 +200,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
     @Override
     public void setBoards(List<BoardEntity> boardEntities) {
-        Timber.v("setBoards()");
-
-        if (mBoardsListAdapter == null) {
-            Timber.e("No adapter registered");
-            return;
-        }
-
-        String[] categorySequenceToBeShown = new String[]{
-                "Игры",
-                "Политика",
-                "Японская культура",
-                "Разное",
-                "Творчество",
-                "Тематика",
-                "Техника и софт",
-                "Взрослым",
-                "Пользовательские"
-        };
-
-        String currentCategory = null;
-
-        for (String category : categorySequenceToBeShown) {
-            for (BoardEntity boardEntity : boardEntities) {
-                // ignore all boards except of matching category.
-                if (!boardEntity.category.equals(category)) {
-                    continue;
-                }
-                // add group header
-                if (boardEntity.category != null && !boardEntity.category.equals(currentCategory)) {
-                    currentCategory = boardEntity.category;
-                    mBoardsListAdapter.add(new SectionEntity(currentCategory));
-                }
-                // add item
-                mBoardsListAdapter.add(boardEntity);
-            }
-        }
-        mBoardsListAdapter.notifyDataSetChanged();
-
-    }
-
-    @Override
-    public void setFavBoards(List<BoardEntity> favBoards) {
-        Timber.v("setFavBoards()");
-
-        if (mBoardsListAdapter == null) {
-            Timber.e("No adapter registered");
-            return;
-        }
-
-        for (BoardEntity favBoard : favBoards) {
-            mBoardsListAdapter.addItemToFavoritesSection(favBoard);
-        }
-
-        mBoardsListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void restoreListViewPosition() {
-        if (mListViewPosition != null) {
-            mListView.setSelectionFromTop(mListViewPosition.position, mListViewPosition.top);
-        }
-    }
-
-    @Override
-    public void clearBoards() {
 
         if (mBoardsListAdapter == null) {
             Timber.e("No adapter registered");
@@ -274,25 +207,38 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         }
 
         mBoardsListAdapter.clear();
-        mBoardsListAdapter.notifyDataSetChanged();
-    }
 
-    @Override
-    public void addFavoriteBoard(BoardEntity b) {
-        mBoardsListAdapter.addItemToFavoritesSection(b);
-    }
+        String currentCategory = null;
 
-    @Override
-    public void removeFavoriteBoard(BoardEntity b) {
-        mBoardsListAdapter.removeItemFromFavoritesSection(b);
-    }
+        for (BoardEntity boardEntity : boardEntities) {
 
-    @Override
-    public void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null && getView() != null && getView().getRootView() != null) {
-            imm.hideSoftInputFromWindow(getView().getRootView().getWindowToken(), 0);
+            if(boardEntity.isFavorite) {
+                mBoardsListAdapter.addItemToFavoritesSection(boardEntity);
+            }
+
+            if(!boardEntity.isVisible) {
+                continue;
+            }
+
+            // add group header
+            if(boardEntity.category != null &&
+                    (currentCategory == null || !boardEntity.category.equals(currentCategory))) {
+                currentCategory = boardEntity.category;
+                mBoardsListAdapter.add(new SectionEntity(currentCategory));
+            }
+
+            // add item
+            mBoardsListAdapter.add(boardEntity);
         }
+
+        mBoardsListAdapter.notifyDataSetChanged();
+
+        //Restore listview position in case fragment was re-created.
+        if (mListViewPosition != null) {
+            mListView.setSelectionFromTop(mListViewPosition.position, mListViewPosition.top);
+            mListViewPosition = null;
+        }
+
     }
 
 }

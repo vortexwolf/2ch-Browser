@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.db.FavoritesDataSource;
@@ -24,80 +23,58 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class BoardsListInteractor {
 
-    @Inject protected BoardsRepository mBoardsRepository;
-    @Inject protected FavoritesDataSource mFavoritesDataSource;
+    @Inject BoardsRepository mBoardsRepository;
+    @Inject FavoritesDataSource mFavoritesDataSource;
     @Inject protected ApplicationSettings mApplicationSettings;
 
     public BoardsListInteractor() {
         MainApplication.getAppComponent().inject(this);
     }
 
-    public Observable<List<BoardEntity>> getBoards(boolean localOnly) {
+    public Observable<List<BoardEntity>> getBoards(boolean remote) {
 
-        if (localOnly) {
-            return getLocalVisibleBoards();
+        if (!remote) {
+            return mBoardsRepository.getLocalBoards()
+                    .map(this::mapBoardModelsToEntities)
+                    .map(this::setHiddenBoards)
+                    .map(this::setFavoriteBoards)
+                    .subscribeOn(Schedulers.io());
+        } else {
+            return mBoardsRepository.getRemoteBoards()
+                    .map(this::mapBoardModelsToEntities)
+                    .map(this::setHiddenBoards)
+                    .map(this::setFavoriteBoards)
+                    .subscribeOn(Schedulers.io());
         }
-
-        return Observable.combineLatest(
-                mBoardsRepository.getLocalBoards(),
-                mBoardsRepository.getRemoteBoards(),
-                (local, remote) -> {
-
-                    if (remote == null || remote.isEmpty()) {
-                        Timber.e("Received empty boards list!");
-
-                        return local;
-                    } else if (!areEqual(remote, local) || local.isEmpty()) {
-                        Timber.d("Boards list have expired, updating...");
-
-                        mBoardsRepository.setLocalBoards(remote);
-                        return remote;
-                    } else {
-                        Timber.d("Boards are up to date ^_^");
-
-                        return local;
-                    }
-                })
-                .startWith(mBoardsRepository.getLocalBoards())
-                .filter(boards -> !boards.isEmpty())
-                .map(this::removeHiddenBoards)
-                .map(this::mapBoardModelsToEntities);
 
     }
 
-    public Observable<List<BoardEntity>> getFavoriteBoards() {
+    private List<BoardEntity> setFavoriteBoards(List<BoardEntity> boards) {
 
-        return Observable.just(mFavoritesDataSource.getFavoriteBoards())
-                .subscribeOn(Schedulers.io())
-                .zipWith(mBoardsRepository.getLocalBoards(), (favoriteBoardsEntities, localBoards) -> {
+        for (FavoritesEntity fe : mFavoritesDataSource.getFavoriteBoards()) {
 
-                    ArrayList<BoardModel> favoriteBoards = new ArrayList<>();
+            boolean matchFound = false;
 
-                    for (FavoritesEntity fe : favoriteBoardsEntities) {
-                        boolean matchFound = false;
+            for (BoardEntity board : boards) {
+                if (board.id.equals(fe.getBoard())) {
 
-                        for (BoardModel board : localBoards) {
-                            if (board.getId().equals(fe.getBoard())) {
-                                favoriteBoards.add(board);
-                                matchFound = true;
-                            }
-                        }
+                    board.isFavorite = true;
+                    matchFound = true;
 
-                        if (!matchFound) {
-                            BoardEntity boardEntity = new BoardEntity();
+                    break;
+                }
+            }
 
-                            if (fe.getBoard() != null) {
-                                boardEntity.id = fe.getBoard();
-                            }
-                            if (fe.getTitle() != null) {
-                                boardEntity.boardName = fe.getTitle();
-                            }
-                        }
-                    }
-                    return favoriteBoards;
+            if (!matchFound) {
+                BoardEntity boardEntity = new BoardEntity();
+                boardEntity.id = fe.getBoard();
+                boardEntity.boardName = fe.getTitle();
+                boardEntity.isFavorite = true;
+                boards.add(boardEntity);
+            }
+        }
 
-                })
-                .map(this::mapBoardModelsToEntities);
+        return boards;
     }
 
     public void addToFavorites(BoardEntity boardEntity) {
@@ -106,17 +83,6 @@ public class BoardsListInteractor {
 
     public void removeFromFavorites(BoardEntity boardEntity) {
         mFavoritesDataSource.removeFromFavorites(Websites.getDefault().name(), boardEntity.id, null);
-    }
-
-    public boolean isFavorite(BoardEntity boardEntity) {
-        return !mFavoritesDataSource.hasFavorites(Websites.getDefault().name(), boardEntity.id, null);
-    }
-
-    private Observable<List<BoardEntity>> getLocalVisibleBoards() {
-        return mBoardsRepository.getLocalBoards()
-                .map(this::removeHiddenBoards)
-                .map(this::mapBoardModelsToEntities);
-
     }
 
     private List<BoardEntity> mapBoardModelsToEntities(List<BoardModel> models) {
@@ -139,38 +105,20 @@ public class BoardsListInteractor {
         return e;
     }
 
-    private List<BoardModel> removeHiddenBoards(List<BoardModel> boards) {
+    private List<BoardEntity> setHiddenBoards(List<BoardEntity> boards) {
 
-        List<BoardModel> filteredBoards = new ArrayList<>(boards);
-        for (BoardModel board : boards) {
+        for (BoardEntity board : boards) {
             if (!isBoardVisible(board)) {
-                filteredBoards.remove(board);
+                board.isVisible = false;
             }
         }
-        return filteredBoards;
+        return boards;
     }
 
-    private boolean areEqual(List<BoardModel> first, List<BoardModel> second) {
 
-        if (first == null || second == null || first.isEmpty() || second.isEmpty()) {
-            return false;
-        }
-
-        for (BoardModel modelA : first) {
-            boolean matchFound = false;
-            for (BoardModel modelB : second) {
-                if (modelA.getId().equals(modelB.getId())) {
-                    matchFound = true;
-                    break;
-                }
-            }
-            if (!matchFound) return false;
-        }
-        return true;
-    }
-
-    private boolean isBoardVisible(BoardModel board) {
-        return mApplicationSettings.isDisplayAllBoards() || mApplicationSettings.getAllowedBoardsIds().contains(board.getId());
+    private boolean isBoardVisible(BoardEntity board) {
+        return mApplicationSettings.isDisplayAllBoards() ||
+                mApplicationSettings.getAllowedBoardsIds().contains(board.id) || board.isFavorite;
     }
 
 }

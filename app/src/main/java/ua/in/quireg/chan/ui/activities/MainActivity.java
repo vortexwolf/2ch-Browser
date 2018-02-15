@@ -2,13 +2,14 @@ package ua.in.quireg.chan.ui.activities;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -21,11 +22,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.terrakok.cicerone.NavigatorHolder;
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
-import ua.in.quireg.chan.mvp.routing.commands.SwitchTab;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class MainActivity extends MvpAppCompatActivity {
@@ -41,15 +42,33 @@ public class MainActivity extends MvpAppCompatActivity {
     private Toast mToast;
     private MainNavigator mNavigator;
 
+    private int mActiveTabPosition = 0;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
+        ((MainApplication)getApplication()).rebuildAppComponent();
+
         MainApplication.getAppComponent().inject(this);
+
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+        );
 
         setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.base_activity);
 
         ButterKnife.bind(this);
+
+        FrameLayout statusBar = findViewById(R.id.status_bar);
+
+        statusBar.setPadding(
+                statusBar.getPaddingLeft(),
+                statusBar.getPaddingTop(),
+                statusBar.getPaddingRight(),
+                statusBar.getPaddingBottom() + getStatusBarHeight()
+        );
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setLogo(R.drawable.browser_logo_drawable);
@@ -59,10 +78,19 @@ public class MainActivity extends MvpAppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+        mNavigator = new MainNavigator(this, savedInstanceState);
+
+        if(savedInstanceState != null) {
+            mActiveTabPosition = savedInstanceState.getInt(Constants.EXTRA_ACTIVE_TAB_POSITION);
+            updateTabSelection(mActiveTabPosition);
+        }
+
         mBottomTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mMainRouter.switchTab(tab.getPosition());
+                mActiveTabPosition = tab.getPosition();
+
+                mMainRouter.switchTab(mActiveTabPosition);
             }
 
             @Override
@@ -75,29 +103,6 @@ public class MainActivity extends MvpAppCompatActivity {
                 onTabSelected(tab);
             }
         });
-
-        mNavigator = new MainNavigator(this) {
-
-            @Override
-            public void updateTabSelection(int activeTabPosition) {
-                MainActivity.this.updateTabSelection(activeTabPosition);
-            }
-
-            @Override
-            public void updateToolbarControls(boolean isRootFrag) {
-                MainActivity.this.updateToolbarControls(isRootFrag);
-            }
-
-            @Override
-            public void sendShortToast(int stringId) {
-                MainActivity.this.showSystemMessage(stringId);
-            }
-
-            @Override
-            public void exitApplication() {
-                MainActivity.this.finish();
-            }
-        };
 
     }
 
@@ -114,11 +119,18 @@ public class MainActivity extends MvpAppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onBackPressed() {
+        mMainRouter.onBackPressed();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(Constants.EXTRA_ACTIVE_TAB_POSITION, mActiveTabPosition);
         if (mNavigator != null) {
-            mNavigator.saveNavigationState();
+            mNavigator.saveNavigationState(outState);
         }
+
     }
 
     public void updateToolbarControls(boolean isRootFrag) {
@@ -129,8 +141,14 @@ public class MainActivity extends MvpAppCompatActivity {
     }
 
     public void updateTabSelection(int currentTab) {
+
         for (int i = 0; i < TABS.length; i++) {
             TabLayout.Tab selectedTab = mBottomTabLayout.getTabAt(i);
+
+            if(selectedTab == null || selectedTab.getCustomView() == null) {
+                continue;
+            }
+
             if (currentTab != i) {
                 selectedTab.getCustomView().setSelected(false);
             } else {
@@ -147,16 +165,6 @@ public class MainActivity extends MvpAppCompatActivity {
         mToast.show();
     }
 
-    @Override
-    public void onBackPressed() {
-        mMainRouter.onBackPressed();
-    }
-
-    public void updateToolbarTitle(@NonNull String title) {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(title);
-        }
-    }
 
     private void initBottomTabs() {
 
@@ -188,5 +196,17 @@ public class MainActivity extends MvpAppCompatActivity {
             R.drawable.browser_history,
             R.drawable.browser_settings
     };
+
+    private int getStatusBarHeight() {
+        int result = 0;
+
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+
+        return result;
+    }
 
 }

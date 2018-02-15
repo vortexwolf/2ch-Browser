@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
@@ -42,25 +43,27 @@ import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
  * 2ch-Browser
  */
 
-public abstract class MainNavigator implements Navigator, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
+public class MainNavigator implements Navigator, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
 
     private static final int BOTTOM_TABS_AMOUNT = 5;
 
     @Inject TabsTransactionHistory mTabsTransactionHistory;
-    @Inject Bundle mSavedInstanceState;
     @Inject Context mContext;
 
-    FragNavController mFragNavController;
+    private FragNavController mFragNavController;
+    private MainActivity mMainActivity;
 
-    public MainNavigator(MainActivity activity) {
+    public MainNavigator(MainActivity activity, Bundle savedInstanceState) {
+
+        mMainActivity = activity;
+
         MainApplication.getAppComponent().inject(this);
 
         FragNavTransactionOptions mFragNavTransactionOptions = FragNavTransactionOptions.newBuilder()
-                .transition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .allowStateLoss(true)
+                .transition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .build();
 
-        mFragNavController = FragNavController.newBuilder(mSavedInstanceState, activity.getSupportFragmentManager(), R.id.base_activity_container)
+        mFragNavController = FragNavController.newBuilder(savedInstanceState, mMainActivity.getSupportFragmentManager(), R.id.base_activity_container)
                 .transactionListener(this)
                 .rootFragmentListener(this, BOTTOM_TABS_AMOUNT)
                 .defaultTransactionOptions(mFragNavTransactionOptions)
@@ -86,10 +89,10 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
         throw new IllegalStateException("Need to send an index that we know");
     }
 
-    public void saveNavigationState() {
+    public void saveNavigationState(Bundle savedInstanceState) {
         if (mFragNavController != null) {
             //re-initialization
-            mFragNavController.onSaveInstanceState(mSavedInstanceState);
+            mFragNavController.onSaveInstanceState(savedInstanceState);
         }
     }
 
@@ -102,7 +105,6 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
         updateTabSelection(i);
         updateToolbarControls(mFragNavController.isRootFragment());
 
-        //mMainActivityPresenter.updateToolbarTitle(fragment.getArguments().getString(Constants.FRAGMENT_TITLE));
     }
 
     @Override
@@ -111,13 +113,6 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
 
     }
 
-    public abstract void updateTabSelection(int activeTabPosition);
-
-    public abstract void updateToolbarControls(boolean isRootFrag);
-
-    public abstract void sendShortToast(@StringRes int stringId);
-
-    public abstract void exitApplication();
 
     @Override
     public void applyCommand(Command command) {
@@ -132,9 +127,13 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
             mFragNavController.pushFragment(((PushFragment) command).getFragment());
         }
         if (command instanceof SwitchTab) {
+
             int activeTabPosition = ((SwitchTab) command).getTabPosition();
+
             mFragNavController.switchTab(activeTabPosition);
+
             updateTabSelection(activeTabPosition);
+
             updateToolbarControls(mFragNavController.isRootFragment());
 
         }
@@ -162,13 +161,29 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
             );
         }
 
-        if (command instanceof OpenAttachment) {
+//        if (command instanceof OpenAttachment) {
 //            Intent imageGallery = new Intent(mContext, ImageGalleryActivity.class);
 //            imageGallery.setData(uri);
 //            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
 //            context.startActivity(imageGallery);
-        }
+//        }
+    }
+
+    private void updateTabSelection(int activeTabPosition) {
+        mMainActivity.updateTabSelection(activeTabPosition);
+    }
+
+    private void updateToolbarControls(boolean isRootFrag) {
+        mMainActivity.updateToolbarControls(isRootFrag);
+    }
+
+    private void sendShortToast(int stringId) {
+        mMainActivity.showSystemMessage(stringId);
+    }
+
+    private void exitApplication() {
+        mMainActivity.finish();
     }
 
     private boolean mDoubleBackToExitPressedOnce = false;
@@ -181,6 +196,7 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
         } else {
             //root fragment is visible, let's check fragment commit history.
             if (mTabsTransactionHistory.isEmpty()) {
+
                 //No history, proceed with exit
                 if (mDoubleBackToExitPressedOnce) {
                     exitApplication();
@@ -189,7 +205,7 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
                 waitForAnotherPressToExit();
 
             } else {
-                if (mTabsTransactionHistory.getStackSize() >= 2) {
+                if (mTabsTransactionHistory.getStackSize() > 1) {
                     //History is there. let's go to previous root fragment that has been opened.
                     int position = mTabsTransactionHistory.pop();
 
@@ -198,11 +214,7 @@ public abstract class MainNavigator implements Navigator, FragNavController.Tran
 
                 } else {
                     //single fragment in stack, go to home fragment.
-
-                    //mMainActivityPresenter.updateTabSelection(0);
-
                     mFragNavController.switchTab(0);
-
                     mTabsTransactionHistory.emptyStack();
                 }
             }

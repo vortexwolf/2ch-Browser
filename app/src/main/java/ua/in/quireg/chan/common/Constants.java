@@ -49,6 +49,7 @@ public class Constants {
 
     public static final String FRAGMENT_TITLE = "fragment_title";
     public static final String EXTRA_LIST_VIEW_POSITION = "ExtraListViewPosition";
+    public static final String EXTRA_ACTIVE_TAB_POSITION = "ExtraSelectedTabPosition";
 
 
     // Request-коды для запуска метода startActivityForResult

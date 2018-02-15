@@ -10,10 +10,10 @@ import dagger.Component;
  * 2ch-Browser
  */
 @Singleton
-@Component(modules={BaseModule.class})
+@Component(modules={BaseModule.class, NavigationModule.class})
 public interface BaseComponent {
 
-    AppComponent plus(NetModule netModule, DataRepositoryModule dataRepositoryModule, WebsiteModule websiteModule, NavigationModule navigationModule);
+    AppComponent plus(NetModule netModule, DataRepositoryModule dataRepositoryModule, WebsiteModule websiteModule);
 
 
 }

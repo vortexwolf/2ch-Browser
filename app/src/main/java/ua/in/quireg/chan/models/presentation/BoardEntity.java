@@ -11,6 +11,8 @@ public class BoardEntity implements BoardsListEntity {
     public String boardName = "Unknown"; //Movies
     public String category = "БЕЗНОГNМ"; //Взрослым
     public int bumpLimit = 0;
+    public boolean isFavorite = false;
+    public boolean isVisible = true;
 
     @Override
     public boolean isSection() {

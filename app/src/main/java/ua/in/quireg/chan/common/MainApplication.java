@@ -73,13 +73,13 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class MainApplication extends Application {
 
-    private static AppComponent mComponent;
+    private static AppComponent mAppComponent;
     private static BaseComponent mBaseComponent;
 
     private Toast mToast;
 
     public static AppComponent getAppComponent() {
-        return mComponent;
+        return mAppComponent;
     }
 
     public static BaseComponent getBaseComponent() {
@@ -102,8 +102,7 @@ public class MainApplication extends Application {
             ACRA.init(this);
         }
         mBaseComponent = buildBaseComponent();
-
-        mComponent = buildComponent();
+        mAppComponent = buildAppComponent();
 
         if (Constants.SDK_VERSION >= 19) {
             CompatibilityUtils.setSerialExecutor();
@@ -163,10 +162,6 @@ public class MainApplication extends Application {
         container.register(MailruCaptchaService.class, new MailruCaptchaService(httpStringReader));
         container.register(DvachCaptchaService.class, new DvachCaptchaService());
 
-        historyDataSource.open();
-        favoritesDataSource.open();
-        hiddenThreadsDataSource.open();
-
 
         httpClient.setCookie(mSettings.getCloudflareClearanceCookie());
         httpClient.setCookie(mSettings.getPassCodeCookie());
@@ -174,24 +169,18 @@ public class MainApplication extends Application {
     }
 
     public void rebuildAppComponent(){
-        mComponent = buildComponent();
+        mAppComponent = buildAppComponent();
     }
 
-    protected AppComponent buildComponent() {
-        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule(), new NavigationModule());
+    protected AppComponent buildAppComponent() {
+        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule());
     }
 
     public BaseComponent buildBaseComponent() {
         return DaggerBaseComponent.builder()
                 .baseModule(new BaseModule(this))
+                .navigationModule(new NavigationModule())
                 .build();
     }
 
-    public void showShortToast(@NonNull String message) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        mToast.show();
-    }
 }

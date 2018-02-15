@@ -21,9 +21,8 @@ import ua.in.quireg.chan.ui.fragments.PostsListFragment;
 import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
 
 
-
 @AppScope
-@Subcomponent(modules = {NetModule.class, DataRepositoryModule.class, WebsiteModule.class, NavigationModule.class})
+@Subcomponent(modules = {NetModule.class, DataRepositoryModule.class, WebsiteModule.class})
 public interface AppComponent {
 
     void inject(MainActivity activity);

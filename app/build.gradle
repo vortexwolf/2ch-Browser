@@ -5,7 +5,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 ext {
-    supportLibraryVersion = '26.1.0'
+    supportLibraryVersion = '27.0.2'
     butterknifeVersion = "8.8.1"
     leakCanaryVersion = "1.5.4"
     dagger2Version = "2.11"
@@ -84,12 +84,12 @@ android {
         }
     }
 
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "ua.in.quireg.chan"
-        minSdkVersion 14
-        targetSdkVersion 26
+        minSdkVersion 21
+        targetSdkVersion 27
         versionCode 2000
         versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

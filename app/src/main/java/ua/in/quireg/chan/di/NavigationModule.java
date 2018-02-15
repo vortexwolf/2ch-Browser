@@ -2,6 +2,8 @@ package ua.in.quireg.chan.di;
 
 import android.os.Bundle;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import ru.terrakok.cicerone.Cicerone;
@@ -24,25 +26,25 @@ public class NavigationModule {
     }
 
     @Provides
-    @AppScope
+    @Singleton
     MainRouter provideRouter() {
         return cicerone.getRouter();
     }
 
     @Provides
-    @AppScope
+    @Singleton
     NavigatorHolder provideNavigatorHolder() {
         return cicerone.getNavigatorHolder();
     }
 
     @Provides
-    @AppScope
+    @Singleton
     Bundle providePersistentBundle() {
         return new Bundle();
     }
 
     @Provides
-    @AppScope
+    @Singleton
     TabsTransactionHistory provideTabsTransactionHistory() {
         return new TabsTransactionHistory();
     }

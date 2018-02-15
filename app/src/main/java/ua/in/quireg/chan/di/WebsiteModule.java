@@ -1,7 +1,5 @@
 package ua.in.quireg.chan.di;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 import ua.in.quireg.chan.domain.ApiReader;

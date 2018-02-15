@@ -14,20 +14,10 @@ public class HiddenThreadsDataSource {
         DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER
     };*/
 
-    private final DvachSqlHelper mDbHelper;
-
     private SQLiteDatabase mDatabase;
 
     public HiddenThreadsDataSource(DvachSqlHelper dbHelper) {
-        mDbHelper = dbHelper;
-    }
-
-    public void open() {
-        mDatabase = mDbHelper.getWritableDatabase();
-    }
-
-    public void close() {
-        mDbHelper.close();
+        mDatabase = dbHelper.getWritableDatabase();
     }
 
     public void addToHiddenThreads(String website, String board, String thread) {

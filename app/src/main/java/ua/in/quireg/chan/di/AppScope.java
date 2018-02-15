@@ -1,10 +1,11 @@
 package ua.in.quireg.chan.di;
 
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Scope;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import dagger.releasablereferences.CanReleaseReferences;
 
 /**
  * Created by Arcturus Mengsk on 12/5/2017, 2:22 AM.
@@ -12,7 +13,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 
 @Scope
-@Retention(RUNTIME)
+@Retention(value= RetentionPolicy.RUNTIME)
+@CanReleaseReferences
 public @interface AppScope {
 
 }

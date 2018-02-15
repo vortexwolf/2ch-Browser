@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+import java.util.List;
 
 import timber.log.Timber;
 import ua.in.quireg.chan.common.Constants;
@@ -31,6 +32,7 @@ import ua.in.quireg.chan.common.library.CancellableInputStream;
 import ua.in.quireg.chan.common.library.ProgressInputStream;
 import ua.in.quireg.chan.interfaces.ICancelled;
 import ua.in.quireg.chan.interfaces.IProgressChangeListener;
+import ua.in.quireg.chan.models.domain.BoardModel;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class IoUtils {
@@ -401,6 +403,25 @@ public class IoUtils {
         }
 
         return samplings.length == 1 && !samplings[0].equals("1x1");
+    }
+
+    public static boolean areEqual(List<BoardModel> first, List<BoardModel> second) {
+
+        if (first == null || second == null || first.isEmpty() || second.isEmpty()) {
+            return false;
+        }
+
+        for (BoardModel modelA : first) {
+            boolean matchFound = false;
+            for (BoardModel modelB : second) {
+                if (modelA.getId().equals(modelB.getId())) {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (!matchFound) return false;
+        }
+        return true;
     }
 
 }

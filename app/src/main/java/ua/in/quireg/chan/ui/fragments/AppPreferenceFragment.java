@@ -4,7 +4,12 @@ import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.CheckBoxPreference;
@@ -13,8 +18,10 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -37,7 +44,6 @@ import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
-    @Inject protected MainApplication mMainApplication;
     @Inject protected SharedPreferences mSharedPreferences;
     @Inject protected MainRouter mRouter;
 
@@ -84,6 +90,19 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getActivity().getTheme();
+
+        theme.resolveAttribute(R.attr.activityRootBackground, typedValue, true);
+        @ColorInt int color = typedValue.data;
+
+        view.setBackgroundColor(color);
+    }
+
+    @Override
     public void onDisplayPreferenceDialog(Preference preference) {
         if (preference instanceof SeekBarDialogPreference) {
             DialogFragment dialogFragment = SeekBarDialogPreferenceFragment.newInstance(preference);
@@ -116,7 +135,6 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onStart() {
         super.onStart();
-
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.menu_preferences));
 
     }
@@ -389,7 +407,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
             Timber.d("network config changed");
 
             mNetworkConfigChanged = false;
-            mMainApplication.rebuildAppComponent();
+            getActivity().recreate();
         }
     }
 }

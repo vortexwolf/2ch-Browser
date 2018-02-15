@@ -12,21 +12,10 @@ import ua.in.quireg.chan.models.presentation.BoardEntity;
  * Created by Arcturus Mengsk on 11/21/2017, 2:31 PM.
  * 2ch-Browser
  */
+
 @StateStrategyType(SkipStrategy.class)
 public interface BoardsListView extends MvpView {
 
     void setBoards(List<BoardEntity> boardModels);
-
-    void setFavBoards(List<BoardEntity> boardModels);
-
-    void restoreListViewPosition();
-
-    void clearBoards();
-
-    void addFavoriteBoard(BoardEntity boardModel);
-
-    void removeFavoriteBoard(BoardEntity boardModel);
-
-    void hideSoftKeyboard();
 
 }

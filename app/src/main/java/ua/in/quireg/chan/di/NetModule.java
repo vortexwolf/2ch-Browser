@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -22,13 +21,10 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.domain.ApiReader;
-import ua.in.quireg.chan.domain.ApiReaderImpl;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 @Module
 public class NetModule {
-
 
     @Provides
     @AppScope
@@ -102,6 +98,5 @@ public class NetModule {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(application.getCacheDir(), cacheSize);
     }
-
 
 }

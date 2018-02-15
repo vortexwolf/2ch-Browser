@@ -11,6 +11,7 @@ import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
+import ua.in.quireg.chan.repositories.BoardsRepositoryImpl;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 2:04 PM.
@@ -22,10 +23,8 @@ public class DataRepositoryModule {
 
     @Provides
     @AppScope
-    BoardsRepository providesBoardsRepository(ApiReader apiReader,
-                                              OkHttpClient okHttpClient,
-                                              Context context) {
-        return new BoardsRepository(apiReader, okHttpClient, context);
+    BoardsRepository providesBoardsRepository(ApiReader apiReader, OkHttpClient okHttpClient, Context context) {
+        return new BoardsRepositoryImpl(apiReader, okHttpClient, context);
     }
 
     @Provides
@@ -37,24 +36,18 @@ public class DataRepositoryModule {
     @Provides
     @AppScope
     FavoritesDataSource providesFavoritesDataSource(DvachSqlHelper dvachSqlHelper) {
-        FavoritesDataSource favoritesDataSource = new FavoritesDataSource(dvachSqlHelper);
-        favoritesDataSource.open();
-        return favoritesDataSource;
+        return new FavoritesDataSource(dvachSqlHelper);
     }
 
     @Provides
     @AppScope
     HistoryDataSource providesHistoryDataSource(DvachSqlHelper dvachSqlHelper) {
-        HistoryDataSource historyDataSource = new HistoryDataSource(dvachSqlHelper);
-        historyDataSource.open();
-        return historyDataSource;
+        return new HistoryDataSource(dvachSqlHelper);
     }
 
     @Provides
     @AppScope
     HiddenThreadsDataSource providesHiddenThreadsDataSource(DvachSqlHelper dvachSqlHelper) {
-        HiddenThreadsDataSource hiddenThreadsDataSource = new HiddenThreadsDataSource(dvachSqlHelper);
-        hiddenThreadsDataSource.open();
-        return hiddenThreadsDataSource;
+        return new HiddenThreadsDataSource(dvachSqlHelper);
     }
 }

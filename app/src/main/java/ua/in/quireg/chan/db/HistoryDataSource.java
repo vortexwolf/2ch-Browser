@@ -21,20 +21,10 @@ public class HistoryDataSource {
     };
     private static final int QUERY_LIMIT = 200;
 
-    private final DvachSqlHelper mDbHelper;
-
     private SQLiteDatabase mDatabase;
 
     public HistoryDataSource(DvachSqlHelper dbHelper) {
-        mDbHelper = dbHelper;
-    }
-
-    public void open() {
-        mDatabase = mDbHelper.getWritableDatabase();
-    }
-
-    public void close() {
-        mDbHelper.close();
+        mDatabase = dbHelper.getWritableDatabase();
     }
 
     public void addHistory(String website, String board, String thread, String title) {

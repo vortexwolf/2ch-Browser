@@ -30,8 +30,6 @@ public class ApplicationSettings {
     private Resources mResources;
     private SharedPreferences mSharedPrefs;
 
-    private List<BoardModel> mBoards = null;
-
     public ApplicationSettings(Context context, SharedPreferences sharedPreferences)  {
         mResources = context.getResources();
         mSharedPrefs = sharedPreferences;

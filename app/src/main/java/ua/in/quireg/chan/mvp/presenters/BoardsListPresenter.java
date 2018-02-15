@@ -7,9 +7,9 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
@@ -34,7 +34,7 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
     private BoardsListInteractor mBoardsListInteractor = new BoardsListInteractor();
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private boolean mFirstViewAttached = false;
+    private boolean updateFromServer = true;
 
     public BoardsListPresenter() {
         MainApplication.getAppComponent().inject(this);
@@ -43,42 +43,41 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
     @Override
     public void attachView(BoardsListView view) {
         super.attachView(view);
+
         Timber.v("attachView()");
 
-        if (mFirstViewAttached) {
-            requestBoards(true);
-        } else {
-            mFirstViewAttached = true;
-            requestBoards(false);
+        updateBoardsList(false);
+
+        if (updateFromServer) {
+
+            updateBoardsList(true);
+
+            updateFromServer = false;
         }
+
     }
 
     @Override
     public void detachView(BoardsListView view) {
         super.detachView(view);
         Timber.v("detachView()");
+
         compositeDisposable.clear();
     }
 
-    public void requestBoards(boolean localOnly) {
-        Timber.v("requestBoards()");
+    public void updateBoardsList(boolean remote) {
+        Timber.v("updateBoardsList() %s", remote ? "remote" : "local");
 
-        compositeDisposable.add(
-                Observable.combineLatest(
-                        mBoardsListInteractor.getBoards(localOnly).observeOn(AndroidSchedulers.mainThread()),
-                        mBoardsListInteractor.getFavoriteBoards().observeOn(AndroidSchedulers.mainThread()),
-                        (boards, favBoards) -> {
+        Disposable d = mBoardsListInteractor.getBoards(remote)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                            getViewState().setBoards(list);
+                        },
+                        Timber::e,
+                        () -> Timber.d("updateBoardsList() %s completed", remote ? "remote" : "local"));
 
-                            getViewState().clearBoards();
-                            getViewState().setBoards(boards);
-                            getViewState().setFavBoards(favBoards);
-                            getViewState().restoreListViewPosition();
+        compositeDisposable.add(d);
 
-                            return boards;
-                        })
-                        .map((b) -> "Boards view updated")
-                        .subscribe(Timber::d, Timber::e)
-        );
     }
 
     public void onBoardClick(String boardCode) {
@@ -96,30 +95,23 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
 
     public void onBoardClick(BoardEntity boardEntity) {
         Timber.v("onBoardClick(BoardModel)");
-        getViewState().hideSoftKeyboard();
 
         mMainRouter.navigateBoard(Websites.getDefault().name(), boardEntity.id, true);
 
     }
 
-    public boolean isFavoriteBoard(BoardEntity boardEntity) {
-        Timber.v("isFavorite()");
-
-        return mBoardsListInteractor.isFavorite(boardEntity);
-    }
-
     public void addToFavorites(BoardEntity boardEntity) {
         Timber.v("addToFavorites()");
 
-        getViewState().addFavoriteBoard(boardEntity);
         mBoardsListInteractor.addToFavorites(boardEntity);
+        updateBoardsList(false);
     }
 
     public void removeFromFavorites(BoardEntity boardEntity) {
         Timber.v("removeFromFavorites()");
 
-        getViewState().removeFavoriteBoard(boardEntity);
         mBoardsListInteractor.removeFromFavorites(boardEntity);
+        updateBoardsList(false);
     }
 
     private boolean validateBoardCode(String boardCode) {

@@ -1,39 +1,29 @@
 package ua.in.quireg.chan.db;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-
-import ua.in.quireg.chan.common.library.MyLog;
+import timber.log.Timber;
 import ua.in.quireg.chan.common.utils.StringUtils;
 
 public class FavoritesDataSource {
+
     private static final String TABLE = DvachSqlHelper.TABLE_FAVORITES;
     private static final String[] ALL_COLUMNS = {
-        DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
-        DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER,
-        DvachSqlHelper.COLUMN_TITLE
+            DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
+            DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER,
+            DvachSqlHelper.COLUMN_TITLE
     };
-
-    private final DvachSqlHelper mDbHelper;
 
     private SQLiteDatabase mDatabase;
     private boolean mModified = false;
 
     public FavoritesDataSource(DvachSqlHelper dbHelper) {
-        mDbHelper = dbHelper;
-    }
-
-    public void open() {
-        mDatabase = mDbHelper.getWritableDatabase();
-    }
-
-    public void close() {
-        mDbHelper.close();
+        mDatabase = dbHelper.getWritableDatabase();
     }
 
     public boolean isModified() {
@@ -45,6 +35,7 @@ public class FavoritesDataSource {
     }
 
     public void addToFavorites(String website, String board, String thread, String title) {
+
         if (!hasFavorites(website, board, thread)) {
             ContentValues values = new ContentValues();
             values.put(DvachSqlHelper.COLUMN_WEBSITE, website);
@@ -53,27 +44,32 @@ public class FavoritesDataSource {
             values.put(DvachSqlHelper.COLUMN_TITLE, title);
 
             try {
+
                 mDatabase.insertOrThrow(TABLE, null, values);
                 mModified = true;
+
             } catch (Exception e) {
-                MyLog.e("FavoritesDataSource", e);
+                Timber.e(e);
             }
         }
     }
 
     public void removeFromFavorites(String website, String board, String thread) {
+
         mDatabase.delete(TABLE,
                 DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
-                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
-                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
-                new String[] { website, board, StringUtils.emptyIfNull(thread) });
+                        " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
+                        " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
+                new String[]{website, board, StringUtils.emptyIfNull(thread)});
         mModified = true;
+
     }
 
     private List<FavoritesEntity> getAllFavorites() {
-        List<FavoritesEntity> favorites = new ArrayList<FavoritesEntity>();
 
-        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID + " desc");
+        List<FavoritesEntity> favorites = new ArrayList<>();
+
+        Cursor cursor = mDatabase.query(TABLE, ALL_COLUMNS, null, null, null, null, DvachSqlHelper.COLUMN_ID + " asc");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             FavoritesEntity he = createFavoritesEntity(cursor);
@@ -88,7 +84,7 @@ public class FavoritesDataSource {
 
     public List<FavoritesEntity> getFavoriteThreads() {
         List<FavoritesEntity> favorites = getAllFavorites();
-        List<FavoritesEntity> threadFavorites = new ArrayList<FavoritesEntity>();
+        List<FavoritesEntity> threadFavorites = new ArrayList<>();
 
         for (FavoritesEntity f : favorites) {
             if (!StringUtils.isEmpty(f.getThread())) {
@@ -101,7 +97,7 @@ public class FavoritesDataSource {
 
     public List<FavoritesEntity> getFavoriteBoards() {
         List<FavoritesEntity> favorites = getAllFavorites();
-        List<FavoritesEntity> boardFavorites = new ArrayList<FavoritesEntity>();
+        List<FavoritesEntity> boardFavorites = new ArrayList<>();
 
         for (FavoritesEntity f : favorites) {
             if (StringUtils.isEmpty(f.getThread())) {
@@ -113,12 +109,15 @@ public class FavoritesDataSource {
     }
 
     public boolean hasFavorites(String website, String board, String thread) {
+
         Cursor cursor = mDatabase.rawQuery(
-                "select count(*) from " + TABLE +
-                " where " + DvachSqlHelper.COLUMN_WEBSITE + " = ?" +
-                " and " + DvachSqlHelper.COLUMN_BOARD_NAME + " = ?" +
-                " and " + DvachSqlHelper.COLUMN_THREAD_NUMBER + " = ?",
-                new String[] { website, board, StringUtils.emptyIfNull(thread) });
+                String.format("SELECT count(*) FROM %s WHERE %s = ? and %s = ? and %s = ?",
+                        TABLE,
+                        DvachSqlHelper.COLUMN_WEBSITE,
+                        DvachSqlHelper.COLUMN_BOARD_NAME,
+                        DvachSqlHelper.COLUMN_THREAD_NUMBER),
+                new String[]{website, board, StringUtils.emptyIfNull(thread)}
+        );
 
         cursor.moveToFirst();
         long count = cursor.getLong(0);
