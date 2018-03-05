@@ -12,6 +12,7 @@ import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.repositories.BoardsRepositoryImpl;
+import ua.in.quireg.chan.services.presentation.OpenTabsManager;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 2:04 PM.
@@ -49,5 +50,11 @@ public class DataRepositoryModule {
     @AppScope
     HiddenThreadsDataSource providesHiddenThreadsDataSource(DvachSqlHelper dvachSqlHelper) {
         return new HiddenThreadsDataSource(dvachSqlHelper);
+    }
+
+    @Provides
+    @AppScope
+    OpenTabsManager providesOpenTabsManager() {
+        return new OpenTabsManager();
     }
 }

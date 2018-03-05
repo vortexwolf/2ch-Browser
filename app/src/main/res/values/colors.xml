@@ -36,7 +36,7 @@
     <color name="black_post_number">@color/black_primary_text</color>
     <color name="neutron_post_number">#C9BE89</color>
     <color name="photon_post_number">@color/photon_primary_text</color>
-    <color name="white_list_section">#ebeff9</color>
+    <color name="white_list_section">#eceef4</color>
     <color name="black_list_section">@color/black_background</color>
     <color name="neutron_list_section">#191919</color>
     <color name="photon_list_section">@color/white_list_section</color>

@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import ru.terrakok.cicerone.Navigator;
 import ru.terrakok.cicerone.commands.Command;
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -68,6 +69,8 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
                 .rootFragmentListener(this, BOTTOM_TABS_AMOUNT)
                 .defaultTransactionOptions(mFragNavTransactionOptions)
                 .build();
+
+        updateTabSelection(mFragNavController.getCurrentStackIndex());
     }
 
     @Override

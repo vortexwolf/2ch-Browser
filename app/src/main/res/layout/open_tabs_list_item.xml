@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:minHeight="?android:listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:paddingLeft="2dip" >
+    tools:ignore="Rtlsymmetry">
 
     <LinearLayout
-        android:layout_width="0.0dip"
+        android:id="@+id/tabs_item_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1.0"
-        android:orientation="vertical" >
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/tabs_item_delete"
+        android:padding="8dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tabs_item_title"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textAppearance="?android:textAppearanceLarge" />
+            android:textAppearance="?android:textAppearanceMedium"
+            tools:text="My mechanism consists of passing the listener as a parameter to the constructor and then assign it" />
 
         <TextView
             android:id="@+id/tabs_item_url"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="1"
             android:singleLine="true"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="?android:textColorSecondary" />
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="?android:textColorSecondary"
+            tools:text="There is a common pattern I use in all of my RecyclerView adapters to listen for click events on each item. " />
+
     </LinearLayout>
 
-    <ua.in.quireg.chan.ui.views.NonParentFocusableImageView
+    <ImageView
         android:id="@+id/tabs_item_delete"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/tabs_item_layout"
         android:background="?tabCloseButtonBackground"
-        android:paddingLeft="18.0dip"
-        android:paddingRight="18.0dip"
+        android:contentDescription="@string/this_is_image"
         android:scaleType="center"
         android:src="@drawable/btn_close_tab" />
 
-</LinearLayout>
+</RelativeLayout>

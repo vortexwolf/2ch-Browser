@@ -153,9 +153,9 @@ public class HistoryFragment extends BaseListFragment {
     }
 
     private void searchHistory() {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mSearchInput.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
-
+//        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.hideSoftInputFromWindow(mSearchInput.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+        mSearchInput.clearFocus();
         String query = mSearchInput.getText().toString();
         mAdapter.searchItems(query);
     }

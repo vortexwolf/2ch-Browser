@@ -12,15 +12,17 @@ public class OpenTabModel {
     private int mPage;
     private String mThread;
     private String mTitle;
+    private boolean mIsFavorite;
 
     private AppearanceUtils.ListViewPosition mPosition;
 
-    public OpenTabModel(IWebsite website, String board, int page, String thread, String title) {
+    public OpenTabModel(IWebsite website, String board, int page, String thread, String title, boolean isFavorite) {
         this.mWebsite = website;
         this.mBoard = board;
         this.mPage = page;
         this.mThread = thread;
         this.mTitle = title;
+        this.mIsFavorite = isFavorite;
     }
 
     public String getTitle() {
@@ -45,6 +47,14 @@ public class OpenTabModel {
 
     public String getThread() {
         return this.mThread;
+    }
+
+    public boolean isFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setFavorite(boolean isFavorite) {
+        this.mIsFavorite = isFavorite;
     }
 
     public void setPosition(AppearanceUtils.ListViewPosition position) {

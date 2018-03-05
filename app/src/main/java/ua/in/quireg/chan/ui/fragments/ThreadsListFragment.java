@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -50,17 +51,16 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 
-public class ThreadsListFragment extends BaseListFragment{
+public class ThreadsListFragment extends BaseListFragment {
 
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
     @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
-
+    @Inject OpenTabsManager mOpenTabsManager;
     @Inject MainRouter mRouter;
 
     private IJsonApiReader mJsonReader = Factory.resolve(MakabaApiReader.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
-    private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
 
@@ -97,7 +97,7 @@ public class ThreadsListFragment extends BaseListFragment{
 //            mNavigationService.restartActivity(this, extras);
 //        }
         // Сохраняем во вкладках
-        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, mPageNumber, null, null);
+        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, mPageNumber, null, null, false);
         mTabModel = mOpenTabsManager.add(tabModel);
         setHasOptionsMenu(true);
 
@@ -111,7 +111,7 @@ public class ThreadsListFragment extends BaseListFragment{
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.threads_list_view, container, false);
     }
 

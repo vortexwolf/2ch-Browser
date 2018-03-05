@@ -5,7 +5,6 @@
     <dimen name="toolbar_height">40dp</dimen>
     <dimen name="tab_layout_size">40dp</dimen>
     <dimen name="navigation_button_size">40dp</dimen>
-    <dimen name="navigation_button_padding">4dp</dimen>
 
     <dimen name="thumbnail_size">64dp</dimen>
     <dimen name="filelist_frame_size">56dp</dimen>

@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -64,13 +65,13 @@ import static android.app.Activity.RESULT_OK;
 public class PostsListFragment extends BaseListFragment {
 
     @Inject MainRouter mRouter;
+    @Inject ApplicationSettings mSettings;
+    @Inject OpenTabsManager mOpenTabsManager;
+    @Inject HistoryDataSource mHistoryDataSource;
+    @Inject FavoritesDataSource mFavoritesDatasource;
 
     private IJsonApiReader mJsonReader;
-    private final ApplicationSettings mSettings = Factory.resolve(ApplicationSettings.class);
     private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
-    private final FavoritesDataSource mFavoritesDatasource = Factory.resolve(FavoritesDataSource.class);
-    private final HistoryDataSource mHistoryDataSource = Factory.resolve(HistoryDataSource.class);
-    private final OpenTabsManager mOpenTabsManager = Factory.resolve(OpenTabsManager.class);
     private final ThreadImagesService mThreadImagesService = Factory.resolve(ThreadImagesService.class);
 
     private IUrlBuilder mUrlBuilder;
@@ -94,8 +95,6 @@ public class PostsListFragment extends BaseListFragment {
         MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
 
-        //mCurrentSettings = mSettings.getCurrentSettings();
-
         // Парсим код доски и номер страницы
         Bundle extras = getArguments();
         mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
@@ -107,8 +106,10 @@ public class PostsListFragment extends BaseListFragment {
         mUrlBuilder = mWebsite.getUrlBuilder();
         mJsonReader = Factory.resolve(MakabaApiReader.class);
 
-        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, 0, mThreadNumber, pageSubject);
+        //TODO fix isFavourite
+        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, 0, mThreadNumber, pageSubject, false);
         mTabModel = mOpenTabsManager.add(tabModel);
+
         setHasOptionsMenu(true);
 
 
@@ -129,7 +130,7 @@ public class PostsListFragment extends BaseListFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.posts_list_view, container, false);
     }
 

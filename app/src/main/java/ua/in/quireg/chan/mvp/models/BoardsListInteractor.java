@@ -49,34 +49,6 @@ public class BoardsListInteractor {
 
     }
 
-    private List<BoardEntity> setFavoriteBoards(List<BoardEntity> boards) {
-
-        for (FavoritesEntity fe : mFavoritesDataSource.getFavoriteBoards()) {
-
-            boolean matchFound = false;
-
-            for (BoardEntity board : boards) {
-                if (board.id.equals(fe.getBoard())) {
-
-                    board.isFavorite = true;
-                    matchFound = true;
-
-                    break;
-                }
-            }
-
-            if (!matchFound) {
-                BoardEntity boardEntity = new BoardEntity();
-                boardEntity.id = fe.getBoard();
-                boardEntity.boardName = fe.getTitle();
-                boardEntity.isFavorite = true;
-                boards.add(boardEntity);
-            }
-        }
-
-        return boards;
-    }
-
     public void addToFavorites(BoardEntity boardEntity) {
         mFavoritesDataSource.addToFavorites(Websites.getDefault().name(), boardEntity.id, null, null);
     }
@@ -115,6 +87,33 @@ public class BoardsListInteractor {
         return boards;
     }
 
+    private List<BoardEntity> setFavoriteBoards(List<BoardEntity> boards) {
+
+        for (FavoritesEntity fe : mFavoritesDataSource.getFavoriteBoards()) {
+
+            boolean matchFound = false;
+
+            for (BoardEntity board : boards) {
+                if (board.id.equals(fe.getBoard())) {
+
+                    board.isFavorite = true;
+                    matchFound = true;
+
+                    break;
+                }
+            }
+
+            if (!matchFound) {
+                BoardEntity boardEntity = new BoardEntity();
+                boardEntity.id = fe.getBoard();
+                boardEntity.boardName = fe.getTitle();
+                boardEntity.isFavorite = true;
+                boards.add(boardEntity);
+            }
+        }
+
+        return boards;
+    }
 
     private boolean isBoardVisible(BoardEntity board) {
         return mApplicationSettings.isDisplayAllBoards() ||

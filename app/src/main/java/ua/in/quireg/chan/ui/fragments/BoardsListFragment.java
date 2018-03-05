@@ -1,6 +1,7 @@
 package ua.in.quireg.chan.ui.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -63,7 +64,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.pick_board_view, container, false);
         mListView = view.findViewById(android.R.id.list);
@@ -77,7 +78,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         if (mBoardsListAdapter == null) {
@@ -99,8 +100,12 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         registerForContextMenu(mListView);
 
-        //TODO move to navigation controller
-        ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        //TODO move to navigation controller maybe?
+
+        ActionBar mActionBar = null;
+        if ((getActivity()) != null) {
+            mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        }
         if (mActionBar != null) {
             mActionBar.setTitle(getString(R.string.app_name));
         }

@@ -5,6 +5,7 @@ import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.boards.makaba.MakabaUrlBuilder;
 import ua.in.quireg.chan.mvp.models.BoardsListInteractor;
 import ua.in.quireg.chan.mvp.presenters.BoardsListPresenter;
+import ua.in.quireg.chan.mvp.presenters.OpenTabsPresenter;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.PostSender;
@@ -17,6 +18,7 @@ import ua.in.quireg.chan.ui.fragments.BaseListFragment;
 import ua.in.quireg.chan.ui.fragments.BoardsListFragment;
 import ua.in.quireg.chan.ui.fragments.FavoritesFragment;
 import ua.in.quireg.chan.ui.fragments.HistoryFragment;
+import ua.in.quireg.chan.ui.fragments.OpenTabsFragment;
 import ua.in.quireg.chan.ui.fragments.PostsListFragment;
 import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
 
@@ -47,6 +49,8 @@ public interface AppComponent {
     void inject(MainNavigator mainNavigator);
 
     void inject(PostsListFragment postsListFragment);
+    void inject(OpenTabsFragment openTabsFragment);
+    void inject(OpenTabsPresenter openTabsPresenter);
 
 
 

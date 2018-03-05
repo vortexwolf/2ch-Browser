@@ -316,6 +316,8 @@
     <string name="notification_video_thumbnail">Нажмите на миниатюру, чтобы открыть</string>
     <string name="notification_video">Нажмите на превью, чтобы открыть</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
+    <string name="this_is_image">This is image</string>
+    <string name="opened_tabs_for_this_session">Открытые Вкладки</string>
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>

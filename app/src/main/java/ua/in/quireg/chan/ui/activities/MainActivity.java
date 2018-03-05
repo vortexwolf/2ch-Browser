@@ -22,7 +22,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.terrakok.cicerone.NavigatorHolder;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
@@ -42,12 +41,10 @@ public class MainActivity extends MvpAppCompatActivity {
     private Toast mToast;
     private MainNavigator mNavigator;
 
-    private int mActiveTabPosition = 0;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
-        ((MainApplication)getApplication()).rebuildAppComponent();
+//        ((MainApplication)getApplication()).rebuildAppComponent();
 
         MainApplication.getAppComponent().inject(this);
 
@@ -80,17 +77,10 @@ public class MainActivity extends MvpAppCompatActivity {
 
         mNavigator = new MainNavigator(this, savedInstanceState);
 
-        if(savedInstanceState != null) {
-            mActiveTabPosition = savedInstanceState.getInt(Constants.EXTRA_ACTIVE_TAB_POSITION);
-            updateTabSelection(mActiveTabPosition);
-        }
-
         mBottomTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mActiveTabPosition = tab.getPosition();
-
-                mMainRouter.switchTab(mActiveTabPosition);
+                mMainRouter.switchTab(tab.getPosition());
             }
 
             @Override
@@ -126,7 +116,6 @@ public class MainActivity extends MvpAppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(Constants.EXTRA_ACTIVE_TAB_POSITION, mActiveTabPosition);
         if (mNavigator != null) {
             mNavigator.saveNavigationState(outState);
         }
@@ -143,6 +132,7 @@ public class MainActivity extends MvpAppCompatActivity {
     public void updateTabSelection(int currentTab) {
 
         for (int i = 0; i < TABS.length; i++) {
+
             TabLayout.Tab selectedTab = mBottomTabLayout.getTabAt(i);
 
             if(selectedTab == null || selectedTab.getCustomView() == null) {

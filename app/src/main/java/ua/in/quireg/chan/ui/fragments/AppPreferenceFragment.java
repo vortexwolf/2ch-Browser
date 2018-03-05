@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -18,6 +17,7 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -37,10 +37,9 @@ import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
-import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
-import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.settings.SeekBarDialogPreference;
 import ua.in.quireg.chan.settings.SeekBarDialogPreferenceFragment;
+import ua.in.quireg.chan.ui.views.AppPreferencesDividerItemDecoration;
 
 public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
@@ -93,6 +92,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //Set proper background according to applied theme
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = getActivity().getTheme();
 
@@ -100,6 +100,17 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         @ColorInt int color = typedValue.data;
 
         view.setBackgroundColor(color);
+
+        //Remove builtin item decorator and replace with custom.
+        RecyclerView recyclerView = view.findViewById(R.id.list);
+
+        int c = recyclerView.getItemDecorationCount();
+        for (int i = 0; i < c; i++) {
+            recyclerView.removeItemDecorationAt(i);
+        }
+        recyclerView.addItemDecoration(new AppPreferencesDividerItemDecoration(getContext()));
+
+
     }
 
     @Override
@@ -107,8 +118,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         if (preference instanceof SeekBarDialogPreference) {
             DialogFragment dialogFragment = SeekBarDialogPreferenceFragment.newInstance(preference);
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getFragmentManager(),
-                    "android.support.v7.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
         } else {
             super.onDisplayPreferenceDialog(preference);
         }

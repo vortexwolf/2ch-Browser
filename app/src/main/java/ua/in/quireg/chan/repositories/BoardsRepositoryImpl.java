@@ -43,7 +43,7 @@ public class BoardsRepositoryImpl implements BoardsRepository {
     private OkHttpClient mOkHttpClient;
     private CacheDirectoryManager mCacheManager;
 
-    private static final String MAKABA_BOARDS = "MAKABA_BOARDS";
+    private final String MAKABA_BOARDS = "MAKABA_BOARDS";
 
     private List<BoardModel> mBoards = null;
 

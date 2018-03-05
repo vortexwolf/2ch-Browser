@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="5.0dip" >
+    android:padding="5dp" >
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_dialog_alert" />
+        android:src="@drawable/ic_dialog_alert"
+        android:contentDescription="@string/this_is_image" />
 
     <TextView
         android:id="@+id/error_text"
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="1.0dip"
         android:layout_weight="1.0"
-        android:paddingLeft="16.0dip"
+        android:paddingStart="16dp"
         android:textColor="?android:textColorPrimary"
         android:textAppearance="?android:textAppearanceLarge" />
 

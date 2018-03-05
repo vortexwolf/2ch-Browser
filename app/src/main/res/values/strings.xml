@@ -331,6 +331,8 @@ If you want to be in read-only, post to /test/.
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
     <string name="notification_video">Tap Video Preview to Play</string>
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
+    <string name="this_is_image">This is image</string>
+    <string name="opened_tabs_for_this_session">Opened Tabs For This Session</string>
 
     <string-array name="catalog_filters">
         <item>Sort by Bump order</item>

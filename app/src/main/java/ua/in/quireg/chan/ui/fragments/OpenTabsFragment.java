@@ -1,43 +1,58 @@
 package ua.in.quireg.chan.ui.fragments;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
+import android.view.ViewParent;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.Toast;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+
+import javax.inject.Inject;
+
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.ui.adapters.OpenTabsAdapter;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.Factory;
-import ua.in.quireg.chan.common.utils.AppearanceUtils;
-import ua.in.quireg.chan.common.utils.CompatibilityUtils;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
-import ua.in.quireg.chan.services.presentation.OpenTabsManager;
+import ua.in.quireg.chan.mvp.presenters.OpenTabsPresenter;
+import ua.in.quireg.chan.mvp.views.OpenTabsView;
+import ua.in.quireg.chan.ui.adapters.OpenTabsRecyclerViewAdapter;
+import ua.in.quireg.chan.ui.views.RecyclerViewWithCM;
 
-public class OpenTabsFragment extends BaseListFragment {
+public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsView {
 
-    private OpenTabsAdapter mAdapter;
-    private OpenTabsManager mTabsManager;
-    private FavoritesDataSource mFavoritesDatasource;
+    @Inject FavoritesDataSource mFavoritesDatasource;
 
+    @InjectPresenter OpenTabsPresenter mOpenTabsPresenter;
 
+    private RecyclerViewWithCM mRecyclerViewWithCM;
+    private OpenTabsRecyclerViewAdapter mOpenTabsRecyclerViewAdapter;
     private Uri mCurrentUri;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mTabsManager = Factory.getContainer().resolve(OpenTabsManager.class);
-        mFavoritesDatasource = Factory.getContainer().resolve(FavoritesDataSource.class);
+        MainApplication.getAppComponent().inject(this);
 
         Bundle extras = getArguments();
         if (extras != null && extras.containsKey(Constants.EXTRA_CURRENT_URL)) {
@@ -48,30 +63,69 @@ public class OpenTabsFragment extends BaseListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.open_tabs_list_view, container, false);
-        ListView listView = (ListView) view.findViewById(android.R.id.list);
-        View listViewHeaderView = inflater.inflate(R.layout.open_tabs_list_header, null);
-        listView.addHeaderView(listViewHeaderView);
+
+//        RecyclerView recyclerView = view.findViewById(R.id.opened_tabs_list);
+
+        mRecyclerViewWithCM = view.findViewById(R.id.opened_tabs_list);
+
+//        mRecyclerViewWithCM = new RecyclerViewWithCM(recyclerView.getContext());
+//        mRecyclerViewWithCM.setLayoutParams(recyclerView.getLayoutParams());
+//
+//        ViewParent parent = recyclerView.getParent();
+//        ((ViewManager) parent).removeView(recyclerView);
+//        ((ViewManager) parent).addView(mRecyclerViewWithCM, recyclerView.getLayoutParams());
+
+//        mRecyclerViewWithCM = new RecyclerViewWithCM(recyclerView.getContext());
+//
+//        ((ViewManager) view).removeView(recyclerView);
+//        ((ViewManager) view).addView(mRecyclerViewWithCM, recyclerView.getLayoutParams());
+
+
+//        ViewGroup parent = (ViewGroup) recyclerView.getParent();
+//        int index = parent.indexOfChild(recyclerView);
+//        parent.removeView(recyclerView);
+//        mRecyclerViewWithCM = getLayoutInflater().inflate(optionId, parent, false);
+//        parent.addView(mRecyclerViewWithCM, index);
+
+
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mAdapter = new OpenTabsAdapter(getActivity(), mTabsManager.getOpenTabs(), mTabsManager);
-        mListView.setAdapter(mAdapter);
-        registerForContextMenu(mListView);
-        setTitle(getString(R.string.tabs_opentabs));
-        mListView.setOnItemClickListener((adapterView, view1, position, l) -> {
-            OpenTabModel item = mAdapter.getItem(position - mListView.getHeaderViewsCount());
-            mTabsManager.navigate(item);
-        });
+
+        if (getActivity() == null) {
+            Timber.e("getActivity() == null");
+            return;
+        }
+
+//        mRecyclerViewWithCM.setOnCreateContextMenuListener(this);
+
+        registerForContextMenu(mRecyclerViewWithCM);
+
+        mOpenTabsRecyclerViewAdapter = new OpenTabsRecyclerViewAdapter(mOpenTabsPresenter);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+
+        mRecyclerViewWithCM.setLayoutManager(layoutManager);
+        mRecyclerViewWithCM.addItemDecoration(new DividerItemDecoration(mRecyclerViewWithCM.getContext(), layoutManager.getOrientation()));
+        mRecyclerViewWithCM.setAdapter(mOpenTabsRecyclerViewAdapter);
+
+
+        ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+        if (mActionBar != null) {
+            mActionBar.setTitle(getString(R.string.tabs_opentabs));
+        }
+
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
         inflater.inflate(R.menu.opentabs, menu);
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -81,8 +135,7 @@ public class OpenTabsFragment extends BaseListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_close_tabs_id:
-                mTabsManager.removeAll();
-                mAdapter.clear();
+                mOpenTabsPresenter.removeAllItems();
                 break;
         }
 
@@ -90,15 +143,23 @@ public class OpenTabsFragment extends BaseListFragment {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        OpenTabModel item = mAdapter.getItem(info.position);
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+        RecyclerViewWithCM.ContextMenuInfo info = (RecyclerViewWithCM.ContextMenuInfo) menuInfo;
+
+        OpenTabModel item = mOpenTabsRecyclerViewAdapter.getItem(info.position);
+
+        if (item == null) {
+            Timber.e("item == null");
+            return;
+        }
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, getString(R.string.cmenu_copy_url));
 
-        if (!mFavoritesDatasource.hasFavorites(item.getWebsite().name(), item.getBoard(), item.getThread())) {
+        if (!item.isFavorite()) {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, getString(R.string.cmenu_add_to_favorites));
         } else {
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, getString(R.string.cmenu_remove_from_favorites));
@@ -106,28 +167,43 @@ public class OpenTabsFragment extends BaseListFragment {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(MenuItem menuItem) {
         if (!getUserVisibleHint()) {
             return false;
         }
 
-        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        OpenTabModel model = mAdapter.getItem(menuInfo.position);
+//        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
 
-        switch (item.getItemId()) {
+        RecyclerViewWithCM.ContextMenuInfo menuInfo = (RecyclerViewWithCM.ContextMenuInfo) menuItem.getMenuInfo();
+
+        OpenTabModel item = mOpenTabsRecyclerViewAdapter.getItem(menuInfo.position);
+
+        if (item == null) {
+            Timber.e("model == null");
+            return false;
+        }
+
+        switch (menuItem.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = model.buildUrl();
+                String uri = item.buildUrl();
+                if (getActivity() == null) {
+                    Timber.e("getActivity() == null");
+                    return false;
+                }
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(ClipData.newPlainText(uri, uri));
+                }
+                Toast.makeText(getActivity(), uri, Toast.LENGTH_SHORT).show();
 
-                CompatibilityUtils.copyText(getActivity(), uri, uri);
-                AppearanceUtils.showLongToast(getActivity(), uri);
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
-                mFavoritesDatasource.addToFavorites(model.getWebsite().name(), model.getBoard(), model.getThread(), model.getTitle());
+                mFavoritesDatasource.addToFavorites(item.getWebsite().name(), item.getBoard(), item.getThread(), item.getTitle());
                 return true;
             }
             case Constants.CONTEXT_MENU_REMOVE_FAVORITES: {
-                mFavoritesDatasource.removeFromFavorites(model.getWebsite().name(), model.getBoard(), model.getThread());
+                mFavoritesDatasource.removeFromFavorites(item.getWebsite().name(), item.getBoard(), item.getThread());
                 return true;
             }
         }
@@ -136,7 +212,17 @@ public class OpenTabsFragment extends BaseListFragment {
     }
 
     @Override
-    public void onRefresh() {
+    public void add(OpenTabModel model) {
+        mOpenTabsRecyclerViewAdapter.addToList(model);
+    }
 
+    @Override
+    public void remove(OpenTabModel model) {
+        mOpenTabsRecyclerViewAdapter.removeFromList(model);
+    }
+
+    @Override
+    public void clearAll() {
+        mOpenTabsRecyclerViewAdapter.clearList();
     }
 }
