@@ -3,76 +3,78 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="5dip" >
+    android:padding="5dip">
+
     <LinearLayout
         android:id="@+id/multi_thumbnails_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone" >
+        android:visibility="gone">
+
         <include
             android:id="@+id/thumbnail_view_1"
             layout="@layout/thumbnail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
-            android:visibility="gone"
-        />
+            android:layout_marginEnd="5dip"
+            android:visibility="gone" />
+
         <include
             android:id="@+id/thumbnail_view_2"
             layout="@layout/thumbnail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
-            android:visibility="gone"
-        />
+            android:layout_marginEnd="5dip"
+            android:visibility="gone" />
+
         <include
             android:id="@+id/thumbnail_view_3"
             layout="@layout/thumbnail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
-            android:visibility="gone"
-        />
+            android:layout_marginEnd="5dip"
+            android:visibility="gone" />
+
         <include
             android:id="@+id/thumbnail_view_4"
             layout="@layout/thumbnail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dip"
-            android:visibility="gone"
-        />
+            android:layout_marginEnd="5dip"
+            android:visibility="gone" />
     </LinearLayout>
+
     <include
         android:id="@+id/thumbnail_view"
         layout="@layout/thumbnail_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="3dip"
-    />
-    
+        android:layout_marginEnd="3dip" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/multi_thumbnails_view"
-        android:layout_toRightOf="@id/thumbnail_view"
         android:layout_marginBottom="1dip"
+        android:layout_toEndOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="?threadTitleForeground" 
+        android:textColor="?threadTitleForeground"
         android:textStyle="bold"
-        android:visibility="gone" />"
+        android:visibility="gone" />
 
-    <ua.in.quireg.chan.ui.views.EllipsizingTextView
+    <TextView
         android:id="@+id/comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/title"
-        android:layout_toRightOf="@id/thumbnail_view"
-        android:layout_marginBottom="1dip"
+        android:layout_marginBottom="1dp"
+        android:layout_toEndOf="@id/thumbnail_view"
         android:maxLines="@integer/opPostMaxLines"
+        android:ellipsize="end"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <!-- Next row -->
@@ -83,8 +85,8 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/comment"
-        android:layout_toRightOf="@id/thumbnail_view"
+        android:layout_toEndOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?itemInfoForeground" />
- 
+
 </RelativeLayout>

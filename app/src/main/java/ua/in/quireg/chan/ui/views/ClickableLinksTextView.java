@@ -19,7 +19,7 @@ import ua.in.quireg.chan.common.utils.StringUtils;
  * The TextView that handles correctly clickable spans.
  */
 public class ClickableLinksTextView extends android.support.v7.widget.AppCompatTextView {
-    public static final String TAG = "ClickableLinksTextView";
+    public static final String TAG = ClickableLinksTextView.class.getSimpleName();
 
     private boolean mBaseEditorCopied = false;
     private Object mBaseEditor = null;

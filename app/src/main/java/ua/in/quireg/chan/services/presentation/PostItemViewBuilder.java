@@ -17,8 +17,6 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import ua.in.quireg.chan.R;
@@ -79,7 +77,7 @@ public class PostItemViewBuilder {
             vb.postOpView = (TextView) view.findViewById(R.id.post_op);
             vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
             vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
-            vb.commentView = (ClickableLinksTextView) view.findViewById(R.id.comment);
+            vb.commentView = view.findViewById(R.id.comment);
             vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
             vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
             vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
@@ -224,7 +222,7 @@ public class PostItemViewBuilder {
 
         // Почему-то LinkMovementMethod отменяет контекстное меню. Пустой
         // listener вроде решает проблему
-        view.setOnLongClickListener(ClickListenersFactory.sIgnoreOnLongClickListener);
+        view.setOnLongClickListener(v -> false);
 
         return view;
     }
@@ -286,14 +284,6 @@ public class PostItemViewBuilder {
             menuButton.setOnClickListener(CompatibilityUtils.createClickListenerShowPostMenu(activity, model, view));
         }
 
-        // Перемещаем текст в ScrollView
-        ScrollView scrollView = (ScrollView) view.findViewById(R.id.post_item_scroll);
-        RelativeLayout contentLayout = (RelativeLayout) view.findViewById(R.id.post_item_content_layout);
-
-        ((ViewGroup) contentLayout.getParent()).removeView(contentLayout);
-        scrollView.addView(contentLayout);
-        scrollView.setVisibility(View.VISIBLE);
-
         // Отображаем созданное view в диалоге
         final Dialog currentDialog = new Dialog(activity);
         currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -302,46 +292,43 @@ public class PostItemViewBuilder {
         currentDialog.show();
 
         if (coordinates != null)
-            AppearanceUtils.callWhenLoaded(view, new Runnable() {
-                @Override
-                public void run() {
-                    final float dimAmount = 0.1f;
-                    boolean gravityLeft = true;
-                    boolean gravityTop = true;
-                    int gravity = 0;
-                    int x = coordinates.x;
-                    int y = coordinates.y;
-                    Rect windowRect = new Rect();
-                    activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
-                    if (x + view.getWidth() > windowRect.width() && x >= view.getWidth()) {
-                        gravityLeft = false;
-                        x = windowRect.width() - x;
-                    }
-                    if (y + view.getHeight() > windowRect.height() && y >= view.getHeight()) {
-                        gravityTop = false;
-                        y = windowRect.height() - y;
-                    }
-                    gravity |= gravityLeft ? Gravity.LEFT : Gravity.RIGHT;
-                    gravity |= gravityTop ? Gravity.TOP : Gravity.BOTTOM;
-
-                    //нужен новый диалог, т.к. в противном случае неправильно определяются координаты следующей ссылки
-                    ((ViewGroup) view.getParent()).removeView(view);
-                    currentDialog.hide();
-                    currentDialog.cancel();
-                    Dialog currentDialog = new Dialog(activity);
-                    WindowManager.LayoutParams params = currentDialog.getWindow().getAttributes();
-                    params.x = x;
-                    params.y = y;
-                    params.gravity = gravity;
-                    currentDialog.getWindow().setAttributes(params);
-
-                    CompatibilityUtils.setDimAmount(currentDialog.getWindow(), dimAmount);
-
-                    currentDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    currentDialog.setCanceledOnTouchOutside(true);
-                    currentDialog.setContentView(view);
-                    currentDialog.show();
+            AppearanceUtils.callWhenLoaded(view, () -> {
+                final float dimAmount = 0.1f;
+                boolean gravityStart = true;
+                boolean gravityTop = true;
+                int gravity = 0;
+                int x = coordinates.x;
+                int y = coordinates.y;
+                Rect windowRect = new Rect();
+                activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(windowRect);
+                if (x + view.getWidth() > windowRect.width() && x >= view.getWidth()) {
+                    gravityStart = false;
+                    x = windowRect.width() - x;
                 }
+                if (y + view.getHeight() > windowRect.height() && y >= view.getHeight()) {
+                    gravityTop = false;
+                    y = windowRect.height() - y;
+                }
+                gravity |= gravityStart ? Gravity.START : Gravity.END;
+                gravity |= gravityTop ? Gravity.TOP : Gravity.BOTTOM;
+
+                //нужен новый диалог, т.к. в противном случае неправильно определяются координаты следующей ссылки
+                ((ViewGroup) view.getParent()).removeView(view);
+                currentDialog.hide();
+                currentDialog.cancel();
+                Dialog currentDialog1 = new Dialog(activity);
+                WindowManager.LayoutParams params = currentDialog1.getWindow().getAttributes();
+                params.x = x;
+                params.y = y;
+                params.gravity = gravity;
+                currentDialog1.getWindow().setAttributes(params);
+
+                CompatibilityUtils.setDimAmount(currentDialog1.getWindow(), dimAmount);
+
+                currentDialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                currentDialog1.setCanceledOnTouchOutside(true);
+                currentDialog1.setContentView(view);
+                currentDialog1.show();
             });
     }
 

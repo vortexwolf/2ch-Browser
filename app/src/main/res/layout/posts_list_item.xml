@@ -1,268 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:local="http://schemas.android.com/apk/res/ua.in.quireg.chan"
-    android:layout_width="fill_parent"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?postBackground"
-    android:minHeight="?android:attr/listPreferredItemHeight"
     android:gravity="top"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:orientation="vertical"
-    android:padding="4dip" >
+    android:padding="4dp">
 
     <!-- Top row -->
 
     <RelativeLayout
         android:id="@+id/post_top_row"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="1dip" >
+        android:layout_marginBottom="1dp">
 
         <TextView
             android:id="@+id/post_index"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="4dip"
-            android:text="666"
+            android:layout_marginEnd="4dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?postIndexForeground"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="666" />
 
         <ImageView
             android:id="@+id/post_item_menu"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
             android:src="?iconOverflow"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/post_item_date_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_toLeftOf="@id/post_item_menu"
             android:layout_alignWithParentIfMissing="true"
+            android:layout_toStartOf="@id/post_item_menu"
             android:singleLine="true"
-            android:text="25.05.2012 23:59:59"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="25.05.2012 23:59:59" />
 
         <TextView
             android:id="@+id/post_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_index"
-            android:text="1234567"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/post_index"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?postNumberForeground" />
+            android:textColor="?postNumberForeground"
+            tools:text="1234567" />
 
         <TextView
             android:id="@+id/post_op"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_id"
             android:layout_alignWithParentIfMissing="true"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/post_id"
             android:singleLine="true"
-            android:text="#OP"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?postOpForeground" />
-        
+            android:textColor="?postOpForeground"
+            tools:text="#OP" />
+
         <TextView
             android:id="@+id/post_sage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_op"
-            android:text="SAGE"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/post_op"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?postSageForeground" />
+            android:textColor="?postSageForeground"
+            tools:text="SAGE" />
 
         <TextView
             android:id="@+id/post_trip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toRightOf="@id/post_sage"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/post_sage"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="!7qYk/yEq0Y"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?postTripForeground" />
+            android:textColor="?postTripForeground"
+            tools:text="!7qYk/yEq0Y" />
 
         <TextView
             android:id="@+id/post_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/post_index"
-            android:layout_marginRight="4dip"
-            android:layout_toLeftOf="@id/post_item_date_id"
-            android:layout_toRightOf="@id/post_trip"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/post_trip"
+            android:layout_toStartOf="@id/post_item_date_id"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="anon anonanonanonanon"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            tools:text="anon anonanonanonanon" />
 
         <LinearLayout
             android:id="@+id/badge_view"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/post_index"
             android:orientation="horizontal"
             android:visibility="visible">
 
-            <ua.in.quireg.chan.ui.views.DynamicWidthImageView
+            <ImageView
                 android:id="@+id/badge_image"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/badge_size"
                 android:layout_gravity="center_vertical"
+                android:adjustViewBounds="true"
                 android:minWidth="@dimen/badge_size"
-                android:adjustViewBounds="false"
-                android:scaleType="fitStart" />
+                android:scaleType="fitCenter"
+                tools:src="@drawable/launch_screen"
+                tools:ignore="ContentDescription" />
+
             <TextView
                 android:id="@+id/badge_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:layout_marginStart="4dp"
                 android:singleLine="true"
-                android:layout_marginLeft="4dip"
-                android:text="ru"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:text="ru" />
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- Content -->
-    <ScrollView
-        android:id="@+id/post_item_scroll"
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1.0"
-        android:minHeight="50dip"
-        android:fillViewport="true"
-        android:visibility="gone" />
-
     <RelativeLayout
         android:id="@+id/post_item_content_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/multi_thumbnails_view"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="gone">
+
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
+
                 <include
-                   android:id="@+id/thumbnail_view_1"
-                   layout="@layout/thumbnail_view"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginRight="5dip"
-                   android:visibility="gone"
-                />
+                    android:id="@+id/thumbnail_view_1"
+                    layout="@layout/thumbnail_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
-                   android:id="@+id/thumbnail_view_2"
-                   layout="@layout/thumbnail_view"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginRight="5dip"
-                   android:visibility="gone"
-                />
+                    android:id="@+id/thumbnail_view_2"
+                    layout="@layout/thumbnail_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
-                   android:id="@+id/thumbnail_view_3"
-                   layout="@layout/thumbnail_view"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginRight="5dip"
-                   android:visibility="gone"
-                />
+                    android:id="@+id/thumbnail_view_3"
+                    layout="@layout/thumbnail_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
-                   android:id="@+id/thumbnail_view_4"
-                   layout="@layout/thumbnail_view"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginRight="5dip"
-                   android:visibility="gone"
-                />
+                    android:id="@+id/thumbnail_view_4"
+                    layout="@layout/thumbnail_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
             </LinearLayout>
+
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
+
                 <include
                     android:id="@+id/thumbnail_view_5"
                     layout="@layout/thumbnail_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dip"
-                    android:visibility="gone"
-                    />
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
                     android:id="@+id/thumbnail_view_6"
                     layout="@layout/thumbnail_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dip"
-                    android:visibility="gone"
-                    />
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
                     android:id="@+id/thumbnail_view_7"
                     layout="@layout/thumbnail_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dip"
-                    android:visibility="gone"
-                    />
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
+
                 <include
                     android:id="@+id/thumbnail_view_8"
                     layout="@layout/thumbnail_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="5dip"
-                    android:visibility="gone"
-                    />
+                    android:layout_marginEnd="5dp"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
-        
+
         <include
-           android:id="@+id/thumbnail_view"
-           layout="@layout/thumbnail_view"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginRight="5dip"
-        />
-        
+            android:id="@+id/thumbnail_view"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp" />
+
         <TextView
             android:id="@+id/post_subject"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_below="@id/multi_thumbnails_view"
-            android:layout_toRightOf="@id/thumbnail_view"
-            android:text="SUBJ"
+            android:layout_toEndOf="@id/thumbnail_view"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="?threadTitleForeground"
-            android:textStyle="bold" 
-            android:visibility="gone" />
-        
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="SUBJ" />
+
         <ua.in.quireg.chan.ui.views.JellyBeanSpanFixTextView
             android:id="@+id/comment"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_below="@id/post_subject"
-            android:layout_toRightOf="@id/thumbnail_view"            
+            android:layout_toEndOf="@id/thumbnail_view"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textIsSelectable="true"
             local:postQuoteForeground="?postQuoteForeground"
@@ -272,14 +268,14 @@
 
         <TextView
             android:id="@+id/show_full_text"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:autoLink="web"
             android:background="?postBackground"
             android:gravity="center"
-            android:paddingBottom="5dip"
-            android:paddingTop="5dip"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
             android:text="@string/show_full_comment"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:visibility="gone" />
@@ -289,9 +285,9 @@
 
     <TextView
         android:id="@+id/post_replies"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
+        android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="?android:textColorPrimary"
         android:textStyle="italic" />

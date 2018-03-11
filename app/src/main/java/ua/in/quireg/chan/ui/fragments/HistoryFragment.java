@@ -1,8 +1,11 @@
 package ua.in.quireg.chan.ui.fragments;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -16,13 +19,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
-import java.util.List;
+import com.arellomobile.mvp.MvpAppCompatFragment;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -32,45 +37,64 @@ import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.db.HistoryEntity;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.ui.adapters.HistoryAdapter;
 
-public class HistoryFragment extends BaseListFragment {
+public class HistoryFragment extends MvpAppCompatFragment {
 
     @Inject protected HistoryDataSource mHistoryDataSource;
     @Inject protected FavoritesDataSource mFavoritesDatasource;
-    //@Inject MainActivityPresenter mMainActivityPresenter;
-
+    @Inject MainRouter mMainRouter;
 
     @BindView(R.id.history_search_container) protected View mSearchContainer;
     @BindView(R.id.history_search_input) protected EditText mSearchInput;
 
     private HistoryAdapter mAdapter;
+    private ListView mListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         MainApplication.getAppComponent().inject(this);
-
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.history_list_view, container, false);
-        ButterKnife.bind(this, view);
 
-        mAdapter = new HistoryAdapter(getContext());
-        new OpenDataSourceTask().execute();
+        mListView = view.findViewById(android.R.id.list);
+        mListView.setNestedScrollingEnabled(true);
+
+        ButterKnife.bind(this, view);
 
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if ((getActivity()) != null) {
+            ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (mActionBar != null) {
+                mActionBar.setTitle(getString(R.string.tabs_history));
+            }
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (mAdapter == null) {
+            mAdapter = new HistoryAdapter(view.getContext());
+        }
+
         mListView.setAdapter(mAdapter);
+        mAdapter.setItems(mHistoryDataSource.getAllHistory());
+
         registerForContextMenu(mListView);
-        setTitle(getString(R.string.tabs_history));
 
         mSearchInput.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -86,11 +110,14 @@ public class HistoryFragment extends BaseListFragment {
         mListView.setOnItemClickListener((adapterView, view1, position, l) -> {
             HistoryEntity item = mAdapter.getItem(position);
 
+            if (item == null) {
+                Timber.e("HistoryEntity item == null, position %d", position);
+                return;
+            }
             if (StringUtils.isEmpty(item.getThread())) {
-                //mMainActivityPresenter.navigateBoard(item.getWebsite(), item.getBoard());
-
+                mMainRouter.navigateBoard(item.getWebsite(), item.getBoard(), true);
             } else {
-                //mMainActivityPresenter.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mMainRouter.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
     }
@@ -106,7 +133,6 @@ public class HistoryFragment extends BaseListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
         inflater.inflate(R.menu.history, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -119,14 +145,12 @@ public class HistoryFragment extends BaseListFragment {
                 mAdapter.clear();
                 break;
         }
-
         return true;
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, getString(R.string.cmenu_copy_url));
     }
 
@@ -139,6 +163,11 @@ public class HistoryFragment extends BaseListFragment {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         HistoryEntity model = mAdapter.getItem(menuInfo.position);
 
+        if (model == null) {
+            Timber.e("HistoryEntity item == null, position %d", menuInfo.position);
+            return false;
+        }
+
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
                 String uri = model.buildUrl();
@@ -148,38 +177,18 @@ public class HistoryFragment extends BaseListFragment {
                 return true;
             }
         }
-
         return false;
     }
 
     private void searchHistory() {
-//        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.hideSoftInputFromWindow(mSearchInput.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
-        mSearchInput.clearFocus();
         String query = mSearchInput.getText().toString();
         mAdapter.searchItems(query);
-    }
 
-    @Override
-    public void onRefresh() {
-
-    }
-
-    private class OpenDataSourceTask extends AsyncTask<Void, Void, List<HistoryEntity>> {
-        @Override
-        protected List<HistoryEntity> doInBackground(Void... arg0) {
-            return mHistoryDataSource.getAllHistory();
-        }
-
-        @Override
-        protected void onPostExecute(List<HistoryEntity> result) {
-            mAdapter.setItems(result);
-            switchToListView();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            switchToLoadingView();
+        //Hide keyboard:
+        @SuppressWarnings("ConstantConditions")
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(mSearchInput.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 }

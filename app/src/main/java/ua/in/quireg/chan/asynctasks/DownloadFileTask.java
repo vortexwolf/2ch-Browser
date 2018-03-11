@@ -1,8 +1,6 @@
 package ua.in.quireg.chan.asynctasks;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -27,9 +25,9 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import java.io.File;
 
 public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implements ICancelled, IProgressChangeListener {
-    public static final String TAG = "DownloadFileTask";
+
     private final DownloadFileService mDownloadFileService;
-    private final Context mContext;
+    private final Activity mActivity;
     private final Resources mResources;
     private final Uri mFrom;
     private final ApplicationSettings mSettings;
@@ -43,49 +41,46 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     private long mContentLength = 0;
 
     {
-        this.mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
-        this.mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-        this.mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
+        mDownloadFileService = Factory.getContainer().resolve(DownloadFileService.class);
+        mSettings = Factory.getContainer().resolve(ApplicationSettings.class);
+        mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
     }
 
-    public DownloadFileTask(Context context, Uri from) {
+    public DownloadFileTask(Activity context, Uri from) {
         this(context, from, null, null, true);
     }
 
-    public DownloadFileTask(Context context, Uri from, File to, IDownloadFileView progressView, boolean updateGallery) {
-        this.mContext = context;
-        this.mResources = context.getResources();
-        this.mFrom = from;
-        this.mSaveTo = to != null ? to : IoUtils.getSaveFilePath(this.mFrom, this.mSettings);
-        this.mUpdateGallery = updateGallery;
+    public DownloadFileTask(Activity context, Uri from, File to, IDownloadFileView progressView, boolean updateGallery) {
+        mActivity = context;
+        mResources = context.getResources();
+        mFrom = from;
+        mSaveTo = to != null ? to : IoUtils.getSaveFilePath(mFrom, mSettings);
+        mUpdateGallery = updateGallery;
 
         if (progressView == null) {
-            this.mProgressView = this.mSettings.isDownloadInBackground()
-                    ? new BackgroundDownloadFileView(this.mContext)
-                    : new DialogDownloadFileView(this.mContext);
+            mProgressView = mSettings.isDownloadInBackground()
+                    ? new BackgroundDownloadFileView(mActivity)
+                    : new DialogDownloadFileView(mActivity);
         } else {
-            this.mProgressView = progressView;
+            mProgressView = progressView;
         }
 
-        this.mProgressView.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                DownloadFileTask.this.retry = false;
-                DownloadFileTask.this.cancel(true);
-            }
+        mProgressView.setOnCancelListener(dialog -> {
+            DownloadFileTask.this.retry = false;
+            DownloadFileTask.this.cancel(true);
         });
     }
 
     @Override
     protected Boolean doInBackground(String... arg0) {
         try {
-            Uri from = this.getSaveFromUri();
+            Uri from = getSaveFromUri();
 
-            this.mDownloadFileService.downloadFile(from, this.mSaveTo, this, this);
+            mDownloadFileService.downloadFile(from, mSaveTo, this, this);
 
             return true;
         } catch (DownloadFileException e) {
-            this.mUserError = e.getMessage();
+            mUserError = e.getMessage();
             return false;
         }
     }
@@ -93,31 +88,31 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
     @Override
     public void onPreExecute() {
         // Не показывать диалог совсем, если файл существует
-        if (this.mSaveTo.exists()) {
-            this.cancel(false);
-            this.mProgressView.showFileExists(this.mSaveTo);
+        if (mSaveTo.exists()) {
+            cancel(false);
+            mProgressView.showFileExists(mSaveTo);
 
             return;
         }
 
-        this.mProgressView.showLoading(this.mContext.getString(R.string.notification_save_image_started, this.mSaveTo.getAbsolutePath()));
+        mProgressView.showLoading(mResources.getString(R.string.notification_save_image_started, mSaveTo.getAbsolutePath()));
     }
 
     @Override
     public void onPostExecute(Boolean success) {
 
         if (success) {
-            Uri uri = Uri.fromFile(this.mSaveTo);
-            if (this.mUpdateGallery && (UriUtils.isImageUri(uri) || UriUtils.isVideoUri(uri))) {
-                SingleMediaScanner scanner = new SingleMediaScanner(this.mContext, this.mSaveTo);
+            Uri uri = Uri.fromFile(mSaveTo);
+            if (mUpdateGallery && (UriUtils.isImageUri(uri) || UriUtils.isVideoUri(uri))) {
+                SingleMediaScanner scanner = new SingleMediaScanner(mActivity, mSaveTo);
                 scanner.scan();
             }
-            this.mProgressView.hideLoading();
-            this.mProgressView.showSuccess(this.mSaveTo);
+            mProgressView.hideLoading();
+            mProgressView.showSuccess(mSaveTo);
         } else {
-            if (this.mUserError.equals("503")) {
+            if (mUserError.equals("503")) {
                 String url = DownloadFileTask.this.mFrom.toString();
-                new CloudflareCheckService(url, (Activity) this.mContext, new ICloudflareCheckListener(){
+                new CloudflareCheckService(url, /*Activity*/ mActivity, new ICloudflareCheckListener(){
                     public void onTimeout() {
                         DownloadFileTask.this.mProgressView.hideLoading();
                         DownloadFileTask.this.mProgressView.showError(mResources.getString(R.string.error_cloudflare_check_timeout));
@@ -125,7 +120,7 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
                     public void onSuccess() {
                         if (DownloadFileTask.this.retry)
                             new DownloadFileTask(
-                                DownloadFileTask.this.mContext,
+                                DownloadFileTask.this.mActivity,
                                 DownloadFileTask.this.mFrom,
                                 null,
                                 DownloadFileTask.this.mProgressView,
@@ -136,16 +131,16 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
                     }
                 }).start();
             } else {
-                this.mProgressView.hideLoading();
-                this.mProgressView.showError(this.mUserError);
+                mProgressView.hideLoading();
+                mProgressView.showError(mUserError);
             }
         }
     }
 
     private Uri getSaveFromUri() {
-        Uri from = this.mFrom;
+        Uri from = mFrom;
 
-        File cachedFile = this.mCacheDirectoryManager.getCachedMediaFileForRead(from);
+        File cachedFile = mCacheDirectoryManager.getCachedMediaFileForRead(from);
         if (cachedFile.exists()) {
             from = Uri.fromFile(cachedFile);
         }
@@ -155,12 +150,12 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
     @Override
     public void onProgressUpdate(Long... progress) {
-        this.mProgressView.setCurrentProgress(progress[0].intValue());
+        mProgressView.setCurrentProgress(progress[0].intValue());
     }
 
     @Override
     public void progressChanged(long newValue) {
-        this.publishProgress(newValue / 1024);
+        publishProgress(newValue / 1024);
     }
 
     @Override
@@ -170,12 +165,12 @@ public class DownloadFileTask extends AsyncTask<String, Long, Boolean> implement
 
     @Override
     public void setContentLength(long value) {
-        this.mContentLength = value;
-        this.mProgressView.setMaxProgress((int) value / 1024);
+        mContentLength = value;
+        mProgressView.setMaxProgress((int) value / 1024);
     }
 
     @Override
     public long getContentLength() {
-        return this.mContentLength;
+        return mContentLength;
     }
 }

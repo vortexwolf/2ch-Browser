@@ -3,27 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?activityRootBackground">
+    android:background="?activityRootBackground"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/opened_tabs_title"
+        style="?android:textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:text="@string/opened_tabs_for_this_session"
-        style="?android:textAppearanceMedium"/>
+        android:text="@string/opened_tabs_for_this_session" />
 
     <View
-    android:id="@+id/top_shadowline"
-    android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:background="@drawable/list_divider" />
+        android:id="@+id/top_shadowline"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/list_divider" />
 
     <ua.in.quireg.chan.ui.views.RecyclerViewWithCM
         android:id="@+id/opened_tabs_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/open_tabs_list_item"/>
+        tools:listitem="@layout/open_tabs_list_item" />
 
 </LinearLayout>

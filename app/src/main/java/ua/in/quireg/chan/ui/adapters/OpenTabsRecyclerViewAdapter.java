@@ -48,7 +48,6 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         if (holder instanceof OpenTabViewHolder) {
-
             OpenTabModel item = mOpenedTabsList.get(position);
 
             ((OpenTabViewHolder) holder).titleView.setText(item.getTitleOrDefault());
@@ -62,12 +61,6 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public long getItemId(int position) {
         return position;
     }
-
-    //    @Override
-//    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-//        holder.itemView.setOnLongClickListener(null);
-//        super.onViewRecycled(holder);
-//    }
 
     @Override
     public int getItemViewType(int position) {
@@ -91,7 +84,6 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             mOpenedTabsList.add(position, openTabModel);
             notifyItemChanged(position);
         }
-
     }
 
     public void removeFromList(OpenTabModel openTabModel) {
@@ -123,28 +115,27 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         OpenTabViewHolder(View view) {
             super(view);
-//            view.setOnCreateContextMenuListener(this);
             titleView = view.findViewById(R.id.tabs_item_title);
             urlView = view.findViewById(R.id.tabs_item_url);
             deleteButton = view.findViewById(R.id.tabs_item_delete);
+
+            view.setOnLongClickListener(v -> {
+                v.showContextMenu();
+                return true;
+            });
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 
-//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-
             RecyclerViewWithCM.ContextMenuInfo info = (RecyclerViewWithCM.ContextMenuInfo) menuInfo;
-
             OpenTabModel item = getItem(info.position);
 
             if (item == null) {
                 Timber.e("item == null");
                 return;
             }
-
             menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, v.getContext().getString(R.string.cmenu_copy_url));
-
             if (!item.isFavorite()) {
                 menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, v.getContext().getString(R.string.cmenu_add_to_favorites));
             } else {

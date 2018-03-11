@@ -44,7 +44,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignBottom="@id/tabs_item_layout"
         android:background="?tabCloseButtonBackground"
-        android:contentDescription="@string/this_is_image"
+        android:contentDescription="@string/simply_image"
         android:scaleType="center"
         android:src="@drawable/btn_close_tab" />
 

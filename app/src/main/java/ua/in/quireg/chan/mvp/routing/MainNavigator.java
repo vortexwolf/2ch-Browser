@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.constraint.ConstraintSet;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
@@ -17,7 +15,6 @@ import javax.inject.Inject;
 
 import ru.terrakok.cicerone.Navigator;
 import ru.terrakok.cicerone.commands.Command;
-import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -25,7 +22,6 @@ import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoardsList;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
-import ua.in.quireg.chan.mvp.routing.commands.OpenAttachment;
 import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
 import ua.in.quireg.chan.mvp.routing.commands.SwitchTab;
@@ -61,7 +57,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         MainApplication.getAppComponent().inject(this);
 
         FragNavTransactionOptions mFragNavTransactionOptions = FragNavTransactionOptions.newBuilder()
-                .transition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .transition(FragmentTransaction.TRANSIT_UNSET)
                 .build();
 
         mFragNavController = FragNavController.newBuilder(savedInstanceState, mMainActivity.getSupportFragmentManager(), R.id.base_activity_container)
@@ -115,7 +111,6 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         updateToolbarControls(mFragNavController.isRootFragment());
 
     }
-
 
     @Override
     public void applyCommand(Command command) {

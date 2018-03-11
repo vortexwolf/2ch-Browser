@@ -13,7 +13,6 @@ import android.widget.TextView;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
-import ua.in.quireg.chan.ui.views.EllipsizingTextView;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
@@ -108,7 +107,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         if (vb == null) {
             vb = new ViewBag();
             vb.titleView = (TextView) view.findViewById(R.id.title);
-            vb.commentView = (EllipsizingTextView) view.findViewById(R.id.comment);
+            vb.commentView = (TextView) view.findViewById(R.id.comment);
             vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
             vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
 
@@ -134,13 +133,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         // Комментарий
         vb.commentView.setText(item.getSpannedComment());
         vb.commentView.setTag(item);
-        vb.commentView.setEllipsizeListener(new EllipsizingTextView.EllipsizeListener() {
-            @Override
-            public void ellipsizeStateChanged(EllipsizingTextView view, boolean ellipsized) {
-                ThreadItemViewModel boundItem = (ThreadItemViewModel) view.getTag();
-                boundItem.setEllipsized(ellipsized);
-            }
-        });
+//        vb.commentView.setEllipsizeListener(new TextView.EllipsizeListener() {
+//            @Override
+//            public void ellipsizeStateChanged(TextView view, boolean ellipsized) {
+//                ThreadItemViewModel boundItem = (ThreadItemViewModel) view.getTag();
+//                boundItem.setEllipsized(ellipsized);
+//            }
+//        });
 
         // Количество ответов
         String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
@@ -237,7 +236,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
     static class ViewBag {
         TextView titleView;
-        EllipsizingTextView commentView;
+        TextView commentView;
         TextView repliesNumberView;
         ThumbnailViewBag singleThumbnailView;
         View multiThumbnailsView;

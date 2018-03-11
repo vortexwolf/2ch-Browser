@@ -134,56 +134,49 @@ public class AppearanceUtils {
         videoViewViewBag.speakerDrawable = getThemeDrawable(theme, R.styleable.Theme_iconSoundSpeaker);
         videoViewViewBag.muteDrawable = getThemeDrawable(theme, R.styleable.Theme_iconSoundMute);
 
-        videoViewViewBag.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(final MediaPlayer mp) {
-                mp.setLooping(true);
+        videoViewViewBag.videoView.setOnPreparedListener(mp -> {
+            mp.setLooping(true);
 
-                videoViewViewBag.durationView.setText("00:00 / " + formatVideoTime(mp.getDuration()));
+            videoViewViewBag.durationView.setText(
+                    String.format("00:00 / %s", formatVideoTime(mp.getDuration()))
+            );
 
-                viewBag.timer = new TimerService(1, context);
-                viewBag.timer.runTask(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            videoViewViewBag.durationView.setText(formatVideoTime(mp.getCurrentPosition()) +
-                                    " / " + formatVideoTime(mp.getDuration()));
-                        } catch (Exception e) {
-                            viewBag.timer.stop();
-                        }
-                    }
-                });
+            viewBag.timer = new TimerService(1, context);
+            viewBag.timer.runTask(() -> {
+                try {
+                    videoViewViewBag.durationView.setText(
+                            String.format("%s / %s",
+                            formatVideoTime(mp.getCurrentPosition()),
+                            formatVideoTime(mp.getDuration()))
+                    );
+                } catch (Exception e) {
+                    viewBag.timer.stop();
+                }
+            });
 
-                if (settings.isVideoMute()) {
+            if (settings.isVideoMute()) {
+                mp.setVolume(0, 0);
+                videoViewViewBag.setVolume(0);
+            } else {
+                mp.setVolume(1, 1);
+                videoViewViewBag.setVolume(1);
+            }
+            videoViewViewBag.muteButton.setOnClickListener(v -> {
+                if (videoViewViewBag.volume > 0) {
                     mp.setVolume(0, 0);
                     videoViewViewBag.setVolume(0);
                 } else {
                     mp.setVolume(1, 1);
                     videoViewViewBag.setVolume(1);
                 }
-                videoViewViewBag.muteButton.setOnClickListener(new ImageButton.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (videoViewViewBag.volume > 0) {
-                            mp.setVolume(0, 0);
-                            videoViewViewBag.setVolume(0);
-                        } else {
-                            mp.setVolume(1, 1);
-                            videoViewViewBag.setVolume(1);
-                        }
-                    }
-                });
+            });
 
-                mp.start();
-            }
+            mp.start();
         });
-        videoViewViewBag.videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                Timber.e("Error code: " + what);
-                viewBag.switchToErrorView(context.getString(R.string.error_video_playing));
-                return true;
-            }
+        videoViewViewBag.videoView.setOnErrorListener((mp, what, extra) -> {
+            Timber.e("Error code: %d", what);
+            viewBag.switchToErrorView(context.getString(R.string.error_video_playing));
+            return true;
         });
 
         videoViewViewBag.videoView.setVideoPath(file.getAbsolutePath());

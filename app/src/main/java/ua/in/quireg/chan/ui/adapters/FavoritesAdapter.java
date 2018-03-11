@@ -1,6 +1,7 @@
 package ua.in.quireg.chan.ui.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,40 +9,45 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
 
 public class FavoritesAdapter extends ArrayAdapter<FavoritesEntity> {
+
     private final LayoutInflater mInflater;
     private final FavoritesDataSource mFavoritesDataSource;
 
     public FavoritesAdapter(Context context, FavoritesDataSource favoritesDataSource) {
         super(context, -1);
-        this.mInflater = LayoutInflater.from(context);
-        this.mFavoritesDataSource = favoritesDataSource;
+        mInflater = LayoutInflater.from(context);
+        mFavoritesDataSource = favoritesDataSource;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final FavoritesEntity item = this.getItem(position);
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        View view = convertView == null ? mInflater.inflate(R.layout.favorites_list_item, parent, false) : convertView;
 
-        View view = convertView == null ? this.mInflater.inflate(R.layout.open_tabs_list_item, null) : convertView;
+        final FavoritesEntity item = getItem(position);
 
-        TextView titleView = (TextView) view.findViewById(R.id.tabs_item_title);
-        TextView urlView = (TextView) view.findViewById(R.id.tabs_item_url);
-        ImageView deleteButton = (ImageView) view.findViewById(R.id.tabs_item_delete);
+        if(item == null) {
+            Timber.e("FavoritesEntity item == null, position %d", position);
+            return view;
+        }
+
+        TextView titleView = view.findViewById(R.id.favorites_item_title);
+        TextView urlView = view.findViewById(R.id.favorites_item_url);
 
         titleView.setText(item.getTitleOrDefault());
         urlView.setText(item.buildUrl());
-        deleteButton.setVisibility(View.GONE);
 
         return view;
     }
 
     public void removeItem(FavoritesEntity item) {
-        this.mFavoritesDataSource.removeFromFavorites(item.getWebsite(), item.getBoard(), item.getThread());
-        this.mFavoritesDataSource.resetModifiedState();
-        this.remove(item);
+        mFavoritesDataSource.removeFromFavorites(item.getWebsite(), item.getBoard(), item.getThread());
+        remove(item);
     }
 }

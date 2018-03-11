@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
     <ImageView
         android:id="@+id/cloudflare_captcha_image"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="90dip"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        tools:ignore="ContentDescription" />
 
     <EditText
         android:id="@+id/cloudflare_captcha_input"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter above text"
+        android:hint="@string/cloudflare_captcha_input_hint"
         android:imeOptions="flagNoExtractUi|flagNoFullscreen|actionSend"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:singleLine="true" />

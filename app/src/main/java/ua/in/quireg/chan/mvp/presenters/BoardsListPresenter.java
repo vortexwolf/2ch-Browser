@@ -44,35 +44,26 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
     public void attachView(BoardsListView view) {
         super.attachView(view);
 
-        Timber.v("attachView()");
-
         updateBoardsList(false);
 
         if (updateFromServer) {
-
             updateBoardsList(true);
-
             updateFromServer = false;
         }
-
     }
 
     @Override
     public void detachView(BoardsListView view) {
         super.detachView(view);
-        Timber.v("detachView()");
-
         compositeDisposable.clear();
     }
 
-    public void updateBoardsList(boolean remote) {
+    public synchronized void updateBoardsList(boolean remote) {
         Timber.v("updateBoardsList() %s", remote ? "remote" : "local");
 
         Disposable d = mBoardsListInteractor.getBoards(remote)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                            getViewState().setBoards(list);
-                        },
+                .subscribe(list -> getViewState().setBoards(list),
                         Timber::e,
                         () -> Timber.d("updateBoardsList() %s completed", remote ? "remote" : "local"));
 
@@ -90,14 +81,11 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         } else {
             mMainRouter.showSystemMessage(R.string.warning_enter_board);
         }
-
     }
 
     public void onBoardClick(BoardEntity boardEntity) {
         Timber.v("onBoardClick(BoardModel)");
-
         mMainRouter.navigateBoard(Websites.getDefault().name(), boardEntity.id, true);
-
     }
 
     public void addToFavorites(BoardEntity boardEntity) {
@@ -119,7 +107,6 @@ public class BoardsListPresenter extends MvpPresenter<BoardsListView> {
         boardCode = boardCode.replaceAll("/", "").toLowerCase(Locale.US);
 
         return !StringUtils.isEmpty(boardCode) && Constants.BOARD_CODE_PATTERN.matcher(boardCode).matches();
-
     }
 
 }

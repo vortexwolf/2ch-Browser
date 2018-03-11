@@ -65,7 +65,7 @@ public class CacheSizePreference extends Preference {
 
             long mediaCacheUtilizedPercent, pagesCacheUtilizedPercent, thumbCacheUtilizedPercent, cacheSize;
 
-            cacheSize = mCacheManager.getCacheSize();
+            cacheSize = mCacheManager.getCacheMaxSize();
 
             mediaCacheUtilizedPercent = Math.round((mediaCacheUtilization / cacheSize) * 100);
             pagesCacheUtilizedPercent = Math.round((pagesCacheUtilization / cacheSize) * 100);

@@ -1,22 +1,25 @@
 package ua.in.quireg.chan.ui.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
-import java.util.List;
+import com.arellomobile.mvp.MvpAppCompatFragment;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
@@ -25,16 +28,16 @@ import ua.in.quireg.chan.common.utils.CompatibilityUtils;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.ui.adapters.FavoritesAdapter;
 
-public class FavoritesFragment extends BaseListFragment {
-
+public class FavoritesFragment extends MvpAppCompatFragment {
 
     @Inject FavoritesDataSource mDatasource;
-    //@Inject MainActivityPresenter mNavigationController;
+    @Inject MainRouter mMainRouter;
 
     private FavoritesAdapter mAdapter;
-    private OpenDataSourceTask mCurrentTask = null;
+    private ListView mListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,62 +47,55 @@ public class FavoritesFragment extends BaseListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(mAdapter == null){
-            mAdapter = new FavoritesAdapter(getActivity(), mDatasource);
-        }
-        mDatasource.resetModifiedState();
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.favorites_list_view, container, false);
+        View view = inflater.inflate(R.layout.favorites_list_view, container, false);
+
+        mListView = view.findViewById(android.R.id.list);
+        mListView.setNestedScrollingEnabled(true);
+
+        return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if ((getActivity()) != null) {
+            ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (mActionBar != null) {
+                mActionBar.setTitle(getString(R.string.tabs_bookmarks));
+            }
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mCurrentTask = new OpenDataSourceTask();
-        mCurrentTask.execute();
+
+        if (mAdapter == null) {
+            mAdapter = new FavoritesAdapter(getActivity(), mDatasource);
+        }
+
         mListView.setAdapter(mAdapter);
-        setTitle(getString(R.string.tabs_bookmarks));
+        mAdapter.clear();
+        mAdapter.addAll(mDatasource.getFavoriteThreads());
+
         registerForContextMenu(mListView);
+
         mListView.setOnItemClickListener((adapterView, view1, position, l) -> {
             FavoritesEntity item = mAdapter.getItem(position);
 
+            if (item == null) {
+                Timber.e("item == null, position %d", position);
+                return;
+            }
             if (StringUtils.isEmpty(item.getThread())) {
-                //mNavigationController.navigateBoard(item.getWebsite(), item.getBoard());
+                mMainRouter.navigateBoard(item.getWebsite(), item.getBoard(), true);
             } else {
-                //mNavigationController.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mMainRouter.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
             }
         });
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (!isAdded()) {
-            return;
-        }
-
-        if (isVisibleToUser && mDatasource.isModified()) {
-            mDatasource.resetModifiedState();
-            mCurrentTask = new OpenDataSourceTask();
-            mCurrentTask.execute();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mDatasource.isModified()) {
-            mDatasource.resetModifiedState();
-            mCurrentTask = new OpenDataSourceTask();
-            mCurrentTask.execute();
-        }
     }
 
     @Override
@@ -119,6 +115,11 @@ public class FavoritesFragment extends BaseListFragment {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         FavoritesEntity model = mAdapter.getItem(menuInfo.position);
 
+        if (model == null) {
+            Timber.e("FavoritesEntity model == null, position %d", menuInfo.position);
+            return false;
+        }
+
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
                 String uri = model.buildUrl();
@@ -135,33 +136,5 @@ public class FavoritesFragment extends BaseListFragment {
         }
 
         return false;
-    }
-
-    @Override
-    public void onRefresh() {
-        
-    }
-
-    private class OpenDataSourceTask extends AsyncTask<Void, Void, List<FavoritesEntity>> {
-
-        @Override
-        protected List<FavoritesEntity> doInBackground(Void... arg0) {
-            return mDatasource.getFavoriteThreads();
-        }
-
-        @Override
-        protected void onPostExecute(List<FavoritesEntity> result) {
-            mAdapter.clear();
-            for (FavoritesEntity item : result) {
-                mAdapter.add(item);
-            }
-
-            switchToListView();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            switchToLoadingView();
-        }
     }
 }

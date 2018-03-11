@@ -10,11 +10,11 @@ import android.text.StaticLayout;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 
-public class EllipsizingTextView extends JellyBeanSpanFixTextView {
+public class TextView extends JellyBeanSpanFixTextView {
     private static final String ELLIPSIS = "...";
 
     public interface EllipsizeListener {
-        void ellipsizeStateChanged(EllipsizingTextView view, boolean ellipsized);
+        void ellipsizeStateChanged(TextView view, boolean ellipsized);
     }
 
     private EllipsizeListener ellipsizeListener = null;
@@ -26,16 +26,16 @@ public class EllipsizingTextView extends JellyBeanSpanFixTextView {
     private float lineSpacingMultiplier = 1.0f;
     private float lineAdditionalVerticalPadding = 0.0f;
 
-    public EllipsizingTextView(Context context) {
+    public TextView(Context context) {
         super(context);
     }
 
-    public EllipsizingTextView(Context context, AttributeSet attrs) {
+    public TextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.updateMaxLinesFromAttributes(context, attrs);
     }
 
-    public EllipsizingTextView(Context context, AttributeSet attrs, int defStyle) {
+    public TextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.updateMaxLinesFromAttributes(context, attrs);
     }

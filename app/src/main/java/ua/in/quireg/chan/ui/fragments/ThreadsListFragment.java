@@ -14,7 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Spinner;
+
+import com.arellomobile.mvp.MvpAppCompatFragment;
+import com.aspsine.swipetoloadlayout.OnLoadMoreListener;
+import com.aspsine.swipetoloadlayout.OnRefreshListener;
+import com.aspsine.swipetoloadlayout.SwipeToLoadLayout;
 
 import javax.inject.Inject;
 
@@ -51,7 +57,7 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 
-public class ThreadsListFragment extends BaseListFragment {
+public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefreshListener, OnLoadMoreListener {
 
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
@@ -68,9 +74,10 @@ public class ThreadsListFragment extends BaseListFragment {
     private ThreadsListAdapter mAdapter = null;
     private final ThreadsReaderListener mThreadsReaderListener = new ThreadsReaderListener();
 
-
     private View mNavigationBar;
     private View mCatalogBar;
+    protected ListView mListView;
+    protected SwipeToLoadLayout mSwipeToLoadLayout;
 
     private OpenTabModel mTabModel;
     private IWebsite mWebsite;
@@ -112,12 +119,17 @@ public class ThreadsListFragment extends BaseListFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.threads_list_view, container, false);
+        return inflater.inflate(R.layout.threads_list_view2, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mListView = view.findViewById(R.id.swipe_target);
+        mSwipeToLoadLayout = view.findViewById(R.id.swipeToLoadLayout);
+        mSwipeToLoadLayout.setOnRefreshListener(this);
+        mSwipeToLoadLayout.setOnLoadMoreListener(this);
 
         mPostItemViewBuilder = new PostItemViewBuilder(getContext(), mWebsite, mBoardName, null, mSettings);
 
@@ -132,12 +144,12 @@ public class ThreadsListFragment extends BaseListFragment {
                 ? String.format(getString(R.string.data_board_title_with_page), mBoardName, String.valueOf(mPageNumber))
                 : String.format(getString(R.string.data_board_title), mBoardName);
 
-        setTitle(pageTitle);
+//        setTitle(pageTitle);
 
         mListView.setOnItemClickListener((parent, view1, position, id) -> {
             ThreadItemViewModel info = mAdapter.getItem(position);
 
-            if(info == null){
+            if (info == null) {
                 return;
             }
 
@@ -155,8 +167,8 @@ public class ThreadsListFragment extends BaseListFragment {
 //        mNavigationBar = getView().findViewById(R.id.threads_navigation_bar);
 //        mNavigationBar.setVisibility(mIsCatalog ? View.GONE : View.VISIBLE);
 
-        mCatalogBar = getView().findViewById(R.id.threads_catalog_bar);
-        mCatalogBar.setVisibility(mIsCatalog ? View.VISIBLE : View.GONE);
+//        mCatalogBar = getView().findViewById(R.id.threads_catalog_bar);
+//        mCatalogBar.setVisibility(mIsCatalog ? View.VISIBLE : View.GONE);
 
 //        TextView pageNumberView = (TextView) getView().findViewById(R.id.threads_page_number);
 //        pageNumberView.setText(String.valueOf(mPageNumber));
@@ -183,19 +195,19 @@ public class ThreadsListFragment extends BaseListFragment {
 //            }
 //        });
 
-        Spinner filterSelect = (Spinner) getView().findViewById(R.id.threads_filter_select);
-        filterSelect.setSelection(mCatalogFilter);
-        filterSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mCatalogFilter != position) {
-                    mCatalogFilter = position;
-                    refreshThreads(false);
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
-        });
+//        Spinner filterSelect = (Spinner) getView().findViewById(R.id.threads_filter_select);
+//        filterSelect.setSelection(mCatalogFilter);
+//        filterSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                if (mCatalogFilter != position) {
+//                    mCatalogFilter = position;
+//                    refreshThreads(false);
+//                }
+//            }
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) { }
+//        });
     }
 
     private void setAdapter(Bundle savedInstanceState) {
@@ -205,9 +217,7 @@ public class ThreadsListFragment extends BaseListFragment {
         mListView.setAdapter(mAdapter);
 
         // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
-        if (Constants.SDK_VERSION > 7) {
-            mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
-        }
+        mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
 
         boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED, false) ||
                 savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
@@ -222,7 +232,7 @@ public class ThreadsListFragment extends BaseListFragment {
     private void setAdapterData(ThreadModel[] threads) {
         mAdapter.setAdapterData(threads);
     }
-        //TODO implement search
+    //TODO implement search
 //    @Override
 //    public boolean onSearchRequested() {
 //        Bundle data = new Bundle();
@@ -302,8 +312,6 @@ public class ThreadsListFragment extends BaseListFragment {
             }
         }
     }
-
-
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -418,7 +426,13 @@ public class ThreadsListFragment extends BaseListFragment {
         refreshThreads(false);
     }
 
+    @Override
+    public void onLoadMore() {
+        mSwipeToLoadLayout.postDelayed(() -> mSwipeToLoadLayout.setLoadingMore(false), 2000);
+    }
+
     private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadModel[]> {
+
         @Override
         protected ThreadModel[] doInBackground(Void... arg0) {
             if (!mIsCatalog) {
@@ -468,23 +482,26 @@ public class ThreadsListFragment extends BaseListFragment {
                 if (mAdapter.getCount() == 0) {
                     showError(error);
                 } else {
-                    showToastIfVisible(error);
+//                    showToastIfVisible(error);
                 }
             }
         }
 
         @Override
         public void showError(String error) {
-            switchToErrorView(error);
+//            switchToErrorView(error);
             if (error != null && error.startsWith("503")) {
                 String url = mUrlBuilder.getPageUrlHtml(mBoardName, mPageNumber);
-                new CloudflareCheckService(url, getActivity(), new ICloudflareCheckListener(){
+                new CloudflareCheckService(url, getActivity(), new ICloudflareCheckListener() {
                     public void onSuccess() {
-                        refreshThreads(false);;
+                        refreshThreads(false);
+
                     }
+
                     public void onStart() {
                         showError(getString(R.string.notification_cloudflare_check_started));
                     }
+
                     public void onTimeout() {
                         showError(getString(R.string.error_cloudflare_check_timeout));
                     }
@@ -494,18 +511,20 @@ public class ThreadsListFragment extends BaseListFragment {
 
         @Override
         public void showCaptcha(CaptchaEntity captcha) {
-            switchToCaptchaView(mWebsite, captcha);
+//            switchToCaptchaView(mWebsite, captcha);
         }
 
         @Override
         public void showLoadingScreen() {
-            switchToLoadingView();
+//            switchToLoadingView();
         }
 
         @Override
         public void hideLoadingScreen() {
-            switchToListView();
+//            switchToListView();
+            mSwipeToLoadLayout.setRefreshing(false);
             mCurrentDownloadTask = null;
+
         }
     }
 }

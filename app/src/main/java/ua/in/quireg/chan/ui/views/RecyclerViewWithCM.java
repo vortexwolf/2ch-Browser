@@ -48,7 +48,7 @@ public class RecyclerViewWithCM extends RecyclerView {
         return false;
     }
 
-    public class ContextMenuInfo implements ContextMenu.ContextMenuInfo {
+    public static class ContextMenuInfo implements ContextMenu.ContextMenuInfo {
 
         ContextMenuInfo(int position, long id) {
             this.position = position;

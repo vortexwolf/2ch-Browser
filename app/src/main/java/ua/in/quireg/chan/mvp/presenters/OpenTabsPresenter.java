@@ -35,7 +35,12 @@ public class OpenTabsPresenter extends MvpPresenter<OpenTabsView> implements Ope
         for (OpenTabModel model:mOpenTabsManager.getOpenTabs()) {
             getViewState().add(model);
         }
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mOpenTabsManager.unsubscribe(this);
     }
 
     public void navigate(OpenTabModel openTabModel) {

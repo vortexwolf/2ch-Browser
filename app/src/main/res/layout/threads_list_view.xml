@@ -1,29 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" 
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="?activityRootBackground">
 
     <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1" >
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/refreshView"
+        <com.aspsine.swipetoloadlayout.SwipeToLoadLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/swipeToLoadLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="?activityRootBackground"
+            tools:context="ua.in.quireg.chan.ui.fragments.ThreadsListFragment">
+
+            <ua.in.quireg.chan.ui.views.RefreshHeaderView
+                android:id="@id/swipe_refresh_header"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="36dp">
+            </ua.in.quireg.chan.ui.views.RefreshHeaderView>
 
             <ListView
-                android:id="@android:id/list"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:fastScrollEnabled="true"
-                android:dividerHeight="0.5dip"
-                android:scrollingCache="false" />
+                android:id="@id/swipe_target"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:dividerHeight="0.5dp"
+                tools:listitem="@layout/threads_list_item"/>
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+            <ua.in.quireg.chan.ui.views.LoadMoreFooterView
+                android:id="@id/swipe_load_more_footer"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="36dp" />
+
+        </com.aspsine.swipetoloadlayout.SwipeToLoadLayout>
 
         <include
             android:id="@+id/loadingView"
@@ -42,54 +59,21 @@
             android:visibility="gone" />
         <include
             android:id="@+id/captchaView"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             layout="@layout/cloudflare_captcha"
             android:visibility="gone" />
     </FrameLayout>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/threads_navigation_bar"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:visibility="gone">-->
-
-        <!--<ImageButton-->
-            <!--android:id="@+id/threads_prev_page"-->
-            <!--android:layout_width="0dip"-->
-            <!--android:layout_height="@dimen/navigation_button_size"-->
-            <!--android:padding="@dimen/navigation_button_padding"-->
-            <!--android:background="@null"-->
-            <!--android:src="?iconBack"-->
-            <!--android:scaleType="fitStart"-->
-            <!--android:layout_weight="1"/>-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/threads_page_number"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_vertical"-->
-            <!--android:textAppearance="?android:attr/textAppearanceLarge" />-->
-
-        <!--<ImageButton-->
-            <!--android:id="@+id/threads_next_page"-->
-            <!--android:layout_width="0dip"-->
-            <!--android:layout_height="@dimen/navigation_button_size"-->
-            <!--android:padding="@dimen/navigation_button_padding"-->
-            <!--android:background="@null"-->
-            <!--android:src="?iconForward"-->
-            <!--android:scaleType="fitEnd"-->
-            <!--android:layout_weight="1"/>-->
-    <!--</LinearLayout>-->
     
     <RelativeLayout
         android:id="@+id/threads_catalog_bar"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
+        android:layout_width="match_parent">
         <Spinner
             android:id="@+id/threads_filter_select"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/navigation_button_size"
             android:entries="@array/catalog_filters" />
     </RelativeLayout>    

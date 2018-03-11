@@ -30,6 +30,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.9'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.6.0'
+    implementation 'com.github.Aspsine:SwipeToLoadLayout:1.0.4'
 
     //Fragment navigation
     implementation 'com.ncapdevi:frag-nav:2.4.0'
@@ -113,6 +114,10 @@ android {
             minifyEnabled false
 //            signingConfig signingConfigs.config
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 
     compileOptions {

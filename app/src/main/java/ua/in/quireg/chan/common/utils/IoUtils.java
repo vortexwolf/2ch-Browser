@@ -38,11 +38,12 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class IoUtils {
 
     @NonNull
+    @SuppressWarnings("ForLoopReplaceableByForEach")
     public static String sha256(String base) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(base.getBytes("UTF-8"));
-            StringBuffer hexString = new StringBuffer();
+            StringBuilder hexString = new StringBuilder();
 
             for (int i = 0; i < hash.length; i++) {
                 String hex = Integer.toHexString(0xff & hash[i]);
@@ -59,8 +60,7 @@ public class IoUtils {
     public static String convertStreamToString(InputStream stream) throws IOException {
         byte[] bytes = convertStreamToBytes(stream);
 
-        String result = convertBytesToString(bytes);
-        return result;
+        return convertBytesToString(bytes);
     }
 
     public static byte[] convertStreamToBytes(InputStream stream) throws IOException {
@@ -138,17 +138,17 @@ public class IoUtils {
             return 0;
         }
 
-        long result = 0;
+        long resultSize = 0;
         for (File file : files) {
             // Recursive call if it's a directory
             if (file.isDirectory()) {
-                result += dirSize(file);
+                resultSize += dirSize(file);
             } else {
                 // Sum the file size in bytes
-                result += file.length();
+                resultSize += file.length();
             }
         }
-        return result; // return the file size
+        return resultSize;
     }
 
     public static void deleteDirectory(File path) {
@@ -181,10 +181,8 @@ public class IoUtils {
         String fileName = uri.getLastPathSegment();
 
         File dir = settings.getDownloadDirectory();
-        dir.mkdirs();
-        File file = new File(dir, fileName);
 
-        return file;
+        return new File(dir, fileName);
     }
 
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
@@ -325,8 +323,7 @@ public class IoUtils {
             return null;
         }
 
-        String str = new String(out.toByteArray());
-        return str;
+        return new String(out.toByteArray());
     }
 
     public static Point getImageSize(File file) {
@@ -349,8 +346,7 @@ public class IoUtils {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inSampleSize = scale;
 
-        Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), o);
-        return b;
+        return BitmapFactory.decodeFile(file.getAbsolutePath(), o);
     }
 
     private static byte[] getJpegInfoBytes(File file) {

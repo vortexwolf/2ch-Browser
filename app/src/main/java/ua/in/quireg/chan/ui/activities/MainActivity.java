@@ -132,13 +132,11 @@ public class MainActivity extends MvpAppCompatActivity {
     public void updateTabSelection(int currentTab) {
 
         for (int i = 0; i < TABS.length; i++) {
-
             TabLayout.Tab selectedTab = mBottomTabLayout.getTabAt(i);
 
             if(selectedTab == null || selectedTab.getCustomView() == null) {
                 continue;
             }
-
             if (currentTab != i) {
                 selectedTab.getCustomView().setSelected(false);
             } else {
@@ -157,7 +155,6 @@ public class MainActivity extends MvpAppCompatActivity {
 
 
     private void initBottomTabs() {
-
         for (int i = 0; i < TABS.length; i++) {
 
             TabLayout.Tab tab = mBottomTabLayout.newTab();
@@ -165,7 +162,6 @@ public class MainActivity extends MvpAppCompatActivity {
 
             //Reminder - this triggers onTabSelected() on first tab
             mBottomTabLayout.addTab(tab);
-
         }
     }
 
@@ -188,14 +184,12 @@ public class MainActivity extends MvpAppCompatActivity {
     };
 
     private int getStatusBarHeight() {
-        int result = 0;
-
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int result = 0;
 
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }
-
         return result;
     }
 

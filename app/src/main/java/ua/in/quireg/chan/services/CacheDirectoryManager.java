@@ -9,7 +9,6 @@ import android.os.HandlerThread;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -22,6 +21,11 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 public class CacheDirectoryManager {
 
     private static final int WORKER_INTERVAL = 60000; // 60 seconds
+
+    private static final String CACHE_DIR_NAME = "cache";
+    private static final String CACHE_THUMB_DIR_NAME = "thumbnails";
+    private static final String CACHE_PAGES_DIR_NAME = "pages";
+    private static final String CACHE_IMAGES_DIR_NAME = "images";
 
     @Inject protected ApplicationSettings mSettings;
 
@@ -38,42 +42,46 @@ public class CacheDirectoryManager {
         mPackageName = context.getPackageName();
 
         mExternalCacheDir = getExternalCachePath();
-        mInternalCacheDir = new File(context.getCacheDir(), "cache");
+        mInternalCacheDir = new File(context.getCacheDir(), CACHE_DIR_NAME);
 
         HandlerThread mHandlerThread = new HandlerThread("CacheWorkerThread");
         mHandlerThread.start();
 
         mHandler = new Handler(mHandlerThread.getLooper());
         mHandler.postDelayed(mWorkerRunnable, WORKER_INTERVAL);
-
     }
 
-    public long getCacheSize() {
+    public long getCacheMaxSize() {
         return mSettings.getCacheSize();
     }
 
     public File getCurrentCacheDirectory() {
-        File currentDirectory;
 
-        if (mExternalCacheDir != null && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            currentDirectory = mExternalCacheDir;
+        if (mExternalCacheDir != null && extStorageReady()) {
+            return mExternalCacheDir;
         } else {
-            currentDirectory = mInternalCacheDir;
+            return mInternalCacheDir;
         }
-
-        return currentDirectory;
     }
 
     public File getThumbnailsCacheDirectory() {
-        return getCacheDirectory("thumbnails");
+        return getCacheSubdirectory(CACHE_THUMB_DIR_NAME);
     }
 
     public File getPagesCacheDirectory() {
-        return getCacheDirectory("pages");
+        return getCacheSubdirectory(CACHE_PAGES_DIR_NAME);
     }
 
     public File getMediaCacheDirectory() {
-        return getCacheDirectory("images");
+        return getCacheSubdirectory(CACHE_IMAGES_DIR_NAME);
+    }
+
+    private File getCacheSubdirectory(String subFolder) {
+        File dir = new File(getCurrentCacheDirectory(), subFolder);
+        if (!dir.exists() && !dir.mkdirs()) {
+            Timber.e("Failed to create cache folder %s", subFolder);
+        }
+        return dir;
     }
 
     public File getCachedMediaFileForWrite(Uri uri) {
@@ -87,7 +95,6 @@ public class CacheDirectoryManager {
         if (!cachedFile.exists()) {
             cachedFile = IoUtils.getSaveFilePath(uri, mSettings);
         }
-
         return cachedFile;
     }
 
@@ -102,28 +109,22 @@ public class CacheDirectoryManager {
         }
     };
 
-    private void trimCacheIfNeeded() {
+    private synchronized void trimCacheIfNeeded() {
 
         long cacheSize = IoUtils.dirSize(getCurrentCacheDirectory());
-        long maxSize = IoUtils.convertMbToBytes(getCacheSize());
+        long maxSize = IoUtils.convertMbToBytes(getCacheMaxSize());
 
         if (cacheSize < maxSize) {
-            //Cache is not full yet
             return;
         }
-        Timber.v("Cache size: %dMb, cleanup started", IoUtils.convertBytesToMb(cacheSize));
+        Timber.d("Cache size: %.2fMb, cleanup started", IoUtils.convertBytesToMb(cacheSize));
 
         final long FILE_CACHE_THRESHOLD = Math.round(IoUtils.convertMbToBytes(mSettings.getCacheSize()));
         final float MAX_THUMBNAILS_PART = mSettings.getCacheThumbnailsSize() / 100f;
         final float MAX_MEDIA_PART = mSettings.getCacheMediaSize() / 100f;
         final float MAX_PAGES_PART = mSettings.getCachePagesSize() / 100f;
 
-        //Delete cache directory that might be previously used by user.
-        IoUtils.deleteDirectory(getReversedCacheDirectory());
-
         long released = 0;
-
-        //Trim current cache directory
 
         File pagesCache = getPagesCacheDirectory();
         long pagesCacheSize = IoUtils.dirSize(pagesCache);
@@ -150,35 +151,30 @@ public class CacheDirectoryManager {
 
     }
 
-    private File getCacheDirectory(String subFolder) {
-        File file = new File(getCurrentCacheDirectory(), subFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-
-        return file;
-    }
-
-    private File getReversedCacheDirectory() {
-        return getCurrentCacheDirectory().equals(mExternalCacheDir)
-                ? mInternalCacheDir
-                : mExternalCacheDir;
-    }
-
     private File getExternalCachePath() {
-        // Check if the external storage is writable
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            // Retrieve the base path for the application in the external
-            // storage
+        if (extStorageReady()) {
+            // Retrieve the base path for the application in the external storage
             File externalStorageDir = Environment.getExternalStorageDirectory();
-            // {SD_PATH}/Android/data/ua.in.quireg.chan/cache
-            File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + mPackageName + File.separator + "cache");
-            extStorageAppCachePath.mkdirs();
 
+            // {SD_PATH}/Android/data/package_name/cache
+            File extStorageAppCachePath = new File(externalStorageDir, "Android" + File.separator + "data" + File.separator + mPackageName + File.separator + CACHE_DIR_NAME);
+
+            if (!extStorageAppCachePath.exists()) {
+                Timber.d("External cache directory is missing. Creating one...");
+
+                boolean success = extStorageAppCachePath.mkdirs();
+                if (!success) {
+                    Timber.e("Failed to create external cache directory");
+                    return null;
+                }
+            }
             return extStorageAppCachePath;
         }
-
         return null;
+    }
+
+    private boolean extStorageReady() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
     private long freeSpace(List<File> files, long bytesToRelease) {
@@ -210,45 +206,42 @@ public class CacheDirectoryManager {
     }
 
     private List<File> getFilesListToDelete(File directoryPath) {
-        List<File> files_list = new ArrayList<>();
+        List<File> filesList = new ArrayList<>();
 
         if (directoryPath != null && directoryPath.exists()) {
             File[] files = directoryPath.listFiles();
             if (files == null || files.length == 0) {
-                return files_list;
+                return filesList;
             }
 
             for (File file : files) {
                 if (file.isDirectory()) {
-                    files_list.addAll(getFilesListToDelete(file));
+                    filesList.addAll(getFilesListToDelete(file));
                 } else {
                     if (canDelete(file)) {
-                        files_list.add(file);
+                        filesList.add(file);
                     }
                 }
 
             }
         }
         //sort by date created
-        Collections.sort(files_list, new Comparator<File>() {
-            @Override
-            public int compare(File f1, File f2) {
-                if (f1.lastModified() > f2.lastModified()) {
-                    return 1;
-                } else if (f1.lastModified() < f2.lastModified()) {
-                    return -1;
-                }
-                return 0;
+        Collections.sort(filesList, (f1, f2) -> {
+            if (f1.lastModified() > f2.lastModified()) {
+                return 1;
+            } else if (f1.lastModified() < f2.lastModified()) {
+                return -1;
             }
+            return 0;
         });
-        return files_list;
+        return filesList;
     }
 
     private boolean canDelete(File f) {
         //Check if it is cached page
         if (f.getParentFile().equals(getPagesCacheDirectory())) {
             //Check if it is old enough to be deleted
-            if (f.lastModified() > System.currentTimeMillis() - mSettings.getCachePagesThresholdSize() * 24 * 60 * 60 * 1000) {
+            if (f.lastModified() > System.currentTimeMillis() - mSettings.getCachePagesThresholdSize()/*days*/ * 24 * 60 * 60 * 1000) {
                 return false;
             }
         }

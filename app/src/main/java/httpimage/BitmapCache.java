@@ -10,14 +10,6 @@ import android.graphics.Bitmap;
 public interface BitmapCache {
 
     /**
-     * Test if a specified bitmap exists
-     * 
-     * @param key
-     * @return
-     */
-    public boolean exists(String key);
-
-    /**
      * Retrieve the bitmap, return null means cache miss
      * 
      * @param key

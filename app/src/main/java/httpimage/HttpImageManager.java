@@ -70,7 +70,7 @@ import ua.in.quireg.chan.services.http.HttpBitmapReader;
  */
 public class HttpImageManager {
 
-    private static final String TAG = "HttpImageManager";
+    private static final String TAG = HttpImageManager.class.getSimpleName();
 
     private final BitmapMemoryCache mCache;
     private final FileSystemPersistence mPersistence;

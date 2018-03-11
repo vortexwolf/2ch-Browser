@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -78,6 +79,18 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if ((getActivity()) != null) {
+            ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (mActionBar != null) {
+                mActionBar.setTitle(getString(R.string.app_name));
+            }
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -100,26 +113,14 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         registerForContextMenu(mListView);
 
-        //TODO move to navigation controller maybe?
-
-        ActionBar mActionBar = null;
-        if ((getActivity()) != null) {
-            mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        }
-        if (mActionBar != null) {
-            mActionBar.setTitle(getString(R.string.app_name));
-        }
-
         mPickBoardButton.setOnClickListener(v -> {
             String enteredBoard = mPickBoardInput.getText().toString().trim();
             mBoardsListPresenter.onBoardClick(enteredBoard);
         });
 
-        mPickBoardInput.setOnKeyListener((v, keyCode, event) -> {
-            if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+        mPickBoardInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_GO) {
                 String enteredBoard = mPickBoardInput.getText().toString().trim();
-
-                mPickBoardInput.clearFocus();
                 mBoardsListPresenter.onBoardClick(enteredBoard);
                 return true;
             }
@@ -160,7 +161,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
                 String uri = Websites.getDefault().getUrlBuilder().getPageUrlHtml(boardEntity.id, 0);
 
                 CompatibilityUtils.copyText(getActivity(), uri, uri);
-
                 Toast.makeText(getContext(), uri, Toast.LENGTH_SHORT).show();
 
                 return true;
@@ -174,7 +174,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
                 return true;
             }
         }
-
         return false;
     }
 
@@ -192,7 +191,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
                 mBoardsListPresenter.updateBoardsList(true);
                 return true;
         }
-
         return false;
     }
 
@@ -226,8 +224,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             }
 
             // add group header
-            if(boardEntity.category != null &&
-                    (currentCategory == null || !boardEntity.category.equals(currentCategory))) {
+            if(boardEntity.category != null && (currentCategory == null || !boardEntity.category.equals(currentCategory))) {
                 currentCategory = boardEntity.category;
                 mBoardsListAdapter.add(new SectionEntity(currentCategory));
             }
@@ -243,7 +240,5 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             mListView.setSelectionFromTop(mListViewPosition.position, mListViewPosition.top);
             mListViewPosition = null;
         }
-
     }
-
 }

@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:hint="@string/pick_board_input_hint"
         android:inputType="text|textEmailAddress|textEmailAddress"
-        android:imeOptions="flagNoExtractUi|flagNoFullscreen"
+        android:imeOptions="flagNoExtractUi|flagNoFullscreen|actionGo"
         android:maxLines="1"
         android:paddingStart="8dp"
         android:layout_toStartOf="@id/pick_board_button" />

@@ -1,0 +1,31 @@
+<com.aspsine.swipetoloadlayout.SwipeToLoadLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeToLoadLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?activityRootBackground"
+    tools:context="ua.in.quireg.chan.ui.fragments.ThreadsListFragment">
+
+    <ua.in.quireg.chan.ui.views.RefreshHeaderView
+        android:id="@id/swipe_refresh_header"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+
+    </ua.in.quireg.chan.ui.views.RefreshHeaderView>
+
+    <ListView
+        android:id="@id/swipe_target"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="0.5dp"
+        tools:listitem="@layout/threads_list_item"/>
+
+    <ua.in.quireg.chan.ui.views.LoadMoreFooterView
+        android:id="@id/swipe_load_more_footer"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="36dp" />
+
+</com.aspsine.swipetoloadlayout.SwipeToLoadLayout>

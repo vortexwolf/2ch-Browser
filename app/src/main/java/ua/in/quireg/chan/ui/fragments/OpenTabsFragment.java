@@ -3,14 +3,13 @@ package ua.in.quireg.chan.ui.fragments;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,9 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.view.ViewParent;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
@@ -42,86 +38,50 @@ import ua.in.quireg.chan.ui.views.RecyclerViewWithCM;
 public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsView {
 
     @Inject FavoritesDataSource mFavoritesDatasource;
-
     @InjectPresenter OpenTabsPresenter mOpenTabsPresenter;
 
-    private RecyclerViewWithCM mRecyclerViewWithCM;
     private OpenTabsRecyclerViewAdapter mOpenTabsRecyclerViewAdapter;
-    private Uri mCurrentUri;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MainApplication.getAppComponent().inject(this);
 
-        Bundle extras = getArguments();
-        if (extras != null && extras.containsKey(Constants.EXTRA_CURRENT_URL)) {
-            mCurrentUri = Uri.parse(extras.getString(Constants.EXTRA_CURRENT_URL));
-        }
-
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.open_tabs_list_view, container, false);
+    }
 
-        View view = inflater.inflate(R.layout.open_tabs_list_view, container, false);
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-//        RecyclerView recyclerView = view.findViewById(R.id.opened_tabs_list);
-
-        mRecyclerViewWithCM = view.findViewById(R.id.opened_tabs_list);
-
-//        mRecyclerViewWithCM = new RecyclerViewWithCM(recyclerView.getContext());
-//        mRecyclerViewWithCM.setLayoutParams(recyclerView.getLayoutParams());
-//
-//        ViewParent parent = recyclerView.getParent();
-//        ((ViewManager) parent).removeView(recyclerView);
-//        ((ViewManager) parent).addView(mRecyclerViewWithCM, recyclerView.getLayoutParams());
-
-//        mRecyclerViewWithCM = new RecyclerViewWithCM(recyclerView.getContext());
-//
-//        ((ViewManager) view).removeView(recyclerView);
-//        ((ViewManager) view).addView(mRecyclerViewWithCM, recyclerView.getLayoutParams());
-
-
-//        ViewGroup parent = (ViewGroup) recyclerView.getParent();
-//        int index = parent.indexOfChild(recyclerView);
-//        parent.removeView(recyclerView);
-//        mRecyclerViewWithCM = getLayoutInflater().inflate(optionId, parent, false);
-//        parent.addView(mRecyclerViewWithCM, index);
-
-
-        return view;
+        if ((getActivity()) != null) {
+            ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (mActionBar != null) {
+                mActionBar.setTitle(getString(R.string.tabs_opentabs));
+            }
+        }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getActivity() == null) {
-            Timber.e("getActivity() == null");
-            return;
+        if (mOpenTabsRecyclerViewAdapter == null) {
+            mOpenTabsRecyclerViewAdapter = new OpenTabsRecyclerViewAdapter(mOpenTabsPresenter);
         }
+        LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
 
-//        mRecyclerViewWithCM.setOnCreateContextMenuListener(this);
-
-        registerForContextMenu(mRecyclerViewWithCM);
-
-        mOpenTabsRecyclerViewAdapter = new OpenTabsRecyclerViewAdapter(mOpenTabsPresenter);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-
+        RecyclerViewWithCM mRecyclerViewWithCM = view.findViewById(R.id.opened_tabs_list);
         mRecyclerViewWithCM.setLayoutManager(layoutManager);
         mRecyclerViewWithCM.addItemDecoration(new DividerItemDecoration(mRecyclerViewWithCM.getContext(), layoutManager.getOrientation()));
         mRecyclerViewWithCM.setAdapter(mOpenTabsRecyclerViewAdapter);
 
-
-        ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-
-        if (mActionBar != null) {
-            mActionBar.setTitle(getString(R.string.tabs_opentabs));
-        }
-
+        registerForContextMenu(mRecyclerViewWithCM);
     }
 
     @Override
@@ -138,7 +98,6 @@ public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsVi
                 mOpenTabsPresenter.removeAllItems();
                 break;
         }
-
         return true;
     }
 
@@ -146,14 +105,12 @@ public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsVi
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-
         RecyclerViewWithCM.ContextMenuInfo info = (RecyclerViewWithCM.ContextMenuInfo) menuInfo;
 
         OpenTabModel item = mOpenTabsRecyclerViewAdapter.getItem(info.position);
 
         if (item == null) {
-            Timber.e("item == null");
+            Timber.e("OpenTabModel item == null");
             return;
         }
 
@@ -171,15 +128,12 @@ public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsVi
         if (!getUserVisibleHint()) {
             return false;
         }
-
-//        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-
         RecyclerViewWithCM.ContextMenuInfo menuInfo = (RecyclerViewWithCM.ContextMenuInfo) menuItem.getMenuInfo();
 
         OpenTabModel item = mOpenTabsRecyclerViewAdapter.getItem(menuInfo.position);
 
         if (item == null) {
-            Timber.e("model == null");
+            Timber.e("OpenTabModel model == null");
             return false;
         }
 
@@ -207,7 +161,6 @@ public class OpenTabsFragment extends MvpAppCompatFragment implements OpenTabsVi
                 return true;
             }
         }
-
         return false;
     }
 

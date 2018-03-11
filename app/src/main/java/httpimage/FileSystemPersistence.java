@@ -9,92 +9,72 @@ import java.io.IOException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import ua.in.quireg.chan.common.library.MyLog;
+import timber.log.Timber;
 import ua.in.quireg.chan.common.utils.IoUtils;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 
 /**
  * File system implementation of persistent storage for downloaded images.
- * 
+ *
  * @author zonghai@gmail.com
  */
 public class FileSystemPersistence implements BitmapCache {
 
-    private static final String TAG = "ThumbnailFSPersistent";
-
-    private final CacheDirectoryManager mCacheManager;
     private final File mBaseDir;
 
     public FileSystemPersistence(CacheDirectoryManager cacheManager) {
-        this.mCacheManager = cacheManager;
-
-        this.mBaseDir = cacheManager.getThumbnailsCacheDirectory();
-        if (!this.mBaseDir.exists()) {
-            this.mBaseDir.mkdirs();
-        }
+        mBaseDir = cacheManager.getThumbnailsCacheDirectory();
     }
 
     @Override
     public void clear() {
-        IoUtils.deleteDirectory(this.mBaseDir);
-    }
-
-    @Override
-    public boolean exists(String key) {
-        File file = new File(this.mBaseDir, key);
-        return file.exists();
+        IoUtils.deleteDirectory(mBaseDir);
     }
 
     @Override
     public Bitmap loadData(String key) {
-        if (!this.exists(key)) {
+        File file = new File(mBaseDir, key);
+        if(!file.exists()){
             return null;
         }
-
-        File file = new File(this.mBaseDir, key);
-        Bitmap bitmap = null;
-        try {
-            bitmap = this.readBitmapFromFile(file);
-        } catch (FileNotFoundException e) {
-            // ignore
-        }
-
-        return bitmap;
+        return readBitmapFromFile(file);
     }
 
     @Override
     public void storeData(String key, Bitmap data) {
         try {
-            File file = new File(this.mBaseDir, key);
-            this.writeBitmapToFile(data, file);
+            File file = new File(mBaseDir, key);
+            writeBitmapToFile(data, file);
         } catch (IOException e) {
-            MyLog.e(TAG, e);
+            Timber.e(e);
         }
     }
 
-    private boolean writeBitmapToFile(Bitmap bitmap, File file) throws IOException, FileNotFoundException {
+    private void writeBitmapToFile(Bitmap bitmap, File file) throws IOException {
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(file);
-            return bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         } finally {
             IoUtils.closeStream(out);
         }
     }
 
-    private Bitmap readBitmapFromFile(File file) throws FileNotFoundException {
+    private Bitmap readBitmapFromFile(File file) {
         FileInputStream fis = null;
         Bitmap bitmap = null;
         try {
             fis = new FileInputStream(file);
             bitmap = BitmapFactory.decodeStream(fis);
             if (bitmap == null) {
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
-
-            return bitmap;
+        } catch (FileNotFoundException e) {
+            //No file, no cry.
         } finally {
             IoUtils.closeStream(fis);
         }
+        return bitmap;
     }
 }

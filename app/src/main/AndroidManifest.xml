@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:name="ua.in.quireg.chan.common.MainApplication"
         android:allowBackup="false"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme_Photon_13">
 
         <activity
             android:name=".ui.activities.LaunchScreenActivity"
