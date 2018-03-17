@@ -65,7 +65,7 @@ public class BrowserActivity extends Activity {
         this.setContentView(R.layout.browser);
 
 
-        this.mBackground = AppearanceUtils.getThemeColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
+        this.mBackground = AppearanceUtils.getThemeDependentColor(this.getTheme(), R.styleable.Theme_activityRootBackground);
 
         View containerView = this.findViewById(R.id.image_gallery_item_container);
         this.mContentView = (FrameLayout) containerView.findViewById(R.id.image_layout);

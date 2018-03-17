@@ -35,14 +35,11 @@ public class RecyclerViewWithCM extends RecyclerView {
 
     @Override
     public boolean showContextMenuForChild(View originalView) {
-
-        final int longPressPosition = getChildAdapterPosition(originalView);
+        final int longPressPosition = getChildLayoutPosition(originalView);
 
         if (longPressPosition >= 0) {
             final long longPressId = getAdapter().getItemId(longPressPosition);
-
             mContextMenuInfo = new ContextMenuInfo(longPressPosition, longPressId);
-
             return super.showContextMenuForChild(originalView);
         }
         return false;

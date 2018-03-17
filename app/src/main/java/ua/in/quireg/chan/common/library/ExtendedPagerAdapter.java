@@ -3,6 +3,7 @@ package ua.in.quireg.chan.common.library;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -18,50 +19,61 @@ public abstract class ExtendedPagerAdapter<T> extends PagerAdapter {
     private int mPreviousPosition = -1;
 
     public ExtendedPagerAdapter(Context context, ArrayList<T> models) {
-        this.mContext = context;
-        this.mModels = models;
-        this.mViews = new View[models.size() + 1]; // requires 1 extra item
+        mContext = context;
+        mModels = models;
+        mViews = new View[models.size() + 1]; // requires 1 extra item
     }
 
     public Context getContext() {
-        return this.mContext;
+        return mContext;
     }
 
     public T getItem(int index) {
-        return this.mModels.get(index);
+        return mModels.get(index);
     }
 
     public View getCreatedView(int position) {
-        return this.mViews[position];
+        return mViews[position];
     }
 
     public void subscribeToPageChangeEvent(ViewPager viewPager) {
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
             @Override
             public void onPageSelected(int position) {
-                ExtendedPagerAdapter.this.notifyPositionChange(position);
+                notifyPositionChange(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
 
-        this.mSubscribedToPager = true;
+        mSubscribedToPager = true;
     }
 
     @Override
     public int getCount() {
-        return this.mModels.size();
+        return mModels.size();
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        View view = this.createView(position);
-        this.mViews[position] = view;
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
+        View view = createView(position);
+        mViews[position] = view;
         container.addView(view);
 
-        if (this.mLoadFirstTime) {
-            this.mLoadFirstTime = false;
+        if (mLoadFirstTime) {
+            mLoadFirstTime = false;
 
-            if (this.mSubscribedToPager) {
-                this.notifyPositionChange(position);
+            if (mSubscribedToPager) {
+                notifyPositionChange(position);
             }
         }
 
@@ -69,13 +81,13 @@ public abstract class ExtendedPagerAdapter<T> extends PagerAdapter {
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
-        this.mViews[position] = null;
+        mViews[position] = null;
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return view == object;
     }
 
@@ -88,17 +100,17 @@ public abstract class ExtendedPagerAdapter<T> extends PagerAdapter {
     }
 
     private void notifyPositionChange(int position) {
-        if (this.mViews[position] == null) {
+        if (mViews[position] == null) {
             // shouldn't happen
             MyLog.w("ExtendedPageAdapter", "the view is null for the position " + position);
             return;
         }
 
-        if (this.mPreviousPosition != -1 && this.mViews[this.mPreviousPosition] != null && this.mPreviousPosition != position) {
-            this.onViewUnselected(this.mPreviousPosition, this.mViews[this.mPreviousPosition]);
+        if (mPreviousPosition != -1 && mViews[mPreviousPosition] != null && mPreviousPosition != position) {
+            onViewUnselected(mPreviousPosition, mViews[mPreviousPosition]);
         }
-        this.mPreviousPosition = position;
+        mPreviousPosition = position;
 
-        this.onViewSelected(position, this.mViews[position]);
+        onViewSelected(position, mViews[position]);
     }
 }

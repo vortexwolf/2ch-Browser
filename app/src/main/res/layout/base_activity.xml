@@ -7,20 +7,22 @@
     android:background="?activityRootBackground"
     tools:context=".ui.activities.MainActivity">
 
-    <FrameLayout
-        android:id="@+id/status_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="?android:colorPrimaryDark">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/status_bar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:background="?android:colorPrimaryDark">-->
 
-    </FrameLayout>
+    <!--android:layout_below="@id/status_bar"-->
+
+    <!--</FrameLayout>-->
 
     <LinearLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/status_bar"
+        android:fitsSystemWindows="true"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar

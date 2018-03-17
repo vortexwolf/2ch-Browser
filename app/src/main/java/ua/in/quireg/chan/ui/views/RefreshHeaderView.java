@@ -5,20 +5,22 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextSwitcher;
-import android.widget.ViewSwitcher;
 
 import com.aspsine.swipetoloadlayout.SwipeRefreshTrigger;
 import com.aspsine.swipetoloadlayout.SwipeTrigger;
 
-import timber.log.Timber;
+import ua.in.quireg.chan.R;
 
 /**
  * Created by Arcturus Mengsk on 3/11/2018, 11:40 AM.
  * 2ch-Browser
  */
 
+@SuppressWarnings("FieldCanBeLocal")
 public class RefreshHeaderView extends LinearLayout implements SwipeRefreshTrigger, SwipeTrigger {
+
+    private TextView mTextView;
+    private ProgressBar mProgressBar;
 
     public RefreshHeaderView(Context context) {
         super(context);
@@ -35,35 +37,20 @@ public class RefreshHeaderView extends LinearLayout implements SwipeRefreshTrigg
         init();
     }
 
-    private TextView mTextView;
-    private TextSwitcher mTextSwitcher;
-    private ProgressBar mProgressBar;
-
-    private ViewSwitcher.ViewFactory mViewFactory = () -> new TextView(getContext());
-
     private void init(){
-
         mProgressBar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleSmall);
-//        mProgressBar.setVisibility(GONE);
-        mProgressBar.setVisibility(VISIBLE);
+
         mTextView = new TextView(getContext());
-
-        int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, getResources().getDisplayMetrics());
-        mTextView.setPadding(padding, 0, padding, 0);
-        mTextView.setSingleLine(true);
-
-        mTextView.setText("REFRESHING");
-
-        mTextSwitcher = new TextSwitcher(getContext());
-        mTextSwitcher.setFactory(mViewFactory);
-//        mTextSwitcher.setInAnimation(getContext(), android.R.anim.fade_in);
-//        mTextSwitcher.setOutAnimation(getContext(), android.R.anim.fade_out);
-//        mTextSwitcher.setPadding(padding, 0, padding, 0);
+        mTextView.setText(R.string.pull_to_refresh);
+        mTextView.setPadding(
+                getResources().getDimensionPixelSize(R.dimen.pull_to_refresh_text_padding),
+                0,
+                getResources().getDimensionPixelSize(R.dimen.pull_to_refresh_text_padding),
+                0
+        );
 
         addView(mTextView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//        addView(mTextSwitcher, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         addView(mProgressBar, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
     }
 
 
@@ -77,12 +64,10 @@ public class RefreshHeaderView extends LinearLayout implements SwipeRefreshTrigg
 
     @Override
     public void onPrepare() {
-//        mProgressBar.setVisibility(GONE);
-//        mTextView.setText("SWIPE TO REFRESH");
-//        Timber.d("SWIPE TO REFRESH");
+
     }
 
-    boolean readyToRefresh = false;
+//    boolean readyToRefresh = false;
 
     @Override
     public void onMove(int yScrolled, boolean isComplete, boolean automatic) {
@@ -104,17 +89,19 @@ public class RefreshHeaderView extends LinearLayout implements SwipeRefreshTrigg
 
     @Override
     public void onRelease() {
-        readyToRefresh = false;
+//        readyToRefresh = false;
     }
 
     @Override
     public void onComplete() {
-        readyToRefresh = false;
+//        readyToRefresh = false;
+//        mProgressBar.setVisibility(GONE);
     }
+
 
     @Override
     public void onReset() {
-        readyToRefresh = false;
+//        readyToRefresh = false;
 //        mProgressBar.setVisibility(GONE);
 //        mTextSwitcher.setText("SWIPE TO REFRESH");
 //        Timber.d("SWIPE TO REFRESH");

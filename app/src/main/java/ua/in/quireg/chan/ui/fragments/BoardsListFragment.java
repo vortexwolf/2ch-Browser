@@ -57,11 +57,8 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         MainApplication.getAppComponent().inject(this);
-
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -105,7 +102,7 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         }
 
-        mListView.setOnItemClickListener((adapterView, view1, i, l) -> {
+        mListView.setOnItemClickListener((adapterView, v, i, l) -> {
             BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(i);
             mBoardsListPresenter.onBoardClick(boardEntity);
 

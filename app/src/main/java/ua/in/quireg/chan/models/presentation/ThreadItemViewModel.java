@@ -11,7 +11,7 @@ import ua.in.quireg.chan.interfaces.IWebsite;
 import ua.in.quireg.chan.models.domain.PostModel;
 import ua.in.quireg.chan.models.domain.ThreadModel;
 
-public class ThreadItemViewModel {
+public class ThreadItemViewModel implements IThreadListEntity {
     private final IWebsite mWebsite;
     private final String mBoardName;
     private final Theme mTheme;
@@ -113,5 +113,14 @@ public class ThreadItemViewModel {
 
     public void setHidden(boolean hidden) {
         this.mHidden = hidden;
+    }
+
+    @Override
+    public Type getType() {
+        if(mHidden) {
+            return Type.THREAD;
+        } else  {
+            return Type.HIDDEN_THREAD;
+        }
     }
 }

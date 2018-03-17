@@ -1,5 +1,6 @@
 package ua.in.quireg.chan.mvp.routing;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import ru.terrakok.cicerone.BaseRouter;
 import ru.terrakok.cicerone.commands.Command;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateGallery;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
 import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
@@ -24,10 +26,6 @@ public final class MainRouter extends BaseRouter {
         executeCommand(new SendShortToast(stringId));
     }
 
-    public void navigateBoard(String mWebsite, String boardCode, boolean preferDeserialized) {
-        executeCommand(new NavigateBoard(mWebsite, boardCode, preferDeserialized));
-    }
-
     public void onBackPressed() {
         executeCommand(new NavigateBackwards());
     }
@@ -40,8 +38,17 @@ public final class MainRouter extends BaseRouter {
         executeCommand(new PushFragment(f));
     }
 
+    public void navigateBoard(String mWebsite, String boardCode, boolean preferDeserialized) {
+        executeCommand(new NavigateBoard(mWebsite, boardCode, preferDeserialized));
+    }
+
+    @SuppressWarnings("SameParameterValue")
     public void navigateThread(String website, String boardName, String thread, @Nullable String subject, @Nullable String post, boolean preferDeserialized) {
         executeCommand(new NavigateThread(website, boardName, thread, subject, post, preferDeserialized));
+    }
+
+    public void navigateGallery(Uri uri, String threadUrl) {
+        executeCommand(new NavigateGallery(uri, threadUrl));
     }
 
     @Override

@@ -326,7 +326,7 @@ If you want to be in read-only, post to /test/.
     <string name="notification_post_copied">Copied to clipboard</string>
     <string name="notification_passcode_correct">The passcode has been successfully validated</string>
     <string name="notification_passcode_incorrect">The passcode is incorrect</string>
-    <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait...</string>
+    <string name="notification_cloudflare_check_started">Started Cloudflare checking, wait…</string>
     <string name="notification_cloudflare_check_finished">Cloudflare checking is complete, try again</string>
     <string name="notification_video_thumbnail">Tap thumbnail to Play</string>
     <string name="notification_video">Tap Video Preview to Play</string>
@@ -334,6 +334,7 @@ If you want to be in read-only, post to /test/.
     <string name="simply_image">Image!</string>
     <string name="opened_tabs_for_this_session">Opened Tabs For This Session</string>
     <string name="cloudflare_captcha_input_hint">Enter above text</string>
+    <string name="pull_to_refresh">REFRESHING</string>
 
     <string-array name="catalog_filters">
         <item>Sort by Bump order</item>

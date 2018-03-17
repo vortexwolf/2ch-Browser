@@ -8,12 +8,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.DownloadFileTask;
 import ua.in.quireg.chan.common.Constants;
@@ -54,8 +56,6 @@ import ua.in.quireg.chan.ui.views.SelectiveViewPager;
 
 public class ImageGalleryFragment extends Fragment implements SelectiveViewPager.OnSingleClickListener{
 
-    public static final String LOG_TAG = ImageGalleryFragment.class.getSimpleName();
-
     private ThreadImagesService mThreadImagesService;
     private CacheDirectoryManager mCacheDirectoryManager;
     private ApplicationSettings mApplicationSettings;
@@ -68,21 +68,12 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
 
     private DownloadFileTask mCurrentTask = null;
 
-    private AppBarLayout appBarLayout;
-    private LinearLayout toolbar_layout;
     private View bottomPanel;
     private Menu mMenu;
     private TextView mImageText;
     private ProgressBar mProgressBar;
-    private View tabLayout;
     private int mBackgroundColor;
-    private CoordinatorLayout.LayoutParams appBarLayoutParams;
-    private CoordinatorLayout.LayoutParams customAppBarLayoutParams;
-    private float appbarElevation;
-    private Drawable appBarBackground;
-    View decorView;
-    private int systemUIVisibility;
-    float alpha;
+    private View mContainerView;
 
     private Uri fileToBeShared;
 
@@ -92,58 +83,28 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        decorView = getActivity().getWindow().getDecorView();
-        systemUIVisibility = decorView.getSystemUiVisibility();
         setHasOptionsMenu(true);
-
-
-//        //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-//        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//        }
-
-//        decorView.setSystemUiVisibility(
-//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
         mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
         mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
 
-
-
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.image_gallery_view, container, false);
-
-        return view;
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (container != null) {
+            mContainerView = container.getRootView().findViewById(R.id.base_activity_container);
+        }
+        return inflater.inflate(R.layout.image_gallery_view, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        View fragment_container = view.getRootView().findViewById(R.id.base_activity_container);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) fragment_container.getLayoutParams();
-        layoutParams.removeRule(RelativeLayout.BELOW);
-        layoutParams.removeRule(RelativeLayout.ABOVE);
-        fragment_container.setLayoutParams(layoutParams);
-
-        tabLayout = view.getRootView().findViewById(R.id.bottom_tab_layout);
-        tabLayout.setVisibility(View.GONE);
-
-        //appBarLayout = (AppBarLayout) view.getRootView().findViewById(R.id.appbar);
         bottomPanel = view.findViewById(R.id.image_gallery_bottom_bar);
-
-        toolbar_layout = view.getRootView().findViewById(R.id.toolbar_layout);
-        alpha = toolbar_layout.getAlpha();
-        toolbar_layout.animate().alpha(0f).setDuration(1000);
 
 
 
@@ -155,7 +116,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         }
 
 
-        SelectiveViewPager selectiveViewPager = (SelectiveViewPager) view.findViewById(R.id.view_pager);
+        SelectiveViewPager selectiveViewPager = view.findViewById(R.id.view_pager);
         selectiveViewPager.setSingleClickListener(this);
 
 
@@ -170,12 +131,12 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         ThreadImageModel currentImage = mThreadImagesService.getImageByUrl(images, imageUrl);
         int imagePosition = images.indexOf(currentImage);
 
-        mImageText = (TextView) view.findViewById(R.id.image_gallery_text);
-        mProgressBar = (ProgressBar) view.findViewById(R.id.page_progress_bar);
-        mBackgroundColor = ContextCompat.getColor(getContext(), R.color.black); //AppearanceUtils.getThemeColor(getActivity().getTheme(), R.styleable.Theme_activityRootBackground);
+        mImageText = view.findViewById(R.id.image_gallery_text);
+        mProgressBar = view.findViewById(R.id.page_progress_bar);
+        mBackgroundColor = AppearanceUtils.getThemeDependentColor(view.getContext().getTheme(), R.styleable.Theme_activityRootBackground);
 
         // view pager
-        final ImageGalleryAdapter adapter = new ImageGalleryAdapter(getActivity(), images);
+        final ImageGalleryAdapter adapter = new ImageGalleryAdapter(selectiveViewPager, images);
         selectiveViewPager.setAdapter(adapter);
         adapter.subscribeToPageChangeEvent(selectiveViewPager);
         selectiveViewPager.setCurrentItem(imagePosition);
@@ -183,23 +144,19 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        expandContainerView();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
-        tabLayout.setVisibility(View.VISIBLE);
+        restoreContainerView();
     }
 
     @Override
     public void onDestroyView() {
-
-        View container = getView().getRootView().findViewById(R.id.base_activity_container);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) container.getLayoutParams();
-        layoutParams.addRule(RelativeLayout.BELOW, R.id.toolbar_layout);
-        layoutParams.addRule(RelativeLayout.ABOVE, R.id.bottom_tab_layout);
-        container.setLayoutParams(layoutParams);
-//        toolbar_layout.setAlpha(alpha);
-
-
-        toolbar_layout.animate().alpha(alpha).setDuration(1000);
 
         if (mCurrentTask != null) {
             mCurrentTask.cancel(true);
@@ -212,13 +169,6 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             fileToBeShared = null;
         }
         super.onDestroyView();
-
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -243,30 +193,22 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         updatePanelsVisibility();
     }
 
+    private void expandContainerView() {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mContainerView.getLayoutParams();
+        layoutParams.removeRule(RelativeLayout.BELOW);
+        layoutParams.removeRule(RelativeLayout.ABOVE);
+        mContainerView.setLayoutParams(layoutParams);
+    }
+
+    private void restoreContainerView() {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mContainerView.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.BELOW, R.id.toolbar_layout);
+        layoutParams.addRule(RelativeLayout.ABOVE, R.id.bottom_tab_layout);
+        mContainerView.setLayoutParams(layoutParams);
+    }
+
     private void updatePanelsVisibility(){
-
-//        float toolbar_statusbar_height = getResources().getDimension(R.dimen.status_bar_height) / getResources().getDisplayMetrics().density;
-//
-//
-//        if(isPanelsVisible){
-//
-//            decorView.setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
-//
-//        }else{
-//            decorView.setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-//
-//        }
-
         isPanelsVisible = !isPanelsVisible;
-
     }
 
     private void updateOptionsMenu() {
@@ -306,7 +248,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
 
         switch (item.getItemId()) {
             case R.id.open_browser_menu_id:
-                BrowserLauncher.launchExternalBrowser(getActivity(), mCurrentImageModel.url.toString());
+                BrowserLauncher.launchExternalBrowser(getActivity(), mCurrentImageModel.url);
                 break;
             case R.id.save_menu_id:
                 new DownloadFileTask(getActivity(), Uri.parse(mCurrentImageModel.url)).execute();
@@ -326,7 +268,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                 if (mImageLoadedFile == null) {
                     break;
                 }
-                fileToBeShared = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", mImageLoadedFile);
+                fileToBeShared = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".fileprovider", mImageLoadedFile);
 
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
                 if (UriUtils.isImageUri(fileToBeShared)) {
@@ -339,10 +281,10 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileToBeShared);
                 shareImageIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                List<ResolveInfo> resInfoList = getContext().getPackageManager().queryIntentActivities(shareImageIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                List<ResolveInfo> resInfoList = getActivity().getPackageManager().queryIntentActivities(shareImageIntent, PackageManager.MATCH_DEFAULT_ONLY);
                 for (ResolveInfo resolveInfo : resInfoList) {
                     String packageName = resolveInfo.activityInfo.packageName;
-                    getContext().grantUriPermission(packageName, fileToBeShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    getActivity().grantUriPermission(packageName, fileToBeShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
 
                 startActivity(Intent.createChooser(shareImageIntent, getString(R.string.share_via)));
@@ -350,21 +292,21 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             case R.id.share_link_menu_id:
                 Intent shareLinkIntent = new Intent(Intent.ACTION_SEND);
                 shareLinkIntent.setType("text/plain");
-                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, mCurrentImageModel.url.toString());
-                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, mCurrentImageModel.url.toString());
+                shareLinkIntent.putExtra(Intent.EXTRA_SUBJECT, mCurrentImageModel.url);
+                shareLinkIntent.putExtra(Intent.EXTRA_TEXT, mCurrentImageModel.url);
                 startActivity(Intent.createChooser(shareLinkIntent, getString(R.string.share_via)));
                 break;
             case R.id.menu_search_tineye_id:
                 String tineyeSearchUrl = "http://www.tineye.com/search?url=" + mCurrentImageModel.url;
-                BrowserLauncher.launchExternalBrowser(getContext(), tineyeSearchUrl);
+                BrowserLauncher.launchExternalBrowser(getActivity(), tineyeSearchUrl);
                 break;
             case R.id.menu_search_google_id:
                 String googleSearchUrl = "http://www.google.com/searchbyimage?image_url=" + mCurrentImageModel.url;
-                BrowserLauncher.launchExternalBrowser(getContext(), googleSearchUrl);
+                BrowserLauncher.launchExternalBrowser(getActivity(), googleSearchUrl);
                 break;
             case R.id.menu_image_operations_id:
                 String imageOpsUrl = "http://imgops.com/" + mCurrentImageModel.url;
-                BrowserLauncher.launchExternalBrowser(getContext(), imageOpsUrl);
+                BrowserLauncher.launchExternalBrowser(getActivity(), imageOpsUrl);
                 break;
         }
 
@@ -372,7 +314,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     }
 
     public void revokeFileReadPermission(Uri fileBeenShared) {
-        getContext().revokeUriPermission(fileBeenShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        getActivity().revokeUriPermission(fileBeenShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
     }
 
 
@@ -424,12 +366,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         thumbnailView.setBackgroundColor(mBackgroundColor);
         viewBag.layout.removeAllViews();
         viewBag.layout.addView(thumbnailView);
-        thumbnailView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ThreadPostUtils.openExternalAttachment(attachment, getActivity());
-            }
-        });
+        thumbnailView.setOnClickListener(v -> ThreadPostUtils.openExternalAttachment(attachment, getActivity()));
 
         String thumbnailUrl = attachment.getThumbnailUrl();
         if (thumbnailUrl != null) {
@@ -474,19 +411,20 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     }
 
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
-        private final LayoutInflater mInflater;
+        private final ViewPager mViewPager;
 
-        public ImageGalleryAdapter(Context context, ArrayList<ThreadImageModel> images) {
-            super(context, images);
-            mInflater = LayoutInflater.from(context);
+        ImageGalleryAdapter(ViewPager viewPager, ArrayList<ThreadImageModel> images) {
+            super(viewPager.getContext(), images);
+            mViewPager = viewPager;
         }
 
         @Override
         protected View createView(int position) {
-            View view = mInflater.inflate(R.layout.image_gallery_item, null);
+
+            View view = LayoutInflater.from(mViewPager.getContext()).inflate(R.layout.image_gallery_item, mViewPager, false);
 
             GalleryItemViewBag vb = new GalleryItemViewBag();
-            vb.layout = (FrameLayout) view.findViewById(R.id.image_layout);
+            vb.layout = view.findViewById(R.id.image_layout);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
@@ -506,7 +444,8 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             GalleryItemViewBag vb = (GalleryItemViewBag) view.getTag();
             loadImage(imageModel, vb);
 
-            mImageText.setText((position + 1) + "/" + getCount() + " (" + imageModel.size + getResources().getString(R.string.data_file_size_measure) + ")");
+            String infoString = (position + 1) + "/" + getCount() + " (" + imageModel.size + getResources().getString(R.string.data_file_size_measure) + ")";
+            mImageText.setText(infoString);
         }
     }
 
@@ -514,7 +453,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         private final GalleryItemViewBag mViewBag;
         private double mMaxValue = -1;
 
-        public ImageDownloadView(GalleryItemViewBag viewBag) {
+        ImageDownloadView(GalleryItemViewBag viewBag) {
             mViewBag = viewBag;
         }
 

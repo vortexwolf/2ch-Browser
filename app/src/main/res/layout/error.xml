@@ -3,18 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="horizontal">
+    android:gravity="center">
 
     <TextView
+        style="@android:style/TextAppearance.Material.Body1"
         android:id="@+id/error_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_dialog_alert"
-        android:paddingStart="16dp"
-        android:textAppearance="?android:textAppearanceLarge"
-        android:textColor="?android:textColorPrimary"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:gravity="center"
+        android:layout_gravity="center"
         tools:ignore="RtlSymmetry"
-        tools:text="Some error oh my gosh" />
+        tools:text="Oh Lord Jesus that's an error!" />
 
 </LinearLayout>

@@ -274,7 +274,7 @@ public class PostItemViewBuilder {
         final View view = this.getView(model, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный
-        int backColor = AppearanceUtils.getThemeColor(theme, R.styleable.Theme_activityRootBackground);
+        int backColor = AppearanceUtils.getThemeDependentColor(theme, R.styleable.Theme_activityRootBackground);
         view.setBackgroundColor(backColor);
 
         // контекстное меню

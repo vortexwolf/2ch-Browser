@@ -84,7 +84,6 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
 
         setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.image_gallery_view);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         //toolbar = (Toolbar) findViewById(R.id.toolbar);
         bottomPanel = findViewById(R.id.image_gallery_bottom_bar);
@@ -112,7 +111,7 @@ public class ImageGalleryActivity extends AppCompatActivity implements Selective
 
         mImageText = (TextView) findViewById(R.id.image_gallery_text);
         mProgressBar = (ProgressBar) findViewById(R.id.page_progress_bar);
-        mBackgroundColor = AppearanceUtils.getThemeColor(getTheme(), R.styleable.Theme_activityRootBackground);
+        mBackgroundColor = AppearanceUtils.getThemeDependentColor(getTheme(), R.styleable.Theme_activityRootBackground);
 
         // view pager
         final ImageGalleryAdapter adapter = new ImageGalleryAdapter(this, images);

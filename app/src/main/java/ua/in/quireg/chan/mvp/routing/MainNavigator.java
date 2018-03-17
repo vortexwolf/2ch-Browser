@@ -3,7 +3,6 @@ package ua.in.quireg.chan.mvp.routing;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -21,6 +20,7 @@ import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoardsList;
+import ua.in.quireg.chan.mvp.routing.commands.NavigateGallery;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
 import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
@@ -66,7 +66,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
                 .defaultTransactionOptions(mFragNavTransactionOptions)
                 .build();
 
-        updateTabSelection(mFragNavController.getCurrentStackIndex());
+        mMainActivity.updateTabSelection(mFragNavController.getCurrentStackIndex());
     }
 
     @Override
@@ -101,14 +101,14 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             return;
         }
         mTabsTransactionHistory.push(i);
-        updateTabSelection(i);
-        updateToolbarControls(mFragNavController.isRootFragment());
+        mMainActivity.updateTabSelection(i);
+        mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
 
     }
 
     @Override
     public void onFragmentTransaction(Fragment fragment, FragNavController.TransactionType transactionType) {
-        updateToolbarControls(mFragNavController.isRootFragment());
+        mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
 
     }
 
@@ -116,7 +116,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
     public void applyCommand(Command command) {
 
         if (command instanceof SendShortToast) {
-            sendShortToast(((SendShortToast) command).getToast());
+            mMainActivity.sendShortToast(((SendShortToast) command).getToast());
         }
         if (command instanceof NavigateBackwards) {
             onBackPressed();
@@ -130,9 +130,9 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
             mFragNavController.switchTab(activeTabPosition);
 
-            updateTabSelection(activeTabPosition);
+            mMainActivity.updateTabSelection(activeTabPosition);
 
-            updateToolbarControls(mFragNavController.isRootFragment());
+            mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
 
         }
         if (command instanceof NavigateBoardsList) {
@@ -159,32 +159,31 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             );
         }
 
-//        if (command instanceof OpenAttachment) {
-//            Intent imageGallery = new Intent(mContext, ImageGalleryActivity.class);
-//            imageGallery.setData(uri);
-//            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
-//            context.startActivity(imageGallery);
-//        }
+        if (command instanceof NavigateGallery) {
+            navigateGallery(
+                    ((NavigateGallery) command).getUri(),
+                    ((NavigateGallery) command).getThreadUrl()
+            );
+        }
     }
 
-    private void updateTabSelection(int activeTabPosition) {
-        mMainActivity.updateTabSelection(activeTabPosition);
-    }
+//    private void updateTabSelection(int activeTabPosition) {
+//        mMainActivity.updateTabSelection(activeTabPosition);
+//    }
+//
+//    private void updateToolbarControls(boolean isRootFrag) {
+//        mMainActivity.updateToolbarControls(isRootFrag);
+//    }
+//
+//    private void sendShortToast(int stringId) {
+//        mMainActivity.sendShortToast(stringId);
+//    }
+//
+//    private void exitApplication() {
+//        mMainActivity.finish();
+//    }
 
-    private void updateToolbarControls(boolean isRootFrag) {
-        mMainActivity.updateToolbarControls(isRootFrag);
-    }
-
-    private void sendShortToast(int stringId) {
-        mMainActivity.showSystemMessage(stringId);
-    }
-
-    private void exitApplication() {
-        mMainActivity.finish();
-    }
-
-    private boolean mDoubleBackToExitPressedOnce = false;
+//    private boolean mDoubleBackToExitPressedOnce = false;
 
     private void onBackPressed() {
 
@@ -194,21 +193,21 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         } else {
             //root fragment is visible, let's check fragment commit history.
             if (mTabsTransactionHistory.isEmpty()) {
+//                //No history, proceed with exit
+                mMainActivity.finish();
 
-                //No history, proceed with exit
-                if (mDoubleBackToExitPressedOnce) {
-                    exitApplication();
-                    return;
-                }
-                waitForAnotherPressToExit();
-
+//                if (mDoubleBackToExitPressedOnce) {
+//                    exitApplication();
+//                    return;
+//                }
+//                waitForAnotherPressToExit();
             } else {
                 if (mTabsTransactionHistory.getStackSize() > 1) {
                     //History is there. let's go to previous root fragment that has been opened.
                     int position = mTabsTransactionHistory.pop();
 
                     mFragNavController.switchTab(position);
-                    updateTabSelection(position);
+                    mMainActivity.updateTabSelection(position);
 
                 } else {
                     //single fragment in stack, go to home fragment.
@@ -219,13 +218,13 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         }
     }
 
-    private void waitForAnotherPressToExit() {
-        mDoubleBackToExitPressedOnce = true;
-
-        sendShortToast(R.string.confirm_exit);
-
-        new Handler().postDelayed(() -> mDoubleBackToExitPressedOnce = false, 2000);
-    }
+//    private void waitForAnotherPressToExit() {
+//        mDoubleBackToExitPressedOnce = true;
+//
+//        sendShortToast(R.string.confirm_exit);
+//
+//        new Handler().postDelayed(() -> mDoubleBackToExitPressedOnce = false, 2000);
+//    }
 
     private void navigateBoardsList(String website) {
         BoardsListFragment boardsListFragment = new BoardsListFragment();

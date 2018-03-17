@@ -76,8 +76,6 @@ public class MainApplication extends Application {
     private static AppComponent mAppComponent;
     private static BaseComponent mBaseComponent;
 
-    private Toast mToast;
-
     public static AppComponent getAppComponent() {
         return mAppComponent;
     }
@@ -104,9 +102,7 @@ public class MainApplication extends Application {
         mBaseComponent = buildBaseComponent();
         mAppComponent = buildAppComponent();
 
-        if (Constants.SDK_VERSION >= 19) {
-            CompatibilityUtils.setSerialExecutor();
-        }
+        CompatibilityUtils.setSerialExecutor();
 
         ExtendedHttpClient httpClient = new ExtendedHttpClient(true);
         HttpStreamReader httpStreamReader = new HttpStreamReader(httpClient, getResources());
@@ -166,10 +162,6 @@ public class MainApplication extends Application {
         httpClient.setCookie(mSettings.getCloudflareClearanceCookie());
         httpClient.setCookie(mSettings.getPassCodeCookie());
         httpClient.setCookie(mSettings.getAdultAccessCookie());
-    }
-
-    public void rebuildAppComponent(){
-        mAppComponent = buildAppComponent();
     }
 
     protected AppComponent buildAppComponent() {

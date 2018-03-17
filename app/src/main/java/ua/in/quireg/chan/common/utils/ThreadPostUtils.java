@@ -7,6 +7,8 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.squareup.haha.perflib.Main;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,18 +17,30 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
+import ru.terrakok.cicerone.Router;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.models.domain.PostModel;
 import ua.in.quireg.chan.models.presentation.AttachmentInfo;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
+import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.ImageGalleryActivity;
 
 public class ThreadPostUtils {
+
+    @Inject
+    MainRouter mMainRouter;
+
+    {
+        MainApplication.getAppComponent().inject(this);
+    }
 
     private static final Pattern dateTextPattern = Pattern.compile("^[а-я]+ (\\d+) ([а-я]+) (\\d+) (\\d{2}):(\\d{2}):(\\d{2})$", Pattern.CASE_INSENSITIVE);
 
@@ -112,7 +126,7 @@ public class ThreadPostUtils {
         BrowserLauncher.launchExternalBrowser(context, url);
     }
 
-    public static void openAttachment(final AttachmentInfo attachment, final Context context) {
+    public void openAttachment(final AttachmentInfo attachment, final Context context) {
         if (attachment == null) {
             return;
         }
@@ -127,12 +141,13 @@ public class ThreadPostUtils {
             // open a gallery fragment
             //TODO not forget to clean this
             //NavigationService.getInstance().navigateGallery(uri, attachment.getThreadUrl());
+            mMainRouter.navigateGallery(uri, attachment.getThreadUrl());
 
-            Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
-            imageGallery.setData(uri);
-            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
-            context.startActivity(imageGallery);
+//            Intent imageGallery = new Intent(context, ImageGalleryActivity.class);
+//            imageGallery.setData(uri);
+//            imageGallery.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            imageGallery.putExtra(Constants.EXTRA_THREAD_URL, attachment.getThreadUrl());
+//            context.startActivity(imageGallery);
         }
     }
 
@@ -175,7 +190,8 @@ public class ThreadPostUtils {
         imageView.setTag(thumbnailUrl);
         imageView.setImageResource(android.R.color.transparent);
         imageView.setOnClickListener(v -> {
-            ThreadPostUtils.openAttachment(attachment, v.getContext());
+            new ThreadPostUtils().openAttachment(attachment, v.getContext());
+//            ThreadPostUtils.openAttachment(attachment, v.getContext());
         });
 
         if (isBusy && shouldLoadFromWeb(attachment)) {

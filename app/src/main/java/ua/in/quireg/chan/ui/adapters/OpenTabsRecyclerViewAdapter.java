@@ -1,9 +1,13 @@
 package ua.in.quireg.chan.ui.adapters;
 
+import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,10 +17,8 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
 import ua.in.quireg.chan.mvp.presenters.OpenTabsPresenter;
-import ua.in.quireg.chan.ui.views.RecyclerViewWithCM;
 
 public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -49,6 +51,7 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         if (holder instanceof OpenTabViewHolder) {
             OpenTabModel item = mOpenedTabsList.get(position);
+            ((OpenTabViewHolder) holder).update(item);
 
             ((OpenTabViewHolder) holder).titleView.setText(item.getTitleOrDefault());
             ((OpenTabViewHolder) holder).urlView.setText(item.buildUrl());
@@ -107,8 +110,10 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public OpenTabModel getItem(int position) {
         return mOpenedTabsList.get(position);
     }
+    private boolean multiSelect = false;
+    private ArrayList<OpenTabModel> selectedItems = new ArrayList<>();
 
-    class OpenTabViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    private class OpenTabViewHolder extends RecyclerView.ViewHolder {
 
         ImageView deleteButton;
         TextView titleView, urlView;
@@ -118,30 +123,53 @@ public class OpenTabsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             titleView = view.findViewById(R.id.tabs_item_title);
             urlView = view.findViewById(R.id.tabs_item_url);
             deleteButton = view.findViewById(R.id.tabs_item_delete);
+        }
+        void selectItem(OpenTabModel item) {
+            if (multiSelect) {
+                if (selectedItems.contains(item)) {
+                    selectedItems.remove(item);
+                    itemView.setBackgroundColor(Color.WHITE);
+                } else {
+                    selectedItems.add(item);
+                    itemView.setBackgroundColor(Color.LTGRAY);
+                }
+            }
+        }
 
-            view.setOnLongClickListener(v -> {
-                v.showContextMenu();
+        void update(final OpenTabModel value) {
+            if (selectedItems.contains(value)) {
+                itemView.setBackgroundColor(Color.LTGRAY);
+            } else {
+                itemView.setBackgroundColor(Color.WHITE);
+            }
+
+            itemView.setOnLongClickListener(view -> {
+                ((AppCompatActivity)view.getContext()).startSupportActionMode(new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        menu.add("Delete");
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+
+                    }
+                });
+                selectItem(value);
                 return true;
             });
+            itemView.setOnClickListener(view -> selectItem(value));
         }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-            RecyclerViewWithCM.ContextMenuInfo info = (RecyclerViewWithCM.ContextMenuInfo) menuInfo;
-            OpenTabModel item = getItem(info.position);
-
-            if (item == null) {
-                Timber.e("item == null");
-                return;
-            }
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, v.getContext().getString(R.string.cmenu_copy_url));
-            if (!item.isFavorite()) {
-                menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, v.getContext().getString(R.string.cmenu_add_to_favorites));
-            } else {
-                menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, v.getContext().getString(R.string.cmenu_remove_from_favorites));
-            }
-        }
-
     }
 }

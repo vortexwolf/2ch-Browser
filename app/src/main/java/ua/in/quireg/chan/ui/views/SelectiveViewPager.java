@@ -8,10 +8,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 public class SelectiveViewPager extends ViewPager {
-    private static final String LOG_TAG = SelectiveViewPager.class.getSimpleName();
 
     private GestureDetectorCompat gestureDetector;
-
     private OnSingleClickListener mViewPagerSingleClickListener;
 
     public interface OnSingleClickListener {

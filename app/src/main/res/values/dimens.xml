@@ -10,5 +10,6 @@
     <dimen name="filelist_frame_size">56dp</dimen>
     <dimen name="filelist_thumbnail_size">48dp</dimen>
     <dimen name="badge_size">16dp</dimen>
+    <dimen name="pull_to_refresh_text_padding">6dp</dimen>
 
 </resources>

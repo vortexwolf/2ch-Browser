@@ -1,11 +1,13 @@
 package ua.in.quireg.chan.ui.activities;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,6 +30,10 @@ import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+import static android.view.View.SYSTEM_UI_FLAG_LOW_PROFILE;
+import static android.view.View.inflate;
+
 public class MainActivity extends MvpAppCompatActivity {
 
     @Inject NavigatorHolder mNavigatorHolder;
@@ -44,57 +50,50 @@ public class MainActivity extends MvpAppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
-//        ((MainApplication)getApplication()).rebuildAppComponent();
-
         MainApplication.getAppComponent().inject(this);
 
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-        );
+
 
         setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.base_activity);
-
         ButterKnife.bind(this);
-
-        FrameLayout statusBar = findViewById(R.id.status_bar);
-
-        statusBar.setPadding(
-                statusBar.getPaddingLeft(),
-                statusBar.getPaddingTop(),
-                statusBar.getPaddingRight(),
-                statusBar.getPaddingBottom() + getStatusBarHeight()
-        );
-
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setLogo(R.drawable.browser_logo_drawable);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+//        FrameLayout statusBar = findViewById(R.id.status_bar);
+//        statusBar.setPadding(
+//                statusBar.getPaddingLeft(),
+//                statusBar.getPaddingTop(),
+//                statusBar.getPaddingRight(),
+//                statusBar.getPaddingBottom() + getStatusBarHeight()
+//        );
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setLogo(R.drawable.browser_logo_drawable);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
         initBottomTabs();
 
         super.onCreate(savedInstanceState);
+        mBottomTabLayout.addOnTabSelectedListener(mTabLayoutListener);
 
+        //this must be called after super::onCreate otherwise won't work
         mNavigator = new MainNavigator(this, savedInstanceState);
-
-        mBottomTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                mMainRouter.switchTab(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                onTabSelected(tab);
-            }
-        });
-
     }
+
+    TabLayout.OnTabSelectedListener mTabLayoutListener = new TabLayout.OnTabSelectedListener() {
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            mMainRouter.switchTab(tab.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+            onTabSelected(tab);
+        }
+    };
 
     @Override
     protected void onResumeFragments() {
@@ -145,7 +144,7 @@ public class MainActivity extends MvpAppCompatActivity {
         }
     }
 
-    public void showSystemMessage(@StringRes int id) {
+    public void sendShortToast(@StringRes int id) {
         if (mToast != null) {
             mToast.cancel();
         }
@@ -156,10 +155,8 @@ public class MainActivity extends MvpAppCompatActivity {
 
     private void initBottomTabs() {
         for (int i = 0; i < TABS.length; i++) {
-
             TabLayout.Tab tab = mBottomTabLayout.newTab();
             tab.setCustomView(getTabView(i));
-
             //Reminder - this triggers onTabSelected() on first tab
             mBottomTabLayout.addTab(tab);
         }
@@ -167,11 +164,9 @@ public class MainActivity extends MvpAppCompatActivity {
 
     private View getTabView(int position) {
         View view = LayoutInflater.from(this).inflate(R.layout.tab_item_bottom, mBottomTabLayout, false);
-
         ImageView icon = view.findViewById(R.id.tab_icon);
         Drawable stateListDrawable = AppearanceUtils.getStateListDrawable(this, mTabIconsSelected[position]);
         icon.setImageDrawable(stateListDrawable);
-
         return view;
     }
 
@@ -183,14 +178,13 @@ public class MainActivity extends MvpAppCompatActivity {
             R.drawable.browser_settings
     };
 
-    private int getStatusBarHeight() {
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        int result = 0;
-
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
+//    private int getStatusBarHeight() {
+//        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+//        int result = 0;
+//
+//        if (resourceId > 0) {
+//            result = getResources().getDimensionPixelSize(resourceId);
+//        }
+//        return result;
+//    }
 }

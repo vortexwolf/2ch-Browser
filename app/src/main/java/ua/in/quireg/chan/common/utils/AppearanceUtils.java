@@ -8,7 +8,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
@@ -107,7 +106,7 @@ public class AppearanceUtils {
         return resizedBitmap;
     }
 
-    public static int getThemeColor(Theme theme, int styleableId) {
+    public static int getThemeDependentColor(Theme theme, int styleableId) {
         TypedArray a = theme.obtainStyledAttributes(R.styleable.Theme);
         int color = a.getColor(styleableId, 0);
         a.recycle();

@@ -15,11 +15,11 @@ public class GalleryItemViewBag {
     public TimerService timer;
 
     public void switchToErrorView(String errorMessage) {
-        this.layout.setVisibility(View.GONE);
-        this.loading.setVisibility(View.GONE);
-        this.error.setVisibility(View.VISIBLE);
+        layout.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
+        error.setVisibility(View.VISIBLE);
 
-        TextView errorTextView = (TextView) this.error.findViewById(R.id.error_text);
+        TextView errorTextView = error.findViewById(R.id.error_text);
         errorTextView.setText(errorMessage);
     }
 

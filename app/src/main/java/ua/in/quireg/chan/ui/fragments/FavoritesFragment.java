@@ -48,7 +48,6 @@ public class FavoritesFragment extends MvpAppCompatFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.favorites_list_view, container, false);
 
         mListView = view.findViewById(android.R.id.list);

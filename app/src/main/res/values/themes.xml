@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Launch_Screen_Theme" parent="Theme.AppCompat.NoActionBar">
+    <style name="Launch_Screen_Theme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
     <style name="Theme_Light_Switch" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--draws ActionMode on top of custom Toolbar-->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/WindowActionMode</item>
+        <!--Translucent status bar-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!--Content can be drawn behind statusbar-->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
         <item name="iconRefresh">@drawable/ic_menu_refresh</item>
         <item name="iconSave">@drawable/ic_menu_save</item>
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
@@ -21,6 +31,14 @@
     </style>
 
     <style name="Theme_Dark_Switch" parent="Theme.AppCompat.NoActionBar">
+        <!--draws ActionMode on top of custom Toolbar-->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/WindowActionMode</item>
+        <!--Translucent status bar-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!--Content can be drawn behind statusbar-->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
         <item name="iconRefresh">@drawable/ic_menu_refresh</item>
         <item name="iconSave">@drawable/ic_menu_save</item>
         <item name="iconPicture">@drawable/ic_menu_slideshow</item>
@@ -42,4 +60,8 @@
     <style name="Theme_Photon_Switch" parent="@style/Theme_Light_Switch">
     </style>
 
+    <style name="WindowActionMode">
+        <item name="height">@dimen/toolbar_height</item>
+        <item name="background">@color/actionModeBackground</item>
+    </style>
 </resources>

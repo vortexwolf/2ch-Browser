@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +20,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.PresenterType;
 import com.aspsine.swipetoloadlayout.OnLoadMoreListener;
 import com.aspsine.swipetoloadlayout.OnRefreshListener;
 import com.aspsine.swipetoloadlayout.SwipeToLoadLayout;
@@ -44,8 +48,10 @@ import ua.in.quireg.chan.models.domain.ThreadModel;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
+import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
+import ua.in.quireg.chan.mvp.views.ThreadsListView;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.services.CloudflareCheckService;
 import ua.in.quireg.chan.services.presentation.ClickListenersFactory;
@@ -57,7 +63,10 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 
-public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefreshListener, OnLoadMoreListener {
+public class ThreadsListFragment extends MvpAppCompatFragment implements ThreadsListView, OnRefreshListener, OnLoadMoreListener {
+
+    @InjectPresenter(type = PresenterType.WEAK)
+    ThreadsListPresenter mThreadsListPresenter;
 
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
@@ -80,7 +89,7 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefre
     protected SwipeToLoadLayout mSwipeToLoadLayout;
 
     private OpenTabModel mTabModel;
-    private IWebsite mWebsite;
+    private IWebsite mWebsite = Websites.getDefault();
     private String mBoardName;
     private int mPageNumber;
     private boolean mIsCatalog;
@@ -93,8 +102,10 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefre
         MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
 
-        mWebsite = Websites.getDefault();
         mUrlBuilder = mWebsite.getUrlBuilder();
+        if (getArguments() == null) {
+            throw new RuntimeException("No arguments supplied");
+        }
         mBoardName = getArguments().getString(Constants.EXTRA_BOARD_NAME);
         mPageNumber = getArguments().getInt(Constants.EXTRA_BOARD_PAGE, 0);
         mIsCatalog = getArguments().getBoolean(Constants.EXTRA_CATALOG);
@@ -108,6 +119,25 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefre
         mTabModel = mOpenTabsManager.add(tabModel);
         setHasOptionsMenu(true);
 
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Заголовок страницы
+        String pageTitle = mIsCatalog
+                ? String.format(getString(R.string.data_board_title_catalog), mBoardName)
+                : mPageNumber > 0
+                ? String.format(getString(R.string.data_board_title_with_page), mBoardName, String.valueOf(mPageNumber))
+                : String.format(getString(R.string.data_board_title), mBoardName);
+
+        if ((getActivity()) != null) {
+            ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (mActionBar != null) {
+                mActionBar.setTitle(pageTitle);
+            }
+        }
     }
 
     @Override
@@ -137,14 +167,6 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements OnRefre
         setAdapter(savedInstanceState);
         mAdapter.notifyDataSetChanged();
 
-        // Заголовок страницы
-        String pageTitle = mIsCatalog
-                ? String.format(getString(R.string.data_board_title_catalog), mBoardName)
-                : mPageNumber > 0
-                ? String.format(getString(R.string.data_board_title_with_page), mBoardName, String.valueOf(mPageNumber))
-                : String.format(getString(R.string.data_board_title), mBoardName);
-
-//        setTitle(pageTitle);
 
         mListView.setOnItemClickListener((parent, view1, position, id) -> {
             ThreadItemViewModel info = mAdapter.getItem(position);
