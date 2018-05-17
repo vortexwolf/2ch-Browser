@@ -7,6 +7,7 @@ import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.mvp.models.BoardsListInteractor;
 import ua.in.quireg.chan.mvp.presenters.BoardsListPresenter;
 import ua.in.quireg.chan.mvp.presenters.OpenTabsPresenter;
+import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
 import ua.in.quireg.chan.mvp.routing.MainNavigator;
 import ua.in.quireg.chan.services.CacheDirectoryManager;
 import ua.in.quireg.chan.services.PostSender;
@@ -26,7 +27,7 @@ import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
 
 
 @AppScope
-@Subcomponent(modules = {NetModule.class, DataRepositoryModule.class, WebsiteModule.class})
+@Subcomponent(modules = {NetModule.class, DataRepositoryModule.class, WebsiteModule.class, ServicesModule.class})
 public interface AppComponent {
 
     void inject(MainActivity activity);
@@ -54,6 +55,7 @@ public interface AppComponent {
     void inject(OpenTabsFragment openTabsFragment);
     void inject(OpenTabsPresenter openTabsPresenter);
     void inject(ImageGalleryFragment imageGalleryFragment);
+    void inject(ThreadsListPresenter threadsListPresenter);
 
     //х*йова мода
     void inject(ThreadPostUtils threadPostUtils);

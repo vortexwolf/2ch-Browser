@@ -5,10 +5,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.common.library.MyLog;
 
 public class HiddenThreadsDataSource {
+
     private static final String TABLE = DvachSqlHelper.TABLE_HIDDEN_THREADS;
+
     /*private static final String[] ALL_COLUMNS = {
         DvachSqlHelper.COLUMN_ID, DvachSqlHelper.COLUMN_WEBSITE,
         DvachSqlHelper.COLUMN_BOARD_NAME, DvachSqlHelper.COLUMN_THREAD_NUMBER
@@ -29,7 +32,7 @@ public class HiddenThreadsDataSource {
             try {
                 mDatabase.insertOrThrow(TABLE, null, values);
             } catch (Exception e) {
-                MyLog.e("HiddenThreadsDataSource", e);
+                Timber.e("HiddenThreadsDataSource", e);
             }
         }
     }

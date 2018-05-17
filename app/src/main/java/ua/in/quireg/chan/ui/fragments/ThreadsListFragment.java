@@ -26,6 +26,8 @@ import com.aspsine.swipetoloadlayout.OnLoadMoreListener;
 import com.aspsine.swipetoloadlayout.OnRefreshListener;
 import com.aspsine.swipetoloadlayout.SwipeToLoadLayout;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import ua.in.quireg.chan.R;
@@ -63,29 +65,27 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
 
-public class ThreadsListFragment extends MvpAppCompatFragment implements ThreadsListView, OnRefreshListener, OnLoadMoreListener {
+public class ThreadsListFragment extends MvpAppCompatFragment implements ThreadsListView, OnRefreshListener {
 
     @InjectPresenter(type = PresenterType.WEAK)
     ThreadsListPresenter mThreadsListPresenter;
 
     @Inject ApplicationSettings mSettings;
     @Inject FavoritesDataSource mFavoritesDatasource;
-    @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
     @Inject OpenTabsManager mOpenTabsManager;
     @Inject MainRouter mRouter;
 
     private IJsonApiReader mJsonReader = Factory.resolve(MakabaApiReader.class);
-    private final PagesSerializationService mSerializationService = Factory.resolve(PagesSerializationService.class);
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
 
     private DownloadThreadsTask mCurrentDownloadTask = null;
     private ThreadsListAdapter mAdapter = null;
-    private final ThreadsReaderListener mThreadsReaderListener = new ThreadsReaderListener();
 
     private View mNavigationBar;
     private View mCatalogBar;
     protected ListView mListView;
+    protected View mLoadingView;
     protected SwipeToLoadLayout mSwipeToLoadLayout;
 
     private OpenTabModel mTabModel;
@@ -149,41 +149,37 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.threads_list_view2, container, false);
+        View rootView = inflater.inflate(R.layout.threads_list_view2, container, false);
+        mSwipeToLoadLayout = rootView.findViewById(R.id.swipeToLoadLayout);
+        mListView = rootView.findViewById(R.id.swipe_target);
+        mLoadingView = rootView.findViewById(R.id.empty_list_item);
+        return rootView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mListView = view.findViewById(R.id.swipe_target);
-        mSwipeToLoadLayout = view.findViewById(R.id.swipeToLoadLayout);
         mSwipeToLoadLayout.setOnRefreshListener(this);
-        mSwipeToLoadLayout.setOnLoadMoreListener(this);
-
         mPostItemViewBuilder = new PostItemViewBuilder(getContext(), mWebsite, mBoardName, null, mSettings);
 
-        registerForContextMenu(mListView);
-        setAdapter(savedInstanceState);
-        mAdapter.notifyDataSetChanged();
+        mListView.setAdapter(mAdapter != null ? mAdapter : new ThreadsListAdapter(getContext()));
 
+        registerForContextMenu(mListView);
+
+//        boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED, false) ||
+//                savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
+//
+//        if (preferDeserialized) {
+//        } else {
+//            refreshThreads(false);
+//        }
 
         mListView.setOnItemClickListener((parent, view1, position, id) -> {
-            ThreadItemViewModel info = mAdapter.getItem(position);
-
-            if (info == null) {
-                return;
-            }
-
-            if (info.isHidden()) {
-                mHiddenThreadsDataSource.removeFromHiddenThreads(mWebsite.name(), mBoardName, info.getNumber());
-                info.setHidden(false);
-                mAdapter.notifyDataSetChanged();
-            } else {
-                String threadSubject = info.getSubjectOrText();
-                navigateToThread(info.getNumber(), threadSubject);
-            }
+            mThreadsListPresenter.onListItemClick(mAdapter.getItem(position));
         });
+
+        mThreadsListPresenter.requestThreadsList();
 
         // Панель навигации по страницам
 //        mNavigationBar = getView().findViewById(R.id.threads_navigation_bar);
@@ -232,28 +228,6 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
 //        });
     }
 
-    private void setAdapter(Bundle savedInstanceState) {
-        if (mAdapter == null) {
-            mAdapter = new ThreadsListAdapter(getContext(), mWebsite, mBoardName, getActivity().getTheme(), mListView);
-        }
-        mListView.setAdapter(mAdapter);
-
-        // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
-        mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
-
-        boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED, false) ||
-                savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
-
-        if (preferDeserialized) {
-            new LoadThreadsTask().execute();
-        } else {
-            refreshThreads(false);
-        }
-    }
-
-    private void setAdapterData(ThreadModel[] threads) {
-        mAdapter.setAdapterData(threads);
-    }
     //TODO implement search
 //    @Override
 //    public boolean onSearchRequested() {
@@ -278,7 +252,7 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh_menu_id:
-                refreshThreads(false);
+                onRefresh();
                 break;
             case R.id.open_browser_menu_id:
                 String browserUrl;
@@ -445,45 +419,16 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
 
     @Override
     public void onRefresh() {
-        refreshThreads(false);
+        mThreadsListPresenter.requestThreadsList();
     }
+
 
     @Override
-    public void onLoadMore() {
-        mSwipeToLoadLayout.postDelayed(() -> mSwipeToLoadLayout.setLoadingMore(false), 2000);
+    public void showThreads(List<ThreadItemViewModel> threads) {
+        mAdapter.clear();
+        mAdapter.addAll(threads);
     }
 
-    private class LoadThreadsTask extends AsyncTask<Void, Long, ThreadModel[]> {
-
-        @Override
-        protected ThreadModel[] doInBackground(Void... arg0) {
-            if (!mIsCatalog) {
-                return mSerializationService.deserializeThreads(mWebsite.name(), mBoardName, mPageNumber);
-            }
-            return null;
-        }
-
-        @Override
-        public void onPreExecute() {
-            mThreadsReaderListener.showLoadingScreen();
-        }
-
-        @Override
-        public void onPostExecute(ThreadModel[] threads) {
-            mThreadsReaderListener.hideLoadingScreen();
-
-            if (threads == null) {
-                refreshThreads(false);
-            } else {
-                setAdapterData(threads);
-                // Устанавливаем позицию, если открываем как уже открытую вкладку
-                if (mTabModel.getPosition() != null) {
-                    AppearanceUtils.ListViewPosition p = mTabModel.getPosition();
-                    mListView.setSelectionFromTop(p.position, p.top);
-                }
-            }
-        }
-    }
 
     private class ThreadsReaderListener implements IListView<ThreadModel[]> {
 

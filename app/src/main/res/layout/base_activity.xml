@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,13 +7,12 @@
     tools:context=".ui.activities.MainActivity">
 
     <!--<FrameLayout-->
-        <!--android:id="@+id/status_bar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:background="?android:colorPrimaryDark">-->
-
+    <!--android:id="@+id/status_bar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentTop="true">-->
     <!--android:layout_below="@id/status_bar"-->
+    <!--android:fitsSystemWindows="true"-->
 
     <!--</FrameLayout>-->
 
@@ -22,14 +20,13 @@
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
+            style="?actionbarStyle"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            style="?actionbarStyle">
+            android:layout_height="@dimen/toolbar_height">
 
         </android.support.v7.widget.Toolbar>
 
@@ -37,8 +34,7 @@
             android:id="@+id/top_shadowline"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/bottom_shadow"
-            />
+            android:background="@drawable/bottom_shadow" />
 
     </LinearLayout>
 
@@ -46,8 +42,8 @@
         android:id="@+id/bottom_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
         <View
             android:id="@+id/bottom_shadowline"
@@ -60,7 +56,7 @@
             style="@style/BottomTabLayout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/tab_layout_size"
-            tools:layout="@layout/tab_item_bottom"/>
+            tools:layout="@layout/tab_item_bottom" />
 
     </LinearLayout>
 
@@ -69,9 +65,8 @@
         android:id="@+id/base_activity_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_layout"
         android:layout_above="@id/bottom_tab_layout"
-        tools:layout="@layout/pick_board_view"/>
-
+        android:layout_below="@id/toolbar_layout"
+        tools:layout="@layout/pick_board_view" />
 
 </RelativeLayout>

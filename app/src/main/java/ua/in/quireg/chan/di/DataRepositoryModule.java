@@ -13,6 +13,7 @@ import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.repositories.BoardsRepositoryImpl;
 import ua.in.quireg.chan.services.presentation.OpenTabsManager;
+import ua.in.quireg.chan.services.presentation.PagesSerializationService;
 
 /**
  * Created by Arcturus Mengsk on 11/21/2017, 2:04 PM.

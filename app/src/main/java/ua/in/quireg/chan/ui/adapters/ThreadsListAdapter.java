@@ -2,6 +2,7 @@ package ua.in.quireg.chan.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources.Theme;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
@@ -30,36 +34,16 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 
-public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implements IBusyAdapter {
+public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
 
-    private final LayoutInflater mInflater;
-    private final Theme mTheme;
     @Inject ApplicationSettings mSettings;
-    private final HiddenThreadsDataSource mHiddenThreadsDataSource;
-    private final ThreadImagesService mThreadImagesService;
-    private final ListView mListView;
-    private final IUrlBuilder mUrlBuilder;
-    private final Timer mLoadImagesTimer = new Timer();
-    private final IWebsite mWebsite;
-    private final String mBoardName;
+    @Inject HiddenThreadsDataSource mHiddenThreadsDataSource;
 
-    private LoadImagesTimerTask mCurrentLoadImagesTask;
-    private boolean mIsBusy = false;
-
-    public ThreadsListAdapter(Context context, IWebsite website, String boardName, Theme theme, ListView listView) {
+    public ThreadsListAdapter(Context context) {
         super(context.getApplicationContext(), 0);
         MainApplication.getAppComponent().inject(this);
-
-        this.mWebsite = website;
-        this.mBoardName = boardName;
-        this.mTheme = theme;
-        this.mInflater = LayoutInflater.from(context);
-        this.mHiddenThreadsDataSource = Factory.resolve(HiddenThreadsDataSource.class);
-        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
-        this.mThreadImagesService = Factory.resolve(ThreadImagesService.class);
-        this.mListView = listView;
     }
 
     @Override
@@ -69,33 +53,50 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 
     @Override
     public int getItemViewType(int position) {
-        return this.getItem(position).isHidden() ? ITEM_VIEW_TYPE_HIDDEN_THREAD : ITEM_VIEW_TYPE_THREAD;
+        ThreadItemViewModel item = getItem(position);
+
+        if (item != null) {
+            return item.isHidden() ? ITEM_VIEW_TYPE_HIDDEN_THREAD : ITEM_VIEW_TYPE_THREAD;
+        } else {
+            return -1;
+        }
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         View view;
-        ThreadItemViewModel item = this.getItem(position);
+        ThreadItemViewModel item = getItem(position);
+
+        if (item == null) {
+            return convertView;
+        }
 
         if (!item.isHidden()) {
-            view = convertView != null ? convertView : this.mInflater.inflate(R.layout.threads_list_item, null);
-
-            this.fillItemView(view, item);
+            view = convertView != null ?
+                    convertView :
+                    LayoutInflater.from(getContext()).inflate(
+                            R.layout.threads_list_item, parent, false
+                    );
+            fillItemView(view, item);
         } else {
-            view = convertView != null ? convertView : this.mInflater.inflate(R.layout.threads_list_hidden_item, null);
-
-            this.fillHiddenThreadView(view, item);
+            view = convertView != null ?
+                    convertView :
+                    LayoutInflater.from(getContext()).inflate(
+                            R.layout.threads_list_hidden_item, parent, false
+                    );
+            fillHiddenThreadView(view, item);
         }
 
         return view;
     }
 
     private void fillHiddenThreadView(final View view, final ThreadItemViewModel item) {
-        TextView threadNumberView = (TextView) view.findViewById(R.id.thread_number);
-        TextView threadDescriptionView = (TextView) view.findViewById(R.id.thread_description);
+        TextView threadNumberView = view.findViewById(R.id.thread_number);
+        TextView threadDescriptionView = view.findViewById(R.id.thread_description);
 
-        threadNumberView.setText("№" + item.getNumber());
+        threadNumberView.setText(String.format("№%s", item.getNumber()));
 
         CharSequence description = item.getSubjectOrText();
         threadDescriptionView.setText(description);
@@ -106,9 +107,9 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         ViewBag vb = (ViewBag) view.getTag();
         if (vb == null) {
             vb = new ViewBag();
-            vb.titleView = (TextView) view.findViewById(R.id.title);
-            vb.commentView = (TextView) view.findViewById(R.id.comment);
-            vb.repliesNumberView = (TextView) view.findViewById(R.id.repliesNumber);
+            vb.titleView = view.findViewById(R.id.title);
+            vb.commentView = view.findViewById(R.id.comment);
+            vb.repliesNumberView = view.findViewById(R.id.repliesNumber);
             vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
 
             vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
@@ -133,6 +134,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
         // Комментарий
         vb.commentView.setText(item.getSpannedComment());
         vb.commentView.setTag(item);
+
 //        vb.commentView.setEllipsizeListener(new TextView.EllipsizeListener() {
 //            @Override
 //            public void ellipsizeStateChanged(TextView view, boolean ellipsized) {
@@ -142,99 +144,71 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> implem
 //        });
 
         // Количество ответов
-        String postsQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
-        String imagesQuantity = this.getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
-        String repliesFormat = this.getContext().getString(R.string.data_posts_files);
+        String postsQuantity = getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
+        String imagesQuantity = getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
+        String repliesFormat = getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
-
-        // Обрабатываем прикрепленные файлы
-        String threadUrl = this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, item.getNumber());
-        if (!this.mThreadImagesService.hasThreadImages(threadUrl)) {
-            for (int i = 0; i < 4; ++i) {
-                this.mThreadImagesService.addThreadImage(threadUrl, item.getAttachment(i));
-            }
-        }
 
         if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
             vb.multiThumbnailsView.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.hide();
             for (int i = 0; i < 4; ++i) {
-                ThreadPostUtils.refreshAttachmentView(this.mIsBusy, item.getAttachment(i), vb.thumbnailViews[i]);
+
+                if (item.getAttachment(i) == null || item.getAttachment(i).isEmpty()) {
+                    vb.thumbnailViews[i].hide();
+                    return;
+                }
+                Timber.i("Image: %s", item.getAttachment(i).getImageUrlIfImage());
+
+                Glide.with(getContext()).load(item.getAttachment(i).getImageUrlIfImage()).into(vb.thumbnailViews[i].image);
+
+                vb.thumbnailViews[i].container.setVisibility(View.VISIBLE);
+                vb.thumbnailViews[i].info.setText(item.getAttachment(i).getDescription());
             }
         } else if (item.getAttachmentsNumber() >= 1) {
-            vb.multiThumbnailsView.setVisibility(View.GONE);
-            ThreadPostUtils.refreshAttachmentView(this.mIsBusy, item.getAttachment(0), vb.singleThumbnailView);
+
+            if (item.getAttachment(0) == null || item.getAttachment(0).isEmpty()) {
+                vb.singleThumbnailView.hide();
+                return;
+            }
+            Timber.i("Image: %s", item.getAttachment(0).getImageUrlIfImage());
+            Glide.with(getContext()).load(item.getAttachment(0).getImageUrlIfImage()).into(vb.singleThumbnailView.image);
+
+            vb.singleThumbnailView.container.setVisibility(View.VISIBLE);
+            vb.singleThumbnailView.info.setText(item.getAttachment(0).getDescription());
+
         } else {
             vb.multiThumbnailsView.setVisibility(View.GONE);
             vb.singleThumbnailView.hide();
         }
     }
 
-    /** Обновляет адаптер полностью */
-    public void setAdapterData(ThreadModel[] threads) {
-        this.clear();
 
-        for (ThreadModel ti : threads) {
-            ThreadItemViewModel model = new ThreadItemViewModel(this.mWebsite, this.mBoardName, ti, this.mTheme);
-            boolean isHidden = this.mHiddenThreadsDataSource.isHidden(this.mWebsite.name(), this.mBoardName, model.getNumber());
-            model.setHidden(isHidden);
+//    private void loadListImages() {
+//        int count = mListView.getChildCount();
+//        for (int i = 0; i < count; i++) {
+//            View v = mListView.getChildAt(i);
+//            int position = mListView.getPositionForView(v);
+//
+//            if (getItemViewType(position) == ITEM_VIEW_TYPE_HIDDEN_THREAD) {
+//                continue;
+//            }
+//
+//            ViewBag vb = (ViewBag) v.getTag();
+//            ThreadItemViewModel item = getItem(position);
+//            if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
+//                for (int j = 0; j < 4; ++j) {
+//                    ThreadPostUtils.setNonBusyAttachment(item.getAttachment(j), vb.thumbnailViews[j].image);
+//                }
+//            } else if (item.getAttachmentsNumber() >= 1) {
+//                ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
+//            }
+//        }
+//    }
 
-            this.add(model);
-        }
-    }
 
-    @Override
-    public void setBusy(boolean value, AbsListView view) {
-        if (this.mCurrentLoadImagesTask != null) {
-            this.mCurrentLoadImagesTask.cancel();
-        }
-
-        if (this.mIsBusy == true && value == false) {
-            this.mCurrentLoadImagesTask = new LoadImagesTimerTask();
-            this.mLoadImagesTimer.schedule(this.mCurrentLoadImagesTask, 500);
-        }
-
-        this.mIsBusy = value;
-    }
-
-    private void loadListImages() {
-        int count = this.mListView.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View v = this.mListView.getChildAt(i);
-            int position = this.mListView.getPositionForView(v);
-
-            if (this.getItemViewType(position) == ITEM_VIEW_TYPE_HIDDEN_THREAD) {
-                continue;
-            }
-
-            ViewBag vb = (ViewBag) v.getTag();
-            ThreadItemViewModel item = this.getItem(position);
-            if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
-                for (int j = 0; j < 4; ++j) {
-                    ThreadPostUtils.setNonBusyAttachment(item.getAttachment(j), vb.thumbnailViews[j].image);
-                }
-            } else if (item.getAttachmentsNumber() >= 1) {
-                ThreadPostUtils.setNonBusyAttachment(item.getAttachment(0), vb.singleThumbnailView.image);
-            }
-        }
-    }
-
-    private class LoadImagesTimerTask extends TimerTask {
-        @Override
-        public void run() {
-            ThreadsListAdapter.this.mListView.post(new LoadImagesRunnable());
-        }
-    }
-
-    private class LoadImagesRunnable implements Runnable {
-        @Override
-        public void run() {
-            ThreadsListAdapter.this.loadListImages();
-        }
-    }
-
-    static class ViewBag {
+    protected static class ViewBag {
         TextView titleView;
         TextView commentView;
         TextView repliesNumberView;

@@ -38,6 +38,14 @@ public class ThreadItemViewModel implements IThreadListEntity {
         this.mSpannedComment = this.createSpannedComment();
     }
 
+    public IWebsite getWebsite() {
+        return mWebsite;
+    }
+
+    public String getBoardName() {
+        return mBoardName;
+    }
+
     public SpannableStringBuilder getSpannedComment() {
         return this.mSpannedComment;
     }

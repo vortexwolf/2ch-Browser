@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -197,6 +198,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mContainerView.getLayoutParams();
         layoutParams.removeRule(RelativeLayout.BELOW);
         layoutParams.removeRule(RelativeLayout.ABOVE);
+        mContainerView.setBackgroundColor(Color.BLACK);
         mContainerView.setLayoutParams(layoutParams);
     }
 
@@ -205,6 +207,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         layoutParams.addRule(RelativeLayout.BELOW, R.id.toolbar_layout);
         layoutParams.addRule(RelativeLayout.ABOVE, R.id.bottom_tab_layout);
         mContainerView.setLayoutParams(layoutParams);
+        mContainerView.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void updatePanelsVisibility(){

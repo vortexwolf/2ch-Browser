@@ -1,6 +1,7 @@
 package ua.in.quireg.chan.ui.activities;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -52,12 +53,12 @@ public class MainActivity extends MvpAppCompatActivity {
 
         MainApplication.getAppComponent().inject(this);
 
-
-
         setTheme(mApplicationSettings.getTheme());
         setContentView(R.layout.base_activity);
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
+
+
 //        FrameLayout statusBar = findViewById(R.id.status_bar);
 //        statusBar.setPadding(
 //                statusBar.getPaddingLeft(),
@@ -65,6 +66,8 @@ public class MainActivity extends MvpAppCompatActivity {
 //                statusBar.getPaddingRight(),
 //                statusBar.getPaddingBottom() + getStatusBarHeight()
 //        );
+//        statusBar.setBackgroundColor(Color.BLACK);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setLogo(R.drawable.browser_logo_drawable);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -178,13 +181,13 @@ public class MainActivity extends MvpAppCompatActivity {
             R.drawable.browser_settings
     };
 
-//    private int getStatusBarHeight() {
-//        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-//        int result = 0;
-//
-//        if (resourceId > 0) {
-//            result = getResources().getDimensionPixelSize(resourceId);
-//        }
-//        return result;
-//    }
+    private int getStatusBarHeight() {
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int result = 0;
+
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 }
