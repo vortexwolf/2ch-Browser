@@ -5,6 +5,7 @@ import java.util.List;
 
 import okhttp3.Response;
 import ua.in.quireg.chan.models.domain.BoardModel;
+import ua.in.quireg.chan.models.domain.ThreadModel;
 
 /**
  * Created by Arcturus Mengsk on 12/1/2017, 9:26 AM.
@@ -14,5 +15,6 @@ import ua.in.quireg.chan.models.domain.BoardModel;
 public interface ApiReader {
 
     List<BoardModel> readBoardsListResponse(Response response) throws IOException;
+    List<ThreadModel> readThreadsListResponse(Response response) throws IOException;
 
 }

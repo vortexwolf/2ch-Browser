@@ -70,7 +70,8 @@ public class MakabaSendPostMapper {
             this.addStringValue(multipartEntity, "captcha_type", "app");
             this.addStringValue(multipartEntity, "app_response_id", model.getCaptchaKey());
             this.addStringValue(multipartEntity, "app_response",
-                IoUtils.sha256(model.getCaptchaKey() + "|" + BuildConfig.CAPTCHA_API_PRIVATE_KEY));
+//                IoUtils.sha256(model.getCaptchaKey() + "|" + BuildConfig.CAPTCHA_API_PRIVATE_KEY));
+                IoUtils.sha256(model.getCaptchaKey()));
         }
 
         this.addStringValue(multipartEntity, SUBJECT, model.getSubject());

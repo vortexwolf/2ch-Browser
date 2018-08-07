@@ -48,10 +48,10 @@ public class BoardsRepositoryImpl implements BoardsRepository {
     private List<BoardModel> mBoards = null;
 
     public BoardsRepositoryImpl(ApiReader apiReader, OkHttpClient okHttpClient, Context context) {
-        this.mApiReader = apiReader;
-        this.mOkHttpClient = okHttpClient;
-        this.mContext = context;
-        this.mCacheManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
+        mApiReader = apiReader;
+        mOkHttpClient = okHttpClient;
+        mContext = context;
+        mCacheManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
     }
 
     //Get list from local storage

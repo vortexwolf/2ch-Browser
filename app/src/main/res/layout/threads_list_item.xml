@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="5dip">
+    android:padding="5dp">
 
     <LinearLayout
         android:id="@+id/multi_thumbnails_view"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:visibility="gone">
@@ -50,24 +51,28 @@
         layout="@layout/thumbnail_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="3dip" />
+        android:layout_marginEnd="3dp" />
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/multi_thumbnails_view"
         android:layout_marginBottom="1dip"
         android:layout_toEndOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="?threadTitleForeground"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:textColor="?threadTitleForeground"
+        android:singleLine="true"
+        android:ellipsize="end"
+        tools:visibility="visible"
+        tools:text="Title Title Title Title Title Title Title Title "/>
 
     <TextView
         android:id="@+id/comment"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/title"
@@ -75,10 +80,12 @@
         android:layout_toEndOf="@id/thumbnail_view"
         android:maxLines="@integer/opPostMaxLines"
         android:ellipsize="end"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:text="Comment Long Long Comment
+         Long Long Comment Long Long Comment Long Long Comment
+          Long Long Comment Long Long"/>
 
     <!-- Next row -->
-
     <TextView
         android:id="@+id/repliesNumber"
         android:layout_width="wrap_content"
@@ -87,6 +94,6 @@
         android:layout_below="@id/comment"
         android:layout_toEndOf="@id/thumbnail_view"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?itemInfoForeground" />
-
+        android:textColor="?itemInfoForeground"
+        tools:text="666"/>
 </RelativeLayout>

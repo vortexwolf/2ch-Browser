@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.PresenterType;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.aspsine.swipetoloadlayout.OnLoadMoreListener;
 import com.aspsine.swipetoloadlayout.OnRefreshListener;
 import com.aspsine.swipetoloadlayout.SwipeToLoadLayout;
@@ -75,15 +76,11 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     @Inject OpenTabsManager mOpenTabsManager;
     @Inject MainRouter mRouter;
 
-    private IJsonApiReader mJsonReader = Factory.resolve(MakabaApiReader.class);
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
 
-    private DownloadThreadsTask mCurrentDownloadTask = null;
     private ThreadsListAdapter mAdapter = null;
 
-    private View mNavigationBar;
-    private View mCatalogBar;
     protected ListView mListView;
     protected View mLoadingView;
     protected SwipeToLoadLayout mSwipeToLoadLayout;
@@ -101,7 +98,6 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     public void onCreate(Bundle savedInstanceState) {
         MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
-
         mUrlBuilder = mWebsite.getUrlBuilder();
         if (getArguments() == null) {
             throw new RuntimeException("No arguments supplied");
@@ -161,9 +157,13 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
         super.onViewCreated(view, savedInstanceState);
 
         mSwipeToLoadLayout.setOnRefreshListener(this);
-        mPostItemViewBuilder = new PostItemViewBuilder(getContext(), mWebsite, mBoardName, null, mSettings);
+        mPostItemViewBuilder = new PostItemViewBuilder(view.getContext(), mWebsite, mBoardName, null, mSettings);
 
-        mListView.setAdapter(mAdapter != null ? mAdapter : new ThreadsListAdapter(getContext()));
+        if (mAdapter == null) {
+            mAdapter = new ThreadsListAdapter(view.getContext());
+        }
+
+        mListView.setAdapter(mAdapter);
 
         registerForContextMenu(mListView);
 
@@ -178,54 +178,8 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
         mListView.setOnItemClickListener((parent, view1, position, id) -> {
             mThreadsListPresenter.onListItemClick(mAdapter.getItem(position));
         });
-
         mThreadsListPresenter.requestThreadsList();
 
-        // Панель навигации по страницам
-//        mNavigationBar = getView().findViewById(R.id.threads_navigation_bar);
-//        mNavigationBar.setVisibility(mIsCatalog ? View.GONE : View.VISIBLE);
-
-//        mCatalogBar = getView().findViewById(R.id.threads_catalog_bar);
-//        mCatalogBar.setVisibility(mIsCatalog ? View.VISIBLE : View.GONE);
-
-//        TextView pageNumberView = (TextView) getView().findViewById(R.id.threads_page_number);
-//        pageNumberView.setText(String.valueOf(mPageNumber));
-
-//        ImageButton nextButton = (ImageButton) getView().findViewById(R.id.threads_next_page);
-//        ImageButton prevButton = (ImageButton) getView().findViewById(R.id.threads_prev_page);
-//        if (mPageNumber == 0) {
-//            prevButton.setVisibility(View.INVISIBLE);
-//        } else if (mPageNumber == 19) {
-//            nextButton.setVisibility(View.INVISIBLE);
-//        }
-//
-//        prevButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                navigateToPageNumber(mPageNumber - 1);
-//            }
-//        });
-//
-//        nextButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                navigateToPageNumber(mPageNumber + 1);
-//            }
-//        });
-
-//        Spinner filterSelect = (Spinner) getView().findViewById(R.id.threads_filter_select);
-//        filterSelect.setSelection(mCatalogFilter);
-//        filterSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if (mCatalogFilter != position) {
-//                    mCatalogFilter = position;
-//                    refreshThreads(false);
-//                }
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) { }
-//        });
     }
 
     //TODO implement search
@@ -340,7 +294,7 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
-                mHiddenThreadsDataSource.addToHiddenThreads(mWebsite.name(), mBoardName, info.getNumber());
+//                mHiddenThreadsDataSource.addToHiddenThreads(mWebsite.name(), mBoardName, info.getNumber());
                 info.setHidden(true);
                 mAdapter.notifyDataSetChanged();
                 return true;
@@ -408,13 +362,7 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     }
 
     private void refreshThreads(boolean checkModified) {
-        if (mCurrentDownloadTask != null) {
-            mCurrentDownloadTask.cancel(true);
-        }
-
-        int pageNumberOrFilter = mIsCatalog ? mCatalogFilter : mPageNumber;
-        mCurrentDownloadTask = new DownloadThreadsTask(getActivity(), mThreadsReaderListener, mBoardName, mIsCatalog, pageNumberOrFilter, checkModified, mJsonReader);
-        mCurrentDownloadTask.execute();
+        onRefresh();
     }
 
     @Override
@@ -427,71 +375,74 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     public void showThreads(List<ThreadItemViewModel> threads) {
         mAdapter.clear();
         mAdapter.addAll(threads);
+        mAdapter.notifyDataSetChanged();
+        mLoadingView.setVisibility(View.GONE);
+        mListView.setVisibility(View.VISIBLE);
+        mSwipeToLoadLayout.setRefreshing(false);
     }
 
-
-    private class ThreadsReaderListener implements IListView<ThreadModel[]> {
-
-        @Override
-        public void setWindowProgress(int value) {
-            getActivity().setProgress(value);
-        }
-
-        @Override
-        public void setData(ThreadModel[] threads) {
-            if (threads != null && threads.length > 0) {
-                if (!mIsCatalog) {
-                    mSerializationService.serializeThreads(mWebsite.name(), mBoardName, mPageNumber, threads);
-                }
-                setAdapterData(threads);
-            } else {
-                String error = getString(R.string.error_list_empty);
-                if (mAdapter.getCount() == 0) {
-                    showError(error);
-                } else {
-//                    showToastIfVisible(error);
-                }
-            }
-        }
-
-        @Override
-        public void showError(String error) {
-//            switchToErrorView(error);
-            if (error != null && error.startsWith("503")) {
-                String url = mUrlBuilder.getPageUrlHtml(mBoardName, mPageNumber);
-                new CloudflareCheckService(url, getActivity(), new ICloudflareCheckListener() {
-                    public void onSuccess() {
-                        refreshThreads(false);
-
-                    }
-
-                    public void onStart() {
-                        showError(getString(R.string.notification_cloudflare_check_started));
-                    }
-
-                    public void onTimeout() {
-                        showError(getString(R.string.error_cloudflare_check_timeout));
-                    }
-                }).start();
-            }
-        }
-
-        @Override
-        public void showCaptcha(CaptchaEntity captcha) {
-//            switchToCaptchaView(mWebsite, captcha);
-        }
-
-        @Override
-        public void showLoadingScreen() {
-//            switchToLoadingView();
-        }
-
-        @Override
-        public void hideLoadingScreen() {
-//            switchToListView();
-            mSwipeToLoadLayout.setRefreshing(false);
-            mCurrentDownloadTask = null;
-
-        }
-    }
+//    private class ThreadsReaderListener implements IListView<ThreadModel[]> {
+//
+//        @Override
+//        public void setWindowProgress(int value) {
+//            getActivity().setProgress(value);
+//        }
+//
+//        @Override
+//        public void setData(ThreadModel[] threads) {
+//            if (threads != null && threads.length > 0) {
+//                if (!mIsCatalog) {
+//                    mSerializationService.serializeThreads(mWebsite.name(), mBoardName, mPageNumber, threads);
+//                }
+//                setAdapterData(threads);
+//            } else {
+//                String error = getString(R.string.error_list_empty);
+//                if (mAdapter.getCount() == 0) {
+//                    showError(error);
+//                } else {
+////                    showToastIfVisible(error);
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void showError(String error) {
+////            switchToErrorView(error);
+//            if (error != null && error.startsWith("503")) {
+//                String url = mUrlBuilder.getPageUrlHtml(mBoardName, mPageNumber);
+//                new CloudflareCheckService(url, getActivity(), new ICloudflareCheckListener() {
+//                    public void onSuccess() {
+//                        refreshThreads(false);
+//
+//                    }
+//
+//                    public void onStart() {
+//                        showError(getString(R.string.notification_cloudflare_check_started));
+//                    }
+//
+//                    public void onTimeout() {
+//                        showError(getString(R.string.error_cloudflare_check_timeout));
+//                    }
+//                }).start();
+//            }
+//        }
+//
+//        @Override
+//        public void showCaptcha(CaptchaEntity captcha) {
+////            switchToCaptchaView(mWebsite, captcha);
+//        }
+//
+//        @Override
+//        public void showLoadingScreen() {
+////            switchToLoadingView();
+//        }
+//
+//        @Override
+//        public void hideLoadingScreen() {
+////            switchToListView();
+//            mSwipeToLoadLayout.setRefreshing(false);
+//            mCurrentDownloadTask = null;
+//
+//        }
+//    }
 }

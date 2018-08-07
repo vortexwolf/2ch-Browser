@@ -26,16 +26,16 @@ public class ThreadItemViewModel implements IThreadListEntity {
     private IUrlBuilder mUrlBuilder;
 
     public ThreadItemViewModel(IWebsite website, String boardName, ThreadModel model, Theme theme) {
-        this.mWebsite = website;
-        this.mBoardName = boardName;
-        this.mTheme = theme;
+        mWebsite = website;
+        mBoardName = boardName;
+        mTheme = theme;
 
-        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
-        this.mOpPost = model.getPosts()[0];
-        this.mReplyCount = model.getReplyCount();
-        this.mImageCount = model.getImageCount();
+        mUrlBuilder = mWebsite.getUrlBuilder();
+        mOpPost = model.getPosts()[0];
+        mReplyCount = model.getReplyCount();
+        mImageCount = model.getImageCount();
 
-        this.mSpannedComment = this.createSpannedComment();
+        mSpannedComment = createSpannedComment();
     }
 
     public IWebsite getWebsite() {
@@ -47,87 +47,87 @@ public class ThreadItemViewModel implements IThreadListEntity {
     }
 
     public SpannableStringBuilder getSpannedComment() {
-        return this.mSpannedComment;
+        return mSpannedComment;
     }
 
     private SpannableStringBuilder createSpannedComment() {
-        String fixedComment = HtmlUtils.fixHtmlTags(this.mOpPost.getComment());
-        SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, this.mTheme, this.mUrlBuilder);
-        HtmlUtils.replaceUrls(spanned, null, this.mTheme);
+        String fixedComment = HtmlUtils.fixHtmlTags(mOpPost.getComment());
+        SpannableStringBuilder spanned = HtmlUtils.createSpannedFromHtml(fixedComment, mTheme, mUrlBuilder);
+        HtmlUtils.replaceUrls(spanned, null, mTheme);
 
         return spanned;
     }
 
     public String getSubject() {
-        return StringUtils.emptyIfNull(this.mOpPost.getSubject());
+        return StringUtils.emptyIfNull(mOpPost.getSubject());
     }
 
     public String getSubjectOrText() {
-        String subject = this.mOpPost.getSubject();
+        String subject = mOpPost.getSubject();
         if (!StringUtils.isEmpty(subject)) {
             return subject;
         }
 
-        return StringUtils.cutIfLonger(StringUtils.emptyIfNull(this.getSpannedComment()), 50) + "...";
+        return StringUtils.cutIfLonger(StringUtils.emptyIfNull(getSpannedComment()), 50) + "...";
     }
 
     public boolean hasAttachment() {
-        return ThreadPostUtils.hasAttachment(this.mOpPost);
+        return ThreadPostUtils.hasAttachment(mOpPost);
     }
 
     public int getAttachmentsNumber() {
-        return ThreadPostUtils.getAttachmentsNumber(this.mOpPost);
+        return ThreadPostUtils.getAttachmentsNumber(mOpPost);
     }
 
     public AttachmentInfo getAttachment(int index) {
-        if(index >= this.getAttachmentsNumber()) {
+        if (index >= getAttachmentsNumber()) {
             return null;
         }
 
-        if (this.mAttachments[index] == null) {
-            this.mAttachments[index] = new AttachmentInfo(this.mOpPost.getAttachments().get(index), this.mWebsite, this.mBoardName, this.mOpPost.getNumber());
+        if (mAttachments[index] == null) {
+            mAttachments[index] = new AttachmentInfo(mOpPost.getAttachments().get(index), mWebsite, mBoardName, mOpPost.getNumber());
         }
 
-        return this.mAttachments[index];
+        return mAttachments[index];
     }
 
     public PostModel getOpPost() {
-        return this.mOpPost;
+        return mOpPost;
     }
 
     public String getNumber() {
-        return this.mOpPost.getNumber();
+        return mOpPost.getNumber();
     }
 
     public int getReplyCount() {
-        return this.mReplyCount;
+        return mReplyCount;
     }
 
     public int getImageCount() {
-        return this.mImageCount;
+        return mImageCount;
     }
 
     public void setEllipsized(boolean ellipsized) {
-        this.mEllipsized = ellipsized;
+        mEllipsized = ellipsized;
     }
 
     public boolean isEllipsized() {
-        return this.mEllipsized;
+        return mEllipsized;
     }
 
     public boolean isHidden() {
-        return this.mHidden;
+        return mHidden;
     }
 
     public void setHidden(boolean hidden) {
-        this.mHidden = hidden;
+        mHidden = hidden;
     }
 
     @Override
     public Type getType() {
-        if(mHidden) {
+        if (mHidden) {
             return Type.THREAD;
-        } else  {
+        } else {
             return Type.HIDDEN_THREAD;
         }
     }

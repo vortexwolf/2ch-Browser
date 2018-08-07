@@ -22,14 +22,13 @@ public class HtmlCaptchaChecker {
 
     public CaptchaResult canSkipCaptcha(IWebsite website, CaptchaType captchaType, String boardName, String threadNumber) {
         IUrlBuilder urlBuilder = website.getUrlBuilder();
-        String checkUrl;
+        String checkUrl = urlBuilder.getPasscodeCookieCheckUrl(boardName, threadNumber);
 
-        if (captchaType == CaptchaType.APP) {
-            checkUrl = urlBuilder.getAppCaptchaCheckUrl(BuildConfig.CAPTCHA_API_PUBLIC_KEY);
-        } else {
-            checkUrl = urlBuilder.getPasscodeCookieCheckUrl(boardName, threadNumber);
-        }
-
+//        if (captchaType == CaptchaType.APP) {
+//            checkUrl = urlBuilder.getAppCaptchaCheckUrl(BuildConfig.CAPTCHA_API_PUBLIC_KEY);
+//        } else {
+//            checkUrl = urlBuilder.getPasscodeCookieCheckUrl(boardName, threadNumber);
+//        }
         CaptchaResult result;
         try {
             String referer = UriUtils.getBoardOrThreadUrl(urlBuilder, boardName, 0, threadNumber);

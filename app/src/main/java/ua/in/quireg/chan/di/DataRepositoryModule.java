@@ -12,6 +12,8 @@ import ua.in.quireg.chan.db.HistoryDataSource;
 import ua.in.quireg.chan.domain.ApiReader;
 import ua.in.quireg.chan.repositories.BoardsRepository;
 import ua.in.quireg.chan.repositories.BoardsRepositoryImpl;
+import ua.in.quireg.chan.repositories.ThreadsRepository;
+import ua.in.quireg.chan.repositories.ThreadsRepositoryImpl;
 import ua.in.quireg.chan.services.presentation.OpenTabsManager;
 import ua.in.quireg.chan.services.presentation.PagesSerializationService;
 
@@ -27,6 +29,12 @@ public class DataRepositoryModule {
     @AppScope
     BoardsRepository providesBoardsRepository(ApiReader apiReader, OkHttpClient okHttpClient, Context context) {
         return new BoardsRepositoryImpl(apiReader, okHttpClient, context);
+    }
+
+    @Provides
+    @AppScope
+    ThreadsRepository providesDataRepository(ApiReader apiReader, OkHttpClient okHttpClient, Context context) {
+        return new ThreadsRepositoryImpl(apiReader, okHttpClient, context);
     }
 
     @Provides

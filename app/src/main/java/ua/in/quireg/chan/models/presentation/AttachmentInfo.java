@@ -36,96 +36,96 @@ public class AttachmentInfo {
     }
 
     public AttachmentInfo(AttachmentModel item, IWebsite website, String boardName, String threadNumber) {
-        this.mModel = item;
-        this.mWebsite = website;
-        this.mBoardName = boardName;
-        this.mThreadNumber = threadNumber;
-        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
+        mModel = item;
+        mWebsite = website;
+        mBoardName = boardName;
+        mThreadNumber = threadNumber;
+        mUrlBuilder = mWebsite.getUrlBuilder();
 
-        SourceWithThumbnailModel urls = this.getUrls();
+        SourceWithThumbnailModel urls = getUrls();
         if (urls != null) {
-            this.mIsEmpty = false;
-            this.mImageUrl = urls.imageUrl;
-            this.mThumbnailUrl = urls.thumbnailUrl;
-            this.mSourceExtension = this.mImageUrl != null
-                    ? RegexUtils.getFileExtension(this.mImageUrl)
+            mIsEmpty = false;
+            mImageUrl = urls.imageUrl;
+            mThumbnailUrl = urls.thumbnailUrl;
+            mSourceExtension = mImageUrl != null
+                    ? RegexUtils.getFileExtension(mImageUrl)
                     : null;
         } else {
-            this.mIsEmpty = true;
-            this.mImageUrl = null;
-            this.mThumbnailUrl = null;
-            this.mSourceExtension = null;
+            mIsEmpty = true;
+            mImageUrl = null;
+            mThumbnailUrl = null;
+            mSourceExtension = null;
         }
     }
 
     public String getThreadUrl() {
-        return this.mUrlBuilder.getThreadUrlHtml(this.mBoardName, this.mThreadNumber);
+        return mUrlBuilder.getThreadUrlHtml(mBoardName, mThreadNumber);
     }
 
     public String getSourceUrl() {
-        if (!this.mIsEmpty) {
-            return this.mImageUrl;
+        if (!mIsEmpty) {
+            return mImageUrl;
         }
         return null;
     }
 
     public String getImageUrlIfImage() {
-        if (this.isImage()) {
-            return this.mImageUrl;
+        if (isImage()) {
+            return mImageUrl;
         }
 
         return null;
     }
 
     public String getSourceExtension() {
-        return this.mSourceExtension;
+        return mSourceExtension;
     }
 
     public boolean isFile() {
-        return !StringUtils.isEmpty(this.mSourceExtension);
+        return !StringUtils.isEmpty(mSourceExtension);
     }
 
     public boolean isImage() {
-        return this.mImageUrl != null && UriUtils.isImageUri(Uri.parse(this.mImageUrl));
+        return mImageUrl != null && UriUtils.isImageUri(Uri.parse(mImageUrl));
     }
 
     public boolean isVideo() {
-        return this.mImageUrl != null && UriUtils.isVideoUri(Uri.parse(this.mImageUrl));
+        return mImageUrl != null && UriUtils.isVideoUri(Uri.parse(mImageUrl));
     }
 
     public boolean isDisplayableInGallery() {
-        return this.isImage() || this.isVideo();
+        return isImage() || isVideo();
     }
 
     public String getThumbnailUrl() {
-        return this.mThumbnailUrl;
+        return mThumbnailUrl;
     }
 
     public int getDefaultThumbnail() {
-        Integer resId = AttachmentInfo.sDefaultThumbnails.get(this.mSourceExtension);
+        Integer resId = AttachmentInfo.sDefaultThumbnails.get(mSourceExtension);
 
         return resId != null ? resId : R.drawable.page_white_4x;
     }
 
     public boolean isEmpty() {
-        return this.mIsEmpty;
+        return mIsEmpty;
     }
 
     public int getSize() {
-        return this.mModel.getImageSize();
+        return mModel.getImageSize();
     }
 
     public String getDescription() {
         String result = "";
 
-        if (this.mModel.getImageSize() != 0) {
-            result += this.mModel.getImageSize() + Factory.resolve(Resources.class).getString(R.string.data_file_size_measure);
+        if (mModel.getImageSize() != 0) {
+            result += mModel.getImageSize() + Factory.resolve(Resources.class).getString(R.string.data_file_size_measure);
 
-            if ("gif".equalsIgnoreCase(this.mSourceExtension)) {
+            if ("gif".equalsIgnoreCase(mSourceExtension)) {
                 result += "\ngif";
-            } else if ("webm".equalsIgnoreCase(this.mSourceExtension)) {
+            } else if ("webm".equalsIgnoreCase(mSourceExtension)) {
                 result += "\nwebm";
-            } else if ("mp4".equalsIgnoreCase(this.mSourceExtension)) {
+            } else if ("mp4".equalsIgnoreCase(mSourceExtension)) {
                 result += "\nmp4";
             }
         }
@@ -137,13 +137,13 @@ public class AttachmentInfo {
         SourceWithThumbnailModel model = new SourceWithThumbnailModel();
 
         // Проверяем существование картинки
-        String imageUrl = this.mModel.getPath();
-        String imageThumbnail = this.mModel.getThumbnailUrl();
+        String imageUrl = mModel.getPath();
+        String imageThumbnail = mModel.getThumbnailUrl();
         if (!StringUtils.isEmpty(imageUrl)) {
-            model.imageUrl = this.mUrlBuilder.getImageUrl(this.mBoardName, imageUrl);
+            model.imageUrl = mUrlBuilder.getImageUrl(mBoardName, imageUrl);
         }
         if (!StringUtils.isEmpty(imageThumbnail)) {
-            model.thumbnailUrl = this.mUrlBuilder.getThumbnailUrl(this.mBoardName, imageThumbnail);
+            model.thumbnailUrl = mUrlBuilder.getThumbnailUrl(mBoardName, imageThumbnail);
         }
 
         if (model.imageUrl == null && model.thumbnailUrl == null) {

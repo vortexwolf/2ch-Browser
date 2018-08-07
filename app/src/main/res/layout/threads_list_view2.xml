@@ -1,5 +1,4 @@
 <FrameLayout
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/threads_list_root"
@@ -17,7 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:gravity="center">
-
         </ua.in.quireg.chan.ui.views.RefreshHeaderView>
 
         <ListView
@@ -26,6 +24,7 @@
             android:layout_height="match_parent"
             android:dividerHeight="0.5dp"
             android:visibility="gone"
+            tools:visibility="visible"
             tools:listitem="@layout/threads_list_item" />
 
         <!--<ua.in.quireg.chan.ui.views.LoadMoreFooterView-->
@@ -51,6 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="visible">
+        android:visibility="visible"
+        tools:visibility="gone">
     </include>
 </FrameLayout>

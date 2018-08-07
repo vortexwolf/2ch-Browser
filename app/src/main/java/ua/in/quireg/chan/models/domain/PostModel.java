@@ -1,23 +1,54 @@
 package ua.in.quireg.chan.models.domain;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Entity(tableName = "postModel")
 public class PostModel implements Serializable {
     private static final long serialVersionUID = 3897934462057089443L;
 
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name = "uniqueid")
+    private String uniqueid = UUID.randomUUID().toString();
+    @ColumnInfo(name = "number")
     private String number;
+    @ColumnInfo(name = "name")
     private String name;
+    @ColumnInfo(name = "subject")
     private String subject;
+    @ColumnInfo(name = "comment")
     private String comment;
+    @ColumnInfo(name = "sage")
     private boolean sage;
+    @ColumnInfo(name = "trip")
     private String trip;
+    @Ignore
     private BadgeModel badge;
+    @ColumnInfo(name = "op")
     private boolean op;
+    @ColumnInfo(name = "timestamp")
     private long timestamp;
+    @ColumnInfo(name = "parentThread")
     private String parentThread;
+    @Ignore
     private ArrayList<AttachmentModel> attachments = new ArrayList<AttachmentModel>();
+
+    public String getUniqueid() {
+        return uniqueid;
+    }
+
+    public void setUniqueid(String uniqueid) {
+        this.uniqueid = uniqueid;
+    }
 
     public String getNumber() {
         return number;
@@ -59,7 +90,10 @@ public class PostModel implements Serializable {
         return badge;
     }
     public void setBadge(BadgeModel icon) {
-        this.badge = icon;
+        if (icon != null) {
+            this.badge = icon;
+            this.badge.setPostId(uniqueid);
+        }
     }
     public boolean isOp() {
         return op;
@@ -81,9 +115,13 @@ public class PostModel implements Serializable {
     }
 
     public void addAttachment(AttachmentModel model) {
-        this.attachments.add(model);
+        if (model != null) {
+            model.setPostId(uniqueid);
+            attachments.add(model);
+        }
     }
     public List<AttachmentModel> getAttachments(){
         return attachments;
     }
+
 }

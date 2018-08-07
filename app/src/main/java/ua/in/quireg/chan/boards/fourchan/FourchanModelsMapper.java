@@ -56,7 +56,9 @@ public class FourchanModelsMapper {
         model.setTrip(source.trip);
         model.setOp(false);
         if (source.renamedFileName != null) {
-            model.addAttachment(this.mapAttachmentModel(source));
+            AttachmentModel attachmentModel = mapAttachmentModel(source);
+            attachmentModel.setPostId(model.getUniqueid());
+            model.addAttachment(attachmentModel);
         }
         model.setTimestamp(source.timestamp * 1000);
         model.setParentThread(source.parent);

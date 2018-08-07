@@ -1,22 +1,44 @@
 package ua.in.quireg.chan.models.domain;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
+@Entity(tableName = "boardModel")
 public class BoardModel implements Serializable {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @NonNull
     private String mId = "?"; // /mov
+    @ColumnInfo(name = "boardName")
     private String mBoardName = "Unknown"; //Movies
+    @ColumnInfo(name = "category")
     private String mCategory = "БЕЗНОГNМ"; //Взрослым
+    @ColumnInfo(name = "userDefaultName")
     private String mUserDefaultName = "OP"; //Аноним
 
-    private int mPagesCount = 0;
+    @ColumnInfo(name = "pagesCount")
+    private int pagesCount = 0;
+    @ColumnInfo(name = "bumpLimit")
     private int mBumpLimit = 0;
 
-    private boolean mLikes = false;
-    private boolean mPosting = false;
+    @ColumnInfo(name = "likes")
+    private boolean likes = false;
+    @ColumnInfo(name = "posting")
+    private boolean posting = false;
+    @ColumnInfo(name = "threadTags")
     private boolean mThreadTags = false;
+    @ColumnInfo(name = "sage")
     private boolean mSage = false;
+    @ColumnInfo(name = "tripcodes")
     private boolean mTripcodes = false;
+
+    @Ignore
     private BoardIconModel[] mBoardIconModels = new BoardIconModel[1];
 
     public int getBumpLimit() {
@@ -36,11 +58,19 @@ public class BoardModel implements Serializable {
     }
 
     public boolean isLikes() {
-        return mLikes;
+        return likes;
     }
 
     public boolean isPosting() {
-        return mPosting;
+        return posting;
+    }
+
+    public void setLikes(boolean likes) {
+        this.likes = likes;
+    }
+
+    public void setPosting(boolean posting) {
+        this.posting = posting;
     }
 
     public String getId() {
@@ -49,10 +79,6 @@ public class BoardModel implements Serializable {
 
     public String getBoardName() {
         return mBoardName;
-    }
-
-    public int getPages() {
-        return mPagesCount;
     }
 
     public boolean isSage() {
@@ -80,11 +106,11 @@ public class BoardModel implements Serializable {
     }
 
     public void setEnableLikes(boolean enableLikes) {
-        this.mLikes = enableLikes;
+        this.likes = enableLikes;
     }
 
     public void setEnablePosting(boolean enablePosting) {
-        this.mPosting = enablePosting;
+        this.posting = enablePosting;
     }
 
     public void setThreadTags(boolean threadTags) {
@@ -99,10 +125,6 @@ public class BoardModel implements Serializable {
         this.mBoardName = name;
     }
 
-    public void setPages(int pages) {
-        this.mPagesCount = pages;
-    }
-
     public void setSage(boolean sage) {
         this.mSage = sage;
     }
@@ -112,7 +134,19 @@ public class BoardModel implements Serializable {
     }
 
     public void setIcons(BoardIconModel[] icons) {
-        this.mBoardIconModels = icons;
+        if (icons != null) {
+            for (BoardIconModel boardIconModel : icons) {
+                boardIconModel.setBoard(getBoardName());
+            }
+            mBoardIconModels = icons;
+        }
     }
 
+    public int getPagesCount() {
+        return pagesCount;
+    }
+
+    public void setPagesCount(int pagesCount) {
+        this.pagesCount = pagesCount;
+    }
 }

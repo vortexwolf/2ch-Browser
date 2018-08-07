@@ -1,7 +1,9 @@
 package ua.in.quireg.chan.di;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.KeyManagementException;
@@ -18,8 +20,12 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import timber.log.Timber;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
@@ -82,12 +88,14 @@ public class NetModule {
                 builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
                 builder.hostnameVerifier((hostname, session) -> true);
 
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 e.printStackTrace();
             }
         }
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        builder.addInterceptor(logging);
 
         return builder.build();
     }

@@ -1,38 +1,23 @@
 package ua.in.quireg.chan.ui.adapters;
 
 import android.content.Context;
-import android.content.res.Resources.Theme;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import javax.inject.Inject;
 
-import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.common.Factory;
+import ua.in.quireg.chan.common.GlideApp;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
-import ua.in.quireg.chan.interfaces.IBusyAdapter;
-import ua.in.quireg.chan.interfaces.IUrlBuilder;
-import ua.in.quireg.chan.interfaces.IWebsite;
-import ua.in.quireg.chan.models.domain.ThreadModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
-import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.inject.Inject;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
@@ -76,16 +61,14 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         if (!item.isHidden()) {
             view = convertView != null ?
                     convertView :
-                    LayoutInflater.from(getContext()).inflate(
-                            R.layout.threads_list_item, parent, false
-                    );
+                    LayoutInflater.from(parent.getContext()).inflate(
+                            R.layout.threads_list_item, parent, false);
             fillItemView(view, item);
         } else {
             view = convertView != null ?
                     convertView :
-                    LayoutInflater.from(getContext()).inflate(
-                            R.layout.threads_list_hidden_item, parent, false
-                    );
+                    LayoutInflater.from(parent.getContext()).inflate(
+                            R.layout.threads_list_hidden_item, parent, false);
             fillHiddenThreadView(view, item);
         }
 
@@ -159,9 +142,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
                     vb.thumbnailViews[i].hide();
                     return;
                 }
-                Timber.i("Image: %s", item.getAttachment(i).getImageUrlIfImage());
-
-                Glide.with(getContext()).load(item.getAttachment(i).getImageUrlIfImage()).into(vb.thumbnailViews[i].image);
+                GlideApp.with(getContext()).load(item.getAttachment(i).getImageUrlIfImage()).into(vb.thumbnailViews[i].image);
 
                 vb.thumbnailViews[i].container.setVisibility(View.VISIBLE);
                 vb.thumbnailViews[i].info.setText(item.getAttachment(i).getDescription());
@@ -172,8 +153,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
                 vb.singleThumbnailView.hide();
                 return;
             }
-            Timber.i("Image: %s", item.getAttachment(0).getImageUrlIfImage());
-            Glide.with(getContext()).load(item.getAttachment(0).getImageUrlIfImage()).into(vb.singleThumbnailView.image);
+            GlideApp.with(getContext()).load(item.getAttachment(0).getImageUrlIfImage()).into(vb.singleThumbnailView.image);
 
             vb.singleThumbnailView.container.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.info.setText(item.getAttachment(0).getDescription());

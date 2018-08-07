@@ -9,6 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
+import ua.in.quireg.chan.db.DvachRoomDatabase;
 import ua.in.quireg.chan.db.FavoritesDataSource;
 import ua.in.quireg.chan.db.FavoritesEntity;
 import ua.in.quireg.chan.models.domain.BoardModel;
