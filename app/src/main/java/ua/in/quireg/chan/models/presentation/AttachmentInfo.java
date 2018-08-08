@@ -77,6 +77,10 @@ public class AttachmentInfo {
         return null;
     }
 
+    public String getThumbnailUrl() {
+        return StringUtils.emptyIfNull(mThumbnailUrl);
+    }
+
     public String getSourceExtension() {
         return mSourceExtension;
     }
@@ -95,10 +99,6 @@ public class AttachmentInfo {
 
     public boolean isDisplayableInGallery() {
         return isImage() || isVideo();
-    }
-
-    public String getThumbnailUrl() {
-        return mThumbnailUrl;
     }
 
     public int getDefaultThumbnail() {

@@ -14,8 +14,8 @@ public class ThumbnailViewBag {
     public static ThumbnailViewBag fromView(View container) {
         ThumbnailViewBag vb = new ThumbnailViewBag();
         vb.container = container;
-        vb.image = (ImageView) container.findViewById(R.id.thumbnail);
-        vb.info = (TextView) container.findViewById(R.id.attachment_info);
+        vb.image = container.findViewById(R.id.thumbnail);
+        vb.info = container.findViewById(R.id.attachment_info);
         return vb;
     }
     

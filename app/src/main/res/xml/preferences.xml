@@ -169,11 +169,6 @@
                 android:title="@string/pref_theme" />
             <CheckBoxPreference
                 android:defaultValue="true"
-                android:key="@string/pref_popup_link_key"
-                android:summary="@string/pref_popup_link_summary"
-                android:title="@string/pref_popup_link" />
-            <CheckBoxPreference
-                android:defaultValue="true"
                 android:key="@string/pref_display_name_key"
                 android:summary="@string/pref_display_name_summary"
                 android:title="@string/pref_display_name" />
@@ -183,10 +178,20 @@
                 android:summary="@string/pref_display_post_date_summary"
                 android:title="@string/pref_display_post_date" />
             <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_show_post_subject_key"
+                android:summary="@string/pref_show_post_subject_summary"
+                android:title="@string/pref_show_post_subject" />
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_display_icons_key"
                 android:summary="@string/pref_display_icons_summary"
                 android:title="@string/pref_display_icons" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="@string/pref_popup_link_key"
+                android:summary="@string/pref_popup_link_summary"
+                android:title="@string/pref_popup_link" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="@string/pref_swipe_to_refresh_key"

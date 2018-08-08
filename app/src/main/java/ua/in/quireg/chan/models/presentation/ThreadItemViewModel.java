@@ -21,7 +21,6 @@ public class ThreadItemViewModel implements IThreadListEntity {
 
     private final SpannableStringBuilder mSpannedComment;
     private AttachmentInfo[] mAttachments = new AttachmentInfo[4];
-    private boolean mEllipsized = false;
     private boolean mHidden = false;
     private IUrlBuilder mUrlBuilder;
 
@@ -71,10 +70,6 @@ public class ThreadItemViewModel implements IThreadListEntity {
         return StringUtils.cutIfLonger(StringUtils.emptyIfNull(getSpannedComment()), 50) + "...";
     }
 
-    public boolean hasAttachment() {
-        return ThreadPostUtils.hasAttachment(mOpPost);
-    }
-
     public int getAttachmentsNumber() {
         return ThreadPostUtils.getAttachmentsNumber(mOpPost);
     }
@@ -107,14 +102,6 @@ public class ThreadItemViewModel implements IThreadListEntity {
         return mImageCount;
     }
 
-    public void setEllipsized(boolean ellipsized) {
-        mEllipsized = ellipsized;
-    }
-
-    public boolean isEllipsized() {
-        return mEllipsized;
-    }
-
     public boolean isHidden() {
         return mHidden;
     }
@@ -125,10 +112,24 @@ public class ThreadItemViewModel implements IThreadListEntity {
 
     @Override
     public Type getType() {
-        if (mHidden) {
+        if (!mHidden) {
             return Type.THREAD;
         } else {
             return Type.HIDDEN_THREAD;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((getNumber() == null) ? 0 : getNumber().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ThreadItemViewModel && ((ThreadItemViewModel) obj).getNumber().equals(this.getNumber());
     }
 }

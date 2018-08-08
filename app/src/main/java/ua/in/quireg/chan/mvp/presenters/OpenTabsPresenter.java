@@ -47,7 +47,7 @@ public class OpenTabsPresenter extends MvpPresenter<OpenTabsView> implements Ope
         if (StringUtils.isEmpty(openTabModel.getThread())) {
             mMainRouter.navigateBoard(openTabModel.getWebsite().name(), openTabModel.getBoard(), false);
         } else {
-            mMainRouter.navigateThread(openTabModel.getWebsite().name(), openTabModel.getBoard(), openTabModel.getThread(), openTabModel.getTitle(), null, false);
+            mMainRouter.navigateThread(openTabModel.getThread(), false);
         }
     }
 

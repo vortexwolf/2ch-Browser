@@ -397,6 +397,10 @@ public class ApplicationSettings {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_use_proxy_key), false);
     }
 
+    public boolean isDisplaySubject() {
+        return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_show_post_subject_key), false);
+    }
+
     public ProxySettings getProxySettings() {
         ProxySettings proxySettings = new ProxySettings();
         proxySettings.server = mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_address_key), "");
@@ -448,6 +452,4 @@ public class ApplicationSettings {
             return password;
         }
     }
-
-
 }

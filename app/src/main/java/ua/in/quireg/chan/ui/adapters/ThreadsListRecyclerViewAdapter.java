@@ -1,19 +1,26 @@
 package ua.in.quireg.chan.ui.adapters;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 import ua.in.quireg.chan.R;
+import ua.in.quireg.chan.common.GlideApp;
+import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.models.presentation.IThreadListEntity;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
+import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
+import ua.in.quireg.chan.settings.ApplicationSettings;
 
 /**
  * Created by Arcturus Mengsk on 3/17/2018, 5:36 AM.
@@ -21,6 +28,13 @@ import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
  */
 
 public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+
+    @Inject ApplicationSettings mSettings;
+
+    {
+        MainApplication.getAppComponent().inject(this);
+    }
 
     private ThreadsListPresenter mThreadsListPresenter;
     private ArrayList<IThreadListEntity> mItems = new ArrayList<>();
@@ -33,8 +47,9 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         mThreadsListPresenter = threadsListPresenter;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         switch (viewType) {
             case ITEM_VIEW_TYPE_THREAD: {
@@ -45,7 +60,7 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             case ITEM_VIEW_TYPE_HIDDEN_THREAD: {
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.threads_list_hidden_item, parent, false);
-                return new ThreadViewHolder(itemView);
+                return new HiddenThreadViewHolder(itemView);
             }
             default: {
                 throw new RuntimeException("Unknown view type");
@@ -54,15 +69,15 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        mThreadsListPresenter.currentRecyclerViewPosition(holder.getAdapterPosition(), getItemCount());
+
+        ThreadItemViewModel item = (ThreadItemViewModel) mItems.get(position);
 
         if (holder instanceof ThreadViewHolder) {
-            ThreadItemViewModel item = (ThreadItemViewModel) mItems.get(position);
-
-//            ((ThreadsListRecyclerViewAdapter.ThreadViewHolder) holder).titleView.setText(item.getTitleOrDefault());
-//            ((ThreadsListRecyclerViewAdapter.ThreadViewHolder) holder).urlView.setText(item.buildUrl());
-//            ((ThreadsListRecyclerViewAdapter.ThreadViewHolder) holder).deleteButton.setOnClickListener(v -> mOpenTabsPresenter.removeItem(item));
-//            ((ThreadsListRecyclerViewAdapter.ThreadViewHolder) holder).itemView.setOnClickListener(v -> mOpenTabsPresenter.navigate(item));
+            fillItemView((ThreadViewHolder) holder, item);
+        } else if (holder instanceof HiddenThreadViewHolder) {
+            fillHiddenThreadView((HiddenThreadViewHolder) holder, item);
         }
     }
 
@@ -73,7 +88,7 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public int getItemViewType(int position) {
-        switch (getItem(position).getType()){
+        switch (getItem(position).getType()) {
             case THREAD:
                 return ITEM_VIEW_TYPE_THREAD;
             case HIDDEN_THREAD:
@@ -89,13 +104,14 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         return mItems.size();
     }
 
+
     public void addToList(ThreadItemViewModel item) {
 
         int position = mItems.indexOf(item);
 
         if (position == -1) {
             mItems.add(item);
-            notifyItemInserted(getItemCount());
+            notifyItemInserted(getItemCount() - 1);
         } else {
             mItems.remove(position);
             mItems.add(position, item);
@@ -125,20 +141,105 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         return mItems.get(position);
     }
 
+    private void fillItemView(final ThreadViewHolder holder, final ThreadItemViewModel item) {
+
+        String subject = item.getSubject();
+        if (!StringUtils.isEmpty(subject) && mSettings.isDisplaySubject()) {
+            holder.titleView.setVisibility(View.VISIBLE);
+            holder.titleView.setText(subject);
+        } else {
+            holder.titleView.setVisibility(View.GONE);
+        }
+
+        // Комментарий
+        holder.commentView.setText(item.getSpannedComment());
+        holder.commentView.setTag(item);
+
+        // Количество ответов
+        String postsQuantity = holder.itemView.getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
+        String imagesQuantity = holder.itemView.getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
+        String repliesFormat = holder.itemView.getContext().getString(R.string.data_posts_files);
+        String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
+        holder.repliesNumberView.setText(repliesText);
+
+        if (mSettings.isMultiThumbnailsInThreads() && item.getAttachmentsNumber() > 1) {
+            holder.multiThumbnailsView.setVisibility(View.VISIBLE);
+            holder.singleThumbnailView.hide();
+            for (int i = 0; i < 4; ++i) {
+
+                if (item.getAttachment(i) == null || item.getAttachment(i).isEmpty()) {
+                    holder.thumbnailViews[i].hide();
+                    continue;
+                }
+                GlideApp.with(holder.itemView.getContext())
+                        .load(item.getAttachment(i).getThumbnailUrl())
+//                        .circleCrop()
+                        .into(holder.thumbnailViews[i].image);
+
+                holder.thumbnailViews[i].container.setVisibility(View.VISIBLE);
+                holder.thumbnailViews[i].info.setText(item.getAttachment(i).getDescription());
+            }
+        } else if (item.getAttachmentsNumber() >= 1) {
+            if (item.getAttachment(0) != null && !item.getAttachment(0).isEmpty()) {
+                holder.singleThumbnailView.info.setText(item.getAttachment(0).getDescription());
+                GlideApp.with(holder.itemView.getContext())
+                        .load(item.getAttachment(0).getThumbnailUrl())
+//                        .circleCrop()
+                        .into(holder.singleThumbnailView.image);
+            }
+        }
+    }
+
+    private void fillHiddenThreadView(final HiddenThreadViewHolder holder, final ThreadItemViewModel item) {
+        holder.threadNumberView.setText(String.format("№%s", item.getNumber()));
+        holder.threadDescriptionView.setText(item.getSubjectOrText());
+    }
+
     private class ThreadViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView deleteButton;
-        TextView titleView, urlView;
+        TextView titleView;
+        TextView commentView;
+        TextView repliesNumberView;
+        ThumbnailViewBag singleThumbnailView;
+        View multiThumbnailsView;
+        ThumbnailViewBag[] thumbnailViews;
 
         ThreadViewHolder(View view) {
             super(view);
-            titleView = view.findViewById(R.id.tabs_item_title);
-            urlView = view.findViewById(R.id.tabs_item_url);
-            deleteButton = view.findViewById(R.id.tabs_item_delete);
+            titleView = view.findViewById(R.id.title);
+            commentView = view.findViewById(R.id.comment);
+            repliesNumberView = view.findViewById(R.id.repliesNumber);
+            singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
+
+            multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
+            thumbnailViews = new ThumbnailViewBag[4];
+            thumbnailViews[0] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_1));
+            thumbnailViews[1] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_2));
+            thumbnailViews[2] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_3));
+            thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
+
+            view.setOnClickListener((View v) -> {
+                mThreadsListPresenter.onItemClick((ThreadItemViewModel) mItems.get(getAdapterPosition()));
+            });
 
             view.setOnLongClickListener((View v) -> {
-                v.showContextMenu();
+                view.showContextMenu();
                 return true;
+            });
+        }
+    }
+
+    private class HiddenThreadViewHolder extends RecyclerView.ViewHolder {
+
+        TextView threadNumberView, threadDescriptionView;
+
+        HiddenThreadViewHolder(View view) {
+            super(view);
+            threadNumberView = view.findViewById(R.id.thread_number);
+            threadDescriptionView = view.findViewById(R.id.thread_description);
+
+            view.setOnClickListener((View v) -> {
+                mThreadsListPresenter.unHideThread((ThreadItemViewModel) mItems.get(getAdapterPosition()));
             });
         }
     }

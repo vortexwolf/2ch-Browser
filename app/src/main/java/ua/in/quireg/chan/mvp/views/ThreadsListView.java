@@ -1,6 +1,10 @@
 package ua.in.quireg.chan.mvp.views;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
@@ -13,6 +17,13 @@ import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 
 public interface ThreadsListView extends MvpView {
 
+    @StateStrategyType(AddToEndStrategy.class)
     void showThreads(List<ThreadItemViewModel> threads);
+
+    @StateStrategyType(SkipStrategy.class)
+    void clearList();
+
+    @StateStrategyType(AddToEndSingleStrategy.class)
+    void setRecyclerViewPosition(int position);
 
 }

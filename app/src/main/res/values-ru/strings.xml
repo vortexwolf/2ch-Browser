@@ -177,6 +177,8 @@
     <string name="pref_display_name_summary">Отображать имена неймфагов над их постами</string>
     <string name="pref_display_icons">Иконки</string>
     <string name="pref_display_icons_summary">Отображать иконки</string>
+    <string name="pref_show_post_subject">Отображать заголовок поста</string>
+    <string name="pref_show_post_subject_summary">Зачастую дублирует сам пост.</string>
     <string name="pref_text_size">Размер текста</string>
     <string name="pref_cut_posts">Длинные сообщения</string>
     <string name="pref_cut_posts_hint">0 - не обрезать; 400px по умолчанию</string>
@@ -318,6 +320,7 @@
     <string name="notification_cloudflare_recaptcha">Cloudflare Recaptcha</string>
     <string name="simply_image">This is image</string>
     <string name="opened_tabs_for_this_session">Открытые Вкладки</string>
+    <string name="hidden_thread_prefix">Скрытый тред</string>
 
     <string-array name="catalog_filters">
 		<item>Сортировка по Бампам</item>

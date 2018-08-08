@@ -2,12 +2,13 @@ package ua.in.quireg.chan.ui.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,15 +16,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Spinner;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.PresenterType;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
-import com.aspsine.swipetoloadlayout.OnLoadMoreListener;
 import com.aspsine.swipetoloadlayout.OnRefreshListener;
 import com.aspsine.swipetoloadlayout.SwipeToLoadLayout;
 
@@ -31,40 +27,29 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
 import ua.in.quireg.chan.R;
-import ua.in.quireg.chan.asynctasks.DownloadThreadsTask;
-import ua.in.quireg.chan.boards.makaba.MakabaApiReader;
 import ua.in.quireg.chan.common.Constants;
-import ua.in.quireg.chan.common.Factory;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.Websites;
-import ua.in.quireg.chan.common.utils.AppearanceUtils;
 import ua.in.quireg.chan.db.FavoritesDataSource;
-import ua.in.quireg.chan.db.HiddenThreadsDataSource;
-import ua.in.quireg.chan.interfaces.ICloudflareCheckListener;
-import ua.in.quireg.chan.interfaces.IJsonApiReader;
-import ua.in.quireg.chan.interfaces.IListView;
 import ua.in.quireg.chan.interfaces.IUrlBuilder;
 import ua.in.quireg.chan.interfaces.IWebsite;
-import ua.in.quireg.chan.models.domain.CaptchaEntity;
-import ua.in.quireg.chan.models.domain.ThreadModel;
 import ua.in.quireg.chan.models.presentation.OpenTabModel;
 import ua.in.quireg.chan.models.presentation.PostItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
 import ua.in.quireg.chan.mvp.routing.MainRouter;
-import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
 import ua.in.quireg.chan.mvp.views.ThreadsListView;
 import ua.in.quireg.chan.services.BrowserLauncher;
-import ua.in.quireg.chan.services.CloudflareCheckService;
 import ua.in.quireg.chan.services.presentation.ClickListenersFactory;
-import ua.in.quireg.chan.services.presentation.ListViewScrollListener;
 import ua.in.quireg.chan.services.presentation.OpenTabsManager;
-import ua.in.quireg.chan.services.presentation.PagesSerializationService;
 import ua.in.quireg.chan.services.presentation.PostItemViewBuilder;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.AddPostActivity;
-import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
+import ua.in.quireg.chan.ui.adapters.ThreadsListRecyclerViewAdapter;
+import ua.in.quireg.chan.ui.views.LeftPaddedDivider;
+import ua.in.quireg.chan.ui.views.RecyclerViewWithCM;
 
 public class ThreadsListFragment extends MvpAppCompatFragment implements ThreadsListView, OnRefreshListener {
 
@@ -79,9 +64,9 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     private PostItemViewBuilder mPostItemViewBuilder;
     private IUrlBuilder mUrlBuilder;
 
-    private ThreadsListAdapter mAdapter = null;
+    private ThreadsListRecyclerViewAdapter mAdapter;
 
-    protected ListView mListView;
+    protected RecyclerViewWithCM mRecyclerView;
     protected View mLoadingView;
     protected SwipeToLoadLayout mSwipeToLoadLayout;
 
@@ -95,13 +80,12 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     private Menu mMenu;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onCreate(Bundle savedInstanceState) {
         MainApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         mUrlBuilder = mWebsite.getUrlBuilder();
-        if (getArguments() == null) {
-            throw new RuntimeException("No arguments supplied");
-        }
+
         mBoardName = getArguments().getString(Constants.EXTRA_BOARD_NAME);
         mPageNumber = getArguments().getInt(Constants.EXTRA_BOARD_PAGE, 0);
         mIsCatalog = getArguments().getBoolean(Constants.EXTRA_CATALOG);
@@ -136,18 +120,12 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
         }
     }
 
-    @Override
-    public void onPause() {
-        mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(mListView));
-        super.onPause();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.threads_list_view2, container, false);
         mSwipeToLoadLayout = rootView.findViewById(R.id.swipeToLoadLayout);
-        mListView = rootView.findViewById(R.id.swipe_target);
+        mRecyclerView = rootView.findViewById(R.id.swipe_target);
         mLoadingView = rootView.findViewById(R.id.empty_list_item);
         return rootView;
     }
@@ -159,27 +137,33 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
         mSwipeToLoadLayout.setOnRefreshListener(this);
         mPostItemViewBuilder = new PostItemViewBuilder(view.getContext(), mWebsite, mBoardName, null, mSettings);
 
-        if (mAdapter == null) {
-            mAdapter = new ThreadsListAdapter(view.getContext());
-        }
+        if (mAdapter == null) mAdapter = new ThreadsListRecyclerViewAdapter(mThreadsListPresenter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
 
-        mListView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.addItemDecoration(
+                mSettings.isMultiThumbnailsInThreads()
+                ? new DividerItemDecoration(view.getContext(), layoutManager.getOrientation())
+                : new LeftPaddedDivider(view.getContext())
+        );
+        mRecyclerView.setAdapter(mAdapter);
+//        mRecyclerView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
 
-        registerForContextMenu(mListView);
+        registerForContextMenu(mRecyclerView);
 
 //        boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED, false) ||
 //                savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
 //
-//        if (preferDeserialized) {
-//        } else {
-//            refreshThreads(false);
-//        }
 
-        mListView.setOnItemClickListener((parent, view1, position, id) -> {
-            mThreadsListPresenter.onListItemClick(mAdapter.getItem(position));
-        });
-        mThreadsListPresenter.requestThreadsList();
+//        mRecyclerView.setOnItemClickListener((parent, v, position, id) -> {
+//            mThreadsListPresenter.onListItemClick((ThreadItemViewModel) parent.getItemAtPosition(position));
+//        });
 
+//                // Устанавливаем позицию, если открываем как уже открытую вкладку
+//                if (mTabModel.getPosition() != null) {
+//                    AppearanceUtils.ListViewPosition p = mTabModel.getPosition();
+//                    mListView.setSelectionFromTop(p.position, p.top);
+//                }
     }
 
     //TODO implement search
@@ -267,8 +251,9 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        ThreadItemViewModel item = mAdapter.getItem(info.position);
+        RecyclerViewWithCM.ContextMenuInfo info = (RecyclerViewWithCM.ContextMenuInfo) menuInfo;
+
+        ThreadItemViewModel item = (ThreadItemViewModel) mAdapter.getItem(info.position);
 
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_ANSWER, 0, getString(R.string.cmenu_answer_without_reading));
         menu.add(Menu.NONE, Constants.CONTEXT_MENU_VIEW_FULL_POST, 2, getString(R.string.cmenu_view_op_post));
@@ -280,8 +265,9 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        ThreadItemViewModel info = mAdapter.getItem(menuInfo.position);
+        RecyclerViewWithCM.ContextMenuInfo menuInfo = (RecyclerViewWithCM.ContextMenuInfo) item.getMenuInfo();
+
+        ThreadItemViewModel info = (ThreadItemViewModel) mAdapter.getItem(menuInfo.position);
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_ANSWER: {
@@ -289,25 +275,25 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
                 return true;
             }
             case Constants.CONTEXT_MENU_VIEW_FULL_POST: {
-                PostItemViewModel postModel = new PostItemViewModel(mWebsite, mBoardName, info.getNumber(), Constants.OP_POST_POSITION, info.getOpPost(), getActivity().getTheme(), ClickListenersFactory.getDefaultSpanClickListener(mUrlBuilder));
+                PostItemViewModel postModel = new PostItemViewModel(
+                        mWebsite, mBoardName, info.getNumber(),
+                        Constants.OP_POST_POSITION, info.getOpPost(), getActivity().getTheme(),
+                        ClickListenersFactory.getDefaultSpanClickListener(mUrlBuilder));
+
                 mPostItemViewBuilder.displayPopupDialog(postModel, getActivity(), getActivity().getTheme(), null);
                 return true;
             }
             case Constants.CONTEXT_MENU_HIDE_THREAD: {
-//                mHiddenThreadsDataSource.addToHiddenThreads(mWebsite.name(), mBoardName, info.getNumber());
-                info.setHidden(true);
-                mAdapter.notifyDataSetChanged();
+                mThreadsListPresenter.hideThread(info);
                 return true;
             }
         }
-
         return false;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, true);
-
         super.onSaveInstanceState(outState);
     }
 
@@ -347,7 +333,7 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
     }
 
     private void navigateToThread(String threadNumber, String threadSubject) {
-        mRouter.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
+//        mRouter.navigateThread(mWebsite.name(), mBoardName, threadNumber, threadSubject, null, false);
 
     }
 
@@ -367,18 +353,37 @@ public class ThreadsListFragment extends MvpAppCompatFragment implements Threads
 
     @Override
     public void onRefresh() {
-        mThreadsListPresenter.requestThreadsList();
+        mThreadsListPresenter.requestThreads();
     }
-
 
     @Override
     public void showThreads(List<ThreadItemViewModel> threads) {
-        mAdapter.clear();
-        mAdapter.addAll(threads);
-        mAdapter.notifyDataSetChanged();
-        mLoadingView.setVisibility(View.GONE);
-        mListView.setVisibility(View.VISIBLE);
+        Timber.i("showThreads() %s", threads.toString());
+
         mSwipeToLoadLayout.setRefreshing(false);
+        if (!threads.isEmpty()) {
+            mLoadingView.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+
+            for (ThreadItemViewModel model : threads) {
+                mAdapter.addToList(model);
+            }
+        }
+    }
+
+    @Override
+    public void clearList() {
+        mSwipeToLoadLayout.setRefreshing(false);
+        mAdapter.clearList();
+        mLoadingView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setRecyclerViewPosition(int position) {
+        Timber.i("smoothScrollToPosition(): %d", position);
+//        mRecyclerView.scrollToPosition(position);
+        mRecyclerView.smoothScrollToPosition(position);
     }
 
 //    private class ThreadsReaderListener implements IListView<ThreadModel[]> {

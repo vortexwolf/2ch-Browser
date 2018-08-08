@@ -92,7 +92,7 @@ public class FavoritesFragment extends MvpAppCompatFragment {
             if (StringUtils.isEmpty(item.getThread())) {
                 mMainRouter.navigateBoard(item.getWebsite(), item.getBoard(), true);
             } else {
-                mMainRouter.navigateThread(item.getWebsite(), item.getBoard(), item.getThread(), item.getTitle(), null, false);
+                mMainRouter.navigateThread(item.getThread(), false);
             }
         });
     }

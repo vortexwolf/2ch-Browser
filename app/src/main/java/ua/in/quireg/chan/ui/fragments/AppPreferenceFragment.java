@@ -85,7 +85,6 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         updateProxyPassSummary();
 
         updateAppVersion();
-
     }
 
     @Override
@@ -232,7 +231,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
             String versionName = pinfo.versionName;
             if (!versionName.isEmpty()) {
                 preference.setSummary(String.format(Locale.getDefault(),
-                        "Version: %s-%s, SDK %s, %s",
+                        "Version: %s-alpha-%s, SDK %s, %s",
                         versionName, BuildConfig.BUILD_TYPE, Constants.SDK_VERSION, new Date(BuildConfig.BUILD_TIMESTAMP).toString()
                 ));
             }

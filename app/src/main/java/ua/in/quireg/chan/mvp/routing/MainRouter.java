@@ -43,8 +43,8 @@ public final class MainRouter extends BaseRouter {
     }
 
     @SuppressWarnings("SameParameterValue")
-    public void navigateThread(String website, String boardName, String thread, @Nullable String subject, @Nullable String post, boolean preferDeserialized) {
-        executeCommand(new NavigateThread(website, boardName, thread, subject, post, preferDeserialized));
+    public void navigateThread(String thread, boolean preferDeserialized) {
+        executeCommand(new NavigateThread(thread, preferDeserialized));
     }
 
     public void navigateGallery(Uri uri, String threadUrl) {

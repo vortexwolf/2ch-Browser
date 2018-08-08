@@ -41,13 +41,13 @@ public class UnknownTagsHandler implements TagHandler {
 
     @Override
     public void handleTag(boolean opening, String tag, SpannableStringBuilder output, Attributes attributes) {
-        if (tag == "span") {
+        if (tag.equals("span")) {
             if (opening) {
                 this.startSpan(output, attributes);
             } else {
                 this.endSpan(output);
             }
-        } else if (tag == "code") {
+        } else if (tag.equals("code")) {
             if (opening) {
                 HtmlToSpannedConverter.start(output, new Code());
                 HtmlToSpannedConverter.start(output, new Code());

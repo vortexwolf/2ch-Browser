@@ -1,8 +1,5 @@
 package ua.in.quireg.chan.mvp.models;
 
-import android.app.Application;
-import android.content.res.Resources;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -23,8 +20,6 @@ public class ThreadsListInteractor {
     ThreadsRepository mThreadsRepository;
     @Inject
     MainApplication mApplication;
-
-    public Resources.Theme theme = null;
 
     public ThreadsListInteractor() {
         super();

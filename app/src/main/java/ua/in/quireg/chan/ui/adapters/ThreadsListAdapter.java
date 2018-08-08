@@ -14,6 +14,7 @@ import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.GlideApp;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
+import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
@@ -117,7 +118,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
         // Комментарий
         vb.commentView.setText(item.getSpannedComment());
         vb.commentView.setTag(item);
-
 //        vb.commentView.setEllipsizeListener(new TextView.EllipsizeListener() {
 //            @Override
 //            public void ellipsizeStateChanged(TextView view, boolean ellipsized) {
@@ -140,7 +140,8 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 
                 if (item.getAttachment(i) == null || item.getAttachment(i).isEmpty()) {
                     vb.thumbnailViews[i].hide();
-                    return;
+                    //TODO set stub pic for failed attachments
+                    break;
                 }
                 GlideApp.with(getContext()).load(item.getAttachment(i).getImageUrlIfImage()).into(vb.thumbnailViews[i].image);
 
@@ -148,9 +149,10 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
                 vb.thumbnailViews[i].info.setText(item.getAttachment(i).getDescription());
             }
         } else if (item.getAttachmentsNumber() >= 1) {
-
             if (item.getAttachment(0) == null || item.getAttachment(0).isEmpty()) {
+                //TODO set stub pic for failed attachments
                 vb.singleThumbnailView.hide();
+                vb.multiThumbnailsView.setVisibility(View.GONE);
                 return;
             }
             GlideApp.with(getContext()).load(item.getAttachment(0).getImageUrlIfImage()).into(vb.singleThumbnailView.image);
@@ -187,8 +189,7 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 //        }
 //    }
 
-
-    protected static class ViewBag {
+    private class ViewBag {
         TextView titleView;
         TextView commentView;
         TextView repliesNumberView;

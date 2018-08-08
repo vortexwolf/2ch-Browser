@@ -10,10 +10,8 @@
         android:layout_width="@dimen/thumbnail_size"
         android:layout_height="@dimen/thumbnail_size"
         android:layout_gravity="center"
-        android:adjustViewBounds="true"
         android:scaleType="centerInside"
-        android:longClickable="true"
-        tools:src="@drawable/icon"
+        android:src="@drawable/btard"
         tools:ignore="ContentDescription" />
 
     <TextView

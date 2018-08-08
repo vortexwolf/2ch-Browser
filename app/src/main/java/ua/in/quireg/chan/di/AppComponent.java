@@ -19,6 +19,7 @@ import ua.in.quireg.chan.services.presentation.OpenTabsManager;
 import ua.in.quireg.chan.ui.activities.MainActivity;
 import ua.in.quireg.chan.ui.adapters.HistoryAdapter;
 import ua.in.quireg.chan.ui.adapters.ThreadsListAdapter;
+import ua.in.quireg.chan.ui.adapters.ThreadsListRecyclerViewAdapter;
 import ua.in.quireg.chan.ui.fragments.AppPreferenceFragment;
 import ua.in.quireg.chan.ui.fragments.BaseListFragment;
 import ua.in.quireg.chan.ui.fragments.BoardsListFragment;
@@ -64,6 +65,10 @@ public interface AppComponent {
     void inject(ThreadsListInteractor threadsListInteractor);
     void inject(ThreadsRepository threadsRepository);
     void inject(BoardsRepository boardsRepository);
+
+
+    //Adapters
+    void inject(ThreadsListRecyclerViewAdapter threadsListRecyclerViewAdapter);
 
     //х*йова мода
     void inject(ThreadPostUtils threadPostUtils);

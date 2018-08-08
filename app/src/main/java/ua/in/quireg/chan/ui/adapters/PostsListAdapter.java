@@ -5,6 +5,7 @@ import android.content.res.Resources.Theme;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.Layout;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
@@ -67,7 +68,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private final Timer mLoadImagesTimer;
     private final ThreadImagesService mThreadImagesService;
     private final IUrlParser mUrlParser;
-    private final ArrayList<PostModel> mOriginalPosts = new ArrayList<PostModel>();
+    private final ArrayList<PostModel> mOriginalPosts = new ArrayList<>();
 
     private StatusItemViewBag mStatusView;
     private boolean mIsUpdating = false;
@@ -100,15 +101,16 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
 
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         final IPostListEntity item = getItem(position);
 
         if (item instanceof StatusIndicatorEntity) {
 
             if(convertView == null){
-                convertView = mInflater.inflate(R.layout.posts_list_status_item, null);
+                convertView = mInflater.inflate(R.layout.posts_list_status_item, parent, false);
             }
 
             StatusItemViewBag vb = (StatusItemViewBag)convertView.getTag();
@@ -325,7 +327,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
             mCurrentLoadImagesTask.cancel();
         }
 
-        if (mIsBusy == true && value == false) {
+        if (mIsBusy && !value) {
             mCurrentLoadImagesTask = new LoadImagesTimerTask();
             mLoadImagesTimer.schedule(mCurrentLoadImagesTask, 500);
         }
@@ -375,7 +377,7 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     }
 
     public List<String> getAllPostFiles() {
-        ArrayList<String> filePaths = new ArrayList<String>();
+        ArrayList<String> filePaths = new ArrayList<>();
         for (PostItemViewModel model : mPostsViewModel.getAllModels()) {
             for (int i = 0; i < model.getAttachmentsNumber(); i++) {
                 AttachmentInfo attachment = model.getAttachment(i);
@@ -389,7 +391,6 @@ public class PostsListAdapter extends ArrayAdapter<IPostListEntity> implements I
     private class LoadImagesTimerTask extends TimerTask {
         @Override
         public void run() {
-            MyLog.d(TAG, "LoadImagesTimerTask");
             mListView.post(new LoadImagesRunnable());
         }
     }

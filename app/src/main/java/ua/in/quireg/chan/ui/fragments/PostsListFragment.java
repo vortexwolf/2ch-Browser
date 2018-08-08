@@ -61,7 +61,6 @@ import ua.in.quireg.chan.ui.adapters.PostsListAdapter;
 
 import static android.app.Activity.RESULT_OK;
 
-
 public class PostsListFragment extends BaseListFragment {
 
     @Inject MainRouter mRouter;
@@ -97,22 +96,21 @@ public class PostsListFragment extends BaseListFragment {
 
         // Парсим код доски и номер страницы
         Bundle extras = getArguments();
-        mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
-        mBoardName = extras.getString(Constants.EXTRA_BOARD_NAME);
-        mThreadNumber = extras.getString(Constants.EXTRA_THREAD_NUMBER);
-        mPostNumber = extras.getString(Constants.EXTRA_POST_NUMBER);
+//        mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
+        mWebsite = Websites.getDefault();
+        mBoardName = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_BOARD_NAME));
+        mThreadNumber = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_THREAD_NUMBER));
+        mPostNumber = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_POST_NUMBER));
         pageSubject = StringUtils.nullIfEmpty(extras.getString(Constants.EXTRA_THREAD_SUBJECT));
 
         mUrlBuilder = mWebsite.getUrlBuilder();
         mJsonReader = Factory.resolve(MakabaApiReader.class);
 
         //TODO fix isFavourite
-        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, 0, mThreadNumber, pageSubject, false);
-        mTabModel = mOpenTabsManager.add(tabModel);
+//        OpenTabModel tabModel = new OpenTabModel(mWebsite, mBoardName, 0, mThreadNumber, pageSubject, false);
+//        mTabModel = mOpenTabsManager.add(tabModel);
 
         setHasOptionsMenu(true);
-
-
 
 //        final Runnable refreshTask = new Runnable() {
 //            @Override
@@ -155,8 +153,8 @@ public class PostsListFragment extends BaseListFragment {
 
     @Override
     public void onStop() {
-        mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(mListView));
-        if(mCurrentDownloadTask != null){
+//        mTabModel.setPosition(AppearanceUtils.getCurrentListPosition(mListView));
+        if (mCurrentDownloadTask != null) {
             mCurrentDownloadTask.cancel(true);
         }
         super.onStop();
@@ -187,15 +185,13 @@ public class PostsListFragment extends BaseListFragment {
     }
 
     private void setAdapter(Bundle savedInstanceState) {
-        if(mAdapter == null){
+        if (mAdapter == null) {
             mAdapter = new PostsListAdapter(getActivity(), mWebsite, mBoardName, mThreadNumber, mListView);
         }
         mListView.setAdapter(mAdapter);
 
-        // добавляем обработчик, чтобы не рисовать картинки во время прокрутки
-        if (Constants.SDK_VERSION > 7) {
-            mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
-        }
+        mListView.setOnScrollListener(new ListViewScrollListener(mAdapter));
+
         boolean preferDeserialized = getArguments().getBoolean(Constants.EXTRA_PREFER_DESERIALIZED)
                 || savedInstanceState != null && savedInstanceState.containsKey(Constants.EXTRA_PREFER_DESERIALIZED);
 
@@ -224,8 +220,9 @@ public class PostsListFragment extends BaseListFragment {
             }
         }
     }
+
     private void updateTitle(String title) {
-        if(!isAdded()) {
+        if (!isAdded()) {
             return;
         }
         String pageTitle = title != null
@@ -235,8 +232,8 @@ public class PostsListFragment extends BaseListFragment {
         setTitle(pageTitle);
 
         String tabTitle = title != null ? title : pageTitle;
-        mTabModel.setTitle(tabTitle);
-        mHistoryDataSource.updateHistoryItem(mWebsite.name(), mBoardName, mThreadNumber, tabTitle);
+//        mTabModel.setTitle(tabTitle);
+//        mHistoryDataSource.updateHistoryItem(mWebsite.name(), mBoardName, mThreadNumber, tabTitle);
     }
 
     @Override
@@ -451,6 +448,7 @@ public class PostsListFragment extends BaseListFragment {
     }
 
     private class LoadPostsTask extends AsyncTask<Void, Long, PostModel[]> {
+
         private boolean mPreferDeserialized;
 
         public LoadPostsTask(boolean preferDeserialized) {

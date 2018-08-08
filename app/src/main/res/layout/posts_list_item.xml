@@ -11,7 +11,6 @@
     android:padding="4dp">
 
     <!-- Top row -->
-
     <RelativeLayout
         android:id="@+id/post_top_row"
         android:layout_width="match_parent"
@@ -278,11 +277,10 @@
             android:paddingTop="5dp"
             android:text="@string/show_full_comment"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:visibility="gone" />
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <!-- Bottom row -->
-
     <TextView
         android:id="@+id/post_replies"
         android:layout_width="match_parent"

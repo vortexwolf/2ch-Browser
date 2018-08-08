@@ -17,6 +17,7 @@ import ru.terrakok.cicerone.commands.Command;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.MainApplication;
+import ua.in.quireg.chan.common.Websites;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBackwards;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoard;
 import ua.in.quireg.chan.mvp.routing.commands.NavigateBoardsList;
@@ -150,11 +151,7 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
         if (command instanceof NavigateThread) {
             navigateThread(
-                    ((NavigateThread) command).getWebsite(),
-                    ((NavigateThread) command).getBoardCode(),
                     ((NavigateThread) command).getThread(),
-                    ((NavigateThread) command).getSubject(),
-                    ((NavigateThread) command).getPost(),
                     ((NavigateThread) command).isPreferDeserialized()
             );
         }
@@ -248,14 +245,14 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
     }
 
-    private void navigateThread(String website, String board, String thread, String subject, String post, boolean preferDeserialized) {
+    private void navigateThread(String thread, boolean preferDeserialized) {
         PostsListFragment postsListFragment = new PostsListFragment();
         Bundle extras = new Bundle();
-        extras.putString(Constants.EXTRA_WEBSITE, website);
-        extras.putString(Constants.EXTRA_BOARD_NAME, board);
+        extras.putString(Constants.EXTRA_WEBSITE, Websites.getDefault().name());
+//        extras.putString(Constants.EXTRA_BOARD_NAME, board);
         extras.putString(Constants.EXTRA_THREAD_NUMBER, thread);
-        extras.putString(Constants.EXTRA_THREAD_SUBJECT, subject);
-        extras.putString(Constants.EXTRA_POST_NUMBER, post);
+//        extras.putString(Constants.EXTRA_THREAD_SUBJECT, subject);
+//        extras.putString(Constants.EXTRA_POST_NUMBER, post);
         extras.putBoolean(Constants.EXTRA_PREFER_DESERIALIZED, preferDeserialized);
 
         postsListFragment.setArguments(extras);

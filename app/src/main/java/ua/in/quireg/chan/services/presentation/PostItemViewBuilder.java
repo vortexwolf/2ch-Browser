@@ -52,38 +52,39 @@ public class PostItemViewBuilder {
     private static Boolean isTablet = null;
 
     public PostItemViewBuilder(Context context, IWebsite website, String boardName, String threadNumber, ApplicationSettings settings) {
-        this.mAppContext = context.getApplicationContext();
-        this.mInflater = LayoutInflater.from(context);
-        this.mWebsite = website;
-        this.mBoardName = boardName;
-        this.mThreadNumber = threadNumber;
-        this.mSettings = settings;
-        this.mWindowManager = ((WindowManager) this.mAppContext.getSystemService(Context.WINDOW_SERVICE));
-        this.mUrlBuilder = this.mWebsite.getUrlBuilder();
+        mAppContext = context.getApplicationContext();
+        mInflater = LayoutInflater.from(context);
+        mWebsite = website;
+        mBoardName = boardName;
+        mThreadNumber = threadNumber;
+        mSettings = settings;
+        mWindowManager = ((WindowManager) mAppContext.getSystemService(Context.WINDOW_SERVICE));
+        mUrlBuilder = mWebsite.getUrlBuilder();
     }
 
     public View getView(final PostItemViewModel item, final View convertView, final boolean isBusy) {
-        final View view = convertView == null ? this.mInflater.inflate(R.layout.posts_list_item, null) : convertView;
+        
+        final View view = convertView == null ? mInflater.inflate(R.layout.posts_list_item, null) : convertView;
 
         // Get inner controls
         ViewBag vb = (ViewBag) view.getTag();
         if (vb == null) {
             vb = new ViewBag();
-            vb.postIdView = (TextView) view.findViewById(R.id.post_id);
-            vb.postNameView = (TextView) view.findViewById(R.id.post_name);
-            vb.postIndexView = (TextView) view.findViewById(R.id.post_index);
-            vb.postDateView = (TextView) view.findViewById(R.id.post_item_date_id);
-            vb.postSageView = (TextView) view.findViewById(R.id.post_sage);
-            vb.postOpView = (TextView) view.findViewById(R.id.post_op);
-            vb.postTripView = (TextView) view.findViewById(R.id.post_trip);
-            vb.postSubjectView = (TextView) view.findViewById(R.id.post_subject);
+            vb.postIdView = view.findViewById(R.id.post_id);
+            vb.postNameView = view.findViewById(R.id.post_name);
+            vb.postIndexView = view.findViewById(R.id.post_index);
+            vb.postDateView = view.findViewById(R.id.post_item_date_id);
+            vb.postSageView = view.findViewById(R.id.post_sage);
+            vb.postOpView = view.findViewById(R.id.post_op);
+            vb.postTripView = view.findViewById(R.id.post_trip);
+            vb.postSubjectView = view.findViewById(R.id.post_subject);
             vb.commentView = view.findViewById(R.id.comment);
-            vb.postRepliesView = (TextView) view.findViewById(R.id.post_replies);
+            vb.postRepliesView = view.findViewById(R.id.post_replies);
             vb.singleThumbnailView = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view));
-            vb.showFullTextView = (TextView) view.findViewById(R.id.show_full_text);
+            vb.showFullTextView = view.findViewById(R.id.show_full_text);
             vb.badgeView = view.findViewById(R.id.badge_view);
-            vb.badgeImage = (ImageView) view.findViewById(R.id.badge_image);
-            vb.badgeTitle = (TextView) view.findViewById(R.id.badge_title);
+            vb.badgeImage = view.findViewById(R.id.badge_image);
+            vb.badgeTitle = view.findViewById(R.id.badge_title);
 
             vb.multiThumbnailsView = view.findViewById(R.id.multi_thumbnails_view);
             vb.thumbnailViews = new ThumbnailViewBag[Constants.MAX_ATTACHMENTS];
@@ -115,7 +116,7 @@ public class PostItemViewBuilder {
         // Номер по порядку
         int postIndex = item.getPosition() + 1;
         vb.postIndexView.setText(String.valueOf(postIndex));
-        if (postIndex >= ThreadPostUtils.getBumpLimitNumber(this.mBoardName)) {
+        if (postIndex >= ThreadPostUtils.getBumpLimitNumber(mBoardName)) {
             vb.postIndexView.setTextColor(Color.parseColor("#C41E3A"));
         } else {
             vb.postIndexView.setTextColor(Color.parseColor("#4F7942"));
@@ -127,7 +128,7 @@ public class PostItemViewBuilder {
         String subject = item.getSubject();
 
         if (isTablet == null) isTablet = CompatibilityUtils.isTablet(mAppContext);
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
+        if (mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(name) && (isTablet || !name.equals(ThreadPostUtils.getDefaultName(mBoardName)))) {
             if (!isTablet && name.startsWith(ThreadPostUtils.getDefaultName(mBoardName))) {
                 name = name.substring(ThreadPostUtils.getDefaultName(mBoardName).length());
             }
@@ -136,7 +137,7 @@ public class PostItemViewBuilder {
         } else {
             vb.postNameView.setVisibility(View.GONE);
         }
-        if (this.mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(trip)) {
+        if (mSettings.isDisplayNames() && !StringUtils.isEmptyOrWhiteSpace(trip)) {
             vb.postTripView.setText(MyHtml.fromHtml(trip, null, null));
             vb.postTripView.setVisibility(View.VISIBLE);
         } else {
@@ -162,9 +163,9 @@ public class PostItemViewBuilder {
         }
 
         // Дата поста
-        if (this.mSettings.isDisplayPostItemDate()) {
+        if (mSettings.isDisplayPostItemDate()) {
             vb.postDateView.setVisibility(View.VISIBLE);
-            vb.postDateView.setText(item.getPostDate(this.mAppContext));
+            vb.postDateView.setText(item.getPostDate(mAppContext));
         } else {
             vb.postDateView.setVisibility(View.GONE);
         }
@@ -188,7 +189,7 @@ public class PostItemViewBuilder {
 
 
         if (item.canMakeCommentFloat()) {
-            FloatImageModel floatModel = new FloatImageModel(vb.singleThumbnailView.container, vb.commentView.getPaint(), this.mWindowManager.getDefaultDisplay(), this.mAppContext.getResources());
+            FloatImageModel floatModel = new FloatImageModel(vb.singleThumbnailView.container, vb.commentView.getPaint(), mWindowManager.getDefaultDisplay(), mAppContext.getResources());
             item.makeCommentFloat(floatModel);
         }
 
@@ -198,7 +199,7 @@ public class PostItemViewBuilder {
         }
 
         // Ответы на сообщение
-        if (this.mThreadNumber != null && item.hasReferencesFrom()) {
+        if (mThreadNumber != null && item.hasReferencesFrom()) {
             vb.postRepliesView.setText(item.getReferencesFromAsSpannableString());
             vb.postRepliesView.setMovementMethod(MyLinkMovementMethod.getInstance());
             vb.postRepliesView.setVisibility(View.VISIBLE);
@@ -214,8 +215,8 @@ public class PostItemViewBuilder {
 
             String protectedUri = Uri.encode(badge.source);
 
-            Uri uri = Uri.parse(this.mUrlBuilder.getIconUrl(protectedUri));
-            this.mBitmapManager.fetchBitmapOnThread(uri, vb.badgeImage, false, null, null);
+            Uri uri = Uri.parse(mUrlBuilder.getIconUrl(protectedUri));
+            mBitmapManager.fetchBitmapOnThread(uri, vb.badgeImage, false, null, null);
         } else {
             vb.badgeView.setVisibility(View.GONE);
         }
@@ -271,18 +272,16 @@ public class PostItemViewBuilder {
 
     public void displayPopupDialog(final PostItemViewModel model, final Activity activity, Theme theme, final Point coordinates) {
         if (model == null) return;
-        final View view = this.getView(model, null, false);
+        final View view = getView(model, null, false);
 
         // убираем фон в виде рамки с закругленными краями и ставим обычный
         int backColor = AppearanceUtils.getThemeDependentColor(theme, R.styleable.Theme_activityRootBackground);
         view.setBackgroundColor(backColor);
 
         // контекстное меню
-        ImageView menuButton = (ImageView) view.findViewById(R.id.post_item_menu);
-        if (Constants.SDK_VERSION >= 11) {
+        ImageView menuButton = view.findViewById(R.id.post_item_menu);
             menuButton.setVisibility(View.VISIBLE);
             menuButton.setOnClickListener(CompatibilityUtils.createClickListenerShowPostMenu(activity, model, view));
-        }
 
         // Отображаем созданное view в диалоге
         final Dialog currentDialog = new Dialog(activity);

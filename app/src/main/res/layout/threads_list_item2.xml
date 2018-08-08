@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingTop="5dp">
+
+    <LinearLayout
+        android:id="@+id/multi_thumbnails_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <include
+            android:id="@+id/thumbnail_view_1"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <include
+            android:id="@+id/thumbnail_view_2"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <include
+            android:id="@+id/thumbnail_view_3"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <include
+            android:id="@+id/thumbnail_view_4"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <include
+            android:id="@+id/thumbnail_view"
+            layout="@layout/thumbnail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textColor="?threadTitleForeground"
+                android:singleLine="true"
+                android:ellipsize="end"
+                tools:visibility="visible"
+                tools:text="Title Title Title Title Title Title Title Title "/>
+
+            <TextView
+                android:id="@+id/comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginStart="2dp"
+                android:maxLines="@integer/opPostMaxLines"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:text="singing sinking dying diving loving leaving pulling pushing falling feeling swimming swinging singing sinking dying diving falling feeling swimming swinging loving leaving pulling pushing singing sinking dying diving in the cold heat of the pool"/>
+
+            <!-- Next row -->
+            <TextView
+                android:id="@+id/repliesNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?itemInfoForeground"
+                tools:text="666"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

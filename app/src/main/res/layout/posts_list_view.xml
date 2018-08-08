@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?activityRootBackground">
 
     <com.aspsine.swipetoloadlayout.SwipeToLoadLayout
@@ -14,7 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@null"
-            android:dividerHeight="4dp" />
+            android:dividerHeight="4dp"
+            tools:listitem="@layout/posts_list_item"/>
 
         <ua.in.quireg.chan.ui.views.LoadMoreFooterView
             android:id="@id/swipe_load_more_footer"
