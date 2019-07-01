@@ -22,7 +22,7 @@ public class AppPreferencesDividerItemDecoration extends RecyclerView.ItemDecora
     private Drawable mDivider;
 
     public AppPreferencesDividerItemDecoration(Context context) {
-        mDivider = context.getResources().getDrawable(R.drawable.list_divider);
+        mDivider = context.getResources().getDrawable(R.drawable.shadowline);
     }
 
     @Override
@@ -33,8 +33,9 @@ public class AppPreferencesDividerItemDecoration extends RecyclerView.ItemDecora
 
             View view = parent.getChildAt(i);
 
-            if (parent.getChildAt(i + 1) instanceof TextView || view instanceof TextView) {
-                //do not draw if it is a header or next item is a header
+            if (parent.getChildAt(i + 1) == null ||
+                    parent.getChildAt(i + 1) instanceof TextView || view instanceof TextView) {
+                //do not draw if it is last item, header or next item is a header
                 continue;
             }
 

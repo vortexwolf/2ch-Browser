@@ -107,9 +107,7 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         for (int i = 0; i < c; i++) {
             recyclerView.removeItemDecorationAt(i);
         }
-        recyclerView.addItemDecoration(new AppPreferencesDividerItemDecoration(getContext()));
-
-
+        recyclerView.addItemDecoration(new AppPreferencesDividerItemDecoration(view.getContext()));
     }
 
     @Override
@@ -117,7 +115,8 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
         if (preference instanceof SeekBarDialogPreference) {
             DialogFragment dialogFragment = SeekBarDialogPreferenceFragment.newInstance(preference);
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getFragmentManager(),
+                    "android.support.v7.preference.PreferenceFragment.DIALOG");
         } else {
             super.onDisplayPreferenceDialog(preference);
         }
@@ -145,7 +144,6 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     public void onStart() {
         super.onStart();
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.menu_preferences));
-
     }
 
     @Override
@@ -157,82 +155,73 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onResume() {
         super.onResume();
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
+        mSharedPreferences
+                .registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
+        mSharedPreferences
+                .unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
     }
 
-    private class SharedPreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private class SharedPreferenceChangeListener
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Override
-        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, String key) {
-
+        public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
+                                              String key) {
             final Preference preference = getPreferenceManager().findPreference(key);
 
             //Disable preference view if needed
             preference.setShouldDisableView(!preference.isEnabled());
 
             if (preference instanceof ListPreference) {
-
                 //Update any ListPreference summary with it's entry name
                 preference.setSummary(((ListPreference) preference).getEntry());
-
             } else if (preference instanceof EditTextPreference) {
-
                 //Update any EditTextPreference summary with it's value
                 preference.setSummary(((EditTextPreference) preference).getText());
-
             }
 
             if (key.equals(getString(R.string.pref_name_key))) {
-
                 updateNameSummary();
-
             } else if (key.equals(getString(R.string.pref_homepage_key))) {
-
                 updateStartPageSummary();
-
             } else if (key.equals(getString(R.string.pref_download_path_key))) {
-
                 updateDownloadPathSummary();
-
             } else if (key.equals(getString(R.string.pref_display_hidden_boards_key))) {
-
                 showFullBoardsListWarning(preference);
-
+            } else if (key.equals(getString(R.string.pref_lef_hand))) {
+                //TODO handle it gracefully
             } else if (isNetworkPreference(key)) {
-
                 updateProxyAddressSummary();
                 updateProxyPortSummary();
                 updateProxyLoginSummary();
                 updateProxyPassSummary();
-
                 mNetworkConfigChanged = true;
-
             } else if (key.equals(getString(R.string.pref_theme_key)) || key.equals(getString(R.string.pref_text_size_key))) {
-
                 getActivity().recreate();
-
             }
         }
     }
 
     private void updateAppVersion() {
         try {
-            EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_screen_about_version_key));
+            EditTextPreference preference = (EditTextPreference) getPreferenceManager()
+                    .findPreference(getString(R.string.pref_screen_about_version_key));
             if (preference == null) {
                 return;
             }
-            PackageInfo pinfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            PackageInfo pinfo = getContext().getPackageManager()
+                    .getPackageInfo(getContext().getPackageName(), 0);
             String versionName = pinfo.versionName;
             if (!versionName.isEmpty()) {
                 preference.setSummary(String.format(Locale.getDefault(),
                         "Version: %s-alpha-%s, SDK %s, %s",
-                        versionName, BuildConfig.BUILD_TYPE, Constants.SDK_VERSION, new Date(BuildConfig.BUILD_TIMESTAMP).toString()
+                        versionName, BuildConfig.BUILD_TYPE, Constants.SDK_VERSION,
+                        new Date(BuildConfig.BUILD_TIMESTAMP).toString()
                 ));
             }
 
@@ -269,14 +258,14 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     private void updateProxyPassSummary() {
         updateEditTextSummary(R.string.pref_proxy_auth_pass_key, R.string.pref_proxy_auth_pass_summary);
 
-        EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(R.string.pref_proxy_auth_pass_key));
+        EditTextPreference preference = (EditTextPreference) getPreferenceManager()
+                .findPreference(getString(R.string.pref_proxy_auth_pass_key));
         if (preference == null) {
             return;
         }
         String value = preference.getText();
         if (!StringUtils.isEmpty(value)) {
             String mask = new String(new char[value.length()]).replace("\0", "*");
-            ;
             preference.setSummary(mask);
         } else {
             preference.setSummary(getString(R.string.pref_proxy_auth_pass_summary));
@@ -284,14 +273,16 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     private void updateListSummary(int prefKeyId) {
-        ListPreference preference = (ListPreference) getPreferenceManager().findPreference(getString(prefKeyId));
+        ListPreference preference = (ListPreference)
+                getPreferenceManager().findPreference(getString(prefKeyId));
         if (preference != null) {
             preference.setSummary(preference.getEntry());
         }
     }
 
     private void updateEditTextSummary(int prefKey, int prefSummary) {
-        EditTextPreference preference = (EditTextPreference) getPreferenceManager().findPreference(getString(prefKey));
+        EditTextPreference preference = (EditTextPreference)
+                getPreferenceManager().findPreference(getString(prefKey));
         if (preference == null) {
             return;
         }
@@ -341,38 +332,35 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
 
     private boolean verifyProxyConfig() {
         //TODO add strings to general file and add translations
-
         if (mSharedPreferences.getBoolean(getString(R.string.pref_use_proxy_key), true)) {
-
-            String proxyAddress = mSharedPreferences.getString(getString(R.string.pref_proxy_address_key), "");
+            String proxyAddress = mSharedPreferences.getString(
+                    getString(R.string.pref_proxy_address_key), "");
             if (StringUtils.isEmpty(proxyAddress)) {
                 AppearanceUtils.showLongToast(getContext(), "Proxy address cannot be empty");
                 return false;
             }
-
-            String proxyPort = mSharedPreferences.getString(getString(R.string.pref_proxy_port_key), "");
+            String proxyPort = mSharedPreferences.getString(
+                    getString(R.string.pref_proxy_port_key), "");
             if (!isValidPort(proxyPort)) {
-                AppearanceUtils.showLongToast(getContext(), "Invalid proxy port.\n Must be between 0 and 65535");
+                AppearanceUtils.showLongToast(
+                        getContext(), "Invalid proxy port.\n Must be between 0 and 65535");
                 return false;
             }
         }
-
         if (mSharedPreferences.getBoolean(getString(R.string.pref_proxy_auth_key), true)) {
-
-            String proxyLogin = mSharedPreferences.getString(getString(R.string.pref_proxy_auth_login_key), "");
+            String proxyLogin = mSharedPreferences.getString(
+                    getString(R.string.pref_proxy_auth_login_key), "");
             if (StringUtils.isEmpty(proxyLogin)) {
                 AppearanceUtils.showLongToast(getContext(), "Proxy login cannot be empty");
                 return false;
             }
-
-            String proxyPassword = mSharedPreferences.getString(getString(R.string.pref_proxy_auth_pass_key), "");
+            String proxyPassword = mSharedPreferences.getString(
+                    getString(R.string.pref_proxy_auth_pass_key), "");
             if (StringUtils.isEmpty(proxyPassword)) {
                 AppearanceUtils.showLongToast(getContext(), "Proxy password cannot be empty");
                 return false;
             }
-
         }
-
         return true;
     }
 
@@ -403,18 +391,14 @@ public class AppPreferenceFragment extends PreferenceFragmentCompat {
     }
 
     private void restartNetworkingIfChanged() {
-
         if (!verifyProxyConfig()) {
             Timber.w("cannot apply new proxy settings, proxy disabled");
-
             //Disable proxy and proxy auth
             mSharedPreferences.edit().putBoolean(getString(R.string.pref_use_proxy_key), false).apply();
             mSharedPreferences.edit().putBoolean(getString(R.string.pref_proxy_auth_key), false).apply();
         }
-
         if (mNetworkConfigChanged) {
             Timber.d("network config changed");
-
             mNetworkConfigChanged = false;
             getActivity().recreate();
         }

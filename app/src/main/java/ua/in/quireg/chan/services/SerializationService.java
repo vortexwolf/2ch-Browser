@@ -22,7 +22,6 @@ public class SerializationService {
         Timber.v("serializeToFile() - %s", file.toString());
         Completable.create(
                 e -> {
-
                     ObjectOutputStream os = null;
                     try {
                         os = new ObjectOutputStream(new FileOutputStream(file));

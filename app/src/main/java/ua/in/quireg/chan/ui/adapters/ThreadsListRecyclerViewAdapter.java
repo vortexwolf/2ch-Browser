@@ -1,5 +1,6 @@
 package ua.in.quireg.chan.ui.adapters;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -17,6 +19,7 @@ import ua.in.quireg.chan.common.GlideApp;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
 import ua.in.quireg.chan.models.presentation.IThreadListEntity;
+import ua.in.quireg.chan.models.presentation.PageDividerViewModel;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.mvp.presenters.ThreadsListPresenter;
@@ -29,32 +32,30 @@ import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-
     @Inject ApplicationSettings mSettings;
-
-    {
-        MainApplication.getAppComponent().inject(this);
-    }
-
     private ThreadsListPresenter mThreadsListPresenter;
     private ArrayList<IThreadListEntity> mItems = new ArrayList<>();
 
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
-    private static final int ITEM_VIEW_TYPE_DIVIDER = 2;
+    private static final int ITEM_VIEW_TYPE_PAGE_DIVIDER = 2;
 
     public ThreadsListRecyclerViewAdapter(ThreadsListPresenter threadsListPresenter) {
+        MainApplication.getAppComponent().inject(this);
         mThreadsListPresenter = threadsListPresenter;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         switch (viewType) {
             case ITEM_VIEW_TYPE_THREAD: {
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.threads_list_item, parent, false);
+
+                ViewGroup.LayoutParams lp = itemView.getLayoutParams();
+                lp.height = parent.getHeight() / 6;
+                itemView.setLayoutParams(lp);
                 return new ThreadViewHolder(itemView);
             }
             case ITEM_VIEW_TYPE_HIDDEN_THREAD: {
@@ -62,28 +63,33 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                         .inflate(R.layout.threads_list_hidden_item, parent, false);
                 return new HiddenThreadViewHolder(itemView);
             }
+            case ITEM_VIEW_TYPE_PAGE_DIVIDER: {
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.threads_list_page_divider, parent, false);
+                return new PageDividerViewHolder(itemView);
+            }
             default: {
-                throw new RuntimeException("Unknown view type");
+                throw new IllegalArgumentException("Unknown view type");
             }
         }
     }
 
     @Override
+    @SuppressLint("DefaultLocale")
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        mThreadsListPresenter.currentRecyclerViewPosition(holder.getAdapterPosition(), getItemCount());
-
-        ThreadItemViewModel item = (ThreadItemViewModel) mItems.get(position);
-
-        if (holder instanceof ThreadViewHolder) {
-            fillItemView((ThreadViewHolder) holder, item);
-        } else if (holder instanceof HiddenThreadViewHolder) {
-            fillHiddenThreadView((HiddenThreadViewHolder) holder, item);
+        mThreadsListPresenter
+                .setListPosition(holder.getAdapterPosition(), getItemCount());
+        IThreadListEntity item = mItems.get(position);
+        if (item instanceof ThreadItemViewModel) {
+            if (holder instanceof ThreadViewHolder) {
+                fillItemView((ThreadViewHolder) holder, (ThreadItemViewModel) item);
+            } else if (holder instanceof HiddenThreadViewHolder) {
+                fillHiddenThreadView((HiddenThreadViewHolder) holder, (ThreadItemViewModel) item);
+            }
+        } else if (item instanceof PageDividerViewModel
+                && holder instanceof PageDividerViewHolder) {
+                fillPageDividerView((PageDividerViewHolder) holder, (PageDividerViewModel) item);
         }
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
     }
 
     @Override
@@ -94,9 +100,9 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             case HIDDEN_THREAD:
                 return ITEM_VIEW_TYPE_HIDDEN_THREAD;
             case DIVIDER:
-                return ITEM_VIEW_TYPE_DIVIDER;
+                return ITEM_VIEW_TYPE_PAGE_DIVIDER;
         }
-        throw new RuntimeException("Unknown view type!");
+        return -1;
     }
 
     @Override
@@ -104,11 +110,14 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         return mItems.size();
     }
 
+    public void setList(List<IThreadListEntity> list) {
+        mItems.clear();
+        mItems.addAll(list);
+        notifyDataSetChanged();
+    }
 
-    public void addToList(ThreadItemViewModel item) {
-
+    public void addToList(IThreadListEntity item) {
         int position = mItems.indexOf(item);
-
         if (position == -1) {
             mItems.add(item);
             notifyItemInserted(getItemCount() - 1);
@@ -119,7 +128,7 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
         }
     }
 
-    public void removeFromList(ThreadItemViewModel item) {
+    public void removeFromList(IThreadListEntity item) {
         int position = mItems.indexOf(item);
         if (position == -1) {
             Timber.e("Nothing to remove");
@@ -142,7 +151,6 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     }
 
     private void fillItemView(final ThreadViewHolder holder, final ThreadItemViewModel item) {
-
         String subject = item.getSubject();
         if (!StringUtils.isEmpty(subject) && mSettings.isDisplaySubject()) {
             holder.titleView.setVisibility(View.VISIBLE);
@@ -166,14 +174,12 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             holder.multiThumbnailsView.setVisibility(View.VISIBLE);
             holder.singleThumbnailView.hide();
             for (int i = 0; i < 4; ++i) {
-
                 if (item.getAttachment(i) == null || item.getAttachment(i).isEmpty()) {
                     holder.thumbnailViews[i].hide();
                     continue;
                 }
                 GlideApp.with(holder.itemView.getContext())
                         .load(item.getAttachment(i).getThumbnailUrl())
-//                        .circleCrop()
                         .into(holder.thumbnailViews[i].image);
 
                 holder.thumbnailViews[i].container.setVisibility(View.VISIBLE);
@@ -181,18 +187,38 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             }
         } else if (item.getAttachmentsNumber() >= 1) {
             if (item.getAttachment(0) != null && !item.getAttachment(0).isEmpty()) {
-                holder.singleThumbnailView.info.setText(item.getAttachment(0).getDescription());
+                holder.singleThumbnailView.info
+                        .setText(item.getAttachment(0).getDescription());
                 GlideApp.with(holder.itemView.getContext())
                         .load(item.getAttachment(0).getThumbnailUrl())
-//                        .circleCrop()
+                        .placeholder(holder.itemView.getContext().getDrawable(R.drawable.doge))
                         .into(holder.singleThumbnailView.image);
             }
         }
     }
 
-    private void fillHiddenThreadView(final HiddenThreadViewHolder holder, final ThreadItemViewModel item) {
+    private void fillHiddenThreadView(final HiddenThreadViewHolder holder,
+                                      final ThreadItemViewModel item) {
         holder.threadNumberView.setText(String.format("№%s", item.getNumber()));
         holder.threadDescriptionView.setText(item.getSubjectOrText());
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void fillPageDividerView(final PageDividerViewHolder holder,
+                                     final PageDividerViewModel item) {
+        String s;
+        if (item.getPage() == ThreadsListPresenter.FIRST_PAGE) {
+            s = String.format(holder.itemView.getContext()
+                    .getString(R.string.thread_list_page_divider_first_page), "/b");
+        } else if (item.getPage() == ThreadsListPresenter.FINAL_PAGE) {
+            s = holder.itemView.getContext().getString(R.string.thread_list_page_divider_last_page);
+        } else {
+            s = String.format(holder.itemView.getContext()
+                    .getString(R.string.thread_list_page_divider_page_number), item.getPage());
+        }
+        holder.itemView.setTag(item);
+//        holder.pageNumberTextView.setTag(item);
+        holder.pageNumberTextView.setText(s);
     }
 
     private class ThreadViewHolder extends RecyclerView.ViewHolder {
@@ -219,9 +245,9 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             thumbnailViews[3] = ThumbnailViewBag.fromView(view.findViewById(R.id.thumbnail_view_4));
 
             view.setOnClickListener((View v) -> {
-                mThreadsListPresenter.onItemClick((ThreadItemViewModel) mItems.get(getAdapterPosition()));
+                mThreadsListPresenter.onItemClick(
+                        (ThreadItemViewModel) mItems.get(getAdapterPosition()));
             });
-
             view.setOnLongClickListener((View v) -> {
                 view.showContextMenu();
                 return true;
@@ -230,17 +256,23 @@ public class ThreadsListRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     }
 
     private class HiddenThreadViewHolder extends RecyclerView.ViewHolder {
-
         TextView threadNumberView, threadDescriptionView;
 
         HiddenThreadViewHolder(View view) {
             super(view);
             threadNumberView = view.findViewById(R.id.thread_number);
             threadDescriptionView = view.findViewById(R.id.thread_description);
+            view.setOnClickListener((View v) ->
+                    mThreadsListPresenter.unHideThread(
+                            (ThreadItemViewModel) mItems.get(getAdapterPosition())));
+        }
+    }
 
-            view.setOnClickListener((View v) -> {
-                mThreadsListPresenter.unHideThread((ThreadItemViewModel) mItems.get(getAdapterPosition()));
-            });
+    private class PageDividerViewHolder extends RecyclerView.ViewHolder {
+        TextView pageNumberTextView;
+        PageDividerViewHolder(View view) {
+            super(view);
+            pageNumberTextView = view.findViewById(R.id.page_number);
         }
     }
 }

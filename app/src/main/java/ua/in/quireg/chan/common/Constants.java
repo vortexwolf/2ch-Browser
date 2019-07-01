@@ -13,12 +13,12 @@ public class Constants {
 
     public static final boolean LOGGING = true;
 
-    public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(Arrays.asList(new String[] { "jpg",
-            "jpeg", "png", "gif" }));
+    public static final ArrayList<String> IMAGE_EXTENSIONS = new ArrayList<String>(
+            Arrays.asList("jpg", "jpeg", "png", "gif"));
     public static final String GIF_IMAGE = "gif";
 
-    public static final ArrayList<String> COOKIE_REQUIRE_BOARDS = new ArrayList<String>(Arrays.asList(new String[] {
-            "h", "ho", "hc", "e", "fet" }));
+    public static final ArrayList<String> COOKIE_REQUIRE_BOARDS = new ArrayList<String>(
+            Arrays.asList("h", "ho", "hc", "e", "fet"));
 
     public static final Pattern BOARD_CODE_PATTERN = Pattern.compile("^\\w+$");
 

@@ -32,7 +32,7 @@ Light theme
 ==================
     -->
     <style name="Theme_Light_Base" parent="@style/Theme_Light_Switch">
-        <item name="activityRootBackground">@color/white_background</item>
+        <item name="activityRootBackground">@color/almost_white_background</item>
         <item name="threadTitleForeground">@color/white_thread_title</item>
         <item name="itemInfoForeground">@color/white_item_info</item>
         <item name="postBackground">@color/white_post_background</item>
@@ -58,8 +58,8 @@ Light theme
         <item name="iconMarkupSpoiler">@drawable/markup_spoiler</item>
         <item name="iconMarkupQuote">@drawable/markup_quote</item>
         <!-- Android built-in styles -->
-        <item name="android:windowBackground">@color/white_background</item>
-        <item name="android:colorBackground">@color/white_background</item>
+        <item name="android:windowBackground">@color/almost_white_background</item>
+        <item name="android:colorBackground">@color/almost_white_background</item>
         <item name="android:textColorPrimary">@color/white_primary_text</item>
         <item name="android:textColorSecondary">@color/white_secondary_text</item>
     </style>
@@ -146,7 +146,8 @@ Photon theme
 ==================
     -->
     <style name="Theme_Photon_Base" parent="@style/Theme_Photon_Switch">
-        <item name="activityRootBackground">@color/photon_background</item>
+        <!--<item name="activityRootBackground">@color/photon_background</item>-->
+        <item name="activityRootBackground">@color/almost_white_background</item>
         <item name="threadTitleForeground">@color/photon_thread_title</item>
         <item name="itemInfoForeground">@color/photon_item_info</item>
         <item name="postBackground">@color/photon_post_background</item>

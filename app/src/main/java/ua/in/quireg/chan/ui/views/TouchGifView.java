@@ -1,6 +1,5 @@
 package ua.in.quireg.chan.ui.views;
 
-import ua.in.quireg.chan.common.Constants;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Matrix;
@@ -10,14 +9,14 @@ import android.os.Build;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import ua.in.quireg.chan.common.Constants;
+
 @TargetApi(Build.VERSION_CODES.FROYO)
-public class TouchGifView extends ImageView {
+public class TouchGifView extends android.support.v7.widget.AppCompatImageView {
 
     Matrix matrix = new Matrix();
 
@@ -52,7 +51,6 @@ public class TouchGifView extends ImageView {
 
     Context context;
 
-
     public TouchGifView(Context context) {
         super(context);
         super.setClickable(true);
@@ -63,81 +61,78 @@ public class TouchGifView extends ImageView {
         m = new float[9];
         setImageMatrix(matrix);
         setScaleType(ScaleType.MATRIX);
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (fling != null) {
-                    fling.cancelFling();
-                }
-                if (!isZooming) {
-                    mScaleDetector.onTouchEvent(event);
-                    mDoubleTapDetector.onTouchEvent(event);
-                                
-                    matrix.getValues(m);
-                    float x = m[Matrix.MTRANS_X];
-                    float y = m[Matrix.MTRANS_Y];
-                    PointF curr = new PointF(event.getX(), event.getY());
-                                
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            last.set(event.getX(), event.getY());
-                            start.set(last);
-                            mode = DRAG;
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            if (mode == DRAG) {
-                                float deltaX = curr.x - last.x;
-                                float deltaY = curr.y - last.y;
-                                float scaleWidth = Math.round(origWidth * saveScale);
-                                float scaleHeight = Math.round(origHeight * saveScale);
-                                if (scaleWidth < width && scaleHeight < height) {
-                                    deltaX = 0;
-                                    deltaY = 0;
-                                } else if (scaleWidth < width) {
-                                    deltaX = 0;
-                                    if (y + deltaY > 0)
-                                        deltaY = -y;
-                                    else if (y + deltaY < -bottom)
-                                        deltaY = -(y + bottom); 
-                                } else if (scaleHeight < height) {
-                                    deltaY = 0;
-                                    if (x + deltaX > 0)
-                                        deltaX = -x;
-                                    else if (x + deltaX < -right)
-                                        deltaX = -(x + right);
-                                } else {
-                                    if (x + deltaX > 0)
-                                        deltaX = -x;
-                                    else if (x + deltaX < -right)
-                                        deltaX = -(x + right);
-                                    
-                                    if (y + deltaY > 0)
-                                        deltaY = -y;
-                                    else if (y + deltaY < -bottom)
-                                        deltaY = -(y + bottom);
-                                }
-                                matrix.postTranslate(deltaX, deltaY);
-                                last.set(curr.x, curr.y);
-                            }
-                            break;
-                            
-                        case MotionEvent.ACTION_UP:
-                            mode = NONE;
-                            int xDiff = (int) Math.abs(curr.x - start.x);
-                            int yDiff = (int) Math.abs(curr.y - start.y);
-                            if (xDiff < CLICK && yDiff < CLICK)
-                                performClick();
-                            break;
-                            
-                        case MotionEvent.ACTION_POINTER_UP:
-                            mode = NONE;
-                            break;
-                    }
-                    setImageMatrix(matrix);
-                    invalidate();
-                }
-                return true; // indicate event was handled
+        setOnTouchListener((v, event) -> {
+            if (fling != null) {
+                fling.cancelFling();
             }
+            if (!isZooming) {
+                mScaleDetector.onTouchEvent(event);
+                mDoubleTapDetector.onTouchEvent(event);
+
+                matrix.getValues(m);
+                float x = m[Matrix.MTRANS_X];
+                float y = m[Matrix.MTRANS_Y];
+                PointF curr = new PointF(event.getX(), event.getY());
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        last.set(event.getX(), event.getY());
+                        start.set(last);
+                        mode = DRAG;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (mode == DRAG) {
+                            float deltaX = curr.x - last.x;
+                            float deltaY = curr.y - last.y;
+                            float scaleWidth = Math.round(origWidth * saveScale);
+                            float scaleHeight = Math.round(origHeight * saveScale);
+                            if (scaleWidth < width && scaleHeight < height) {
+                                deltaX = 0;
+                                deltaY = 0;
+                            } else if (scaleWidth < width) {
+                                deltaX = 0;
+                                if (y + deltaY > 0)
+                                    deltaY = -y;
+                                else if (y + deltaY < -bottom)
+                                    deltaY = -(y + bottom);
+                            } else if (scaleHeight < height) {
+                                deltaY = 0;
+                                if (x + deltaX > 0)
+                                    deltaX = -x;
+                                else if (x + deltaX < -right)
+                                    deltaX = -(x + right);
+                            } else {
+                                if (x + deltaX > 0)
+                                    deltaX = -x;
+                                else if (x + deltaX < -right)
+                                    deltaX = -(x + right);
+
+                                if (y + deltaY > 0)
+                                    deltaY = -y;
+                                else if (y + deltaY < -bottom)
+                                    deltaY = -(y + bottom);
+                            }
+                            matrix.postTranslate(deltaX, deltaY);
+                            last.set(curr.x, curr.y);
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        mode = NONE;
+                        int xDiff = (int) Math.abs(curr.x - start.x);
+                        int yDiff = (int) Math.abs(curr.y - start.y);
+                        if (xDiff < CLICK && yDiff < CLICK)
+                            performClick();
+                        break;
+
+                    case MotionEvent.ACTION_POINTER_UP:
+                        mode = NONE;
+                        break;
+                }
+                setImageMatrix(matrix);
+                invalidate();
+            }
+            return true; // indicate event was handled
         });
     }
 
@@ -148,10 +143,6 @@ public class TouchGifView extends ImageView {
        bmHeight = drawable.getIntrinsicHeight();
     }
 
-    public void setMaxZoom(float x) {
-        maxScale = x;
-    }
-    
     private void fixTrans() {
         matrix.getValues(m);
         float transX = m[Matrix.MTRANS_X];
@@ -212,7 +203,8 @@ public class TouchGifView extends ImageView {
                 float x = m[Matrix.MTRANS_X];
                 float y = m[Matrix.MTRANS_Y];
                 if (mScaleFactor < 1) {
-                    if (Math.round(origWidth * saveScale) >= width || Math.round(origHeight * saveScale) >= height) {
+                    if (Math.round(origWidth * saveScale) >= width ||
+                            Math.round(origHeight * saveScale) >= height) {
                         
                         if (Math.round(origWidth * saveScale) < width) {
                             if (y < -bottom)
@@ -296,7 +288,8 @@ public class TouchGifView extends ImageView {
         private long startTime;
         private static final float ZOOM_TIME = 500;
         private float startZoom, targetZoom, bitmapX, bitmapY;
-        private AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+        private AccelerateDecelerateInterpolator interpolator =
+                new AccelerateDecelerateInterpolator();
         private PointF startTouch, endTouch;
         
         DoubleTapZoom(float targetZoom, float focusX, float focusY) {
@@ -304,12 +297,12 @@ public class TouchGifView extends ImageView {
             startTime = System.currentTimeMillis();
             this.startZoom = saveScale;
             this.targetZoom = targetZoom;
-            PointF bitmapPoint = transformCoordTouchToBitmap(focusX, focusY, false);
+            PointF bitmapPoint = transformXYTouchToBitmap(focusX, focusY, false);
             
             this.bitmapX = bitmapPoint.x;
             this.bitmapY = bitmapPoint.y;
             
-            startTouch = transformCoordBitmapToTouch(bitmapX, bitmapY);
+            startTouch = transformXYBitmapToTouch(bitmapX, bitmapY);
             endTouch = new PointF(width / 2, height / 2);
         }
         
@@ -349,11 +342,12 @@ public class TouchGifView extends ImageView {
         private void translateImageToCenterTouchPosition(float t) {
             float targetX = startTouch.x + t * (endTouch.x - startTouch.x);
             float targetY = startTouch.y + t * (endTouch.y - startTouch.y);
-            PointF curr = transformCoordBitmapToTouch(bitmapX, bitmapY);
+            PointF curr = transformXYBitmapToTouch(bitmapX, bitmapY);
             matrix.postTranslate(targetX - curr.x, targetY - curr.y);
         }
         
-        private PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
+        @SuppressWarnings("SameParameterValue")
+        private PointF transformXYTouchToBitmap(float x, float y, boolean clipToBitmap) {
             matrix.getValues(m);
             float origW = getDrawable().getIntrinsicWidth();
             float origH = getDrawable().getIntrinsicHeight();
@@ -370,7 +364,7 @@ public class TouchGifView extends ImageView {
             return new PointF(finalX , finalY);
         }
         
-        private PointF transformCoordBitmapToTouch(float bx, float by) {
+        private PointF transformXYBitmapToTouch(float bx, float by) {
             matrix.getValues(m);
             float origW = getDrawable().getIntrinsicWidth();
             float origH = getDrawable().getIntrinsicHeight();
@@ -382,17 +376,17 @@ public class TouchGifView extends ImageView {
             float finalY = m[Matrix.MTRANS_Y] + imageHeight * py;
             return new PointF(finalX , finalY);
         }
-        
     }
     
     private interface IScroller {
-        public void init(Context context);
-        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY);
-        public void forceFinished(boolean finished);
-        public boolean isFinished();
-        public boolean computeScrollOffset();
-        public int getCurrX();
-        public int getCurrY();
+        void init(Context context);
+        void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX,
+                   int minY, int maxY);
+        void forceFinished(boolean finished);
+        boolean isFinished();
+        boolean computeScrollOffset();
+        int getCurrX();
+        int getCurrY();
     }
     
     private class OldScroller implements IScroller {
@@ -400,7 +394,8 @@ public class TouchGifView extends ImageView {
         public void init(Context context) {
             scroller = new Scroller(context);
         }
-        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
+        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX,
+                          int minY, int maxY) {
             scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);            
         }
         public void forceFinished(boolean finished) {
@@ -426,7 +421,8 @@ public class TouchGifView extends ImageView {
         public void init(Context context) {
             overScroller = new OverScroller(context);
         }
-        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
+        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX,
+                          int minY, int maxY) {
             overScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         }
         public void forceFinished(boolean finished) {
@@ -475,12 +471,12 @@ public class TouchGifView extends ImageView {
             } else {
                 minY = maxY = startY;
             }
-            scroller.fling(startX, startY, (int) velocityX, (int) velocityY, minX, maxX, minY, maxY);
+            scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
             currX = startX;
             currY = startY;
         }
         
-        public void cancelFling() {
+        void cancelFling() {
             if (scroller != null) {
                 scroller.forceFinished(true);
             }
@@ -513,8 +509,8 @@ public class TouchGifView extends ImageView {
         width = MeasureSpec.getSize(widthMeasureSpec);
         height = MeasureSpec.getSize(heightMeasureSpec);
         //default scale.
-        float scaleX =  (float)width / (float)bmWidth;
-        float scaleY = (float)height / (float)bmHeight;
+        float scaleX =  width / bmWidth;
+        float scaleY = height / bmHeight;
         float scale = Math.min(scaleX, scaleY); //to fit the screen
         defaultScale = Math.min(cDefaultScale, scale);
         minScale = Math.min(cMinScale, scale)/defaultScale;
@@ -525,8 +521,8 @@ public class TouchGifView extends ImageView {
         saveScale = 1f;
     
         //Center the image
-        redundantYSpace = (float)height - (defaultScale * (float)bmHeight) ;
-        redundantXSpace = (float)width - (defaultScale * (float)bmWidth);
+        redundantYSpace = height - (defaultScale * bmHeight) ;
+        redundantXSpace = width - (defaultScale * bmWidth);
         redundantYSpace /= (float)2;
         redundantXSpace /= (float)2;
     
@@ -538,8 +534,9 @@ public class TouchGifView extends ImageView {
         bottom = height * saveScale - height - (2 * redundantYSpace * saveScale);
         setImageMatrix(matrix);
     }
-    
+
     @Override
+    @SuppressWarnings("RedundantIfStatement")
     public boolean canScrollHorizontally(int direction) {
         matrix.getValues(m);
         float x = m[Matrix.MTRANS_X];
@@ -553,9 +550,4 @@ public class TouchGifView extends ImageView {
         }
         return true;
     }
-    
-    public boolean canScrollHorizontallyOldAPI(int direction) {
-        return canScrollHorizontally(direction);
-    }
-
 }

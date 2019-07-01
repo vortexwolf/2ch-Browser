@@ -401,6 +401,10 @@ public class ApplicationSettings {
         return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_show_post_subject_key), false);
     }
 
+    public boolean isLeftHand() {
+        return mSharedPrefs.getBoolean(mResources.getString(R.string.pref_lef_hand), false);
+    }
+
     public ProxySettings getProxySettings() {
         ProxySettings proxySettings = new ProxySettings();
         proxySettings.server = mSharedPrefs.getString(mResources.getString(R.string.pref_proxy_address_key), "");

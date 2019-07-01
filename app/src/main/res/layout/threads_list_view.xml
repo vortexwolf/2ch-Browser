@@ -28,7 +28,7 @@
             </ua.in.quireg.chan.ui.views.RefreshHeaderView>
 
             <ListView
-                android:id="@id/swipe_target"
+                android:id="@id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:dividerHeight="0.5dp"

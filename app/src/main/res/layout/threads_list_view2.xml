@@ -5,35 +5,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.aspsine.swipetoloadlayout.SwipeToLoadLayout
-        android:id="@+id/swipeToLoadLayout"
+    <ua.in.quireg.chan.ui.views.RecyclerViewWithCM
+        android:id="@id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="ua.in.quireg.chan.ui.fragments.ThreadsListFragment">
+        android:scrollbars="vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:context="ua.in.quireg.chan.ui.fragments.ThreadsListFragment"
+        tools:listitem="@layout/threads_list_item" />
 
-        <ua.in.quireg.chan.ui.views.RefreshHeaderView
-            android:id="@id/swipe_refresh_header"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:gravity="center">
-        </ua.in.quireg.chan.ui.views.RefreshHeaderView>
-
-        <ua.in.quireg.chan.ui.views.RecyclerViewWithCM
-            android:id="@id/swipe_target"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:listitem="@layout/threads_list_item" />
-
-        <!--<ua.in.quireg.chan.ui.views.LoadMoreFooterView-->
-        <!--android:id="@id/swipe_load_more_footer"-->
+    <!--<com.aspsine.swipetoloadlayout.SwipeToLoadLayout-->
+        <!--android:id="@+id/swipeToLoadLayout"-->
         <!--android:layout_width="match_parent"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_height="36dp" />-->
+        <!--android:layout_height="match_parent"-->
+        <!--tools:context="ua.in.quireg.chan.ui.fragments.ThreadsListFragment">-->
 
-    </com.aspsine.swipetoloadlayout.SwipeToLoadLayout>
+        <!--<ua.in.quireg.chan.ui.views.RefreshHeaderView-->
+            <!--android:id="@id/swipe_refresh_header"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:gravity="center">-->
+        <!--</ua.in.quireg.chan.ui.views.RefreshHeaderView>-->
+
+
+
+        <!--&lt;!&ndash;<ua.in.quireg.chan.ui.views.LoadMoreFooterView&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@id/swipe_load_more_footer"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="36dp" />&ndash;&gt;-->
+
+    <!--</com.aspsine.swipetoloadlayout.SwipeToLoadLayout>-->
 
     <include
         android:id="@+id/empty_list_item"
@@ -41,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="visible"
-        tools:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
     </include>
 </FrameLayout>

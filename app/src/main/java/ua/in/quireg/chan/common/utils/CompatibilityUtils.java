@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.text.Spannable;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
@@ -32,7 +31,8 @@ import static ua.in.quireg.chan.ui.fragments.PostsListFragment.populateContextMe
 public class CompatibilityUtils {
 
     public static void copyText(Context context, String label, String text) {
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager clipboard =
+                (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null) {
             clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
         }
@@ -62,8 +62,9 @@ public class CompatibilityUtils {
         settings.setDisplayZoomControls(enabled);
     }
 
-    public static void removeOnGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener victim) {
-        view.getViewTreeObserver().removeOnGlobalLayoutListener(victim);
+    public static void removeOnGlobalLayoutListener(View view,
+                                                    ViewTreeObserver.OnGlobalLayoutListener v) {
+        view.getViewTreeObserver().removeOnGlobalLayoutListener(v);
     }
 
     public static void setDimAmount(Window window, float f) {
@@ -72,35 +73,34 @@ public class CompatibilityUtils {
 
     public static void setSerialExecutor() {
         try {
-            AsyncTask.class.getMethod("setDefaultExecutor", Executor.class).invoke(null, AsyncTask.SERIAL_EXECUTOR);
+            AsyncTask.class.getMethod("setDefaultExecutor", Executor.class)
+                    .invoke(null, AsyncTask.SERIAL_EXECUTOR);
         } catch (Exception e) {
             MyLog.e("setDefaultExecutor", e);
         }
     }
 
     public static class API4 {
+
         public static boolean isTablet(Context context) {
-            return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+            return (context.getResources().getConfiguration().screenLayout
+                    & Configuration.SCREENLAYOUT_SIZE_MASK)
                     >= Configuration.SCREENLAYOUT_SIZE_LARGE;
         }
     }
 
-    public static View.OnClickListener createClickListenerShowPostMenu(final Activity activity, final PostItemViewModel model, final View view) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                PopupMenu popupMenu = new PopupMenu(activity, v);
-                Menu menu = popupMenu.getMenu();
-                populateContextMenu(menu, model, Factory.resolve(Resources.class));
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        handleContextMenuItemClick(menuItem, model, activity, view);
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
+    public static View.OnClickListener createClickListenerShowPostMenu(final Activity activity,
+                                                                       final PostItemViewModel model,
+                                                                       final View view) {
+        return v -> {
+            PopupMenu popupMenu = new PopupMenu(activity, v);
+            Menu menu = popupMenu.getMenu();
+            populateContextMenu(menu, model, Factory.resolve(Resources.class));
+            popupMenu.setOnMenuItemClickListener(menuItem -> {
+                handleContextMenuItemClick(menuItem, model, activity, view);
+                return true;
+            });
+            popupMenu.show();
         };
     }
 

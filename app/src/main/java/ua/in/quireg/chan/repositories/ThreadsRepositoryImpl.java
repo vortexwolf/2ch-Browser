@@ -2,9 +2,12 @@ package ua.in.quireg.chan.repositories;
 
 import android.content.Context;
 
+import org.apache.http.NoHttpResponseException;
+
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,26 +35,23 @@ public class ThreadsRepositoryImpl implements ThreadsRepository {
     }
 
     @Override
-    public Observable<List<ThreadModel>> getLocalThreads(String board) {
-        return Observable.just(mDvachRoomDatabase.makabaDao().getThreadModelsForBoard(board));
+    public Single<List<ThreadModel>> getLocalThreads(String board) {
+        return Single.just(mDvachRoomDatabase.makabaDao().getThreadModelsForBoard(board));
     }
 
     @Override
-    public Observable<List<ThreadModel>> getRemoteThreads(String board, int page) {
-
+    public Single<List<ThreadModel>> getRemoteThreads(String board, int page) {
         String fetchUrl = Websites.getDefault().getUrlBuilder().getPageUrlApi(board, page);
 
-        Request request = new Request.Builder()
+        final Request request = new Request.Builder()
                 .url(fetchUrl)
                 .build();
 
-        Timber.i("Fetching %s", fetchUrl);
-
-        return Observable.fromCallable(() -> mOkHttpClient.newCall(request))
+        return Single.fromCallable(() -> mOkHttpClient.newCall(request))
+                .observeOn(Schedulers.io())
                 .map(Call::execute)
                 .map((r) -> {
                     List<ThreadModel> threadModels = mApiReader.readThreadsListResponse(r);
-
                     if (threadModels == null || threadModels.isEmpty()) {
                         Timber.e("Received empty response");
                     } else {
@@ -64,18 +64,15 @@ public class ThreadsRepositoryImpl implements ThreadsRepository {
                                 }
                                 savePostModel(postModel);
                                 saveBadgeModel(postModel.getBadge());
-
                                 for (AttachmentModel attachmentModel : postModel.getAttachments()) {
                                     saveAttachmentModel(attachmentModel);
                                 }
                             }
                         }
                     }
-
                     return threadModels;
                 });
     }
-
 
     private void saveThreadModel(ThreadModel model) {
         if (model == null) return;

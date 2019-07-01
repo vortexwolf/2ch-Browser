@@ -1,26 +1,28 @@
 package ua.in.quireg.chan.ui.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-
 import javax.inject.Inject;
 
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.GlideApp;
 import ua.in.quireg.chan.common.MainApplication;
 import ua.in.quireg.chan.common.utils.StringUtils;
-import ua.in.quireg.chan.common.utils.ThreadPostUtils;
 import ua.in.quireg.chan.db.HiddenThreadsDataSource;
 import ua.in.quireg.chan.models.presentation.ThreadItemViewModel;
 import ua.in.quireg.chan.models.presentation.ThumbnailViewBag;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
+
     private static final int ITEM_VIEW_TYPE_THREAD = 0;
     private static final int ITEM_VIEW_TYPE_HIDDEN_THREAD = 1;
 
@@ -54,10 +56,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 
         View view;
         ThreadItemViewModel item = getItem(position);
-
-        if (item == null) {
-            return convertView;
-        }
 
         if (!item.isHidden()) {
             view = convertView != null ?
@@ -127,8 +125,13 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 //        });
 
         // Количество ответов
-        String postsQuantity = getContext().getResources().getQuantityString(R.plurals.data_posts_quantity, item.getReplyCount(), item.getReplyCount());
-        String imagesQuantity = getContext().getResources().getQuantityString(R.plurals.data_files_quantity, item.getImageCount(), item.getImageCount());
+        String postsQuantity = getContext().getResources()
+                .getQuantityString(R.plurals.data_posts_quantity,
+                        item.getReplyCount(), item.getReplyCount());
+        String imagesQuantity = getContext().getResources()
+                .getQuantityString(R.plurals.data_files_quantity,
+                        item.getImageCount(), item.getImageCount());
+
         String repliesFormat = getContext().getString(R.string.data_posts_files);
         String repliesText = String.format(repliesFormat, postsQuantity, imagesQuantity);
         vb.repliesNumberView.setText(repliesText);
@@ -140,22 +143,27 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
 
                 if (item.getAttachment(i) == null || item.getAttachment(i).isEmpty()) {
                     vb.thumbnailViews[i].hide();
-                    //TODO set stub pic for failed attachments
                     break;
                 }
-                GlideApp.with(getContext()).load(item.getAttachment(i).getImageUrlIfImage()).into(vb.thumbnailViews[i].image);
+                GlideApp.with(getContext())
+                        .load(item.getAttachment(i).getImageUrlIfImage())
+                        .into(vb.thumbnailViews[i].image)
+                        .onLoadFailed(getContext().getDrawable(R.drawable.error_image));
 
                 vb.thumbnailViews[i].container.setVisibility(View.VISIBLE);
                 vb.thumbnailViews[i].info.setText(item.getAttachment(i).getDescription());
             }
         } else if (item.getAttachmentsNumber() >= 1) {
             if (item.getAttachment(0) == null || item.getAttachment(0).isEmpty()) {
-                //TODO set stub pic for failed attachments
                 vb.singleThumbnailView.hide();
                 vb.multiThumbnailsView.setVisibility(View.GONE);
                 return;
             }
-            GlideApp.with(getContext()).load(item.getAttachment(0).getImageUrlIfImage()).into(vb.singleThumbnailView.image);
+
+            GlideApp.with(getContext())
+                    .load(item.getAttachment(0).getImageUrlIfImage())
+                    .into(vb.singleThumbnailView.image)
+                    .onLoadFailed(getContext().getDrawable(R.drawable.error_image));
 
             vb.singleThumbnailView.container.setVisibility(View.VISIBLE);
             vb.singleThumbnailView.info.setText(item.getAttachment(0).getDescription());
@@ -165,7 +173,6 @@ public class ThreadsListAdapter extends ArrayAdapter<ThreadItemViewModel> {
             vb.singleThumbnailView.hide();
         }
     }
-
 
 //    private void loadListImages() {
 //        int count = mListView.getChildCount();

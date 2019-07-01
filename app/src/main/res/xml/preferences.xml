@@ -197,6 +197,11 @@
                 android:key="@string/pref_swipe_to_refresh_key"
                 android:summary="@string/pref_swipe_to_refresh_summary"
                 android:title="@string/pref_swipe_to_refresh_title" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="@string/pref_lef_hand"
+                android:summary="@string/pref_lef_hand_summary"
+                android:title="@string/pref_lef_hand_title" />
             <EditTextPreference
                 android:hint="@string/pref_cut_posts_hint"
                 android:inputType="number"

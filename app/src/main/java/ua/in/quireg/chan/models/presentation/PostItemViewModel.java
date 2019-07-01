@@ -28,7 +28,8 @@ import ua.in.quireg.chan.services.presentation.FlowTextHelper;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 
 public class PostItemViewModel implements IPostListEntity {
-    private static final Pattern sReplyLinkFullPattern = Pattern.compile("<a.*?href=\".+?#(\\d+)\".*?>(?:>>|&gt;&gt;).+?</a>");
+    private static final Pattern sReplyLinkFullPattern =
+            Pattern.compile("<a.*?href=\".+?#(\\d+)\".*?>(?:>>|&gt;&gt;).+?</a>");
 
     private final IWebsite mWebsite;
     private final String mBoardName;
@@ -55,7 +56,8 @@ public class PostItemViewModel implements IPostListEntity {
     private boolean mHasUrlSpans = false;
     private boolean mIsLongTextExpanded = false;
 
-    public PostItemViewModel(IWebsite website, String boardName, String threadNumber, int position, PostModel model, Theme theme, IURLSpanClickListener listener) {
+    public PostItemViewModel(IWebsite website, String boardName, String threadNumber, int position,
+                             PostModel model, Theme theme, IURLSpanClickListener listener) {
         this.mModel = model;
         this.mTheme = theme;
         this.mUrlListener = listener;

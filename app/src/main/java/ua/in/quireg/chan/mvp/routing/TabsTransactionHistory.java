@@ -6,35 +6,34 @@ import timber.log.Timber;
 
 public class TabsTransactionHistory {
 
-    private ArrayList<Integer> stackArr;
+    private ArrayList<Integer> mStackArr;
 
     public TabsTransactionHistory() {
-        stackArr = new ArrayList<>();
-
+        mStackArr = new ArrayList<>();
     }
 
-    public void push(int entry) {
+    void push(int entry) {
         Timber.v("push() entry: %s", entry);
 
         if (isAlreadyExists(entry)) {
-            stackArr.remove(Integer.valueOf(entry));
+            mStackArr.remove(Integer.valueOf(entry));
             Timber.v("entry %d exists, not pushed", entry);
         }
-        stackArr.add(entry);
+        mStackArr.add(entry);
         //printHistoryStack();
     }
 
-    public int pop() {
+    int pop() {
         Timber.v("pop()");
 
         int entry = -1;
 
         if (!isEmpty()) {
-            stackArr.remove(stackArr.size() - 1);
+            mStackArr.remove(mStackArr.size() - 1);
         }
 
         if (!isEmpty()) {
-            entry = stackArr.get(stackArr.size() - 1);
+            entry = mStackArr.get(mStackArr.size() - 1);
         }
         Timber.v("pop() returned %d", entry);
         //printHistoryStack();
@@ -43,7 +42,7 @@ public class TabsTransactionHistory {
     }
 
     private boolean isAlreadyExists(int entry) {
-        return (stackArr.contains(entry));
+        return (mStackArr.contains(entry));
     }
 
 //    public int popPrevious() {
@@ -51,44 +50,44 @@ public class TabsTransactionHistory {
 //
 //        int entry = -1;
 //
-//        if (!isEmpty() && stackArr.size() > 2) {
-//            entry = stackArr.get(stackArr.size() - 2);
-//            stackArr.remove(stackArr.size() - 2);
+//        if (!isEmpty() && mStackArr.size() > 2) {
+//            entry = mStackArr.get(mStackArr.size() - 2);
+//            mStackArr.remove(mStackArr.size() - 2);
 //        }
 //        Timber.v("popPrevious() returned %d", entry);
 //        return entry;
 //    }
 //
-    /**
-     * This method returns top of the stack
-     * without removing it.
-     *
-     * @return
-     */
-    public int peek() {
-        if (!isEmpty()) {
-            return stackArr.get(stackArr.size() - 1);
-        }
+//    /**
+//     * This method returns top of the stack
+//     * without removing it.
+//     *
+//     * @return
+//     */
+//    public int peek() {
+//        if (!isEmpty()) {
+//            return mStackArr.get(mStackArr.size() - 1);
+//        }
+//
+//        return -1;
+//    }
 
-        return -1;
+    boolean isEmpty() {
+        return (mStackArr.size() == 0);
     }
 
-    public boolean isEmpty() {
-        return (stackArr.size() == 0);
+    int getStackSize() {
+        return mStackArr.size();
     }
 
-    public int getStackSize() {
-        return stackArr.size();
-    }
-
-    public void emptyStack() {
-        stackArr.clear();
+    void emptyStack() {
+        mStackArr.clear();
     }
 
     private void printHistoryStack() {
         Timber.v("history stack: ");
-        for (int i = 0; i < stackArr.size(); i++) {
-            Timber.v("Position %d, tab: %d", i, stackArr.get(i));
+        for (int i = 0; i < mStackArr.size(); i++) {
+            Timber.v("Position %d, tab: %d", i, mStackArr.get(i));
         }
     }
 }

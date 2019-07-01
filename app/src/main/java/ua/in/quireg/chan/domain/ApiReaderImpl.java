@@ -26,7 +26,7 @@ import ua.in.quireg.chan.models.domain.ThreadModel;
 
 public class ApiReaderImpl implements ApiReader {
 
-    ObjectMapper mMapper = new ObjectMapper()
+    private ObjectMapper mMapper = new ObjectMapper()
             .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override

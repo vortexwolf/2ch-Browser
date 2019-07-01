@@ -1,18 +1,14 @@
 package ua.in.quireg.chan.ui.fragments;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
@@ -26,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,7 +30,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.asynctasks.DownloadFileTask;
 import ua.in.quireg.chan.common.Constants;
@@ -55,7 +49,7 @@ import ua.in.quireg.chan.services.ThreadImagesService;
 import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.views.SelectiveViewPager;
 
-public class ImageGalleryFragment extends Fragment implements SelectiveViewPager.OnSingleClickListener{
+public class ImageGalleryFragment extends Fragment implements SelectiveViewPager.OnSingleClickListener {
 
     private ThreadImagesService mThreadImagesService;
     private CacheDirectoryManager mCacheDirectoryManager;
@@ -83,13 +77,10 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
-
         mThreadImagesService = Factory.getContainer().resolve(ThreadImagesService.class);
         mCacheDirectoryManager = Factory.getContainer().resolve(CacheDirectoryManager.class);
         mApplicationSettings = Factory.getContainer().resolve(ApplicationSettings.class);
-
     }
 
     @Nullable
@@ -107,19 +98,15 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
 
         bottomPanel = view.findViewById(R.id.image_gallery_bottom_bar);
 
-
-
         String imageUrl = "";
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
             imageUrl = getArguments().getString(Constants.EXTRA_IMAGE_URI);
             mThreadUri = getArguments().getString(Constants.EXTRA_THREAD_URL);
         }
 
-
         SelectiveViewPager selectiveViewPager = view.findViewById(R.id.view_pager);
         selectiveViewPager.setSingleClickListener(this);
-
 
         // get the current image
         ArrayList<ThreadImageModel> images = mThreadImagesService.getImagesList(mThreadUri);
@@ -158,7 +145,6 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
 
     @Override
     public void onDestroyView() {
-
         if (mCurrentTask != null) {
             mCurrentTask.cancel(true);
         }
@@ -210,7 +196,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         mContainerView.setBackgroundColor(Color.TRANSPARENT);
     }
 
-    private void updatePanelsVisibility(){
+    private void updatePanelsVisibility() {
         isPanelsVisible = !isPanelsVisible;
     }
 
@@ -262,7 +248,8 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                 }
                 break;
             case R.id.play_video_menu_id:
-                File cachedFile = mCacheDirectoryManager.getCachedMediaFileForRead(Uri.parse(mCurrentImageModel.url));
+                File cachedFile = mCacheDirectoryManager
+                        .getCachedMediaFileForRead(Uri.parse(mCurrentImageModel.url));
                 if (cachedFile.exists()) {
                     BrowserLauncher.playVideoExternal(cachedFile, getActivity());
                 }
@@ -271,7 +258,8 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                 if (mImageLoadedFile == null) {
                     break;
                 }
-                fileToBeShared = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".fileprovider", mImageLoadedFile);
+                fileToBeShared = FileProvider.getUriForFile(getActivity(),
+                        getActivity().getPackageName() + ".fileprovider", mImageLoadedFile);
 
                 Intent shareImageIntent = new Intent(Intent.ACTION_SEND);
                 if (UriUtils.isImageUri(fileToBeShared)) {
@@ -284,10 +272,12 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
                 shareImageIntent.putExtra(Intent.EXTRA_STREAM, fileToBeShared);
                 shareImageIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                List<ResolveInfo> resInfoList = getActivity().getPackageManager().queryIntentActivities(shareImageIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                List<ResolveInfo> resInfoList = getActivity().getPackageManager()
+                        .queryIntentActivities(shareImageIntent, PackageManager.MATCH_DEFAULT_ONLY);
                 for (ResolveInfo resolveInfo : resInfoList) {
                     String packageName = resolveInfo.activityInfo.packageName;
-                    getActivity().grantUriPermission(packageName, fileToBeShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    getActivity().grantUriPermission(
+                            packageName, fileToBeShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
 
                 startActivity(Intent.createChooser(shareImageIntent, getString(R.string.share_via)));
@@ -320,8 +310,6 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         getActivity().revokeUriPermission(fileBeenShared, Intent.FLAG_GRANT_READ_URI_PERMISSION);
     }
 
-
-
     private void loadImage(ThreadImageModel model, GalleryItemViewBag viewBag) {
         mImageLoaded = false;
         mImageLoadedFile = null;
@@ -332,8 +320,10 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             // only 1 image per time
             mCurrentTask.cancel(true);
         }
+        Uri uri = Uri.parse(model.url);
 
-        if (UriUtils.isVideoUri(Uri.parse(model.url)) && mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
+        if (UriUtils.isVideoUri(uri)
+                && mApplicationSettings.getVideoPlayer() == Constants.VIDEO_PLAYER_EXTERNAL_2CLICK) {
             if (model.attachment != null) {
                 setThumbnail(model.attachment, viewBag);
                 mImageLoaded = true;
@@ -342,9 +332,6 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
             }
             return;
         }
-
-        Uri uri = Uri.parse(model.url);
-
         File cachedFile = mCacheDirectoryManager.getCachedMediaFileForRead(uri);
         if (cachedFile.exists()) {
             // show from cache
@@ -374,12 +361,13 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         String thumbnailUrl = attachment.getThumbnailUrl();
         if (thumbnailUrl != null) {
             BitmapManager bitmapManager = Factory.resolve(BitmapManager.class);
-            bitmapManager.fetchBitmapOnThread(Uri.parse(thumbnailUrl), thumbnailView, true, null, R.drawable.error_image);
+            bitmapManager.fetchBitmapOnThread(Uri.parse(thumbnailUrl), thumbnailView, true,
+                    null, R.drawable.doge);
         } else {
             if (attachment.isFile()) {
                 thumbnailView.setImageResource(attachment.getDefaultThumbnail());
             } else {
-                thumbnailView.setImageResource(R.drawable.error_image);
+                thumbnailView.setImageResource(R.drawable.doge);
             }
         }
 
@@ -390,7 +378,8 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
         if (UriUtils.isImageUri(Uri.fromFile(file))) {
             AppearanceUtils.setImage(file, getActivity(), viewBag.layout, mBackgroundColor);
         } else if (UriUtils.isVideoUri(Uri.fromFile(file))) {
-            AppearanceUtils.setVideoFile(file, getActivity(), viewBag, mBackgroundColor, getActivity().getTheme());
+            AppearanceUtils.setVideoFile(
+                    file, getActivity(), viewBag, mBackgroundColor, getActivity().getTheme());
         }
 
         mImageLoaded = true;
@@ -414,6 +403,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     }
 
     private class ImageGalleryAdapter extends ExtendedPagerAdapter<ThreadImageModel> {
+
         private final ViewPager mViewPager;
 
         ImageGalleryAdapter(ViewPager viewPager, ArrayList<ThreadImageModel> images) {
@@ -423,15 +413,13 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
 
         @Override
         protected View createView(int position) {
-
-            View view = LayoutInflater.from(mViewPager.getContext()).inflate(R.layout.image_gallery_item, mViewPager, false);
-
+            View view = LayoutInflater.from(mViewPager.getContext())
+                    .inflate(R.layout.image_gallery_item, mViewPager, false);
             GalleryItemViewBag vb = new GalleryItemViewBag();
             vb.layout = view.findViewById(R.id.image_layout);
             vb.loading = view.findViewById(R.id.loading);
             vb.error = view.findViewById(R.id.error);
             view.setTag(vb);
-
             return view;
         }
 
@@ -453,6 +441,7 @@ public class ImageGalleryFragment extends Fragment implements SelectiveViewPager
     }
 
     private class ImageDownloadView implements IDownloadFileView {
+
         private final GalleryItemViewBag mViewBag;
         private double mMaxValue = -1;
 

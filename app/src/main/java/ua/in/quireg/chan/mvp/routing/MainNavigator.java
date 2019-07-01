@@ -26,6 +26,7 @@ import ua.in.quireg.chan.mvp.routing.commands.NavigateThread;
 import ua.in.quireg.chan.mvp.routing.commands.PushFragment;
 import ua.in.quireg.chan.mvp.routing.commands.SendShortToast;
 import ua.in.quireg.chan.mvp.routing.commands.SwitchTab;
+import ua.in.quireg.chan.settings.ApplicationSettings;
 import ua.in.quireg.chan.ui.activities.MainActivity;
 import ua.in.quireg.chan.ui.fragments.AppPreferenceFragment;
 import ua.in.quireg.chan.ui.fragments.BoardsListFragment;
@@ -41,52 +42,59 @@ import ua.in.quireg.chan.ui.fragments.ThreadsListFragment;
  * 2ch-Browser
  */
 
-public class MainNavigator implements Navigator, FragNavController.TransactionListener, FragNavController.RootFragmentListener {
+public class MainNavigator implements Navigator,
+        FragNavController.TransactionListener,
+        FragNavController.RootFragmentListener {
 
     private static final int BOTTOM_TABS_AMOUNT = 5;
 
     @Inject TabsTransactionHistory mTabsTransactionHistory;
+    @Inject ApplicationSettings mApplicationSettings;
     @Inject Context mContext;
 
     private FragNavController mFragNavController;
     private MainActivity mMainActivity;
 
+    private Fragment[] mTabsFragments = new Fragment[]{
+            new BoardsListFragment(),
+            new OpenTabsFragment(),
+            new FavoritesFragment(),
+            new HistoryFragment(),
+            new AppPreferenceFragment()
+    };
+
     public MainNavigator(MainActivity activity, Bundle savedInstanceState) {
-
         mMainActivity = activity;
-
         MainApplication.getAppComponent().inject(this);
 
-        FragNavTransactionOptions mFragNavTransactionOptions = FragNavTransactionOptions.newBuilder()
-                .transition(FragmentTransaction.TRANSIT_UNSET)
-                .build();
+        FragNavTransactionOptions mFragNavTransactionOptions =
+                FragNavTransactionOptions.newBuilder()
+                        .transition(FragmentTransaction.TRANSIT_NONE)
+                        .build();
 
-        mFragNavController = FragNavController.newBuilder(savedInstanceState, mMainActivity.getSupportFragmentManager(), R.id.base_activity_container)
-                .transactionListener(this)
-                .rootFragmentListener(this, BOTTOM_TABS_AMOUNT)
-                .defaultTransactionOptions(mFragNavTransactionOptions)
-                .build();
+        mFragNavController =
+                FragNavController.newBuilder(
+                        savedInstanceState,
+                        mMainActivity.getSupportFragmentManager(),
+                        R.id.base_activity_container)
+                        .transactionListener(this)
+                        .rootFragmentListener(this, BOTTOM_TABS_AMOUNT)
+                        .defaultTransactionOptions(mFragNavTransactionOptions)
+                        .selectedTabIndex(mApplicationSettings.isLeftHand()
+                                ? FragNavController.TAB1
+                                : FragNavController.TAB5)
+                        .build();
 
         mMainActivity.updateTabSelection(mFragNavController.getCurrentStackIndex());
     }
 
     @Override
     public Fragment getRootFragment(int index) {
-        switch (index) {
-
-            case FragNavController.TAB1:
-                return new BoardsListFragment();
-            case FragNavController.TAB2:
-                return new OpenTabsFragment();
-            case FragNavController.TAB3:
-                return new FavoritesFragment();
-            case FragNavController.TAB4:
-                return new HistoryFragment();
-            case FragNavController.TAB5:
-                return new AppPreferenceFragment();
-
+        if (mApplicationSettings.isLeftHand()) {
+            return mTabsFragments[index];
+        } else {
+            return mTabsFragments[mTabsFragments.length - 1 - index];
         }
-        throw new IllegalStateException("Need to send an index that we know");
     }
 
     public void saveNavigationState(Bundle savedInstanceState) {
@@ -104,13 +112,12 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         mTabsTransactionHistory.push(i);
         mMainActivity.updateTabSelection(i);
         mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
-
     }
 
     @Override
-    public void onFragmentTransaction(Fragment fragment, FragNavController.TransactionType transactionType) {
+    public void onFragmentTransaction(Fragment fragment,
+                                      FragNavController.TransactionType transactionType) {
         mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
-
     }
 
     @Override
@@ -126,41 +133,28 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
             mFragNavController.pushFragment(((PushFragment) command).getFragment());
         }
         if (command instanceof SwitchTab) {
-
             int activeTabPosition = ((SwitchTab) command).getTabPosition();
-
             mFragNavController.switchTab(activeTabPosition);
-
             mMainActivity.updateTabSelection(activeTabPosition);
-
             mMainActivity.updateToolbarControls(mFragNavController.isRootFragment());
-
         }
         if (command instanceof NavigateBoardsList) {
-            navigateBoardsList(
-                    ((NavigateBoardsList) command).getWebsite()
-            );
+            navigateBoardsList(((NavigateBoardsList) command).getWebsite());
         }
         if (command instanceof NavigateBoard) {
-            navigateBoard(
-                    ((NavigateBoard) command).getWebsite(),
+            navigateBoard(((NavigateBoard) command).getWebsite(),
                     ((NavigateBoard) command).getBoardCode(),
-                    ((NavigateBoard) command).isPreferDeserialized()
-            );
+                    ((NavigateBoard) command).isPreferDeserialized());
         }
 
         if (command instanceof NavigateThread) {
-            navigateThread(
-                    ((NavigateThread) command).getThread(),
-                    ((NavigateThread) command).isPreferDeserialized()
-            );
+            navigateThread(((NavigateThread) command).getThread(),
+                    ((NavigateThread) command).isPreferDeserialized());
         }
 
         if (command instanceof NavigateGallery) {
-            navigateGallery(
-                    ((NavigateGallery) command).getUri(),
-                    ((NavigateGallery) command).getThreadUrl()
-            );
+            navigateGallery(((NavigateGallery) command).getUri(),
+                    ((NavigateGallery) command).getThreadUrl());
         }
     }
 
@@ -257,7 +251,6 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
         postsListFragment.setArguments(extras);
         mFragNavController.pushFragment(postsListFragment);
-
     }
 
     private void navigateGallery(Uri imageUri, String threadUrl) {
@@ -268,7 +261,6 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
 
         imageGalleryFragment.setArguments(extras);
         mFragNavController.pushFragment(imageGalleryFragment);
-
     }
 
     private void navigateCatalog(String website, String board) {
@@ -276,7 +268,6 @@ public class MainNavigator implements Navigator, FragNavController.TransactionLi
         extras.putString(Constants.EXTRA_WEBSITE, website);
         extras.putString(Constants.EXTRA_BOARD_NAME, board);
         extras.putBoolean(Constants.EXTRA_CATALOG, true);
-
     }
 
 }

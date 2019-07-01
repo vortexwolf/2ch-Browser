@@ -1,7 +1,6 @@
 package ua.in.quireg.chan.mvp.routing;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 

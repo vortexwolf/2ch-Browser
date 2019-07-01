@@ -13,7 +13,6 @@
     <!--android:layout_alignParentTop="true">-->
     <!--android:layout_below="@id/status_bar"-->
     <!--android:fitsSystemWindows="true"-->
-
     <!--</FrameLayout>-->
 
     <LinearLayout
@@ -22,19 +21,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <ua.in.quireg.chan.ui.decor.actionbar.DvachTopBar
             android:id="@+id/toolbar"
             style="?actionbarStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height">
-
-        </android.support.v7.widget.Toolbar>
+        </ua.in.quireg.chan.ui.decor.actionbar.DvachTopBar>
 
         <View
             android:id="@+id/top_shadowline"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/bottom_shadow" />
+            android:background="@drawable/shadowline" />
 
     </LinearLayout>
 
@@ -49,7 +47,7 @@
             android:id="@+id/bottom_shadowline"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/bottom_shadow" />
+            android:background="@drawable/shadowline" />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/bottom_tab"
@@ -59,7 +57,6 @@
             tools:layout="@layout/tab_item_bottom" />
 
     </LinearLayout>
-
 
     <FrameLayout
         android:id="@+id/base_activity_container"

@@ -81,7 +81,10 @@
         android:maxLines="@integer/opPostMaxLines"
         android:ellipsize="end"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        tools:text="singing sinking dying diving loving leaving pulling pushing falling feeling swimming swinging singing sinking dying diving falling feeling swimming swinging loving leaving pulling pushing singing sinking dying diving in the cold heat of the pool"/>
+        tools:text="singing sinking dying diving loving leaving pulling pushing
+         falling feeling swimming swinging singing sinking dying diving falling
+         feeling swimming swinging loving leaving pulling pushing singing sinking
+          dying diving in the cold heat of the pool"/>
 
     <!-- Next row -->
     <TextView

@@ -18,14 +18,12 @@ import ua.in.quireg.chan.R;
  * 2ch-Browser
  */
 
-public class SeekBarDialogPreferenceFragment extends PreferenceDialogFragmentCompat implements SeekBar.OnSeekBarChangeListener {
-
+public class SeekBarDialogPreferenceFragment extends PreferenceDialogFragmentCompat
+        implements SeekBar.OnSeekBarChangeListener {
 
     private int mCurrentTempValue;
     private TextView mValueTextView;
-
     private WeakReference<SeekBarDialogPreference> mSeekBarDialogPreference;
-
 
     public static SeekBarDialogPreferenceFragment newInstance(Preference preference) {
         SeekBarDialogPreferenceFragment fragment = new SeekBarDialogPreferenceFragment();
@@ -38,24 +36,19 @@ public class SeekBarDialogPreferenceFragment extends PreferenceDialogFragmentCom
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mSeekBarDialogPreference = new WeakReference<>((SeekBarDialogPreference) getPreference());
         mCurrentTempValue = mSeekBarDialogPreference.get().getValue();
-
     }
 
     @Override
     protected View onCreateDialogView(Context context) {
-
         // Inflate layout
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_slider, null);
 
-
         int minValue = mSeekBarDialogPreference.get().getMinValue();
         int maxValue = mSeekBarDialogPreference.get().getMaxValue();
         int step = mSeekBarDialogPreference.get().getStep();
-
 
         // Setup minimum and maximum text labels
         ((TextView) view.findViewById(R.id.min_value)).setText(String.valueOf(minValue));
@@ -83,14 +76,12 @@ public class SeekBarDialogPreferenceFragment extends PreferenceDialogFragmentCom
         }
     }
 
-
     @Override
     public void onProgressChanged(SeekBar seek, int value, boolean fromTouch) {
         int step = mSeekBarDialogPreference.get().getStep();
         int minValue = mSeekBarDialogPreference.get().getMinValue();
 
         mCurrentTempValue = value * step + minValue;
-
         // Update label with current value
         updateValueTextView();
     }
@@ -107,9 +98,7 @@ public class SeekBarDialogPreferenceFragment extends PreferenceDialogFragmentCom
 
     private void updateValueTextView() {
         String text = String.format(
-                mSeekBarDialogPreference.get().getValueFormat(),
-                mCurrentTempValue
-        );
+                mSeekBarDialogPreference.get().getValueFormat(), mCurrentTempValue);
         mValueTextView.setText(text);
     }
 }

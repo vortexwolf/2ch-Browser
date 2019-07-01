@@ -5,26 +5,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="?activityRootBackground">
 
-    <com.aspsine.swipetoloadlayout.SwipeToLoadLayout
-        android:id="@+id/swipeToLoadLayout"
+    <ListView
+        android:id="@id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        tools:listitem="@layout/posts_list_item"/>
 
-        <ListView
-            android:id="@id/swipe_target"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="4dp"
-            tools:listitem="@layout/posts_list_item"/>
+    <!--<com.aspsine.swipetoloadlayout.SwipeToLoadLayout-->
+        <!--android:id="@+id/swipeToLoadLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
-        <ua.in.quireg.chan.ui.views.LoadMoreFooterView
-            android:id="@id/swipe_load_more_footer"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="36dp" />
 
-    </com.aspsine.swipetoloadlayout.SwipeToLoadLayout>
+
+        <!--<ua.in.quireg.chan.ui.views.LoadMoreFooterView-->
+            <!--android:id="@id/swipe_load_more_footer"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_height="36dp" />-->
+
+    <!--</com.aspsine.swipetoloadlayout.SwipeToLoadLayout>-->
 
     <include
         android:id="@+id/loadingView"

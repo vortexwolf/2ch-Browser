@@ -43,17 +43,19 @@ public class MakabaApiReader implements IJsonApiReader {
 
     @Inject protected ApplicationSettings mApplicationSettings;
 
-    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper, MakabaUrlBuilder makabaUriBuilder, Resources resources) {
-        this.mJsonReader = jsonReader;
-        this.mMakabaModelsMapper = makabaModelsMapper;
-        this.mMakabaUriBuilder = makabaUriBuilder;
-        this.mResources = resources;
-
+    public MakabaApiReader(JsonHttpReader jsonReader, MakabaModelsMapper makabaModelsMapper,
+                           MakabaUrlBuilder makabaUriBuilder, Resources resources) {
+        mJsonReader = jsonReader;
+        mMakabaModelsMapper = makabaModelsMapper;
+        mMakabaUriBuilder = makabaUriBuilder;
+        mResources = resources;
         MainApplication.getAppComponent().inject(this);
     }
 
     @Override
-    public ThreadModel[] readCatalog(String boardName, int filter, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public ThreadModel[] readCatalog(String boardName, int filter,
+                                     IJsonProgressChangeListener listener, ICancelled task)
+            throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.mMakabaUriBuilder.getCatalogUrlApi(boardName, filter);
 
         JsonNode json = this.mJsonReader.readData(uri, false, listener, task);
@@ -61,13 +63,15 @@ public class MakabaApiReader implements IJsonApiReader {
             return null;
         }
 
-        MakabaThreadsListCatalog result = this.parseDataOrThrowError(json, MakabaThreadsListCatalog.class);
-        ThreadModel[] models = this.mMakabaModelsMapper.mapCatalog(result);
-        return models;
+        MakabaThreadsListCatalog result =
+                this.parseDataOrThrowError(json, MakabaThreadsListCatalog.class);
+        return mMakabaModelsMapper.mapCatalog(result);
     }
 
     @Override
-    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public ThreadModel[] readThreadsList(String boardName, int page, boolean checkModified,
+                                         IJsonProgressChangeListener listener, ICancelled task)
+            throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.mMakabaUriBuilder.getPageUrlApi(boardName, page);
 
         JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
@@ -78,8 +82,7 @@ public class MakabaApiReader implements IJsonApiReader {
         MakabaThreadsList result = this.parseDataOrThrowError(json, MakabaThreadsList.class);
         setIcons(result, boardName);
 
-        ThreadModel[] models = this.mMakabaModelsMapper.mapThreadModels(result);
-        return models;
+        return MakabaModelsMapper.mapThreadModels(result);
     }
 
     private void setIcons(MakabaThreadsList source, String boardName) {
@@ -95,10 +98,14 @@ public class MakabaApiReader implements IJsonApiReader {
     }
 
     @Override
-    public PostModel[] readPostsList(String boardName, String threadNumber, int fromNumber, boolean checkModified, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public PostModel[] readPostsList(String boardName, String threadNumber, int fromNumber,
+                                     boolean checkModified, IJsonProgressChangeListener listener,
+                                     ICancelled task)
+            throws JsonApiReaderException, HtmlNotJsonException {
         boolean isExtendedUrl = this.mApplicationSettings.isMobileApi() && fromNumber != 0;
         String uri = isExtendedUrl
-                ? this.mMakabaUriBuilder.getThreadUrlExtendedApi(boardName, threadNumber, fromNumber + "")
+                ? this.mMakabaUriBuilder.getThreadUrlExtendedApi(
+                        boardName, threadNumber, fromNumber + "")
                 : this.mMakabaUriBuilder.getThreadUrlApi(boardName, threadNumber);
 
         JsonNode json = this.mJsonReader.readData(uri, checkModified, listener, task);
@@ -106,23 +113,25 @@ public class MakabaApiReader implements IJsonApiReader {
             return null;
         }
 
-        MakabaPostInfo[] data = null;
+        MakabaPostInfo[] data;
         if (isExtendedUrl) {
             data = this.parseDataOrThrowError(json, MakabaPostInfo[].class);
         } else {
             data = this.parseDataOrThrowError(json, MakabaThreadsList.class).threads[0].posts;
         }
 
-        PostModel[] models = this.mMakabaModelsMapper.mapPostModels(data);
-        return models;
+        return MakabaModelsMapper.mapPostModels(data);
     }
 
-
     @Override
-    public SearchPostListModel searchPostsList(String boardName, String searchQuery, IJsonProgressChangeListener listener, ICancelled task) throws JsonApiReaderException, HtmlNotJsonException {
+    public SearchPostListModel searchPostsList(String boardName, String searchQuery,
+                                               IJsonProgressChangeListener listener,
+                                               ICancelled task)
+            throws JsonApiReaderException, HtmlNotJsonException {
         String uri = this.mMakabaUriBuilder.getSearchUrlApi();
 
-        MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
+        MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE,
+                Constants.MULTIPART_BOUNDARY, Constants.UTF8_CHARSET);
         try {
             entity.addPart("task", new StringBody("search", Constants.UTF8_CHARSET));
             entity.addPart("board", new StringBody(boardName, Constants.UTF8_CHARSET));
@@ -138,11 +147,11 @@ public class MakabaApiReader implements IJsonApiReader {
         }
 
         MakabaFoundPostsList result = this.parseDataOrThrowError(json, MakabaFoundPostsList.class);
-        SearchPostListModel model = this.mMakabaModelsMapper.mapSearchPostListModel(result);
-        return model;
+        return this.mMakabaModelsMapper.mapSearchPostListModel(result);
     }
 
-    private <T> T parseDataOrThrowError(JsonNode json, Class<T> valueType) throws JsonApiReaderException {
+    private <T> T parseDataOrThrowError(JsonNode json, Class<T> valueType)
+            throws JsonApiReaderException {
         T result = this.mJsonReader.convertValue(json, valueType);
         if (result != null) {
             return result;

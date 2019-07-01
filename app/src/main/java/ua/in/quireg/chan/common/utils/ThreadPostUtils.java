@@ -1,13 +1,10 @@
 package ua.in.quireg.chan.common.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.ImageView;
-
-import com.squareup.haha.perflib.Main;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,7 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import ru.terrakok.cicerone.Router;
 import ua.in.quireg.chan.R;
 import ua.in.quireg.chan.common.Constants;
 import ua.in.quireg.chan.common.Factory;
@@ -31,7 +27,6 @@ import ua.in.quireg.chan.mvp.routing.MainRouter;
 import ua.in.quireg.chan.services.BitmapManager;
 import ua.in.quireg.chan.services.BrowserLauncher;
 import ua.in.quireg.chan.settings.ApplicationSettings;
-import ua.in.quireg.chan.ui.activities.ImageGalleryActivity;
 
 public class ThreadPostUtils {
 

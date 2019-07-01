@@ -124,7 +124,9 @@ public class TextView extends JellyBeanSpanFixTextView {
     }
 
     private Layout createWorkingLayout(CharSequence workingText) {
-        return new StaticLayout(workingText, this.getPaint(), this.getWidth() - this.getPaddingLeft() - this.getPaddingRight(), Alignment.ALIGN_NORMAL, this.lineSpacingMultiplier, this.lineAdditionalVerticalPadding, false);
+        return new StaticLayout(workingText, this.getPaint(), this.getWidth()
+                - this.getPaddingLeft() - this.getPaddingRight(), Alignment.ALIGN_NORMAL,
+                this.lineSpacingMultiplier, this.lineAdditionalVerticalPadding, false);
     }
 
     @Override

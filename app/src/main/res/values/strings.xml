@@ -282,6 +282,8 @@
     <string name="pref_video_mute_summary">Set sound to 0 when video starts</string>
     <string name="pref_swipe_to_refresh_summary">Refresh posts and threads with swipe</string>
     <string name="pref_swipe_to_refresh_title">Use swipe-to-refresh</string>
+    <string name="pref_lef_hand_summary">UI will be more left-hand oriented</string>
+    <string name="pref_lef_hand_title">Switch to left-hand</string>
 
     <!-- Errors -->
     <string name="error_send_post">An error has occurred while sending the post.</string>
@@ -338,6 +340,9 @@ If you want to be in read-only, post to /test/.
     <string name="cloudflare_captcha_input_hint">Enter above text</string>
     <string name="pull_to_refresh">REFRESHING</string>
     <string name="hidden_thread_prefix">Hidden thread</string>
+    <string name="thread_list_page_divider_page_number">Page %d</string>
+    <string name="thread_list_page_divider_first_page">Board %s, blah blah …</string>
+    <string name="thread_list_page_divider_last_page">The fin.</string>
 
     <string-array name="catalog_filters">
         <item>Sort by Bump order</item>

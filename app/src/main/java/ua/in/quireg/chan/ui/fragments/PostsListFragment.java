@@ -98,7 +98,8 @@ public class PostsListFragment extends BaseListFragment {
         Bundle extras = getArguments();
 //        mWebsite = Websites.fromName(extras.getString(Constants.EXTRA_WEBSITE));
         mWebsite = Websites.getDefault();
-        mBoardName = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_BOARD_NAME));
+//        mBoardName = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_BOARD_NAME));
+        mBoardName = "/b";
         mThreadNumber = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_THREAD_NUMBER));
         mPostNumber = StringUtils.emptyIfNull(extras.getString(Constants.EXTRA_POST_NUMBER));
         pageSubject = StringUtils.nullIfEmpty(extras.getString(Constants.EXTRA_THREAD_SUBJECT));

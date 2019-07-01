@@ -10,7 +10,7 @@
     <color name="white">#FFFFFF</color>
     <color name="white_transparent_80">#BFFFFFFF</color>
     <color name="grey_trans">#c7c7c7</color>
-    <color name="white_background">#f4f4f4</color>
+    <color name="almost_white_background">#f4f4f4</color>
     <color name="black_background">@android:color/black</color>
     <color name="neutron_background">#212121</color>
     <color name="photon_background">#EEEEEE</color>

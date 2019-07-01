@@ -89,7 +89,9 @@ public class MakabaModelsMapper {
                 model.addAttachment(mapAttachmentModel(file));
             }
         }
-        model.setTimestamp(source.timestamp != 0 ? source.timestamp * 1000 : ThreadPostUtils.parseMoscowTextDate(source.date));
+        model.setTimestamp(source.timestamp != 0
+                ? source.timestamp * 1000
+                : ThreadPostUtils.parseMoscowTextDate(source.date));
         model.setParentThread(source.parent);
 
         return model;

@@ -18,7 +18,7 @@
         android:id="@+id/top_shadowline"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@drawable/list_divider" />
+        android:background="@drawable/shadowline" />
 
     <ua.in.quireg.chan.ui.views.RecyclerViewWithCM
         android:id="@+id/opened_tabs_list"

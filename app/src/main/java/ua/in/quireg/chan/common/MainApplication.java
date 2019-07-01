@@ -2,9 +2,7 @@ package ua.in.quireg.chan.common;
 
 import android.app.Application;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
-import android.widget.Toast;
 
 import com.squareup.leakcanary.LeakCanary;
 
@@ -93,7 +91,7 @@ public class MainApplication extends Application {
             return;
         }
 
-        if(Constants.LOGGING) {
+        if (Constants.LOGGING) {
             LeakCanary.install(this);
             Timber.plant(new Timber.DebugTree());
         } else {
@@ -109,8 +107,8 @@ public class MainApplication extends Application {
         HttpBytesReader httpBytesReader = new HttpBytesReader(httpStreamReader, getResources());
         HttpStringReader httpStringReader = new HttpStringReader(httpBytesReader);
         HttpBitmapReader httpBitmapReader = new HttpBitmapReader(httpBytesReader);
-        JsonHttpReader jsonApiReader = new JsonHttpReader(getResources(), new ExtendedObjectMapper(), httpStreamReader);
-
+        JsonHttpReader jsonApiReader =
+                new JsonHttpReader(getResources(), new ExtendedObjectMapper(), httpStreamReader);
 
         DvachSqlHelper dbHelper = new DvachSqlHelper(this);
         HistoryDataSource historyDataSource = new HistoryDataSource(dbHelper);
@@ -119,13 +117,19 @@ public class MainApplication extends Application {
 
         CacheDirectoryManager cacheManager = new CacheDirectoryManager(getApplicationContext());
         BitmapMemoryCache bitmapMemoryCache = new BitmapMemoryCache();
-        HttpImageManager imageManager = new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager), getResources(), httpBitmapReader);
-        DownloadFileService downloadFileService = new DownloadFileService(this.getResources(), httpStreamReader);
+        HttpImageManager imageManager =
+                new HttpImageManager(bitmapMemoryCache, new FileSystemPersistence(cacheManager),
+                        getResources(), httpBitmapReader);
+        DownloadFileService downloadFileService =
+                new DownloadFileService(getResources(), httpStreamReader);
 
         MakabaUrlBuilder makabaUriBuilder = new MakabaUrlBuilder();
-        MakabaApiReader makabaApiReader = new MakabaApiReader(jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, getResources());
+        MakabaApiReader makabaApiReader = new MakabaApiReader(
+                jsonApiReader, new MakabaModelsMapper(), makabaUriBuilder, getResources());
 
-        ApplicationSettings mSettings = new ApplicationSettings(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+        ApplicationSettings mSettings = new ApplicationSettings(
+                getApplicationContext(),
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
 
         Container container = Factory.getContainer();
         container.register(Resources.class, getResources());
@@ -140,11 +144,13 @@ public class MainApplication extends Application {
         container.register(HttpStringReader.class, httpStringReader);
         container.register(HttpBitmapReader.class, httpBitmapReader);
         container.register(JsonHttpReader.class, jsonApiReader);
-        container.register(PostSender.class, new PostSender(httpClient, getResources(), httpStringReader));
+        container.register(PostSender.class,
+                new PostSender(httpClient, getResources(), httpStringReader));
         container.register(DraftPostsStorage.class, new DraftPostsStorage());
         container.register(OpenTabsManager.class, new OpenTabsManager());
         container.register(CacheDirectoryManager.class, cacheManager);
-        container.register(PagesSerializationService.class, new PagesSerializationService(cacheManager));
+        container.register(PagesSerializationService.class,
+                new PagesSerializationService(cacheManager));
         container.register(BitmapMemoryCache.class, bitmapMemoryCache);
         container.register(HttpImageManager.class, imageManager);
         container.register(BitmapManager.class, new BitmapManager(imageManager));
@@ -158,14 +164,14 @@ public class MainApplication extends Application {
         container.register(MailruCaptchaService.class, new MailruCaptchaService(httpStringReader));
         container.register(DvachCaptchaService.class, new DvachCaptchaService());
 
-
         httpClient.setCookie(mSettings.getCloudflareClearanceCookie());
         httpClient.setCookie(mSettings.getPassCodeCookie());
         httpClient.setCookie(mSettings.getAdultAccessCookie());
     }
 
     protected AppComponent buildAppComponent() {
-        return getBaseComponent().plus(new NetModule(), new DataRepositoryModule(), new WebsiteModule());
+        return getBaseComponent().plus(
+                new NetModule(), new DataRepositoryModule(), new WebsiteModule());
     }
 
     public BaseComponent buildBaseComponent() {
@@ -174,5 +180,4 @@ public class MainApplication extends Application {
                 .navigationModule(new NavigationModule())
                 .build();
     }
-
 }

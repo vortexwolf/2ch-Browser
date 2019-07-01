@@ -68,8 +68,7 @@ public abstract class BaseListFragment extends Fragment implements OnRefreshList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mListView = view.findViewById(R.id.swipe_target);
-
+        mListView = view.findViewById(R.id.list);
         mListView.setNestedScrollingEnabled(true);
 
         mLoadingView = view.findViewById(R.id.loadingView);

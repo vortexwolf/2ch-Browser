@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
+    <TextView
+        android:id="@+id/page_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="6dp"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:backgroundTint="@color/white"
+        android:background="@color/black"
+        tools:text="Page 4, blah blah">
+    </TextView>
+
+</FrameLayout>
+

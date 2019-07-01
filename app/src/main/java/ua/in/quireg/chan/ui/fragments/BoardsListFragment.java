@@ -62,8 +62,8 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.pick_board_view, container, false);
         mListView = view.findViewById(android.R.id.list);
 
@@ -71,14 +71,12 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         mListView.addHeaderView(headerView);
 
         ButterKnife.bind(this, view);
-
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         if ((getActivity()) != null) {
             ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (mActionBar != null) {
@@ -94,18 +92,15 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         if (mBoardsListAdapter == null) {
             mBoardsListAdapter = new BoardsListAdapter(getContext());
         }
-
         mListView.setAdapter(mBoardsListAdapter);
 
         if (savedInstanceState != null) {
-            mListViewPosition = (AppearanceUtils.ListViewPosition) savedInstanceState.getSerializable(Constants.EXTRA_LIST_VIEW_POSITION);
-
+            mListViewPosition = (AppearanceUtils.ListViewPosition)
+                    savedInstanceState.getSerializable(Constants.EXTRA_LIST_VIEW_POSITION);
         }
-
         mListView.setOnItemClickListener((adapterView, v, i, l) -> {
             BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(i);
             mBoardsListPresenter.onBoardClick(boardEntity);
-
         });
 
         registerForContextMenu(mListView);
@@ -114,7 +109,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             String enteredBoard = mPickBoardInput.getText().toString().trim();
             mBoardsListPresenter.onBoardClick(enteredBoard);
         });
-
         mPickBoardInput.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 String enteredBoard = mPickBoardInput.getText().toString().trim();
@@ -123,7 +117,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             }
             return false;
         });
-
     }
 
     @Override
@@ -133,18 +126,22 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(info.position);
 
-        menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0, getString(R.string.cmenu_copy_url));
+        menu.add(Menu.NONE, Constants.CONTEXT_MENU_COPY_URL, 0,
+                getString(R.string.cmenu_copy_url));
 
         if (!boardEntity.isFavorite) {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES, 0, getString(R.string.cmenu_add_to_favorites));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_ADD_FAVORITES,
+                    0, getString(R.string.cmenu_add_to_favorites));
         } else {
-            menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES, 0, getString(R.string.cmenu_remove_from_favorites));
+            menu.add(Menu.NONE, Constants.CONTEXT_MENU_REMOVE_FAVORITES,
+                    0, getString(R.string.cmenu_remove_from_favorites));
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo menuInfo =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
         BoardEntity boardEntity = (BoardEntity) mListView.getItemAtPosition(menuInfo.position);
 
@@ -155,11 +152,11 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
         switch (item.getItemId()) {
             case Constants.CONTEXT_MENU_COPY_URL: {
-                String uri = Websites.getDefault().getUrlBuilder().getPageUrlHtml(boardEntity.id, 0);
+                String uri = Websites.getDefault().getUrlBuilder()
+                        .getPageUrlHtml(boardEntity.id, 0);
 
                 CompatibilityUtils.copyText(getActivity(), uri, uri);
                 Toast.makeText(getContext(), uri, Toast.LENGTH_SHORT).show();
-
                 return true;
             }
             case Constants.CONTEXT_MENU_ADD_FAVORITES: {
@@ -200,7 +197,6 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
 
     @Override
     public void setBoards(List<BoardEntity> boardEntities) {
-
         if (mBoardsListAdapter == null) {
             Timber.e("No adapter registered");
             return;
@@ -215,13 +211,11 @@ public class BoardsListFragment extends MvpAppCompatFragment implements BoardsLi
             if(boardEntity.isFavorite) {
                 mBoardsListAdapter.addItemToFavoritesSection(boardEntity);
             }
-
             if(!boardEntity.isVisible) {
                 continue;
             }
-
             // add group header
-            if(boardEntity.category != null && (currentCategory == null || !boardEntity.category.equals(currentCategory))) {
+            if(boardEntity.category != null && (!boardEntity.category.equals(currentCategory))) {
                 currentCategory = boardEntity.category;
                 mBoardsListAdapter.add(new SectionEntity(currentCategory));
             }

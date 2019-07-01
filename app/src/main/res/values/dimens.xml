@@ -2,7 +2,7 @@
 <resources>
     <dimen name="image_gallery_top_panel_size">44dp</dimen>
     <dimen name="image_gallery_bottom_panel_size">44dp</dimen>
-    <dimen name="toolbar_height">40dp</dimen>
+    <dimen name="toolbar_height">39dp</dimen>
     <dimen name="toolbar_height_with_divider">41dp</dimen>
     <dimen name="tab_layout_size">40dp</dimen>
     <dimen name="navigation_button_size">40dp</dimen>

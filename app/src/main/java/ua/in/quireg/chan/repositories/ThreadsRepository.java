@@ -3,6 +3,7 @@ package ua.in.quireg.chan.repositories;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import ua.in.quireg.chan.models.domain.ThreadModel;
 
 /**
@@ -12,8 +13,8 @@ import ua.in.quireg.chan.models.domain.ThreadModel;
 
 public interface ThreadsRepository {
 
-    Observable<List<ThreadModel>> getLocalThreads(String board);
+    Single<List<ThreadModel>> getLocalThreads(String board);
 
-    Observable<List<ThreadModel>> getRemoteThreads(String board, int page);
+    Single<List<ThreadModel>> getRemoteThreads(String board, int page);
 
 }
