@@ -95,17 +95,17 @@ public class MakabaModelsMapper {
     public static BoardModel mapBoardModel(MakabaBoardInfo source){
         BoardModel model = new BoardModel();
 
-        model.setBump_limit(source.bump_limit);
+        model.setBump_limit(String.valueOf(source.bump_limit));
         model.setCategory(source.category);
         model.setDefault_name(source.default_name);
-        model.setEnable_likes(source.enable_likes);
-        model.setEnable_posting(source.enable_posting);
-        model.setEnable_thread_tags(source.enable_thread_tags);
+        model.setEnable_likes(source.enable_likes ? 1 : 0);
+        model.setEnable_posting(source.enable_posting ? 1 : 0);
+        model.setEnable_thread_tags(source.enable_thread_tags ? 1 : 0);
         model.setId(source.id);
         model.setName(source.name);
         model.setPages(source.pages);
-        model.setSage(source.sage);
-        model.setTripcodes(source.tripcodes);
+        model.setSage(source.sage ? 1 : 0);
+        model.setTripcodes(source.tripcodes ? 1 : 0);
         model.setIcons(source.icons);
 
         return model;
