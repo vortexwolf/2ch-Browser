@@ -47,9 +47,9 @@ public class ParseBoardsTask extends AsyncTask<JSONObject, Void, ArrayList<Board
 
             JsonNode result = mapper.readValue(jsonObjects[0].toString(), JsonNode.class);
 
-            //Parse each category as single JsonNode
+            //Parse boards array
             Iterator iterator = result.getElements();
-            while (iterator.hasNext()){
+            if (iterator.hasNext()){
                 JsonNode node = (JsonNode) iterator.next();
                 MakabaBoardInfo[] data = mapper.convertValue(node, MakabaBoardInfo[].class);
                 BoardModel[] tempBoardModels = MakabaModelsMapper.mapBoardModels(data);
